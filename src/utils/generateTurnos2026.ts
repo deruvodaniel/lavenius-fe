@@ -1,6 +1,18 @@
 // Utility to generate appointments for 2026
-export function generateTurnos2026() {
-  const turnos = [];
+
+interface Turno {
+  id: number;
+  pacienteId: number;
+  fecha: string;
+  hora: string;
+  motivo: string;
+  modalidad: 'remoto' | 'presencial';
+  estado: 'pendiente' | 'confirmado' | 'completado';
+  monto: number;
+}
+
+export function generateTurnos2026(): Turno[] {
+  const turnos: Turno[] = [];
   let turnoId = 1;
   
   // Patient IDs 1-6

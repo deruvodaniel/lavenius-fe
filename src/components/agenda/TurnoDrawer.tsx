@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X, Calendar, Clock, User, Video, MapPin, AlertTriangle } from 'lucide-react';
-import { Turno, Paciente } from '../data/mockData';
+import { Turno, Paciente } from '../../data/mockData';
 
 interface TurnoDrawerProps {
   isOpen: boolean;
@@ -61,9 +61,9 @@ export function TurnoDrawer({ isOpen, onClose, turno, pacientes, pacienteId, onS
       />
 
       {/* Drawer */}
-      <div className="relative ml-auto h-full w-full max-w-lg bg-white shadow-2xl overflow-y-auto">
+      <div className="relative ml-auto h-full w-full md:max-w-lg bg-white shadow-2xl overflow-y-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-6">
+        <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 md:p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-white text-xl">
               {isEditing ? 'Editar Turno' : 'Nuevo Turno'}
@@ -78,7 +78,7 @@ export function TurnoDrawer({ isOpen, onClose, turno, pacientes, pacienteId, onS
         </div>
 
         {/* Form */}
-        <div className="p-6 space-y-6">
+        <div className="p-4 md:p-6 space-y-4 md:space-y-6">
           {/* Paciente */}
           <div>
             <label className="block text-gray-700 mb-2 flex items-center gap-2">
@@ -202,7 +202,7 @@ export function TurnoDrawer({ isOpen, onClose, turno, pacientes, pacienteId, onS
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
               onClick={handleSave}
               className="flex-1 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors"

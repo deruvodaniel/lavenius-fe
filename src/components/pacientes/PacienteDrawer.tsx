@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X, User, Phone, Mail, Heart, Video, MapPin, Calendar } from 'lucide-react';
-import { Paciente } from '../data/mockData';
+import { Paciente } from '../../data/mockData';
 
 interface PacienteDrawerProps {
   isOpen: boolean;
@@ -68,9 +68,9 @@ export function PacienteDrawer({ isOpen, onClose, onSave }: PacienteDrawerProps)
       />
 
       {/* Drawer */}
-      <div className="relative ml-auto h-full w-full max-w-2xl bg-white shadow-2xl overflow-y-auto">
+      <div className="relative ml-auto h-full w-full md:max-w-2xl bg-white shadow-2xl overflow-y-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-6">
+        <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 md:p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-white text-xl">Nuevo Paciente</h2>
             <button
@@ -83,7 +83,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave }: PacienteDrawerProps)
         </div>
 
         {/* Form */}
-        <div className="p-6 space-y-6">
+        <div className="p-4 md:p-6 space-y-4 md:space-y-6">
           <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
             <p className="text-indigo-800 text-sm">
               Todos los campos son opcionales. Completa solo la información que tengas disponible.
@@ -173,7 +173,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave }: PacienteDrawerProps)
             <div className="space-y-4">
               <div>
                 <label className="block text-gray-700 mb-2">Modalidad</label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, modalidad: 'presencial' })}
@@ -272,7 +272,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave }: PacienteDrawerProps)
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
               onClick={onClose}
               className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"

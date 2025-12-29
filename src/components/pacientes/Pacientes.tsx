@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Video, MapPin, Calendar, Filter, Plus } from 'lucide-react';
-import { pacientes as initialPacientes, allTurnos as turnos, Paciente } from '../data/mockData';
-import { FichaClinica } from './FichaClinica';
+import { pacientes as initialPacientes, allTurnos as turnos, Paciente } from '../../data/mockData';
+import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
 
 export function Pacientes() {
@@ -27,9 +27,10 @@ export function Pacientes() {
   };
 
   const handleSavePaciente = (pacienteData: Partial<Paciente>) => {
+    const newId = Math.max(...pacientes.map(p => p.id)) + 1;
     const newPaciente: Paciente = {
-      id: Math.max(...pacientes.map(p => p.id)) + 1,
       ...pacienteData as Paciente,
+      id: newId,
     };
     setPacientes(prevPacientes => [...prevPacientes, newPaciente]);
   };
@@ -111,8 +112,8 @@ export function Pacientes() {
 
   // Otherwise, show the list of patients
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 md:p-6 lg:p-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div className="flex items-center gap-2 text-gray-600">
           <h1 className="text-gray-900">Pacientes</h1>
           <Filter className="w-4 h-4 ml-4" />
@@ -120,7 +121,7 @@ export function Pacientes() {
         </div>
         <button
           onClick={handleNuevoPaciente}
-          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+          className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Nuevo Paciente

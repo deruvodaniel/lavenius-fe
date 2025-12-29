@@ -1,7 +1,7 @@
 import { ArrowLeft, Mail, Phone, Heart, Calendar, FileText, User, Clock, Flag, Edit2, Save, X, Plus, Trash2 } from 'lucide-react';
-import { pacientes, allTurnos as turnos, sesiones, Turno } from '../data/mockData';
+import { pacientes, allTurnos as turnos, sesiones, Turno } from '../../data/mockData';
 import { useState } from 'react';
-import { TurnoDrawer } from './TurnoDrawer';
+import { TurnoDrawer } from '../agenda';
 
 interface FichaClinicaProps {
   pacienteId: number;
@@ -83,6 +83,8 @@ export function FichaClinica({ pacienteId, onBack }: FichaClinicaProps) {
       id: Math.max(...localSesiones.map(s => s.id), 0) + 1,
       pacienteId: pacienteId,
       fecha: newNote.fecha,
+      duracion: 60,
+      tipo: 'Terapia Individual',
       notas: newNote.notas,
     };
 
@@ -133,7 +135,7 @@ export function FichaClinica({ pacienteId, onBack }: FichaClinicaProps) {
     .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
       {/* Header with Back Button */}
       <button
         onClick={onBack}
@@ -144,16 +146,16 @@ export function FichaClinica({ pacienteId, onBack }: FichaClinicaProps) {
       </button>
 
       {/* Patient Header */}
-      <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white rounded-lg p-8 mb-6">
-        <div className="flex items-center gap-6">
-          <div className="w-24 h-24 bg-indigo-600 rounded-full flex items-center justify-center">
-            <span className="text-white text-3xl">
+      <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white rounded-lg p-4 md:p-6 lg:p-8 mb-6">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+            <span className="text-white text-xl sm:text-2xl md:text-3xl">
               {paciente.nombre.split(' ').map((n) => n[0]).join('')}
             </span>
           </div>
-          <div className="flex-1">
-            <h1 className="text-white text-3xl mb-2">{paciente.nombre}</h1>
-            <div className="flex items-center gap-6 text-indigo-200">
+          <div className="flex-1 text-center sm:text-left">
+            <h1 className="text-white text-2xl md:text-3xl mb-2">{paciente.nombre}</h1>
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-indigo-200">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4" />
                 <span>{paciente.edad} años</span>
@@ -177,7 +179,7 @@ export function FichaClinica({ pacienteId, onBack }: FichaClinicaProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Contact & Basic Info */}
         <div className="space-y-6">
           {/* Contact Information */}
@@ -461,7 +463,7 @@ export function FichaClinica({ pacienteId, onBack }: FichaClinicaProps) {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => setIsTurnoDrawerOpen(true)}
               className="flex-1 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors"

@@ -37,6 +37,15 @@ export interface Cobro {
   estado: "pendiente" | "pagado";
 }
 
+export interface Sesion {
+  id: number;
+  pacienteId: number;
+  fecha: string;
+  notas: string;
+  duracion: number;
+  tipo: string;
+}
+
 export const pacientes: Paciente[] = [
   {
     id: 1,
@@ -637,6 +646,8 @@ export const sesiones: Sesion[] = [
     id: 1,
     pacienteId: 1,
     fecha: "2025-11-20",
+    duracion: 60,
+    tipo: "Terapia Individual",
     notas:
       "La paciente llegó con mejor disposición que en sesiones anteriores. Reporta haber practicado técnicas de respiración diafragmática durante episodios de ansiedad con buenos resultados. Trabajamos en identificación de pensamientos automáticos negativos y reestructuración cognitiva. Se observa mayor consciencia sobre sus patrones de pensamiento. Tarea asignada: registro diario de situaciones ansiógenas y respuestas adaptativas.",
   },
@@ -644,6 +655,8 @@ export const sesiones: Sesion[] = [
     id: 2,
     pacienteId: 1,
     fecha: "2025-11-13",
+    duracion: 60,
+    tipo: "Terapia Individual",
     notas:
       "Sesión enfocada en técnicas de relajación progresiva. La paciente mostró dificultades iniciales para concentrarse pero logró completar el ejercicio completo. Discutimos estrategias de afrontamiento ante situaciones laborales estresantes. Se trabajó en establecer límites saludables en el ámbito profesional.",
   },
@@ -651,6 +664,8 @@ export const sesiones: Sesion[] = [
     id: 3,
     pacienteId: 2,
     fecha: "2025-11-22",
+    duracion: 60,
+    tipo: "Terapia Individual",
     notas:
       "El paciente reporta mejoría en la organización de sus tareas laborales. Ha implementado pausas regulares durante la jornada de trabajo como acordamos. Exploramos creencias sobre perfeccionismo y su impacto en el bienestar. Se evidencia progreso en la capacidad de delegar responsabilidades. Continuamos con ejercicios de mindfulness para manejo del estrés.",
   },
@@ -658,6 +673,8 @@ export const sesiones: Sesion[] = [
     id: 4,
     pacienteId: 2,
     fecha: "2025-11-08",
+    duracion: 60,
+    tipo: "Terapia Individual",
     notas:
       'Sesión dedicada a explorar el origen del burnout y patrones de sobrecarga laboral. El paciente identificó varios factores contribuyentes incluyendo dificultad para decir "no" y expectativas poco realistas sobre su rendimiento. Trabajamos en estrategias de establecimiento de límites profesionales.',
   },
@@ -665,6 +682,8 @@ export const sesiones: Sesion[] = [
     id: 5,
     pacienteId: 3,
     fecha: "2025-11-15",
+    duracion: 60,
+    tipo: "Terapia Individual",
     notas:
       "La paciente muestra avances significativos en su estado de ánimo. Ha retomado actividades que antes disfrutaba, incluyendo ejercicio físico tres veces por semana. Procesamos emociones relacionadas con eventos pasados que contribuyeron al episodio depresivo. Se observa mejor higiene del sueño y rutina diaria más estructurada.",
   },
@@ -672,6 +691,8 @@ export const sesiones: Sesion[] = [
     id: 6,
     pacienteId: 3,
     fecha: "2025-11-01",
+    duracion: 60,
+    tipo: "Terapia Individual",
     notas:
       "Continuamos trabajando en activación conductual. La paciente completó el registro de actividades placenteras y reporta leve mejoría en energía matutina. Exploramos pensamientos relacionados con autocrítica excesiva. Se acordó incrementar gradualmente actividades sociales.",
   },
@@ -679,6 +700,8 @@ export const sesiones: Sesion[] = [
     id: 7,
     pacienteId: 4,
     fecha: "2025-11-18",
+    duracion: 60,
+    tipo: "Terapia Individual",
     notas:
       "El paciente continúa procesando el duelo por la pérdida reciente. Expresa emociones con mayor facilidad que en sesiones anteriores. Trabajamos en la aceptación del proceso de duelo y sus etapas. Se observa mejor capacidad para hablar sobre recuerdos positivos sin evitación emocional. Discutimos la importancia de mantener rutinas y conexiones sociales.",
   },
@@ -686,6 +709,8 @@ export const sesiones: Sesion[] = [
     id: 8,
     pacienteId: 4,
     fecha: "2025-11-04",
+    duracion: 60,
+    tipo: "Terapia Individual",
     notas:
       "Sesión centrada en validación emocional y psicoeducación sobre el proceso de duelo. El paciente presenta dificultades para concentrarse en actividades cotidianas. Exploramos mecanismos de afrontamiento saludables versus evitación. Se estableció plan para mantener estructura diaria básica.",
   },
@@ -693,6 +718,8 @@ export const sesiones: Sesion[] = [
     id: 9,
     pacienteId: 5,
     fecha: "2025-11-25",
+    duracion: 60,
+    tipo: "Terapia Individual",
     notas:
       "Excelente progreso en el manejo de ataques de pánico. La paciente no ha experimentado episodios completos en las últimas dos semanas. Ha estado practicando ejercicios de exposición gradual a situaciones previamente evitadas con éxito. Reporta mayor confianza en su capacidad de manejar la ansiedad anticipatoria. Continuamos reforzando técnicas de grounding y respiración.",
   },
@@ -700,6 +727,8 @@ export const sesiones: Sesion[] = [
     id: 10,
     pacienteId: 5,
     fecha: "2025-11-11",
+    duracion: 60,
+    tipo: "Terapia Individual",
     notas:
       "Trabajamos en jerarquía de exposición a situaciones temidas. La paciente completó exitosamente dos niveles básicos de la jerarquía durante la semana. Procesamos la experiencia de enfrentar miedos y celebramos los logros. Se observa disminución gradual en conductas de evitación.",
   },
@@ -707,6 +736,8 @@ export const sesiones: Sesion[] = [
     id: 11,
     pacienteId: 6,
     fecha: "2025-11-10",
+    duracion: 60,
+    tipo: "Terapia Individual",
     notas:
       "El paciente muestra mayor consciencia sobre patrones de pensamiento rígido característicos del trastorno. Hemos comenzado a trabajar en flexibilidad cognitiva mediante ejercicios prácticos. Discutimos la relación entre perfeccionismo y malestar emocional. Se nota resistencia al cambio, lo cual es esperado. Avanzamos lentamente pero de manera consistente.",
   },
@@ -714,6 +745,8 @@ export const sesiones: Sesion[] = [
     id: 12,
     pacienteId: 6,
     fecha: "2025-10-27",
+    duracion: 60,
+    tipo: "Terapia Individual",
     notas:
       "Sesión dedicada a explorar esquemas tempranos desadaptativos. El paciente identificó patrones de autoexigencia excesiva originados en la infancia. Trabajamos en reconocer cuando estos esquemas se activan en situaciones actuales. Se asignaron tareas de autoobservación de patrones de comportamiento obsesivo-compulsivos.",
   },
