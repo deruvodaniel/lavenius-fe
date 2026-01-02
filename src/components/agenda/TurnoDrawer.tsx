@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Calendar, Clock, User, Video, MapPin, AlertTriangle } from 'lucide-react';
 import { Turno, Paciente } from '../../data/mockData';
+import { useAuthStore } from '@/lib/stores';
 import type { CreateAppointmentDto, Appointment, SessionType, AppointmentStatus } from '@/lib/types/api.types';
 
 interface TurnoDrawerProps {
@@ -15,6 +16,8 @@ interface TurnoDrawerProps {
 }
 
 export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pacienteId, onSave, onDelete }: TurnoDrawerProps) {
+  const user = useAuthStore(state => state.user);
+  
   const [formData, setFormData] = useState({
     pacienteId: '',
     fecha: '',
@@ -76,11 +79,17 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pa
   };
 
   const confirmSave = () => {
+    if (!user?.id) {
+      console.error('No user ID available');
+      return;
+    }
+
     // Combine fecha and hora into ISO dateTime
     const dateTimeStr = `${formData.fecha}T${formData.hora}:00`;
     const dateTime = new Date(dateTimeStr);
 
     const appointmentDto: CreateAppointmentDto = {
+      therapistId: user.id,
       patientId: formData.pacienteId,
       dateTime: dateTime.toISOString(),
       description: formData.motivo || undefined,
