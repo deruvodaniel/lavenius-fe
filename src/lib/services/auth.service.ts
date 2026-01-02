@@ -17,6 +17,9 @@ export class AuthService {
    * Register a new therapist user
    */
   async register(data: RegisterDto): Promise<AuthResponse> {
+    // Clear any existing auth data before register
+    apiClient.clearAuth();
+    
     const response = await apiClient.post<AuthResponse, RegisterDto>(
       `${this.basePath}/register`,
       data
@@ -32,6 +35,9 @@ export class AuthService {
    * Login with credentials and passphrase
    */
   async login(data: LoginDto): Promise<AuthResponse> {
+    // Clear any existing auth data before login
+    apiClient.clearAuth();
+    
     const response = await apiClient.post<AuthResponse, LoginDto>(
       `${this.basePath}/login`,
       data
