@@ -4,15 +4,13 @@ import { Pacientes } from '../pacientes';
 import { Cobros } from '../cobros';
 import { Configuracion } from '../config';
 import { AppLayout, Sidebar } from '../layout';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 type View = 'agenda' | 'pacientes' | 'cobros' | 'configuracion';
 
-interface DashboardProps {
-  onLogout?: () => void;
-}
-
-export function Dashboard({ onLogout }: DashboardProps = {}) {
+export function Dashboard() {
   const [currentView, setCurrentView] = useState<View>('agenda');
+  const { logout } = useAuth();
 
   const handleViewChange = (view: View) => {
     setCurrentView(view);
@@ -25,7 +23,7 @@ export function Dashboard({ onLogout }: DashboardProps = {}) {
         <Sidebar
           currentView={currentView}
           onViewChange={handleViewChange}
-          onLogout={onLogout}
+          onLogout={logout}
           onNavigate={onNavigate}
         />
       )}

@@ -1,4 +1,5 @@
 import { Calendar, Users, DollarSign, LogOut, Settings } from 'lucide-react';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 type View = 'agenda' | 'pacientes' | 'cobros' | 'configuracion';
 
@@ -11,6 +12,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentView, onViewChange, onLogout, showHeader = true, onNavigate }: SidebarProps) {
+  const { user } = useAuth();
   const handleNavClick = (view: View) => {
     onViewChange(view);
     onNavigate?.(); // Cerrar drawer en mobile
@@ -68,15 +70,21 @@ export function Sidebar({ currentView, onViewChange, onLogout, showHeader = true
       
       {/* User Profile & Logout */}
       <div className="p-6 border-t border-indigo-800">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-indigo-700 rounded-full flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-sm font-semibold">LP</span>
+        {user && (
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-indigo-700 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-sm font-semibold">
+                {user.firstName.charAt(0).toUpperCase()}{user.lastName.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-white text-sm font-medium truncate">
+                {user.firstName} {user.lastName}
+              </p>
+              <p className="text-indigo-300 text-xs truncate">{user.email}</p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-white text-sm font-medium truncate">Dra. Laura Pereyra</p>
-            <p className="text-indigo-300 text-xs truncate">Psicóloga</p>
-          </div>
-        </div>
+        )}
         <button
           onClick={onLogout}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white transition-colors"
