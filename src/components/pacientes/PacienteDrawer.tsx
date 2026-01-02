@@ -1,58 +1,83 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, User, Phone, Mail, Heart, Video, MapPin, Calendar } from 'lucide-react';
-import { Paciente } from '../../data/mockData';
+import type { CreatePatientDto, Patient } from '../../lib/types/api.types';
 
 interface PacienteDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (paciente: Partial<Paciente>) => void;
+  onSave: (patient: CreatePatientDto) => void;
+  patient?: Patient | null;
 }
 
-export function PacienteDrawer({ isOpen, onClose, onSave }: PacienteDrawerProps) {
+export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDrawerProps) {
   const [formData, setFormData] = useState({
     nombre: '',
-    edad: 30,
+    apellido: '',
+    edad: '',
     telefono: '',
     email: '',
     obraSocial: '',
-    modalidad: 'presencial' as 'presencial' | 'remoto' | 'mixto',
-    frecuencia: 'semanal' as 'semanal' | 'quincenal' | 'mensual',
+    modalidad: 'INDIVIDUAL' as const,
+    frecuencia: '',
     diagnostico: '',
     tratamientoActual: '',
     observaciones: '',
   });
 
+  // Load patient data when editing
+  useEffect(() => {
+    if (patient) {
+      setFormData({
+        nombre: patient.firstName || '',
+        apellido: patient.lastName || '',
+        edad: patient.age?.toString() || '',
+        telefono: patient.phone || '',
+        email: patient.email || '',
+        obraSocial: patient.healthInsurance || '',
+        modalidad: patient.sessionType || 'INDIVIDUAL',
+        frecuencia: patient.frequency || '',
+        diagnostico: patient.diagnosis || '',
+        tratamientoActual: patient.currentTreatment || '',
+        observaciones: patient.observations || '',
+      });
+    }
+  }, [patient]);
+
   if (!isOpen) return null;
 
   const handleSave = () => {
-    const newPaciente: Partial<Paciente> = {
-      nombre: formData.nombre,
-      edad: formData.edad,
-      telefono: formData.telefono,
-      email: formData.email,
-      obraSocial: formData.obraSocial,
-      modalidad: formData.modalidad,
-      frecuencia: formData.frecuencia,
-      historiaClinica: {
-        diagnostico: formData.diagnostico,
-        tratamientoActual: formData.tratamientoActual,
-        observaciones: formData.observaciones,
-        ultimaConsulta: new Date().toISOString().split('T')[0],
-      },
+    // Split nombre into firstName and lastName
+    const nameParts = formData.nombre.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || formData.apellido;
+
+    const patientDto: CreatePatientDto = {
+      firstName,
+      lastName,
+      email: formData.email || undefined,
+      phone: formData.telefono || undefined,
+      age: formData.edad ? Number(formData.edad) : undefined,
+      healthInsurance: formData.obraSocial || undefined,
+      sessionType: formData.modalidad,
+      frequency: formData.frecuencia || undefined,
+      diagnosis: formData.diagnostico || undefined,
+      currentTreatment: formData.tratamientoActual || undefined,
+      observations: formData.observaciones || undefined,
     };
 
-    onSave(newPaciente);
+    onSave(patientDto);
     onClose();
     
     // Reset form
     setFormData({
       nombre: '',
-      edad: 30,
+      apellido: '',
+      edad: '',
       telefono: '',
       email: '',
       obraSocial: '',
-      modalidad: 'presencial',
-      frecuencia: 'semanal',
+      modalidad: 'INDIVIDUAL',
+      frecuencia: '',
       diagnostico: '',
       tratamientoActual: '',
       observaciones: '',
@@ -72,7 +97,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave }: PacienteDrawerProps)
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 md:p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-white text-xl">Nuevo Paciente</h2>
+            <h2 className="text-white text-xl">{patient ? 'Editar Paciente' : 'Nuevo Paciente'}</h2>
             <button
               onClick={onClose}
               className="text-indigo-200 hover:text-white transition-colors"
@@ -99,12 +124,23 @@ export function PacienteDrawer({ isOpen, onClose, onSave }: PacienteDrawerProps)
 
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 mb-2">Nombre completo</label>
+                <label className="block text-gray-700 mb-2">Nombre</label>
                 <input
                   type="text"
                   value={formData.nombre}
                   onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                  placeholder="Ej: Juan Pérez"
+                  placeholder="Ej: Juan"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 mb-2">Apellido</label>
+                <input
+                  type="text"
+                  value={formData.apellido}
+                  onChange={(e) => setFormData({ ...formData, apellido: e.target.value })}
+                  placeholder="Ej: Pérez"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
@@ -114,7 +150,8 @@ export function PacienteDrawer({ isOpen, onClose, onSave }: PacienteDrawerProps)
                 <input
                   type="number"
                   value={formData.edad}
-                  onChange={(e) => setFormData({ ...formData, edad: Number(e.target.value) })}
+                  onChange={(e) => setFormData({ ...formData, edad: e.target.value })}
+                  placeholder="Ej: 30"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
@@ -172,61 +209,68 @@ export function PacienteDrawer({ isOpen, onClose, onSave }: PacienteDrawerProps)
 
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 mb-2">Modalidad</label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <label className="block text-gray-700 mb-2">Tipo de Sesión</label>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, modalidad: 'presencial' })}
+                    onClick={() => setFormData({ ...formData, modalidad: 'INDIVIDUAL' })}
                     className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
-                      formData.modalidad === 'presencial'
+                      formData.modalidad === 'INDIVIDUAL'
                         ? 'border-purple-600 bg-purple-50 text-purple-700'
                         : 'border-gray-300 text-gray-700 hover:border-purple-300'
                     }`}
                   >
-                    <MapPin className="w-5 h-5" />
-                    <span className="text-sm">Presencial</span>
+                    <User className="w-5 h-5" />
+                    <span className="text-sm">Individual</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, modalidad: 'remoto' })}
+                    onClick={() => setFormData({ ...formData, modalidad: 'COUPLE' })}
                     className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
-                      formData.modalidad === 'remoto'
+                      formData.modalidad === 'COUPLE'
                         ? 'border-blue-600 bg-blue-50 text-blue-700'
                         : 'border-gray-300 text-gray-700 hover:border-blue-300'
                     }`}
                   >
-                    <Video className="w-5 h-5" />
-                    <span className="text-sm">Remoto</span>
+                    <Heart className="w-5 h-5" />
+                    <span className="text-sm">Pareja</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, modalidad: 'mixto' })}
+                    onClick={() => setFormData({ ...formData, modalidad: 'FAMILY' })}
                     className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
-                      formData.modalidad === 'mixto'
+                      formData.modalidad === 'FAMILY'
                         ? 'border-teal-600 bg-teal-50 text-teal-700'
                         : 'border-gray-300 text-gray-700 hover:border-teal-300'
                     }`}
                   >
-                    <div className="flex gap-1">
-                      <MapPin className="w-4 h-4" />
-                      <Video className="w-4 h-4" />
-                    </div>
-                    <span className="text-sm">Mixto</span>
+                    <MapPin className="w-5 h-5" />
+                    <span className="text-sm">Familia</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, modalidad: 'GROUP' })}
+                    className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
+                      formData.modalidad === 'GROUP'
+                        ? 'border-amber-600 bg-amber-50 text-amber-700'
+                        : 'border-gray-300 text-gray-700 hover:border-amber-300'
+                    }`}
+                  >
+                    <Video className="w-5 h-5" />
+                    <span className="text-sm">Grupal</span>
                   </button>
                 </div>
               </div>
 
               <div>
                 <label className="block text-gray-700 mb-2">Frecuencia</label>
-                <select
+                <input
+                  type="text"
                   value={formData.frecuencia}
-                  onChange={(e) => setFormData({ ...formData, frecuencia: e.target.value as any })}
+                  onChange={(e) => setFormData({ ...formData, frecuencia: e.target.value })}
+                  placeholder="Ej: semanal, quincenal, mensual"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                  <option value="semanal">Semanal</option>
-                  <option value="quincenal">Quincenal</option>
-                  <option value="mensual">Mensual</option>
-                </select>
+                />
               </div>
             </div>
           </div>
@@ -284,7 +328,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave }: PacienteDrawerProps)
               className="flex-1 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors"
               disabled={!formData.nombre}
             >
-              Crear Paciente
+              {patient ? 'Actualizar' : 'Crear Paciente'}
             </button>
           </div>
         </div>

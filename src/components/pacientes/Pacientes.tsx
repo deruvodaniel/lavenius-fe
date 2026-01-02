@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Video, MapPin, Calendar, Filter, Plus } from 'lucide-react';
+import { Video, MapPin, Calendar, Filter, Plus, Edit2, Trash2 } from 'lucide-react';
 import { Paciente } from '../../data/mockData';
 import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
 import { usePatients, useAppointments } from '@/lib/hooks';
+import type { CreatePatientDto } from '@/lib/types/api.types';
 
 export function Pacientes() {
-  const { patients, isLoading, fetchPatients } = usePatients();
+  const { patients, isLoading, fetchPatients, createPatient, updatePatient, deletePatient } = usePatients();
   const { appointments, fetchAppointments } = useAppointments();
   
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
@@ -14,6 +15,7 @@ export function Pacientes() {
   const [frecuenciaFilter, setFrecuenciaFilter] = useState<'todas' | 'semanal' | 'quincenal' | 'mensual'>('todas');
   const [soloTurnosEstaSemana, setSoloTurnosEstaSemana] = useState(false);
   const [pacienteDrawerOpen, setPacienteDrawerOpen] = useState(false);
+  const [editingPatient, setEditingPatient] = useState<typeof patients[0] | null>(null);
 
   // Fetch data on mount
   useEffect(() => {
@@ -36,10 +38,38 @@ export function Pacientes() {
     setPacienteDrawerOpen(true);
   };
 
-  const handleSavePaciente = async (pacienteData: Partial<Paciente>) => {
-    // TODO: Integrate with createPatient from usePatients hook
-    // await createPatient(pacienteData);
-    console.log('Create patient:', pacienteData);
+  const handleSavePaciente = async (patientData: CreatePatientDto) => {
+    try {
+      if (editingPatient) {
+        // Update existing patient
+        await updatePatient(editingPatient.id, patientData);
+      } else {
+        // Create new patient
+        await createPatient(patientData);
+      }
+      setPacienteDrawerOpen(false);
+      setEditingPatient(null);
+      // Refresh list
+      await fetchPatients();
+    } catch (error) {
+      console.error('Error saving patient:', error);
+      // TODO: Show error notification to user
+    }
+  };
+
+  const handleDeletePaciente = async (patientId: string, patientName: string) => {
+    if (!confirm(`¿Estás seguro de que deseas eliminar al paciente ${patientName}? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    try {
+      await deletePatient(patientId);
+      // Refresh list
+      await fetchPatients();
+    } catch (error) {
+      console.error('Error deleting patient:', error);
+      // TODO: Show error notification to user
+    }
   };
 
   // Map API data to component format
@@ -214,15 +244,18 @@ export function Pacientes() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredPacientes.map((paciente) => {
           const proximoTurno = getProximoTurno(paciente.id);
+          const patient = patients.find(p => parseInt(p.id) === paciente.id);
 
           return (
             <div
               key={paciente.id}
-              onClick={() => setSelectedPatientId(paciente.id)}
-              className="bg-white rounded-lg shadow-sm p-6 hover:shadow-lg transition-all border border-gray-200 cursor-pointer hover:border-indigo-300"
+              className="bg-white rounded-lg shadow-sm p-6 hover:shadow-lg transition-all border border-gray-200"
             >
               <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
+                <div 
+                  className="flex items-center gap-3 cursor-pointer flex-1"
+                  onClick={() => setSelectedPatientId(paciente.id)}
+                >
                   <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
                     <span className="text-indigo-600">
                       {paciente.nombre.split(' ').map((n) => n[0]).join('')}
@@ -232,6 +265,33 @@ export function Pacientes() {
                     <h3 className="text-gray-900">{paciente.nombre}</h3>
                     <p className="text-gray-500 text-sm">{paciente.edad} años</p>
                   </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (patient) {
+                        setEditingPatient(patient);
+                        setPacienteDrawerOpen(true);
+                      }
+                    }}
+                    className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                    title="Editar paciente"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (patient) {
+                        handleDeletePaciente(patient.id, paciente.nombre);
+                      }
+                    }}
+                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Eliminar paciente"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
 
@@ -301,8 +361,12 @@ export function Pacientes() {
       {/* Paciente Drawer */}
       <PacienteDrawer
         isOpen={pacienteDrawerOpen}
-        onClose={() => setPacienteDrawerOpen(false)}
+        onClose={() => {
+          setPacienteDrawerOpen(false);
+          setEditingPatient(null);
+        }}
         onSave={handleSavePaciente}
+        patient={editingPatient}
       />
     </div>
   );
