@@ -124,7 +124,7 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pa
         <div className="p-4 md:p-6 space-y-4 md:space-y-6">
           {/* Paciente */}
           <div>
-            <label className="block text-gray-700 mb-2 flex items-center gap-2">
+            <label className="flex items-center gap-2 text-gray-700 mb-2">
               <User className="w-4 h-4" />
               Paciente
             </label>
@@ -144,7 +144,7 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pa
 
           {/* Fecha */}
           <div>
-            <label className="block text-gray-700 mb-2 flex items-center gap-2">
+            <label className="flex items-center gap-2 text-gray-700 mb-2">
               <Calendar className="w-4 h-4" />
               Fecha
             </label>
@@ -158,7 +158,7 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pa
 
           {/* Hora */}
           <div>
-            <label className="block text-gray-700 mb-2 flex items-center gap-2">
+            <label className="flex items-center gap-2 text-gray-700 mb-2">
               <Clock className="w-4 h-4" />
               Hora
             </label>

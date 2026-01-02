@@ -157,7 +157,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 flex items-center gap-2">
+                <label className="flex items-center gap-2 text-gray-700 mb-2">
                   <Phone className="w-4 h-4" />
                   Teléfono
                 </label>
@@ -171,7 +171,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 flex items-center gap-2">
+                <label className="flex items-center gap-2 text-gray-700 mb-2">
                   <Mail className="w-4 h-4" />
                   Email
                 </label>
@@ -185,7 +185,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 flex items-center gap-2">
+                <label className="flex items-center gap-2 text-gray-700 mb-2">
                   <Heart className="w-4 h-4" />
                   Obra Social
                 </label>
