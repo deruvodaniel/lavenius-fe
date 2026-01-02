@@ -1,8 +1,16 @@
 /**
  * Store Index
- * Export all stores from a single entry point
+ * Export all stores with namespace to avoid naming conflicts
  */
 
-export * from './auth.store';
-export * from './patient.store';
-export * from './appointment.store';
+// Auth Store
+export { useAuthStore } from './auth.store';
+export type { AuthStore } from './auth.store';
+
+// Patient Store
+export { usePatientStore } from './patient.store';
+export type { PatientStore } from './patient.store';
+
+// Appointment Store
+export { useAppointmentStore } from './appointment.store';
+export type { AppointmentStore } from './appointment.store';

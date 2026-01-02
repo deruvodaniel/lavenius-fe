@@ -1,4 +1,4 @@
-import { useAuthStore, selectUser, selectIsAuthenticated, selectIsLoading, selectError } from '@/lib/stores';
+import { useAuthStore } from '@/lib/stores';
 
 /**
  * Custom hook for authentication
@@ -12,10 +12,10 @@ import { useAuthStore, selectUser, selectIsAuthenticated, selectIsLoading, selec
  * ```
  */
 export const useAuth = () => {
-  const user = useAuthStore(selectUser);
-  const isAuthenticated = useAuthStore(selectIsAuthenticated);
-  const isLoading = useAuthStore(selectIsLoading);
-  const error = useAuthStore(selectError);
+  const user = useAuthStore(state => state.user);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const isLoading = useAuthStore(state => state.isLoading);
+  const error = useAuthStore(state => state.error);
   
   const login = useAuthStore(state => state.login);
   const register = useAuthStore(state => state.register);

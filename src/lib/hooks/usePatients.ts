@@ -1,4 +1,4 @@
-import { usePatientStore, selectPatients, selectActivePatients, selectInactivePatients } from '@/lib/stores';
+import { usePatientStore } from '@/lib/stores';
 
 /**
  * Custom hook for patient management
@@ -18,9 +18,9 @@ import { usePatientStore, selectPatients, selectActivePatients, selectInactivePa
  * ```
  */
 export const usePatients = () => {
-  const patients = usePatientStore(selectPatients);
-  const activePatients = usePatientStore(selectActivePatients);
-  const inactivePatients = usePatientStore(selectInactivePatients);
+  const patients = usePatientStore(state => state.patients);
+  const activePatients = usePatientStore(state => state.patients.filter(p => p.isActive));
+  const inactivePatients = usePatientStore(state => state.patients.filter(p => !p.isActive));
   const selectedPatient = usePatientStore(state => state.selectedPatient);
   const isLoading = usePatientStore(state => state.isLoading);
   const error = usePatientStore(state => state.error);

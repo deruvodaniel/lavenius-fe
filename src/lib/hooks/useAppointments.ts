@@ -1,4 +1,4 @@
-import { useAppointmentStore, selectTodayAppointments } from '@/lib/stores';
+import { useAppointmentStore } from '@/lib/stores';
 
 /**
  * Custom hook for appointment management
@@ -15,7 +15,16 @@ import { useAppointmentStore, selectTodayAppointments } from '@/lib/stores';
  */
 export const useAppointments = () => {
   const appointments = useAppointmentStore(state => state.appointments);
-  const todayAppointments = useAppointmentStore(selectTodayAppointments);
+  const todayAppointments = useAppointmentStore(state => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return state.appointments.filter(apt => {
+      const aptDate = new Date(apt.date);
+      return aptDate >= today && aptDate < tomorrow;
+    });
+  });
   const isLoading = useAppointmentStore(state => state.isLoading);
   const error = useAppointmentStore(state => state.error);
   
