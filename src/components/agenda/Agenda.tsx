@@ -30,7 +30,8 @@ export function Agenda() {
       fetchUpcoming(100).catch(() => {}); // Get next 100 appointments
       fetchPatients().catch(() => {}); // Ignore errors
     }
-  }, [fetchUpcoming, fetchPatients]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Infinite scroll effect
   useEffect(() => {

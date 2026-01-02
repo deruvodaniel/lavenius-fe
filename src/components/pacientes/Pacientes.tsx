@@ -25,7 +25,8 @@ export function Pacientes() {
       fetchPatients().catch(() => {});
       fetchAppointments().catch(() => {});
     }
-  }, [fetchPatients, fetchAppointments]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // If a patient is selected, show their clinical record
   if (selectedPatientId !== null) {
