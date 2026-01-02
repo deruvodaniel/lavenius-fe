@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Video, MapPin, Calendar, Filter, Plus, Edit2, Trash2 } from 'lucide-react';
+import { Video, MapPin, Calendar, Filter, Plus, Edit2, Trash2, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { Paciente } from '../../data/mockData';
 import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
 import { usePatients, useAppointments, useErrorToast } from '@/lib/hooks';
+import { AnimatedSection, AnimatedList, SkeletonCard, EmptyState } from '../shared';
 import type { CreatePatientDto } from '@/lib/types/api.types';
 
 export function Pacientes() {
@@ -266,8 +267,33 @@ export function Pacientes() {
       </div>
 
       {/* Patient Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredPacientes.map((paciente) => {
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      ) : filteredPacientes.length === 0 ? (
+        <EmptyState
+          icon={Users}
+          title="No hay pacientes"
+          description={
+            pacientes.length === 0
+              ? "Aún no has creado ningún paciente. Comienza agregando tu primer paciente."
+              : "No se encontraron pacientes con los filtros aplicados. Intenta ajustar los criterios de búsqueda."
+          }
+          action={
+            pacientes.length === 0
+              ? {
+                  label: "Crear primer paciente",
+                  onClick: handleNuevoPaciente
+                }
+              : undefined
+          }
+        />
+      ) : (
+        <AnimatedList animation="slide-up" stagger={100} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredPacientes.map((paciente) => {
           const proximoTurno = getProximoTurno(paciente.id);
           const patient = patients.find(p => parseInt(p.id) === paciente.id);
 
@@ -371,14 +397,9 @@ export function Pacientes() {
               </div>
             </div>
           );
-        })}
-      </div>
-
-      {/* Empty State */}
-      {filteredPacientes.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No se encontraron pacientes con los filtros seleccionados</p>
-        </div>
+            );
+          })}
+        </AnimatedList>
       )}
 
       {/* Paciente Drawer */}

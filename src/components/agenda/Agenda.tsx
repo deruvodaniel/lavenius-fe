@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Clock, Video, MapPin, Plus, Calendar, X, Edit2 } from 'lucide-react';
+import { Clock, Video, MapPin, Plus, Calendar, X, Edit2, CalendarX } from 'lucide-react';
 import { toast } from 'sonner';
 import { Turno } from '../../data/mockData';
 import { TurnoDrawer } from './TurnoDrawer';
-import { CalendarView } from '../shared';
+import { CalendarView, AnimatedSection, SkeletonList, EmptyState } from '../shared';
 import { useAppointments, usePatients, useErrorToast } from '@/lib/hooks';
 import type { CreateAppointmentDto, Appointment } from '@/lib/types/api.types';
 
@@ -239,8 +239,22 @@ export function Agenda() {
         <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col">
           <h2 className="text-gray-900 px-6 pt-6 pb-4 flex-shrink-0">Próximos Turnos</h2>
           <div className="flex-1 overflow-y-auto px-6 pb-6">
-            <div className="space-y-6">
-              {visibleTurnosPorDia.map(([fecha, turnosDelDia]) => {
+            {isLoading ? (
+              <SkeletonList items={5} />
+            ) : visibleTurnosPorDia.length === 0 ? (
+              <EmptyState
+                icon={CalendarX}
+                title="No hay turnos programados"
+                description="Aún no tienes turnos agendados. Comienza creando un nuevo turno."
+                action={{
+                  label: "Crear primer turno",
+                  onClick: handleNuevoTurno
+                }}
+                variant="subtle"
+              />
+            ) : (
+              <div className="space-y-6">
+                {visibleTurnosPorDia.map(([fecha, turnosDelDia]) => {
                 const isToday = new Date(fecha).toDateString() === today.toDateString();
 
                 return (
@@ -364,6 +378,7 @@ export function Agenda() {
                 </div>
               )}
             </div>
+            )}
           </div>
         </div>
 

@@ -131,18 +131,23 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pac
     const dateTimeStr = `${formData.fecha}T${formData.hora}:00`;
     const dateTime = new Date(dateTimeStr);
 
+    // Ensure sessionType is sent as literal string
+    const sessionType = formData.sessionType === 'remote' ? 'remote' as const : 'presential' as const;
+    const status = formData.estado as AppointmentStatus;
+
     const appointmentDto: CreateAppointmentDto = {
       therapistId: user.id,
       patientId: formData.pacienteId,
       dateTime: dateTime.toISOString(),
       description: formData.motivo || undefined,
-      sessionType: formData.sessionType,
-      status: formData.estado,
+      sessionType: sessionType,
+      status: status,
       cost: formData.monto,
     };
 
     console.log('Appointment DTO:', appointmentDto);
     console.log('DTO sessionType:', appointmentDto.sessionType);
+    console.log('DTO status:', appointmentDto.status);
 
     onSave(appointmentDto);
     setShowSaveConfirm(false);
