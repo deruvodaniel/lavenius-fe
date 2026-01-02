@@ -1,21 +1,37 @@
 import { useState, useEffect } from 'react';
 import { X, Calendar, Clock, User, Video, MapPin, AlertTriangle } from 'lucide-react';
-import { Turno, Paciente } from '../../data/mockData';
 import { useAuthStore } from '@/lib/stores';
 import type { CreateAppointmentDto, Appointment, SessionType, AppointmentStatus, Patient } from '@/lib/types/api.types';
+
+// Format date-time keeping the user's local offset so the backend stores the expected slot
+const formatLocalDateTime = (date: Date) => {
+  const pad = (value: number) => value.toString().padStart(2, '0');
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  const seconds = pad(date.getSeconds());
+  const offsetMinutes = date.getTimezoneOffset();
+  const absoluteOffset = Math.abs(offsetMinutes);
+  const offsetHours = pad(Math.floor(absoluteOffset / 60));
+  const offsetRemainingMinutes = pad(absoluteOffset % 60);
+  const sign = offsetMinutes <= 0 ? '+' : '-';
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetHours}:${offsetRemainingMinutes}`;
+};
 
 interface TurnoDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  turno?: Turno | null;
   appointment?: Appointment | null;
   patients: Patient[];
-  pacienteId?: number;
+  pacienteId?: string | number;
   onSave: (appointment: CreateAppointmentDto) => void;
   onDelete?: (appointmentId: string) => void;
 }
 
-export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pacienteId, onSave, onDelete }: TurnoDrawerProps) {
+export function TurnoDrawer({ isOpen, onClose, appointment, patients, pacienteId, onSave, onDelete }: TurnoDrawerProps) {
   const user = useAuthStore(state => state.user);
   
   const [formData, setFormData] = useState({
@@ -47,32 +63,14 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pac
         estado: appointment.status,
         monto: appointment.cost,
       });
-    } else if (turno) {
-      // Support legacy turno format - map old values to new
-      const mapEstado = (estado: string): AppointmentStatus => {
-        if (estado === 'confirmado') return 'confirmed';
-        if (estado === 'completado') return 'completed';
-        if (estado === 'cancelado') return 'cancelled';
-        return 'pending';
-      };
-
-      setFormData({
-        pacienteId: turno.pacienteId?.toString() || pacienteId?.toString() || '',
-        fecha: turno.fecha || '',
-        hora: turno.hora || '09:00',
-        motivo: turno.motivo || '',
-        sessionType: 'presential',
-        estado: mapEstado(turno.estado || 'pendiente'),
-        monto: turno.monto || 8500,
-      });
     } else if (pacienteId) {
-      setFormData(prev => ({ ...prev, pacienteId: pacienteId.toString() }));
+      setFormData(prev => ({ ...prev, pacienteId: String(pacienteId) }));
     }
-  }, [appointment, turno, pacienteId]);
+  }, [appointment, pacienteId]);
 
   if (!isOpen) return null;
 
-  const isEditing = !!appointment || !!turno;
+  const isEditing = !!appointment;
   
   // Validate form
   const isFormValid = formData.pacienteId && formData.fecha && formData.hora && formData.sessionType && formData.estado;
@@ -130,6 +128,7 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pac
     // Combine fecha and hora into ISO dateTime
     const dateTimeStr = `${formData.fecha}T${formData.hora}:00`;
     const dateTime = new Date(dateTimeStr);
+    const localDateTime = formatLocalDateTime(dateTime);
 
     // Ensure sessionType is sent as literal string
     const sessionType = formData.sessionType === 'remote' ? 'remote' as const : 'presential' as const;
@@ -138,7 +137,7 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pac
     const appointmentDto: CreateAppointmentDto = {
       therapistId: user.id,
       patientId: formData.pacienteId,
-      dateTime: dateTime.toISOString(),
+      dateTime: localDateTime,
       description: formData.motivo || undefined,
       sessionType: sessionType,
       status: status,

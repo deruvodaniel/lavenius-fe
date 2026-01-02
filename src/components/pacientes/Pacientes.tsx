@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Video, MapPin, Calendar, Filter, Plus, Edit2, Trash2, Users } from 'lucide-react';
 import { toast } from 'sonner';
-import { Paciente } from '../../data/mockData';
 import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
 import { usePatients, useAppointments, useErrorToast } from '@/lib/hooks';
@@ -35,9 +34,10 @@ export function Pacientes() {
 
   // If a patient is selected, show their clinical record
   if (selectedPatientId !== null) {
+    const selectedPatient = patients.find(p => p.id === selectedPatientId);
     return (
       <FichaClinica
-        pacienteId={selectedPatientId}
+        patient={selectedPatient || null}
         onBack={() => setSelectedPatientId(null)}
       />
     );
@@ -85,7 +85,7 @@ export function Pacientes() {
   };
 
   // Map API data to component format
-  const pacientes = patients.map(p => {
+  const pacientes = patients.map((p, index) => {
     // Calculate age from birthDate if available
     let edad = p.age || 0;
     if (p.birthDate && !p.age) {
@@ -98,8 +98,12 @@ export function Pacientes() {
       }
     }
 
+    const numericId = Number.parseInt(p.id, 10);
+    const safeId = Number.isNaN(numericId) ? index : numericId;
+
     return {
-      id: parseInt(p.id),
+      id: safeId,
+      rawId: p.id,
       nombre: `${p.firstName} ${p.lastName}`,
       telefono: p.phone || '',
       email: p.email || '',
@@ -112,13 +116,19 @@ export function Pacientes() {
   });
 
   // Map appointments to turnos format
-  const turnos = appointments.map(a => {
+  const turnos = appointments.map((a, index) => {
     const dateTime = new Date(a.dateTime);
     const fecha = dateTime.toISOString().split('T')[0];
     const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
+    const numericId = Number.parseInt(a.id, 10);
+    const safeId = Number.isNaN(numericId) ? index : numericId;
+    const numericPatientId = Number.parseInt(a.patientId, 10);
+
     return {
-      id: parseInt(a.id),
-      pacienteId: parseInt(a.patientId),
+      id: safeId,
+      rawId: a.id,
+      pacienteId: Number.isNaN(numericPatientId) ? null : numericPatientId,
+      pacienteRawId: a.patientId,
       fecha,
       hora,
       modalidad: 'presencial' as const,
@@ -148,7 +158,7 @@ export function Pacientes() {
     if (soloTurnosEstaSemana) {
       const tieneTurnoEstaSemana = turnos.some((turno) => {
         const turnoDate = new Date(turno.fecha);
-        return turno.pacienteId === paciente.id && turnoDate >= today && turnoDate <= endOfWeek;
+        return turno.pacienteRawId === paciente.rawId && turnoDate >= today && turnoDate <= endOfWeek;
       });
       if (!tieneTurnoEstaSemana) {
         return false;
@@ -159,9 +169,9 @@ export function Pacientes() {
   });
 
   // Get next appointment for a patient
-  const getProximoTurno = (pacienteId: number) => {
+  const getProximoTurno = (pacienteId: string) => {
     const turnosPaciente = turnos
-      .filter((t) => t.pacienteId === pacienteId && new Date(t.fecha) >= today)
+      .filter((t) => t.pacienteRawId === pacienteId && new Date(t.fecha) >= today)
       .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
 
     if (turnosPaciente.length === 0) return null;
@@ -294,18 +304,18 @@ export function Pacientes() {
       ) : (
         <AnimatedList animation="slide-up" stagger={100} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPacientes.map((paciente) => {
-          const proximoTurno = getProximoTurno(paciente.id);
-          const patient = patients.find(p => parseInt(p.id) === paciente.id);
+          const proximoTurno = getProximoTurno(paciente.rawId);
+          const patient = patients.find(p => p.id === paciente.rawId);
 
           return (
             <div
-              key={paciente.id}
+              key={paciente.rawId}
               className="bg-white rounded-lg shadow-sm p-6 hover:shadow-lg transition-all border border-gray-200"
             >
               <div className="flex items-start justify-between mb-4">
                 <div 
                   className="flex items-center gap-3 cursor-pointer flex-1"
-                  onClick={() => setSelectedPatientId(paciente.id)}
+                  onClick={() => setSelectedPatientId(paciente.rawId)}
                 >
                   <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
                     <span className="text-indigo-600">

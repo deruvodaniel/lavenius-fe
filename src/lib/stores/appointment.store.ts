@@ -57,13 +57,16 @@ export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
     set({ isLoading: true, error: null });
     
     try {
+      console.log('[AppointmentStore] Fetching appointments...');
       const appointments = await appointmentService.getAll();
+      console.log('[AppointmentStore] Received appointments:', appointments);
       set({ appointments, isLoading: false });
     } catch (error) {
       const errorMessage = error instanceof ApiClientError
         ? error.message
         : 'Error al cargar citas';
       
+      console.error('[AppointmentStore] Error fetching appointments:', error);
       set({ isLoading: false, error: errorMessage });
       throw error;
     }
@@ -114,13 +117,16 @@ export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
     set({ isLoading: true, error: null });
     
     try {
+      console.log('[AppointmentStore] Fetching upcoming appointments with limit:', limit);
       const appointments = await appointmentService.getUpcoming(limit);
+      console.log('[AppointmentStore] Received upcoming appointments:', appointments);
       set({ appointments, isLoading: false });
     } catch (error) {
       const errorMessage = error instanceof ApiClientError
         ? error.message
         : 'Error al cargar próximas citas';
       
+      console.error('[AppointmentStore] Error fetching upcoming:', error);
       set({ isLoading: false, error: errorMessage });
       throw error;
     }
@@ -134,10 +140,8 @@ export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
     
     try {
       const appointment = await appointmentService.create(data);
-      set((state) => ({
-        appointments: [...state.appointments, appointment],
-        isLoading: false,
-      }));
+      // Don't update optimistically - let the caller refetch to get fresh data from backend
+      set({ isLoading: false });
       return appointment;
     } catch (error) {
       const errorMessage = error instanceof ApiClientError

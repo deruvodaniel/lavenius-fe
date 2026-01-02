@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { X, User, Phone, Mail, Heart, Video, MapPin, Calendar } from 'lucide-react';
-import type { CreatePatientDto, Patient } from '../../lib/types/api.types';
+import type { CreatePatientDto, Patient, SessionType } from '../../lib/types/api.types';
+
+type PatientSessionType = 'remote' | 'presential';
 
 interface PacienteDrawerProps {
   isOpen: boolean;
@@ -17,7 +19,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
     telefono: '',
     email: '',
     obraSocial: '',
-    modalidad: 'INDIVIDUAL' as const,
+    tipoSesion: 'presential' as PatientSessionType,
     frecuencia: '',
     diagnostico: '',
     tratamientoActual: '',
@@ -34,7 +36,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
         telefono: patient.phone || '',
         email: patient.email || '',
         obraSocial: patient.healthInsurance || '',
-        modalidad: patient.sessionType || 'INDIVIDUAL',
+        tipoSesion: (patient.sessionType as PatientSessionType) || 'presential',
         frecuencia: patient.frequency || '',
         diagnostico: patient.diagnosis || '',
         tratamientoActual: patient.currentTreatment || '',
@@ -58,7 +60,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
       phone: formData.telefono || undefined,
       age: formData.edad ? Number(formData.edad) : undefined,
       healthInsurance: formData.obraSocial || undefined,
-      sessionType: formData.modalidad,
+      sessionType: formData.tipoSesion as SessionType,
       frequency: formData.frecuencia || undefined,
       diagnosis: formData.diagnostico || undefined,
       currentTreatment: formData.tratamientoActual || undefined,
@@ -76,7 +78,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
       telefono: '',
       email: '',
       obraSocial: '',
-      modalidad: 'INDIVIDUAL',
+      tipoSesion: 'presential',
       frecuencia: '',
       diagnostico: '',
       tratamientoActual: '',
@@ -210,54 +212,30 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
             <div className="space-y-4">
               <div>
                 <label className="block text-gray-700 mb-2">Tipo de Sesión</label>
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, modalidad: 'INDIVIDUAL' })}
+                    onClick={() => setFormData({ ...formData, tipoSesion: 'presential' })}
                     className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
-                      formData.modalidad === 'INDIVIDUAL'
+                      formData.tipoSesion === 'presential'
                         ? 'border-purple-600 bg-purple-50 text-purple-700'
                         : 'border-gray-300 text-gray-700 hover:border-purple-300'
                     }`}
                   >
-                    <User className="w-5 h-5" />
-                    <span className="text-sm">Individual</span>
+                    <MapPin className="w-5 h-5" />
+                    <span className="text-sm">Presencial</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, modalidad: 'COUPLE' })}
+                    onClick={() => setFormData({ ...formData, tipoSesion: 'remote' })}
                     className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
-                      formData.modalidad === 'COUPLE'
+                      formData.tipoSesion === 'remote'
                         ? 'border-blue-600 bg-blue-50 text-blue-700'
                         : 'border-gray-300 text-gray-700 hover:border-blue-300'
                     }`}
                   >
-                    <Heart className="w-5 h-5" />
-                    <span className="text-sm">Pareja</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, modalidad: 'FAMILY' })}
-                    className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
-                      formData.modalidad === 'FAMILY'
-                        ? 'border-teal-600 bg-teal-50 text-teal-700'
-                        : 'border-gray-300 text-gray-700 hover:border-teal-300'
-                    }`}
-                  >
-                    <MapPin className="w-5 h-5" />
-                    <span className="text-sm">Familia</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, modalidad: 'GROUP' })}
-                    className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
-                      formData.modalidad === 'GROUP'
-                        ? 'border-amber-600 bg-amber-50 text-amber-700'
-                        : 'border-gray-300 text-gray-700 hover:border-amber-300'
-                    }`}
-                  >
                     <Video className="w-5 h-5" />
-                    <span className="text-sm">Grupal</span>
+                    <span className="text-sm">Remoto</span>
                   </button>
                 </div>
               </div>

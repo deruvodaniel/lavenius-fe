@@ -156,6 +156,11 @@ export class ApiClient {
       config.headers['x-user-key'] = userKey;
     }
 
+    // Disable caching for GET requests to always fetch fresh data
+    if (config.method === 'get') {
+      config.headers['Cache-Control'] = 'no-cache';
+    }
+
     return config;
   }
 

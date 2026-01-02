@@ -151,8 +151,8 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
         patients: state.patients.filter((p) => p.id !== id),
         selectedPatient:
           state.selectedPatient?.id === id ? null : state.selectedPatient,
-        isLoading: false,
       }));
+      await get().fetchPatients();
     } catch (error) {
       const errorMessage = error instanceof ApiClientError
         ? error.message

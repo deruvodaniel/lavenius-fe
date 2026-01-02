@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Clock, Video, MapPin, Plus, Calendar, X, Edit2, CalendarX } from 'lucide-react';
 import { toast } from 'sonner';
-import { Turno } from '../../data/mockData';
 import { TurnoDrawer } from './TurnoDrawer';
 import { CalendarView, AnimatedSection, SkeletonList, EmptyState } from '../shared';
 import { useAppointments, usePatients, useErrorToast } from '@/lib/hooks';
@@ -14,9 +13,8 @@ export function Agenda() {
   // Auto-display error toasts
   useErrorToast(error, clearError);
   
-  const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [turnoDrawerOpen, setTurnoDrawerOpen] = useState(false);
-  const [selectedTurno, setSelectedTurno] = useState<Turno | null>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [visibleCount, setVisibleCount] = useState(5); // For infinite scroll
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -31,8 +29,17 @@ export function Agenda() {
   useEffect(() => {
     if (!hasFetchedRef.current) {
       hasFetchedRef.current = true;
-      fetchUpcoming(100).catch(() => {}); // Get next 100 appointments
-      fetchPatients().catch(() => {}); // Ignore errors
+      console.log('[Agenda] Fetching appointments and patients...');
+      fetchUpcoming(100).then((data) => {
+        console.log('[Agenda] fetchUpcoming returned:', data);
+      }).catch((err) => {
+        console.error('[Agenda] fetchUpcoming error:', err);
+      });
+      fetchPatients().then((data) => {
+        console.log('[Agenda] fetchPatients returned:', data);
+      }).catch((err) => {
+        console.error('[Agenda] fetchPatients error:', err);
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -66,11 +73,13 @@ export function Agenda() {
   }, [isLoadingMore]);
 
   // Map API data to component format
-  const turnos = appointments.map(a => {
+  const turnos = appointments.map((a, index) => {
     const dateTime = new Date(a.dateTime);
     const fecha = dateTime.toISOString().split('T')[0];
     const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
-    
+    const numericId = Number.parseInt(a.id, 10);
+    const safeId = Number.isNaN(numericId) ? index : numericId;
+
     // Map status to legacy format for display
     const mapEstado = (status: string): 'pendiente' | 'confirmado' | 'completado' => {
       if (status === 'confirmed') return 'confirmado';
@@ -79,9 +88,13 @@ export function Agenda() {
       return 'pendiente';
     };
 
+    const numericPatientId = Number.parseInt(a.patientId, 10);
+
     return {
-      id: parseInt(a.id),
-      pacienteId: parseInt(a.patientId),
+      id: safeId,
+      rawId: a.id,
+      pacienteId: Number.isNaN(numericPatientId) ? null : numericPatientId,
+      pacienteRawId: a.patientId,
       fecha,
       hora,
       modalidad: a.sessionType === 'remote' ? 'remoto' as const : 'presencial' as const,
@@ -90,17 +103,26 @@ export function Agenda() {
     };
   });
 
-  const pacientes = patients.map(p => ({
-    id: parseInt(p.id),
-    nombre: `${p.firstName} ${p.lastName}`,
-    telefono: p.phone || '',
-    email: p.email || '',
-    edad: 0,
-    obraSocial: p.healthInsurance || '',
-    modalidad: 'presencial' as const,
-    frecuencia: 'semanal' as const,
-    historiaClinica: p.notes || '',
-  }));
+  console.log('[Agenda] appointments from store:', appointments);
+  console.log('[Agenda] mapped turnos:', turnos);
+
+  const pacientes = patients.map((p, index) => {
+    const numericId = Number.parseInt(p.id, 10);
+    const safeId = Number.isNaN(numericId) ? index : numericId;
+
+    return {
+      id: safeId,
+      rawId: p.id,
+      nombre: `${p.firstName} ${p.lastName}`,
+      telefono: p.phone || '',
+      email: p.email || '',
+      edad: 0,
+      obraSocial: p.healthInsurance || '',
+      modalidad: 'presencial' as const,
+      frecuencia: 'semanal' as const,
+      historiaClinica: p.notes || '',
+    };
+  });
 
   // Get future appointments
   const today = new Date();
@@ -114,7 +136,15 @@ export function Agenda() {
       return a.hora.localeCompare(b.hora);
     });
 
-  const getPaciente = (pacienteId: number) => {
+  const getPaciente = (pacienteId: number | string | null) => {
+    if (pacienteId === null || pacienteId === undefined) {
+      return undefined;
+    }
+
+    if (typeof pacienteId === 'string') {
+      return pacientes.find((p) => p.rawId === pacienteId);
+    }
+
     return pacientes.find((p) => p.id === pacienteId);
   };
 
@@ -171,7 +201,6 @@ export function Agenda() {
 
 
   const handleNuevoTurno = () => {
-    setSelectedTurno(null);
     setSelectedAppointment(null);
     setTurnoDrawerOpen(true);
   };
@@ -269,12 +298,12 @@ export function Agenda() {
                     {/* Appointments for this day */}
                     <div className="space-y-3">
                       {turnosDelDia.map((turno) => {
-                        const paciente = getPaciente(turno.pacienteId);
-                        const appointment = appointments.find(a => parseInt(a.id) === turno.id);
+                        const paciente = getPaciente(turno.pacienteRawId ?? turno.pacienteId ?? null);
+                        const appointment = appointments.find(a => a.id === turno.rawId);
 
                         return (
                           <div
-                            key={turno.id}
+                            key={turno.rawId ?? turno.id}
                             className="p-3 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors group"
                           >
                             <div className="flex items-center gap-3">
@@ -287,7 +316,7 @@ export function Agenda() {
                               {/* Avatar */}
                               <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
                                 <span className="text-indigo-600 text-xs font-semibold">
-                                  {paciente?.nombre.split(' ').map((n) => n[0]).join('')}
+                                  {paciente ? paciente.nombre.split(' ').map((n) => n[0]).join('') : '?'}
                                 </span>
                               </div>
 
@@ -295,7 +324,7 @@ export function Agenda() {
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2">
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-900 truncate">{paciente?.nombre}</p>
+                                    <p className="text-sm font-medium text-gray-900 truncate">{paciente?.nombre || 'Paciente sin nombre'}</p>
                                     <div className="flex items-center gap-2 mt-0.5">
                                       <div
                                         className={`flex items-center gap-1 text-xs ${
@@ -343,7 +372,7 @@ export function Agenda() {
                                       <Edit2 className="w-3.5 h-3.5" />
                                     </button>
                                     <button
-                                      onClick={() => setSelectedPatientId(paciente?.id || null)}
+                                      onClick={() => setSelectedPatientId(paciente?.rawId || null)}
                                       className="text-indigo-600 text-xs hover:text-indigo-700 transition-colors whitespace-nowrap"
                                     >
                                       Ver ficha
@@ -445,10 +474,8 @@ export function Agenda() {
         isOpen={turnoDrawerOpen}
         onClose={() => {
           setTurnoDrawerOpen(false);
-          setSelectedTurno(null);
           setSelectedAppointment(null);
         }}
-        turno={selectedTurno}
         appointment={selectedAppointment}
         patients={patients}
         pacienteId={selectedPatientId || undefined}
