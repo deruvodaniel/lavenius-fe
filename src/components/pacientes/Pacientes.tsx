@@ -84,17 +84,31 @@ export function Pacientes() {
   };
 
   // Map API data to component format
-  const pacientes = patients.map(p => ({
-    id: parseInt(p.id),
-    nombre: `${p.firstName} ${p.lastName}`,
-    telefono: p.phone || '',
-    email: p.email || '',
-    edad: 0,
-    obraSocial: p.healthInsurance || '',
-    modalidad: 'presencial' as const,
-    frecuencia: 'semanal' as const,
-    historiaClinica: p.notes || '',
-  }));
+  const pacientes = patients.map(p => {
+    // Calculate age from birthDate if available
+    let edad = p.age || 0;
+    if (p.birthDate && !p.age) {
+      const birthDate = new Date(p.birthDate);
+      const today = new Date();
+      edad = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        edad--;
+      }
+    }
+
+    return {
+      id: parseInt(p.id),
+      nombre: `${p.firstName} ${p.lastName}`,
+      telefono: p.phone || '',
+      email: p.email || '',
+      edad,
+      obraSocial: p.healthInsurance || '',
+      modalidad: 'presencial' as const,
+      frecuencia: 'semanal' as const,
+      historiaClinica: p.notes || '',
+    };
+  });
 
   // Map appointments to turnos format
   const turnos = appointments.map(a => {
@@ -281,10 +295,8 @@ export function Pacientes() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (patient) {
-                        setEditingPatient(patient);
-                        setPacienteDrawerOpen(true);
-                      }
+                      setEditingPatient(patient || null);
+                      setPacienteDrawerOpen(true);
                     }}
                     className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                     title="Editar paciente"
