@@ -21,7 +21,7 @@ export const useAppointments = () => {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
     return state.appointments.filter(apt => {
-      const aptDate = new Date(apt.date);
+      const aptDate = new Date(apt.dateTime);
       return aptDate >= today && aptDate < tomorrow;
     });
   });

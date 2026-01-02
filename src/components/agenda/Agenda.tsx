@@ -55,20 +55,31 @@ export function Agenda() {
   }, [isLoadingMore]);
 
   // Map API data to component format
-  const turnos = appointments.map(a => ({
-    id: parseInt(a.id),
-    pacienteId: parseInt(a.patientId),
-    fecha: a.date,
-    hora: a.time,
-    modalidad: 'presencial' as const, // TODO: Add to Appointment model
-    estado: a.status,
-  }));
+  const turnos = appointments.map(a => {
+    const dateTime = new Date(a.dateTime);
+    const fecha = dateTime.toISOString().split('T')[0];
+    const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
+    return {
+      id: parseInt(a.id),
+      pacienteId: parseInt(a.patientId),
+      fecha,
+      hora,
+      modalidad: 'presencial' as const,
+      estado: a.status.toLowerCase() as 'pendiente' | 'confirmado' | 'completado',
+      motivo: a.description || '',
+    };
+  });
 
   const pacientes = patients.map(p => ({
     id: parseInt(p.id),
     nombre: `${p.firstName} ${p.lastName}`,
     telefono: p.phone || '',
     email: p.email || '',
+    edad: 0,
+    obraSocial: p.healthInsurance || '',
+    modalidad: 'presencial' as const,
+    frecuencia: 'semanal' as const,
+    historiaClinica: p.notes || '',
   }));
 
   // Get future appointments
@@ -144,25 +155,20 @@ export function Agenda() {
     setTurnoDrawerOpen(true);
   };
 
-  const handleSaveTurno = (turnoData: Partial<Turno>) => {
-    if (selectedTurno) {
-      // Editar turno existente
-      setTurnos(prevTurnos =>
-        prevTurnos.map(t => t.id === selectedTurno.id ? { ...t, ...turnoData } : t)
-      );
-    } else {
-      // Crear nuevo turno
-      const newId = Math.max(...turnos.map(t => t.id)) + 1;
-      const newTurno: Turno = {
-        ...turnoData as Turno,
-        id: newId,
-      };
-      setTurnos(prevTurnos => [...prevTurnos, newTurno]);
-    }
+  const handleSaveTurno = async (turnoData: Partial<Turno>) => {
+    // TODO: Integrate with createAppointment/updateAppointment from useAppointments hook
+    console.log('Save turno:', turnoData);
+    // if (selectedTurno) {
+    //   await updateAppointment(selectedTurno.id, turnoData);
+    // } else {
+    //   await createAppointment(turnoData);
+    // }
   };
 
-  const handleDeleteTurno = (turnoId: number) => {
-    setTurnos(prevTurnos => prevTurnos.filter(t => t.id !== turnoId));
+  const handleDeleteTurno = async (turnoId: number) => {
+    // TODO: Integrate with deleteAppointment from useAppointments hook
+    console.log('Delete turno:', turnoId);
+    // await deleteAppointment(turnoId.toString());
   };
 
   return (

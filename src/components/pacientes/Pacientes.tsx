@@ -47,19 +47,26 @@ export function Pacientes() {
     nombre: `${p.firstName} ${p.lastName}`,
     telefono: p.phone || '',
     email: p.email || '',
-    modalidad: 'presencial' as const, // TODO: Add to Patient model
-    frecuencia: 'semanal' as const, // TODO: Add to Patient model
-    // Add other required fields from mockData structure
+    edad: 0,
+    obraSocial: p.healthInsurance || '',
+    modalidad: 'presencial' as const,
+    frecuencia: 'semanal' as const,
+    historiaClinica: p.notes || '',
   }));
 
   // Map appointments to turnos format
-  const turnos = appointments.map(a => ({
-    id: parseInt(a.id),
-    pacienteId: parseInt(a.patientId),
-    fecha: a.date,
-    hora: a.time,
-    // Add other required fields
-  }));
+  const turnos = appointments.map(a => {
+    const dateTime = new Date(a.dateTime);
+    const fecha = dateTime.toISOString().split('T')[0];
+    const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
+    return {
+      id: parseInt(a.id),
+      pacienteId: parseInt(a.patientId),
+      fecha,
+      hora,
+      modalidad: 'presencial' as const,
+    };
+  });
 
   // Get today and end of this week
   const today = new Date();

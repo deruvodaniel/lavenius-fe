@@ -27,15 +27,20 @@ export function Cobros() {
   }, [fetchAppointments, fetchPatients]);
 
   // Map API data to component format
-  const turnos = appointments.map(a => ({
-    id: parseInt(a.id),
-    pacienteId: parseInt(a.patientId),
-    fecha: a.date,
-    hora: a.time,
-    modalidad: 'presencial' as const,
-    estado: a.status,
-    monto: 0, // TODO: Get from payments
-  }));
+  const turnos = appointments.map(a => {
+    const dateTime = new Date(a.dateTime);
+    const fecha = dateTime.toISOString().split('T')[0];
+    const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
+    return {
+      id: parseInt(a.id),
+      pacienteId: parseInt(a.patientId),
+      fecha,
+      hora,
+      modalidad: 'presencial' as const,
+      estado: a.status.toLowerCase() as 'pendiente' | 'confirmado' | 'completado',
+      monto: a.cost,
+    };
+  });
 
   const pacientes = patients.map(p => ({
     id: parseInt(p.id),
