@@ -1,14 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { Clock, Video, MapPin, Plus, Calendar, X } from 'lucide-react';
-import { allTurnos, pacientes, Turno } from '../../data/mockData';
+import { Turno } from '../../data/mockData';
 import { TurnoDrawer } from './TurnoDrawer';
 import { CalendarView } from '../shared';
+import { useAppointments, usePatients } from '@/lib/hooks';
 
 export function Agenda() {
+  const { appointments, isLoading, fetchUpcoming } = useAppointments();
+  const { patients, fetchPatients } = usePatients();
+  
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   const [turnoDrawerOpen, setTurnoDrawerOpen] = useState(false);
   const [selectedTurno, setSelectedTurno] = useState<Turno | null>(null);
-  const [turnos, setTurnos] = useState<Turno[]>(allTurnos);
   const [visibleCount, setVisibleCount] = useState(5); // For infinite scroll
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -16,6 +19,12 @@ export function Agenda() {
   
   // Estado para el mes/año del calendario
   const [calendarDate, setCalendarDate] = useState(new Date());
+
+  // Fetch data on mount
+  useEffect(() => {
+    fetchUpcoming(100); // Get next 100 appointments
+    fetchPatients();
+  }, [fetchUpcoming, fetchPatients]);
 
   // Infinite scroll effect
   useEffect(() => {
@@ -44,6 +53,23 @@ export function Agenda() {
       }
     };
   }, [isLoadingMore]);
+
+  // Map API data to component format
+  const turnos = appointments.map(a => ({
+    id: parseInt(a.id),
+    pacienteId: parseInt(a.patientId),
+    fecha: a.date,
+    hora: a.time,
+    modalidad: 'presencial' as const, // TODO: Add to Appointment model
+    estado: a.status,
+  }));
+
+  const pacientes = patients.map(p => ({
+    id: parseInt(p.id),
+    nombre: `${p.firstName} ${p.lastName}`,
+    telefono: p.phone || '',
+    email: p.email || '',
+  }));
 
   // Get future appointments
   const today = new Date();

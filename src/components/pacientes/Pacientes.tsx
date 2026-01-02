@@ -1,16 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Video, MapPin, Calendar, Filter, Plus } from 'lucide-react';
-import { pacientes as initialPacientes, allTurnos as turnos, Paciente } from '../../data/mockData';
+import { Paciente } from '../../data/mockData';
 import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
+import { usePatients, useAppointments } from '@/lib/hooks';
 
 export function Pacientes() {
+  const { patients, isLoading, fetchPatients } = usePatients();
+  const { appointments, fetchAppointments } = useAppointments();
+  
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   const [modalidadFilter, setModalidadFilter] = useState<'todas' | 'presencial' | 'remoto' | 'mixto'>('todas');
   const [frecuenciaFilter, setFrecuenciaFilter] = useState<'todas' | 'semanal' | 'quincenal' | 'mensual'>('todas');
   const [soloTurnosEstaSemana, setSoloTurnosEstaSemana] = useState(false);
   const [pacienteDrawerOpen, setPacienteDrawerOpen] = useState(false);
-  const [pacientes, setPacientes] = useState<Paciente[]>(initialPacientes);
+
+  // Fetch data on mount
+  useEffect(() => {
+    fetchPatients();
+    fetchAppointments();
+  }, [fetchPatients, fetchAppointments]);
 
   // If a patient is selected, show their clinical record
   if (selectedPatientId !== null) {
@@ -26,14 +35,31 @@ export function Pacientes() {
     setPacienteDrawerOpen(true);
   };
 
-  const handleSavePaciente = (pacienteData: Partial<Paciente>) => {
-    const newId = Math.max(...pacientes.map(p => p.id)) + 1;
-    const newPaciente: Paciente = {
-      ...pacienteData as Paciente,
-      id: newId,
-    };
-    setPacientes(prevPacientes => [...prevPacientes, newPaciente]);
+  const handleSavePaciente = async (pacienteData: Partial<Paciente>) => {
+    // TODO: Integrate with createPatient from usePatients hook
+    // await createPatient(pacienteData);
+    console.log('Create patient:', pacienteData);
   };
+
+  // Map API data to component format
+  const pacientes = patients.map(p => ({
+    id: parseInt(p.id),
+    nombre: `${p.firstName} ${p.lastName}`,
+    telefono: p.phone || '',
+    email: p.email || '',
+    modalidad: 'presencial' as const, // TODO: Add to Patient model
+    frecuencia: 'semanal' as const, // TODO: Add to Patient model
+    // Add other required fields from mockData structure
+  }));
+
+  // Map appointments to turnos format
+  const turnos = appointments.map(a => ({
+    id: parseInt(a.id),
+    pacienteId: parseInt(a.patientId),
+    fecha: a.date,
+    hora: a.time,
+    // Add other required fields
+  }));
 
   // Get today and end of this week
   const today = new Date();

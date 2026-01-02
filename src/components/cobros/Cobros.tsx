@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Bell, CheckCircle, Clock, DollarSign, Calendar, Video, MapPin, Copy, MessageCircle, X, MoreVertical } from 'lucide-react';
-import { allTurnos as turnos, pacientes } from '../../data/mockData';
+import { useAppointments, usePatients } from '@/lib/hooks';
 
 export function Cobros() {
+  const { appointments, fetchAppointments } = useAppointments();
+  const { patients, fetchPatients } = usePatients();
+  
   const [turnosCobrados, setTurnosCobrados] = useState<{ [key: number]: boolean }>({});
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [selectedTurno, setSelectedTurno] = useState<any>(null);
@@ -10,13 +13,36 @@ export function Cobros() {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Simular carga inicial de datos
+  // Fetch data on mount
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      await Promise.all([
+        fetchAppointments(),
+        fetchPatients()
+      ]);
       setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+    };
+    fetchData();
+  }, [fetchAppointments, fetchPatients]);
+
+  // Map API data to component format
+  const turnos = appointments.map(a => ({
+    id: parseInt(a.id),
+    pacienteId: parseInt(a.patientId),
+    fecha: a.date,
+    hora: a.time,
+    modalidad: 'presencial' as const,
+    estado: a.status,
+    monto: 0, // TODO: Get from payments
+  }));
+
+  const pacientes = patients.map(p => ({
+    id: parseInt(p.id),
+    nombre: `${p.firstName} ${p.lastName}`,
+    telefono: p.phone || '',
+    email: p.email || '',
+  }));
 
   const getPaciente = (pacienteId: number) => {
     return pacientes.find((p) => p.id === pacienteId);
