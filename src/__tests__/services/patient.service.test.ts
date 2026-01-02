@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { patientService } from '../../lib/services/patient.service';
 import { apiClient } from '../../lib/api/client';
 import type { Patient, CreatePatientDto } from '../../lib/types/api.types';
+import { PatientStatus } from '../../lib/types/api.types';
 
 vi.mock('../../lib/api/client');
 
@@ -16,7 +17,7 @@ describe('PatientService', () => {
     firstName: 'John',
     lastName: 'Doe',
     email: 'john@example.com',
-    status: 'ACTIVE',
+    status: PatientStatus.ACTIVE,
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
   };
@@ -50,7 +51,7 @@ describe('PatientService', () => {
         firstName: 'Jane',
         lastName: 'Smith',
         email: 'jane@example.com',
-        status: 'ACTIVE',
+        status: PatientStatus.ACTIVE,
       };
 
       const newPatient: Patient = {

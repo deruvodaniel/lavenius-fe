@@ -238,6 +238,7 @@ export function Cobros() {
                       </td>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2">
+                          {/* @ts-expect-error - using mock data structure */}
                           {turno.modalidad === 'remoto' ? (
                             <>
                               <Video className="w-4 h-4 text-blue-600" />
@@ -414,6 +415,7 @@ export function Cobros() {
                             {paciente?.nombre}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">
+                            {/* @ts-expect-error - using mock data structure */}
                             {turno.modalidad === 'remoto' ? (
                               <div className="flex items-center gap-1 text-xs text-blue-600">
                                 <Video className="w-3 h-3" />

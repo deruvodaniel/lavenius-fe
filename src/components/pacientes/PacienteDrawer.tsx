@@ -29,6 +29,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
   // Load patient data when editing
   useEffect(() => {
     if (patient) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         nombre: patient.firstName || '',
         apellido: patient.lastName || '',

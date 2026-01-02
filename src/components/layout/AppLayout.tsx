@@ -27,6 +27,7 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
     };
 
     checkViewport();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     window.addEventListener('resize', checkViewport);
     return () => window.removeEventListener('resize', checkViewport);

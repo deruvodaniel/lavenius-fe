@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { appointmentService } from '../../lib/services/appointment.service';
 import { apiClient } from '../../lib/api/client';
 import type { Appointment, CreateAppointmentDto } from '../../lib/types/api.types';
+import { SessionType, AppointmentStatus } from '../../lib/types/api.types';
 
 vi.mock('../../lib/api/client');
 
@@ -15,8 +16,8 @@ describe('AppointmentService', () => {
     therapistId: 'therapist-1',
     patientId: 'patient-1',
     dateTime: '2024-01-15T10:00:00Z',
-    sessionType: 'INDIVIDUAL',
-    status: 'SCHEDULED',
+    sessionType: SessionType.PRESENTIAL,
+    status: AppointmentStatus.PENDING,
     cost: 100,
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
@@ -51,8 +52,8 @@ describe('AppointmentService', () => {
       const createData: CreateAppointmentDto = {
         patientId: 'patient-1',
         dateTime: '2024-01-15T10:00:00Z',
-        sessionType: 'INDIVIDUAL',
-        status: 'SCHEDULED',
+        sessionType: SessionType.PRESENTIAL,
+        status: AppointmentStatus.PENDING,
         cost: 100,
       };
 

@@ -3,9 +3,9 @@ import type {
   Payment,
   CreatePaymentDto,
   UpdatePaymentDto,
-  PaymentStatus,
   PaymentMethod,
 } from '../types/api.types';
+import { PaymentStatus } from '../types/api.types';
 
 /**
  * Payment Service
@@ -104,7 +104,7 @@ export class PaymentService {
    * Get pending payments total
    */
   async getPendingTotal(): Promise<number> {
-    const pending = await this.getByStatus('PENDING');
+    const pending = await this.getByStatus(PaymentStatus.PENDING);
     return pending.reduce((total, payment) => total + payment.amount, 0);
   }
 }

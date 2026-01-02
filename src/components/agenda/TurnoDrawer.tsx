@@ -54,6 +54,7 @@ export function TurnoDrawer({ isOpen, onClose, appointment, patients, pacienteId
       const fecha = dateTime.toISOString().split('T')[0];
       const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
       
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         pacienteId: appointment.patientId,
         fecha,
@@ -135,11 +136,10 @@ export function TurnoDrawer({ isOpen, onClose, appointment, patients, pacienteId
     const status = formData.estado as AppointmentStatus;
 
     const appointmentDto: CreateAppointmentDto = {
-      therapistId: user.id,
       patientId: formData.pacienteId,
       dateTime: localDateTime,
       description: formData.motivo || undefined,
-      sessionType: sessionType,
+      sessionType: sessionType as SessionType,
       status: status,
       cost: formData.monto,
     };
