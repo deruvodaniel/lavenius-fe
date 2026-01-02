@@ -1,52 +1,95 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Calendar, Clock, User, Video, MapPin, AlertTriangle } from 'lucide-react';
 import { Turno, Paciente } from '../../data/mockData';
+import type { CreateAppointmentDto, Appointment, SessionType, AppointmentStatus } from '@/lib/types/api.types';
 
 interface TurnoDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   turno?: Turno | null;
+  appointment?: Appointment | null;
   pacientes: Paciente[];
-  pacienteId?: number; // Paciente preseleccionado
-  onSave: (turno: Partial<Turno>) => void;
-  onDelete?: (turnoId: number) => void;
+  pacienteId?: number;
+  onSave: (appointment: CreateAppointmentDto) => void;
+  onDelete?: (appointmentId: string) => void;
 }
 
-export function TurnoDrawer({ isOpen, onClose, turno, pacientes, pacienteId, onSave, onDelete }: TurnoDrawerProps) {
+export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pacienteId, onSave, onDelete }: TurnoDrawerProps) {
   const [formData, setFormData] = useState({
-    pacienteId: turno?.pacienteId || pacienteId || pacientes[0]?.id || 1,
-    fecha: turno?.fecha || '',
-    hora: turno?.hora || '09:00',
-    motivo: turno?.motivo || '',
-    modalidad: turno?.modalidad || 'presencial' as 'presencial' | 'remoto',
-    estado: turno?.estado || 'pendiente' as 'pendiente' | 'confirmado' | 'completado',
-    monto: turno?.monto || 8500,
+    pacienteId: '',
+    fecha: '',
+    hora: '09:00',
+    motivo: '',
+    sessionType: 'INDIVIDUAL' as SessionType,
+    estado: 'SCHEDULED' as AppointmentStatus,
+    monto: 8500,
   });
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
 
+  // Load appointment data when editing
+  useEffect(() => {
+    if (appointment) {
+      const dateTime = new Date(appointment.dateTime);
+      const fecha = dateTime.toISOString().split('T')[0];
+      const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
+      
+      setFormData({
+        pacienteId: appointment.patientId,
+        fecha,
+        hora,
+        motivo: appointment.description || '',
+        sessionType: appointment.sessionType,
+        estado: appointment.status,
+        monto: appointment.cost,
+      });
+    } else if (turno) {
+      // Support legacy turno format
+      setFormData({
+        pacienteId: turno.pacienteId?.toString() || pacienteId?.toString() || '',
+        fecha: turno.fecha || '',
+        hora: turno.hora || '09:00',
+        motivo: turno.motivo || '',
+        sessionType: 'INDIVIDUAL',
+        estado: turno.estado === 'confirmado' ? 'CONFIRMED' : 'SCHEDULED',
+        monto: turno.monto || 8500,
+      });
+    } else if (pacienteId) {
+      setFormData(prev => ({ ...prev, pacienteId: pacienteId.toString() }));
+    }
+  }, [appointment, turno, pacienteId]);
+
   if (!isOpen) return null;
 
-  const isEditing = !!turno;
+  const isEditing = !!appointment || !!turno;
 
   const handleSave = () => {
     setShowSaveConfirm(true);
   };
 
   const confirmSave = () => {
-    if (isEditing) {
-      onSave({ ...formData, id: turno.id });
-    } else {
-      onSave(formData);
-    }
+    // Combine fecha and hora into ISO dateTime
+    const dateTimeStr = `${formData.fecha}T${formData.hora}:00`;
+    const dateTime = new Date(dateTimeStr);
+
+    const appointmentDto: CreateAppointmentDto = {
+      patientId: formData.pacienteId,
+      dateTime: dateTime.toISOString(),
+      description: formData.motivo || undefined,
+      sessionType: formData.sessionType,
+      status: formData.estado,
+      cost: formData.monto,
+    };
+
+    onSave(appointmentDto);
     setShowSaveConfirm(false);
     onClose();
   };
 
   const confirmDelete = () => {
-    if (turno && onDelete) {
-      onDelete(turno.id);
+    if (appointment && onDelete) {
+      onDelete(appointment.id);
       setShowDeleteConfirm(false);
       onClose();
     }
@@ -87,9 +130,10 @@ export function TurnoDrawer({ isOpen, onClose, turno, pacientes, pacienteId, onS
             </label>
             <select
               value={formData.pacienteId}
-              onChange={(e) => setFormData({ ...formData, pacienteId: Number(e.target.value) })}
+              onChange={(e) => setFormData({ ...formData, pacienteId: e.target.value })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
+              <option value="">Seleccionar paciente...</option>
               {pacientes.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.nombre}
@@ -143,35 +187,35 @@ export function TurnoDrawer({ isOpen, onClose, turno, pacientes, pacienteId, onS
             />
           </div>
 
-          {/* Modalidad */}
+          {/* Tipo de Sesión */}
           <div>
-            <label className="block text-gray-700 mb-2">Modalidad</label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, modalidad: 'presencial' })}
-                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
-                  formData.modalidad === 'presencial'
-                    ? 'border-purple-600 bg-purple-50 text-purple-700'
-                    : 'border-gray-300 text-gray-700 hover:border-purple-300'
-                }`}
-              >
-                <MapPin className="w-4 h-4" />
-                Presencial
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, modalidad: 'remoto' })}
-                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
-                  formData.modalidad === 'remoto'
-                    ? 'border-blue-600 bg-blue-50 text-blue-700'
-                    : 'border-gray-300 text-gray-700 hover:border-blue-300'
-                }`}
-              >
-                <Video className="w-4 h-4" />
-                Remoto
-              </button>
-            </div>
+            <label className="block text-gray-700 mb-2">Tipo de Sesión</label>
+            <select
+              value={formData.sessionType}
+              onChange={(e) => setFormData({ ...formData, sessionType: e.target.value as SessionType })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="INDIVIDUAL">Individual</option>
+              <option value="COUPLE">Pareja</option>
+              <option value="FAMILY">Familia</option>
+              <option value="GROUP">Grupal</option>
+            </select>
+          </div>
+
+          {/* Estado */}
+          <div>
+            <label className="block text-gray-700 mb-2">Estado</label>
+            <select
+              value={formData.estado}
+              onChange={(e) => setFormData({ ...formData, estado: e.target.value as AppointmentStatus })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="SCHEDULED">Agendado</option>
+              <option value="CONFIRMED">Confirmado</option>
+              <option value="COMPLETED">Completado</option>
+              <option value="CANCELLED">Cancelado</option>
+              <option value="NO_SHOW">No asistió</option>
+            </select>
           </div>
 
           {/* Monto */}

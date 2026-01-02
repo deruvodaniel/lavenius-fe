@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
-import { Clock, Video, MapPin, Plus, Calendar, X } from 'lucide-react';
+import { Clock, Video, MapPin, Plus, Calendar, X, Edit2 } from 'lucide-react';
 import { Turno } from '../../data/mockData';
 import { TurnoDrawer } from './TurnoDrawer';
 import { CalendarView } from '../shared';
 import { useAppointments, usePatients } from '@/lib/hooks';
+import type { CreateAppointmentDto, Appointment } from '@/lib/types/api.types';
 
 export function Agenda() {
-  const { appointments, isLoading, fetchUpcoming } = useAppointments();
+  const { appointments, isLoading, fetchUpcoming, createAppointment, updateAppointment, deleteAppointment } = useAppointments();
   const { patients, fetchPatients } = usePatients();
   
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   const [turnoDrawerOpen, setTurnoDrawerOpen] = useState(false);
   const [selectedTurno, setSelectedTurno] = useState<Turno | null>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [visibleCount, setVisibleCount] = useState(5); // For infinite scroll
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -153,23 +155,39 @@ export function Agenda() {
 
   const handleNuevoTurno = () => {
     setSelectedTurno(null);
+    setSelectedAppointment(null);
     setTurnoDrawerOpen(true);
   };
 
-  const handleSaveTurno = async (turnoData: Partial<Turno>) => {
-    // TODO: Integrate with createAppointment/updateAppointment from useAppointments hook
-    console.log('Save turno:', turnoData);
-    // if (selectedTurno) {
-    //   await updateAppointment(selectedTurno.id, turnoData);
-    // } else {
-    //   await createAppointment(turnoData);
-    // }
+  const handleSaveTurno = async (appointmentData: CreateAppointmentDto) => {
+    try {
+      if (selectedAppointment) {
+        // Update existing appointment
+        await updateAppointment(selectedAppointment.id, appointmentData);
+      } else {
+        // Create new appointment
+        await createAppointment(appointmentData);
+      }
+      setTurnoDrawerOpen(false);
+      setSelectedAppointment(null);
+      // Refresh list
+      await fetchUpcoming(100);
+    } catch (error) {
+      console.error('Error saving appointment:', error);
+      // TODO: Show error notification to user
+    }
   };
 
-  const handleDeleteTurno = async (turnoId: number) => {
-    // TODO: Integrate with deleteAppointment from useAppointments hook
-    console.log('Delete turno:', turnoId);
-    // await deleteAppointment(turnoId.toString());
+  const handleDeleteTurno = async (appointmentId: string) => {
+    try {
+      await deleteAppointment(appointmentId);
+      setTurnoDrawerOpen(false);
+      // Refresh list
+      await fetchUpcoming(100);
+    } catch (error) {
+      console.error('Error deleting appointment:', error);
+      // TODO: Show error notification to user
+    }
   };
 
   return (
@@ -218,6 +236,7 @@ export function Agenda() {
                     <div className="space-y-3">
                       {turnosDelDia.map((turno) => {
                         const paciente = getPaciente(turno.pacienteId);
+                        const appointment = appointments.find(a => parseInt(a.id) === turno.id);
 
                         return (
                           <div
@@ -277,6 +296,18 @@ export function Agenda() {
                                     >
                                       {turno.estado === 'confirmado' ? 'Confirmado' : turno.estado === 'completado' ? 'Completado' : 'Pendiente'}
                                     </span>
+                                    <button
+                                      onClick={() => {
+                                        if (appointment) {
+                                          setSelectedAppointment(appointment);
+                                          setTurnoDrawerOpen(true);
+                                        }
+                                      }}
+                                      className="p-1.5 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                                      title="Editar turno"
+                                    >
+                                      <Edit2 className="w-3.5 h-3.5" />
+                                    </button>
                                     <button
                                       onClick={() => setSelectedPatientId(paciente?.id || null)}
                                       className="text-indigo-600 text-xs hover:text-indigo-700 transition-colors whitespace-nowrap"
@@ -380,9 +411,12 @@ export function Agenda() {
         onClose={() => {
           setTurnoDrawerOpen(false);
           setSelectedTurno(null);
+          setSelectedAppointment(null);
         }}
         turno={selectedTurno}
+        appointment={selectedAppointment}
         pacientes={pacientes}
+        pacienteId={selectedPatientId || undefined}
         onSave={handleSaveTurno}
         onDelete={handleDeleteTurno}
       />
