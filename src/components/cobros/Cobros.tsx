@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Bell, CheckCircle, Clock, DollarSign, Calendar, Video, MapPin, Copy, MessageCircle, X, MoreVertical } from 'lucide-react';
 import { useAppointments, usePatients } from '@/lib/hooks';
 
@@ -12,20 +12,27 @@ export function Cobros() {
   const [reminderMessage, setReminderMessage] = useState('');
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const hasFetchedRef = useRef(false);
 
-  // Fetch data on mount
+  // Fetch data on mount (only once)
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      await Promise.all([
-        fetchAppointments(),
-        fetchPatients()
-      ]);
-      setIsLoading(false);
-    };
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      const fetchData = async () => {
+        setIsLoading(true);
+        try {
+          await Promise.all([
+            fetchAppointments(),
+            fetchPatients()
+          ]);
+        } catch (error) {
+          // Ignore errors
+        }
+        setIsLoading(false);
+      };
+      fetchData();
+    }
+  }, [fetchAppointments, fetchPatients]);
 
   // Map API data to component format
   const turnos = appointments.map(a => {

@@ -18,16 +18,19 @@ export function Agenda() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const [calendarDrawerOpen, setCalendarDrawerOpen] = useState(false);
+  const hasFetchedRef = useRef(false);
   
   // Estado para el mes/año del calendario
   const [calendarDate, setCalendarDate] = useState(new Date());
 
-  // Fetch data on mount
+  // Fetch data on mount (only once)
   useEffect(() => {
-    fetchUpcoming(100); // Get next 100 appointments
-    fetchPatients();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      fetchUpcoming(100).catch(() => {}); // Get next 100 appointments
+      fetchPatients().catch(() => {}); // Ignore errors
+    }
+  }, [fetchUpcoming, fetchPatients]);
 
   // Infinite scroll effect
   useEffect(() => {

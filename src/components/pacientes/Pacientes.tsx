@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Video, MapPin, Calendar, Filter, Plus, Edit2, Trash2 } from 'lucide-react';
 import { Paciente } from '../../data/mockData';
 import { FichaClinica } from '../dashboard';
@@ -16,13 +16,16 @@ export function Pacientes() {
   const [soloTurnosEstaSemana, setSoloTurnosEstaSemana] = useState(false);
   const [pacienteDrawerOpen, setPacienteDrawerOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState<typeof patients[0] | null>(null);
+  const hasFetchedRef = React.useRef(false);
 
-  // Fetch data on mount
-  useEffect(() => {
-    fetchPatients();
-    fetchAppointments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Fetch data on mount (only once)
+  React.useEffect(() => {
+    if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      fetchPatients().catch(() => {});
+      fetchAppointments().catch(() => {});
+    }
+  }, [fetchPatients, fetchAppointments]);
 
   // If a patient is selected, show their clinical record
   if (selectedPatientId !== null) {
