@@ -252,9 +252,12 @@ export class ApiClient {
 
   /**
    * Check if user is authenticated
+   * Requires both token AND userKey to be present
    */
   isAuthenticated(): boolean {
-    return !!this.tokenStorage.getToken();
+    const hasToken = !!this.tokenStorage.getToken();
+    const hasUserKey = !!this.tokenStorage.getUserKey();
+    return hasToken && hasUserKey;
   }
 
   /**
