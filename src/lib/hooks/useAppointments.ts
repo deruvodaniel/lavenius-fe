@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useAppointmentStore } from '@/lib/stores';
 
 /**
@@ -15,16 +16,6 @@ import { useAppointmentStore } from '@/lib/stores';
  */
 export const useAppointments = () => {
   const appointments = useAppointmentStore(state => state.appointments);
-  const todayAppointments = useAppointmentStore(state => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return state.appointments.filter(apt => {
-      const aptDate = new Date(apt.dateTime);
-      return aptDate >= today && aptDate < tomorrow;
-    });
-  });
   const isLoading = useAppointmentStore(state => state.isLoading);
   const error = useAppointmentStore(state => state.error);
   
@@ -34,6 +25,18 @@ export const useAppointments = () => {
   const updateAppointment = useAppointmentStore(state => state.updateAppointment);
   const deleteAppointment = useAppointmentStore(state => state.deleteAppointment);
   const clearError = useAppointmentStore(state => state.clearError);
+
+  // Memoize todayAppointments to avoid recreating on every render
+  const todayAppointments = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return appointments.filter(apt => {
+      const aptDate = new Date(apt.dateTime);
+      return aptDate >= today && aptDate < tomorrow;
+    });
+  }, [appointments]);
 
   return {
     appointments,

@@ -34,6 +34,9 @@ export function Login() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    // Prevent double submission
+    if (isLoading) return;
+    
     try {
       await login(data);
       navigate('/dashboard');

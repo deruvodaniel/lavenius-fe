@@ -1,14 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { Clock, Video, MapPin, Plus, Calendar, X, Edit2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Turno } from '../../data/mockData';
 import { TurnoDrawer } from './TurnoDrawer';
 import { CalendarView } from '../shared';
-import { useAppointments, usePatients } from '@/lib/hooks';
+import { useAppointments, usePatients, useErrorToast } from '@/lib/hooks';
 import type { CreateAppointmentDto, Appointment } from '@/lib/types/api.types';
 
 export function Agenda() {
-  const { appointments, isLoading, fetchUpcoming, createAppointment, updateAppointment, deleteAppointment } = useAppointments();
+  const { appointments, isLoading, error, fetchUpcoming, createAppointment, updateAppointment, deleteAppointment, clearError } = useAppointments();
   const { patients, fetchPatients } = usePatients();
+  
+  // Auto-display error toasts
+  useErrorToast(error, clearError);
   
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   const [turnoDrawerOpen, setTurnoDrawerOpen] = useState(false);
@@ -168,9 +172,11 @@ export function Agenda() {
       if (selectedAppointment) {
         // Update existing appointment
         await updateAppointment(selectedAppointment.id, appointmentData);
+        toast.success('Turno actualizado exitosamente');
       } else {
         // Create new appointment
         await createAppointment(appointmentData);
+        toast.success('Turno creado exitosamente');
       }
       setTurnoDrawerOpen(false);
       setSelectedAppointment(null);
@@ -178,19 +184,20 @@ export function Agenda() {
       await fetchUpcoming(100);
     } catch (error) {
       console.error('Error saving appointment:', error);
-      // TODO: Show error notification to user
+      toast.error('Error al guardar el turno');
     }
   };
 
   const handleDeleteTurno = async (appointmentId: string) => {
     try {
       await deleteAppointment(appointmentId);
+      toast.success('Turno eliminado exitosamente');
       setTurnoDrawerOpen(false);
       // Refresh list
       await fetchUpcoming(100);
     } catch (error) {
       console.error('Error deleting appointment:', error);
-      // TODO: Show error notification to user
+      toast.error('Error al eliminar el turno');
     }
   };
 

@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Video, MapPin, Calendar, Filter, Plus, Edit2, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Paciente } from '../../data/mockData';
 import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
-import { usePatients, useAppointments } from '@/lib/hooks';
+import { usePatients, useAppointments, useErrorToast } from '@/lib/hooks';
 import type { CreatePatientDto } from '@/lib/types/api.types';
 
 export function Pacientes() {
-  const { patients, isLoading, fetchPatients, createPatient, updatePatient, deletePatient } = usePatients();
+  const { patients, isLoading, error, fetchPatients, createPatient, updatePatient, deletePatient, clearError } = usePatients();
   const { appointments, fetchAppointments } = useAppointments();
+  
+  // Auto-display error toasts
+  useErrorToast(error, clearError);
   
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   const [modalidadFilter, setModalidadFilter] = useState<'todas' | 'presencial' | 'remoto' | 'mixto'>('todas');
@@ -47,9 +51,11 @@ export function Pacientes() {
       if (editingPatient) {
         // Update existing patient
         await updatePatient(editingPatient.id, patientData);
+        toast.success('Paciente actualizado exitosamente');
       } else {
         // Create new patient
         await createPatient(patientData);
+        toast.success('Paciente creado exitosamente');
       }
       setPacienteDrawerOpen(false);
       setEditingPatient(null);
@@ -57,7 +63,7 @@ export function Pacientes() {
       await fetchPatients();
     } catch (error) {
       console.error('Error saving patient:', error);
-      // TODO: Show error notification to user
+      toast.error('Error al guardar el paciente');
     }
   };
 
@@ -68,11 +74,12 @@ export function Pacientes() {
 
     try {
       await deletePatient(patientId);
+      toast.success('Paciente eliminado exitosamente');
       // Refresh list
       await fetchPatients();
     } catch (error) {
       console.error('Error deleting patient:', error);
-      // TODO: Show error notification to user
+      toast.error('Error al eliminar el paciente');
     }
   };
 
