@@ -24,10 +24,8 @@ export type PaginatedResponse<T> = {
 // ==================== Enums ====================
 
 export enum SessionType {
-  INDIVIDUAL = 'INDIVIDUAL',
-  COUPLE = 'COUPLE',
-  FAMILY = 'FAMILY',
-  GROUP = 'GROUP',
+  REMOTE = 'remote',
+  PRESENTIAL = 'presential',
 }
 
 export enum PatientStatus {
@@ -37,11 +35,10 @@ export enum PatientStatus {
 }
 
 export enum AppointmentStatus {
-  SCHEDULED = 'SCHEDULED',
-  CONFIRMED = 'CONFIRMED',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
-  NO_SHOW = 'NO_SHOW',
+  CONFIRMED = 'confirmed',
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
 }
 
 export enum PaymentMethod {

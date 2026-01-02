@@ -20,8 +20,8 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pa
     fecha: '',
     hora: '09:00',
     motivo: '',
-    sessionType: 'INDIVIDUAL' as SessionType,
-    estado: 'SCHEDULED' as AppointmentStatus,
+    sessionType: 'presential' as SessionType,
+    estado: 'pending' as AppointmentStatus,
     monto: 8500,
   });
 
@@ -45,14 +45,21 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pa
         monto: appointment.cost,
       });
     } else if (turno) {
-      // Support legacy turno format
+      // Support legacy turno format - map old values to new
+      const mapEstado = (estado: string): AppointmentStatus => {
+        if (estado === 'confirmado') return 'confirmed';
+        if (estado === 'completado') return 'completed';
+        if (estado === 'cancelado') return 'cancelled';
+        return 'pending';
+      };
+
       setFormData({
         pacienteId: turno.pacienteId?.toString() || pacienteId?.toString() || '',
         fecha: turno.fecha || '',
         hora: turno.hora || '09:00',
         motivo: turno.motivo || '',
-        sessionType: 'INDIVIDUAL',
-        estado: turno.estado === 'confirmado' ? 'CONFIRMED' : 'SCHEDULED',
+        sessionType: 'presential',
+        estado: mapEstado(turno.estado || 'pendiente'),
         monto: turno.monto || 8500,
       });
     } else if (pacienteId) {
@@ -195,10 +202,8 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pa
               onChange={(e) => setFormData({ ...formData, sessionType: e.target.value as SessionType })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="INDIVIDUAL">Individual</option>
-              <option value="COUPLE">Pareja</option>
-              <option value="FAMILY">Familia</option>
-              <option value="GROUP">Grupal</option>
+              <option value="presential">Presencial</option>
+              <option value="remote">Remoto</option>
             </select>
           </div>
 
@@ -210,11 +215,10 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pa
               onChange={(e) => setFormData({ ...formData, estado: e.target.value as AppointmentStatus })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="SCHEDULED">Agendado</option>
-              <option value="CONFIRMED">Confirmado</option>
-              <option value="COMPLETED">Completado</option>
-              <option value="CANCELLED">Cancelado</option>
-              <option value="NO_SHOW">No asistió</option>
+              <option value="pending">Pendiente</option>
+              <option value="confirmed">Confirmado</option>
+              <option value="completed">Completado</option>
+              <option value="cancelled">Cancelado</option>
             </select>
           </div>
 
@@ -229,20 +233,6 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pa
               onChange={(e) => setFormData({ ...formData, monto: Number(e.target.value) })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
-          </div>
-
-          {/* Estado */}
-          <div>
-            <label className="block text-gray-700 mb-2">Estado</label>
-            <select
-              value={formData.estado}
-              onChange={(e) => setFormData({ ...formData, estado: e.target.value as any })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="pendiente">Pendiente</option>
-              <option value="confirmado">Confirmado</option>
-              <option value="completado">Completado</option>
-            </select>
           </div>
 
           {/* Actions */}

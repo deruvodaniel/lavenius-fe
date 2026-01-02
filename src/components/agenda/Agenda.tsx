@@ -70,13 +70,22 @@ export function Agenda() {
     const dateTime = new Date(a.dateTime);
     const fecha = dateTime.toISOString().split('T')[0];
     const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
+    
+    // Map status to legacy format for display
+    const mapEstado = (status: string): 'pendiente' | 'confirmado' | 'completado' => {
+      if (status === 'confirmed') return 'confirmado';
+      if (status === 'completed') return 'completado';
+      if (status === 'cancelled') return 'completado'; // Treat cancelled as completed for display
+      return 'pendiente';
+    };
+
     return {
       id: parseInt(a.id),
       pacienteId: parseInt(a.patientId),
       fecha,
       hora,
-      modalidad: 'presencial' as const,
-      estado: a.status.toLowerCase() as 'pendiente' | 'confirmado' | 'completado',
+      modalidad: a.sessionType === 'remote' ? 'remoto' as const : 'presencial' as const,
+      estado: mapEstado(a.status),
       motivo: a.description || '',
     };
   });
