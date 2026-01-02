@@ -24,7 +24,8 @@ export function Cobros() {
       setIsLoading(false);
     };
     fetchData();
-  }, [fetchAppointments, fetchPatients]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Map API data to component format
   const turnos = appointments.map(a => {

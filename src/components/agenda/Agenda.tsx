@@ -24,7 +24,8 @@ export function Agenda() {
   useEffect(() => {
     fetchUpcoming(100); // Get next 100 appointments
     fetchPatients();
-  }, [fetchUpcoming, fetchPatients]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Infinite scroll effect
   useEffect(() => {
