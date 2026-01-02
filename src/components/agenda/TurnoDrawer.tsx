@@ -73,8 +73,33 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pac
   if (!isOpen) return null;
 
   const isEditing = !!appointment || !!turno;
+  
+  // Validate form
+  const isFormValid = formData.pacienteId && formData.fecha && formData.hora && formData.sessionType && formData.estado;
 
   const handleSave = () => {
+    // Validate before showing confirmation
+    if (!formData.pacienteId) {
+      alert('Por favor seleccione un paciente');
+      return;
+    }
+    if (!formData.fecha) {
+      alert('Por favor seleccione una fecha');
+      return;
+    }
+    if (!formData.hora) {
+      alert('Por favor seleccione una hora');
+      return;
+    }
+    if (!formData.sessionType) {
+      alert('Por favor seleccione un tipo de sesión');
+      return;
+    }
+    if (!formData.estado) {
+      alert('Por favor seleccione un estado');
+      return;
+    }
+    
     setShowSaveConfirm(true);
   };
 
@@ -82,6 +107,8 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pac
     console.log('confirmSave called');
     console.log('User:', user);
     console.log('FormData:', formData);
+    console.log('SessionType value:', formData.sessionType);
+    console.log('SessionType type:', typeof formData.sessionType);
     
     if (!user?.id) {
       console.error('No user ID available');
@@ -89,7 +116,7 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pac
       return;
     }
 
-    // Validate required fields
+    // Validate required fields (redundant but safe)
     if (!formData.pacienteId) {
       alert('Por favor seleccione un paciente');
       return;
@@ -115,6 +142,7 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pac
     };
 
     console.log('Appointment DTO:', appointmentDto);
+    console.log('DTO sessionType:', appointmentDto.sessionType);
 
     onSave(appointmentDto);
     setShowSaveConfirm(false);
@@ -160,12 +188,15 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pac
           <div>
             <label className="flex items-center gap-2 text-gray-700 mb-2">
               <User className="w-4 h-4" />
-              Paciente
+              Paciente <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.pacienteId}
               onChange={(e) => setFormData({ ...formData, pacienteId: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                !formData.pacienteId ? 'border-red-300 bg-red-50' : 'border-gray-300'
+              }`}
+              required
             >
               <option value="">Seleccionar paciente...</option>
               {patients.map((p) => (
@@ -180,13 +211,16 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pac
           <div>
             <label className="flex items-center gap-2 text-gray-700 mb-2">
               <Calendar className="w-4 h-4" />
-              Fecha
+              Fecha <span className="text-red-500">*</span>
             </label>
             <input
               type="date"
               value={formData.fecha}
               onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                !formData.fecha ? 'border-red-300 bg-red-50' : 'border-gray-300'
+              }`}
+              required
             />
           </div>
 
@@ -194,7 +228,7 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pac
           <div>
             <label className="flex items-center gap-2 text-gray-700 mb-2">
               <Clock className="w-4 h-4" />
-              Hora
+              Hora <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.hora}
@@ -266,7 +300,12 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pac
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
               onClick={handleSave}
-              className="flex-1 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+              disabled={!isFormValid}
+              className={`flex-1 py-3 rounded-lg transition-colors ${
+                isFormValid
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
             >
               {isEditing ? 'Guardar cambios' : 'Crear turno'}
             </button>
