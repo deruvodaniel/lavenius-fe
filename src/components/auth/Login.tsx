@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,6 +5,7 @@ import { z } from 'zod';
 import { User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth, useErrorToast } from '@/lib/hooks';
@@ -21,7 +21,6 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export function Login() {
   const navigate = useNavigate();
   const { login, isLoading, error, clearError } = useAuth();
-  const [showPassphrase, setShowPassphrase] = useState(false);
 
   useErrorToast(error, clearError);
 
@@ -45,20 +44,22 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <Card className="w-full max-w-md shadow-2xl border-0">
+        <CardHeader className="space-y-1 pb-6">
           <div className="flex justify-center mb-4">
-            <div className="bg-primary p-3 rounded-full">
-              <User className="w-8 h-8 text-primary-foreground" />
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-4 rounded-full shadow-lg">
+              <User className="w-10 h-10 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl text-center">Lavenius</CardTitle>
-          <CardDescription className="text-center">
+          <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            Lavenius
+          </CardTitle>
+          <CardDescription className="text-center text-gray-600 text-base">
             Plataforma de gestión psicológica
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-2">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -66,13 +67,14 @@ export function Login() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-gray-700 font-medium">Email</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="email"
                         placeholder="doctor@clinica.com"
                         disabled={isLoading}
+                        className="h-11"
                       />
                     </FormControl>
                     <FormMessage />
@@ -85,13 +87,13 @@ export function Login() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Contraseña</FormLabel>
+                    <FormLabel className="text-gray-700 font-medium">Contraseña</FormLabel>
                     <FormControl>
-                      <Input
+                      <PasswordInput
                         {...field}
-                        type="password"
                         placeholder="••••••••"
                         disabled={isLoading}
+                        className="h-11"
                       />
                     </FormControl>
                     <FormMessage />
@@ -104,13 +106,13 @@ export function Login() {
                 name="passphrase"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Passphrase (Encriptación)</FormLabel>
+                    <FormLabel className="text-gray-700 font-medium">Passphrase (Encriptación)</FormLabel>
                     <FormControl>
-                      <Input
+                      <PasswordInput
                         {...field}
-                        type={showPassphrase ? 'text' : 'password'}
                         placeholder="••••••••"
                         disabled={isLoading}
+                        className="h-11"
                       />
                     </FormControl>
                     <FormMessage />
@@ -118,9 +120,24 @@ export function Login() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium shadow-lg hover:shadow-xl transition-all"
+                disabled={isLoading}
+              >
                 {isLoading ? 'Ingresando...' : 'Ingresar'}
               </Button>
+
+              <div className="text-center mt-4">
+                <button
+                  type="button"
+                  onClick={() => navigate('/register')}
+                  className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                  disabled={isLoading}
+                >
+                  ¿No tienes cuenta? <span className="font-semibold">Regístrate aquí</span>
+                </button>
+              </div>
             </form>
           </Form>
         </CardContent>
