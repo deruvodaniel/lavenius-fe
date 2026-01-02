@@ -2,20 +2,20 @@ import { useState, useEffect } from 'react';
 import { X, Calendar, Clock, User, Video, MapPin, AlertTriangle } from 'lucide-react';
 import { Turno, Paciente } from '../../data/mockData';
 import { useAuthStore } from '@/lib/stores';
-import type { CreateAppointmentDto, Appointment, SessionType, AppointmentStatus } from '@/lib/types/api.types';
+import type { CreateAppointmentDto, Appointment, SessionType, AppointmentStatus, Patient } from '@/lib/types/api.types';
 
 interface TurnoDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   turno?: Turno | null;
   appointment?: Appointment | null;
-  pacientes: Paciente[];
+  patients: Patient[];
   pacienteId?: number;
   onSave: (appointment: CreateAppointmentDto) => void;
   onDelete?: (appointmentId: string) => void;
 }
 
-export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pacienteId, onSave, onDelete }: TurnoDrawerProps) {
+export function TurnoDrawer({ isOpen, onClose, turno, appointment, patients, pacienteId, onSave, onDelete }: TurnoDrawerProps) {
   const user = useAuthStore(state => state.user);
   
   const [formData, setFormData] = useState({
@@ -79,8 +79,24 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pa
   };
 
   const confirmSave = () => {
+    console.log('confirmSave called');
+    console.log('User:', user);
+    console.log('FormData:', formData);
+    
     if (!user?.id) {
       console.error('No user ID available');
+      alert('Error: No se pudo obtener el ID del usuario. Por favor, inicie sesión nuevamente.');
+      return;
+    }
+
+    // Validate required fields
+    if (!formData.pacienteId) {
+      alert('Por favor seleccione un paciente');
+      return;
+    }
+
+    if (!formData.fecha) {
+      alert('Por favor seleccione una fecha');
       return;
     }
 
@@ -97,6 +113,8 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pa
       status: formData.estado,
       cost: formData.monto,
     };
+
+    console.log('Appointment DTO:', appointmentDto);
 
     onSave(appointmentDto);
     setShowSaveConfirm(false);
@@ -150,9 +168,9 @@ export function TurnoDrawer({ isOpen, onClose, turno, appointment, pacientes, pa
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="">Seleccionar paciente...</option>
-              {pacientes.map((p) => (
+              {patients.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.nombre}
+                  {p.firstName} {p.lastName}
                 </option>
               ))}
             </select>

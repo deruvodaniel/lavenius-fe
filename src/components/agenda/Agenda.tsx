@@ -435,7 +435,7 @@ export function Agenda() {
         }}
         turno={selectedTurno}
         appointment={selectedAppointment}
-        pacientes={pacientes}
+        patients={patients}
         pacienteId={selectedPatientId || undefined}
         onSave={handleSaveTurno}
         onDelete={handleDeleteTurno}
