@@ -397,7 +397,6 @@ export function Pacientes() {
               </div>
             </div>
           );
-            );
           })}
         </AnimatedList>
       )}
