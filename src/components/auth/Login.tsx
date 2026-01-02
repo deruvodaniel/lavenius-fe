@@ -1,55 +1,130 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useAuth, useErrorToast } from '@/lib/hooks';
 
-interface LoginProps {
-  onLogin: () => void;
-}
+const loginSchema = z.object({
+  email: z.string().email('Email inválido'),
+  password: z.string().min(8, 'Contraseña debe tener al menos 8 caracteres'),
+  passphrase: z.string().min(6, 'Passphrase debe tener al menos 6 caracteres'),
+});
 
-export function Login({ onLogin }: LoginProps) {
+type LoginFormData = z.infer<typeof loginSchema>;
+
+export function Login() {
+  const navigate = useNavigate();
+  const { login, isLoading, error, clearError } = useAuth();
+  const [showPassphrase, setShowPassphrase] = useState(false);
+
+  useErrorToast(error, clearError);
+
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      passphrase: '',
+    },
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      await login(data);
+      navigate('/dashboard');
+    } catch (err) {
+      // Error is handled by store and displayed via useErrorToast
+      console.error('Login failed:', err);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <div className="flex justify-center mb-6">
-          <div className="bg-indigo-600 p-4 rounded-full">
-            <User className="w-12 h-12 text-white" />
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <div className="flex justify-center mb-4">
+            <div className="bg-primary p-3 rounded-full">
+              <User className="w-8 h-8 text-primary-foreground" />
+            </div>
           </div>
-        </div>
-        
-        <h1 className="text-center text-indigo-900 mb-2">Lavenius</h1>
-        <p className="text-center text-gray-600 mb-8">Plataforma de gestión psicológica</p>
-        
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="doctor@clinica.com"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="password" className="block text-gray-700 mb-2">
-              Contraseña
-            </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-          
-          <button
-            onClick={onLogin}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors"
-          >
-            Ingresar
-          </button>
-        </div>
-      </div>
+          <CardTitle className="text-2xl text-center">Lavenius</CardTitle>
+          <CardDescription className="text-center">
+            Plataforma de gestión psicológica
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder="doctor@clinica.com"
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contraseña</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="password"
+                        placeholder="••••••••"
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="passphrase"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Passphrase (Encriptación)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type={showPassphrase ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Ingresando...' : 'Ingresar'}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
