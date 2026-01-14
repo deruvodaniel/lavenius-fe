@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,11 +8,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/lib/hooks';
 import { toast } from 'sonner';
+import { useEffect } from 'react';
 import type { LoginDto } from '@/lib/types/api.types';
 
 export function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login, isLoading, error: _error, clearError } = useAuth();
+  
+  // Show success message if coming from registration
+  useEffect(() => {
+    if (searchParams.get('registered') === 'true') {
+      toast.success('¡Cuenta creada exitosamente!', {
+        description: 'Ahora puedes iniciar sesión con tus credenciales'
+      });
+    }
+  }, [searchParams]);
 
   const form = useForm<LoginDto>({
     defaultValues: {

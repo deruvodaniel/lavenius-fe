@@ -44,7 +44,8 @@ export function Register() {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       await register(data);
-      navigate('/dashboard');
+      // Redirect to login instead of auto-authenticating
+      navigate('/login?registered=true');
     } catch (err) {
       // Error is handled by store and displayed via useErrorToast
       console.error('Registration failed:', err);

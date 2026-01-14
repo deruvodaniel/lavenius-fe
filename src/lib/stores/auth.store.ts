@@ -84,15 +84,15 @@ export const useAuthStore = create<AuthStore>()(
 
       /**
        * Register new therapist user
+       * Note: Does NOT auto-authenticate. User must login after registration.
        */
       register: async (data: RegisterDto) => {
         set({ isLoading: true, error: null });
         
         try {
-          const response = await authService.register(data);
+          await authService.register(data);
+          // Do NOT set user or isAuthenticated - require explicit login
           set({
-            user: response.user,
-            isAuthenticated: true,
             isLoading: false,
             error: null,
           });
