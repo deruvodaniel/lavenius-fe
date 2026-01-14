@@ -107,6 +107,8 @@ export class ApiClient {
       timeout: API_TIMEOUT,
       headers: {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true', // Skip ngrok warning page
+        'User-Agent': 'Lavenius-Frontend', // Custom user agent for ngrok
       },
     });
 
