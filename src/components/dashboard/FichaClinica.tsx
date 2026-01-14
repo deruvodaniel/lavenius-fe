@@ -1,10 +1,13 @@
-import { ArrowLeft, Mail, Phone, Heart, Calendar, FileText, User, Clock, Flag, Edit2, Save, X } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, Mail, Phone, Heart, Calendar, FileText, User, Clock, Flag, Edit2, Save, X, Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { TurnoDrawer } from '../agenda';
+import { NoteDrawer } from '../notes/NoteDrawer';
+import { NoteList } from '../notes/NoteList';
 import { usePatients } from '@/lib/hooks';
+import { useNotes } from '@/lib/hooks/useNotes';
 import { useSessions } from '@/lib/stores/sessionStore';
-import type { Patient } from '@/lib/types/api.types';
+import type { Patient, CreateNoteDto, UpdateNoteDto, Note } from '@/lib/types/api.types';
 import type { CreateSessionDto } from '@/lib/types/session';
 
 interface FichaClinicaProps {
@@ -15,6 +18,7 @@ interface FichaClinicaProps {
 export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   const { updatePatient } = usePatients();
   const { sessionsUI, fetchUpcoming, createSession } = useSessions();
+  const { notes, isLoading: isLoadingNotes, fetchNotesByPatient, createNote, updateNote, deleteNote, clearNotes } = useNotes();
   
   // Estado para gestionar flag
   const [isFlagged, setIsFlagged] = useState(false);
@@ -31,8 +35,20 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     observaciones: patient?.observations || '',
   });
 
-  // Estado para drawer de turnos
+  // Estado para drawer de turnos y notas
   const [isTurnoDrawerOpen, setIsTurnoDrawerOpen] = useState(false);
+  const [isNoteDrawerOpen, setIsNoteDrawerOpen] = useState(false);
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+
+  // Load notes when patient changes
+  useEffect(() => {
+    if (patient) {
+      fetchNotesByPatient(patient.id);
+    }
+    return () => {
+      clearNotes();
+    };
+  }, [patient, fetchNotesByPatient, clearNotes]);
 
   if (!patient) return null;
 
@@ -96,6 +112,43 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
       console.error('Error creating session:', error);
       toast.error('Error al crear el turno');
     }
+  };
+
+  const handleSaveNote = async (data: CreateNoteDto | UpdateNoteDto, noteId?: string) => {
+    try {
+      if (noteId) {
+        await updateNote(noteId, data as UpdateNoteDto);
+        toast.success('Nota actualizada exitosamente');
+      } else {
+        await createNote(data as CreateNoteDto);
+        toast.success('Nota creada exitosamente');
+      }
+      setIsNoteDrawerOpen(false);
+      setSelectedNote(null);
+    } catch (error) {
+      console.error('Error saving note:', error);
+      toast.error('Error al guardar la nota');
+    }
+  };
+
+  const handleEditNote = (note: Note) => {
+    setSelectedNote(note);
+    setIsNoteDrawerOpen(true);
+  };
+
+  const handleDeleteNote = async (id: string) => {
+    try {
+      await deleteNote(id);
+      toast.success('Nota eliminada exitosamente');
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      toast.error('Error al eliminar la nota');
+    }
+  };
+
+  const handleCreateNote = () => {
+    setSelectedNote(null);
+    setIsNoteDrawerOpen(true);
   };
 
   // Get patient's sessions
@@ -311,12 +364,33 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
             )}
           </div>
 
-          {/* Notas de Sesión - Placeholder para futuras implementaciones */}
+          {/* Notas de Sesión */}
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-gray-900 mb-4">Notas de Sesión</h3>
-            <p className="text-gray-500 text-sm italic">
-              Las notas de sesión estarán disponibles próximamente. Por ahora, puedes usar el campo de observaciones clínicas para guardar información importante.
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-gray-900 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-indigo-600" />
+                Notas de Sesión
+              </h3>
+              <button
+                onClick={handleCreateNote}
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Nueva Nota
+              </button>
+            </div>
+            
+            {isLoadingNotes ? (
+              <p className="text-gray-500 text-sm">Cargando notas...</p>
+            ) : (
+              <NoteList
+                notes={notes}
+                onEdit={handleEditNote}
+                onDelete={handleDeleteNote}
+                onCreateNew={handleCreateNote}
+                emptyMessage="No hay notas registradas para este paciente"
+              />
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -338,6 +412,18 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
         pacienteId={patient.id}
         patients={[patient]}
         onSave={handleSaveTurno}
+      />
+
+      {/* Note Drawer */}
+      <NoteDrawer
+        isOpen={isNoteDrawerOpen}
+        onClose={() => {
+          setIsNoteDrawerOpen(false);
+          setSelectedNote(null);
+        }}
+        onSave={handleSaveNote}
+        note={selectedNote}
+        patientId={patient.id}
       />
     </div>
   );

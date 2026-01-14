@@ -34,7 +34,7 @@ export function NoteCard({ note, onEdit, onDelete, readOnly = false }: NoteCardP
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar className="w-4 h-4" />
-          <span>{formatDate(note.noteDate)}</span>
+          <span>{formatDate(note.createdAt)}</span>
         </div>
         
         {!readOnly && (
@@ -67,7 +67,7 @@ export function NoteCard({ note, onEdit, onDelete, readOnly = false }: NoteCardP
 
       {/* Note Content */}
       <div className="text-sm text-foreground whitespace-pre-wrap break-words">
-        {note.text}
+        {note.content}
       </div>
 
       {/* Footer - Type Badge */}

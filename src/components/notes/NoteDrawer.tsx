@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, FileText, Calendar as CalendarIcon, Save } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
+import { NoteType } from '@/lib/types/api.types';
 import type { Note, CreateNoteDto, UpdateNoteDto } from '@/lib/types/api.types';
 
 interface NoteDrawerProps {
@@ -26,8 +27,8 @@ export function NoteDrawer({
   sessionId
 }: NoteDrawerProps) {
   const [formData, setFormData] = useState({
-    text: '',
-    noteDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+    content: '',
+    noteType: NoteType.SESSION,
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -35,14 +36,14 @@ export function NoteDrawer({
   useEffect(() => {
     if (note) {
       setFormData({
-        text: note.text || '',
-        noteDate: note.noteDate ? new Date(note.noteDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        content: note.content || '',
+        noteType: note.noteType || NoteType.SESSION,
       });
     } else {
       // Reset form when creating new note
       setFormData({
-        text: '',
-        noteDate: new Date().toISOString().split('T')[0],
+        content: '',
+        noteType: NoteType.SESSION,
       });
     }
   }, [note, isOpen]);
@@ -50,7 +51,7 @@ export function NoteDrawer({
   if (!isOpen) return null;
 
   const handleSave = async () => {
-    if (!formData.text.trim()) {
+    if (!formData.content.trim()) {
       return;
     }
 
@@ -59,15 +60,15 @@ export function NoteDrawer({
       if (note) {
         // Update existing note
         const updateData: UpdateNoteDto = {
-          text: formData.text,
-          noteDate: formData.noteDate,
+          content: formData.content,
+          noteType: formData.noteType,
         };
         await onSave(updateData, note.id);
       } else {
         // Create new note
         const createData: CreateNoteDto = {
-          text: formData.text,
-          noteDate: formData.noteDate,
+          content: formData.content,
+          noteType: formData.noteType,
           patientId,
           sessionId,
         };
@@ -76,8 +77,8 @@ export function NoteDrawer({
 
       // Reset form and close
       setFormData({
-        text: '',
-        noteDate: new Date().toISOString().split('T')[0],
+        content: '',
+        noteType: NoteType.SESSION,
       });
       onClose();
     } catch (error) {
@@ -90,8 +91,8 @@ export function NoteDrawer({
   const handleClose = () => {
     if (!isSaving) {
       setFormData({
-        text: '',
-        noteDate: new Date().toISOString().split('T')[0],
+        content: '',
+        noteType: NoteType.SESSION,
       });
       onClose();
     }
@@ -128,29 +129,32 @@ export function NoteDrawer({
 
         {/* Form */}
         <div className="p-4 md:p-6 space-y-6">
-          {/* Date Input */}
+          {/* Note Type Selector */}
           <div>
-            <label className="block text-gray-700 mb-2 flex items-center gap-2">
-              <CalendarIcon className="w-4 h-4 text-indigo-600" />
-              Fecha de la nota
+            <label className="block text-gray-700 mb-2">
+              Tipo de nota
             </label>
-            <input
-              type="date"
-              value={formData.noteDate}
-              onChange={(e) => setFormData({ ...formData, noteDate: e.target.value })}
+            <select
+              value={formData.noteType}
+              onChange={(e) => setFormData({ ...formData, noteType: e.target.value as NoteType })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               disabled={isSaving}
-            />
+            >
+              <option value="SESSION">Sesión</option>
+              <option value="GENERAL">General</option>
+              <option value="TREATMENT_PLAN">Plan de tratamiento</option>
+              <option value="PROGRESS">Progreso</option>
+            </select>
           </div>
 
-          {/* Note Text */}
+          {/* Note Content */}
           <div>
             <label className="block text-gray-700 mb-2">
               Contenido de la nota
             </label>
             <Textarea
-              value={formData.text}
-              onChange={(e) => setFormData({ ...formData, text: e.target.value })}
+              value={formData.content}
+              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               placeholder="Escribe aquí las observaciones de la sesión..."
               className="min-h-[300px] resize-none"
               disabled={isSaving}
@@ -172,7 +176,7 @@ export function NoteDrawer({
           </Button>
           <Button
             onClick={handleSave}
-            disabled={isSaving || !formData.text.trim()}
+            disabled={isSaving || !formData.content.trim()}
             className="bg-gradient-to-r from-indigo-600 to-indigo-700"
           >
             {isSaving ? (
