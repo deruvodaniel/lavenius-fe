@@ -76,3 +76,14 @@ export function formatISODate(date: Date | string): string {
   const day = String(d.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
+
+/**
+ * Formatea un valor numérico como moneda
+ * @example "$ 1.500,00"
+ */
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+  }).format(amount);
+}
