@@ -9,7 +9,7 @@ export function Cobros() {
   
   const [turnosCobrados, setTurnosCobrados] = useState<{ [key: number]: boolean }>({});
   const [showReminderModal, setShowReminderModal] = useState(false);
-  const [selectedTurno, setSelectedTurno] = useState<any>(null);
+  const [_selectedTurno, setSelectedTurno] = useState<any>(null);
   const [reminderMessage, setReminderMessage] = useState('');
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +26,7 @@ export function Cobros() {
             fetchUpcoming(),
             fetchPatients()
           ]);
-        } catch (error) {
+        } catch {
           // Ignore errors
         }
         setIsLoading(false);
@@ -43,10 +43,10 @@ export function Cobros() {
     const hora = s.formattedTime || `${scheduledFrom.getHours().toString().padStart(2, '0')}:${scheduledFrom.getMinutes().toString().padStart(2, '0')}`;
     return {
       id: parseInt(s.id),
-      pacienteId: parseInt(s.patientId),
+      pacienteId: s.patient ? parseInt(s.patient.id) : 0,
       fecha,
       hora,
-      modalidad: s.type as 'presential' | 'remote',
+      modalidad: s.sessionType as 'presential' | 'remote',
       estado: s.status.toLowerCase() as 'pendiente' | 'confirmado' | 'completado' | 'cancelled',
       monto: Number(s.cost) || 0,
     };

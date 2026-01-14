@@ -47,7 +47,7 @@ const initialState: AppointmentState = {
  * Appointment Store
  * Maneja el estado de citas global
  */
-export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
+export const useAppointmentStore = create<AppointmentStore>((set, _get) => ({
   ...initialState,
 
   /**

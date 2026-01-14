@@ -3,7 +3,7 @@ import { Clock, Video, MapPin, Plus, Calendar, X, Edit2, CalendarX } from 'lucid
 import { toast } from 'sonner';
 import { TurnoDrawer } from './TurnoDrawer';
 import { SessionDetailsModal } from './SessionDetailsModal';
-import { CalendarView, AnimatedSection, SkeletonList, EmptyState } from '../shared';
+import { SkeletonList, EmptyState } from '../shared';
 import { FullCalendarView } from './FullCalendarView';
 import CalendarSyncButton from '../config/CalendarSyncButton';
 import { usePatients } from '@/lib/hooks';
@@ -209,18 +209,18 @@ export function Agenda() {
     return turnosPorDia;
   };
 
-  const turnosCountPorDia = getTurnosPorDia();
+  const _turnosCountPorDia = getTurnosPorDia();
 
   // Navigation functions for calendar
-  const goToPreviousMonth = () => {
+  const _goToPreviousMonth = () => {
     setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1, 1));
   };
 
-  const goToNextMonth = () => {
+  const _goToNextMonth = () => {
     setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 1));
   };
 
-  const goToToday = () => {
+  const _goToToday = () => {
     setCalendarDate(new Date());
   };
   
@@ -395,10 +395,10 @@ export function Agenda() {
                                   <div className="flex items-center gap-2 flex-shrink-0">
                                     <span
                                       className={`px-2 py-0.5 rounded text-xs whitespace-nowrap ${
-                                        SESSION_STATUS_BADGE_CLASSES[session.status]
+                                        session ? SESSION_STATUS_BADGE_CLASSES[session.status] : ''
                                       }`}
                                     >
-                                      {SESSION_STATUS_LABELS[session.status]}
+                                      {session ? SESSION_STATUS_LABELS[session.status] : ''}
                                     </span>
                                     <button
                                       onClick={() => {
@@ -461,17 +461,17 @@ export function Agenda() {
                 setSelectedSession(session);
                 setDetailsModalOpen(true);
               }}
-              onDateSelect={(start, end) => {
+              onDateSelect={(_start, _end) => {
                 // Abrir drawer para crear nueva sesión con esas fechas
                 setSelectedSession(null);
                 setTurnoDrawerOpen(true);
                 // TODO: Pre-fill con las fechas seleccionadas
               }}
-              onEventDrop={async (sessionId, newStart, newEnd) => {
+              onEventDrop={async (sessionId, _newStart, _newEnd) => {
                 try {
                   await updateSession(sessionId, {
-                    scheduledFrom: newStart.toISOString(),
-                    scheduledTo: newEnd.toISOString(),
+                    scheduledFrom: _newStart.toISOString(),
+                    scheduledTo: _newEnd.toISOString(),
                   });
                   toast.success('Turno reagendado exitosamente');
                   await fetchUpcoming();
@@ -518,7 +518,7 @@ export function Agenda() {
                   setCalendarDrawerOpen(false);
                   setDetailsModalOpen(true);
                 }}
-                onDateSelect={(start, end) => {
+                onDateSelect={(_start, _end) => {
                   setSelectedSession(null);
                   setCalendarDrawerOpen(false);
                   setTurnoDrawerOpen(true);

@@ -17,7 +17,7 @@ interface SessionState {
   clearError: () => void;
 }
 
-export const useSessionStore = create<SessionState>((set, get) => ({
+export const useSessionStore = create<SessionState>((set, _get) => ({
   sessions: [],
   isLoading: false,
   error: null,

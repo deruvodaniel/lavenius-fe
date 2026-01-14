@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Video, MapPin, Calendar, Filter, Plus, Edit2, Trash2, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
 import { usePatients, useErrorToast } from '@/lib/hooks';
-import { AnimatedSection, AnimatedList, SkeletonCard, EmptyState } from '../shared';
+import { AnimatedList, SkeletonCard, EmptyState } from '../shared';
 import type { CreatePatientDto } from '@/lib/types/api.types';
 
 export function Pacientes() {
@@ -131,7 +131,7 @@ export function Pacientes() {
   });
 
   // Get next appointment for a patient (simplified - can be enhanced later with sessions)
-  const getProximoTurno = (pacienteId: string) => {
+  const getProximoTurno = (_pacienteId: string): { dias: number } | null => {
     // TODO: Implement with sessions API
     return null;
   };

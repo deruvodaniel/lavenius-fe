@@ -1,4 +1,4 @@
-import { ArrowLeft, Mail, Phone, Heart, Calendar, FileText, User, Clock, Flag, Edit2, Save, X, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Heart, Calendar, FileText, User, Clock, Flag, Edit2, Save, X } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { TurnoDrawer } from '../agenda';
@@ -99,13 +99,13 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   };
 
   // Get patient's sessions
-  const turnosPaciente = sessionsUI.filter((s) => s.patientId === patient.id);
+  const turnosPaciente = sessionsUI.filter((s) => s.patient?.id === patient.id);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
   const proximosTurnos = turnosPaciente
-    .filter((a) => new Date(a.dateTime) >= today)
-    .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
+    .filter((a) => new Date(a.scheduledFrom) >= today)
+    .sort((a, b) => new Date(a.scheduledFrom).getTime() - new Date(b.scheduledFrom).getTime());
 
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
@@ -243,14 +243,14 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
             {proximosTurnos.length > 0 ? (
               <div className="space-y-3">
                 {proximosTurnos.map((turno) => {
-                  const dateTime = new Date(turno.dateTime);
+                  const dateTime = new Date(turno.scheduledFrom);
                   const fecha = dateTime.toISOString().split('T')[0];
                   const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
                   
                   return (
                     <div key={turno.id} className="p-3 bg-indigo-50 rounded border border-indigo-100">
                       <p className="text-gray-900 text-sm mb-1">{formatFecha(fecha)}</p>
-                      <p className="text-gray-600 text-sm">{hora} - {turno.description || 'Sesión'}</p>
+                      <p className="text-gray-600 text-sm">{hora} - {turno.sessionSummary || 'Sesión'}</p>
                     </div>
                   );
                 })}

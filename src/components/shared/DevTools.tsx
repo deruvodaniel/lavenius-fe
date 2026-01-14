@@ -27,7 +27,7 @@ export function DevTools() {
         status: response.ok ? 'ok' : 'error',
         message: response.ok ? 'Running' : `HTTP ${response.status}`
       });
-    } catch (error) {
+    } catch {
       results.push({
         service: 'Backend (3001)',
         status: 'error',

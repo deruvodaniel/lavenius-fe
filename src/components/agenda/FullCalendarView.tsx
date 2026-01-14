@@ -5,11 +5,11 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import type { EventClickArg, DateSelectArg, EventContentArg } from '@fullcalendar/core';
-import { SessionStatus, SessionType, type SessionUI } from '@/lib/types/session';
+import { SessionType, type SessionUI } from '@/lib/types/session';
 import { SESSION_STATUS_COLORS } from '@/lib/constants/sessionColors';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
-import { Calendar, List, Grid3x3, Clock } from 'lucide-react';
+import { Calendar, Grid3x3, Clock } from 'lucide-react';
 
 interface FullCalendarViewProps {
   sessions: SessionUI[];
@@ -67,7 +67,7 @@ export function FullCalendarView({
   };
 
   const renderEventContent = (eventInfo: EventContentArg) => {
-    const { status, patientName, cost } = eventInfo.event.extendedProps;
+    const { status: _status, patientName: _patientName, cost } = eventInfo.event.extendedProps;
     
     return (
       <div className="fc-event-main-frame px-1 py-0.5 text-xs">

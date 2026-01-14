@@ -9,6 +9,13 @@ export default [
   {
     ignores: ['dist', 'node_modules']
   },
+  // Disable react-refresh warnings for UI components (shadcn generated)
+  {
+    files: ['src/components/ui/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {

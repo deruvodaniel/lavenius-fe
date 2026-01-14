@@ -12,7 +12,7 @@ import type { LoginDto } from '@/lib/types/api.types';
 
 export function Login() {
   const navigate = useNavigate();
-  const { login, isLoading, error, clearError } = useAuth();
+  const { login, isLoading, error: _error, clearError } = useAuth();
 
   const form = useForm<LoginDto>({
     defaultValues: {
