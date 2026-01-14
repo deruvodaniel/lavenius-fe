@@ -130,11 +130,9 @@ export type Session = {
 
 export type Note = {
   id: string;
-  therapistId: string;
-  patientId: string;
-  sessionId?: string;
-  content: string;
-  noteType: NoteType;
+  text: string; // Decrypted text from backend
+  noteDate: string; // Date of the note
+  patientId: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -219,13 +217,15 @@ export type CreateAppointmentDto = {
 export type UpdateAppointmentDto = Partial<CreateAppointmentDto>;
 
 export type CreateNoteDto = {
-  patientId: string;
-  sessionId?: string;
-  content: string;
-  noteType: NoteType;
+  text: string;
+  noteDate: string; // ISO 8601 date string
+  patientId: number; // Backend expects integer
 };
 
-export type UpdateNoteDto = Partial<Omit<CreateNoteDto, 'patientId'>>;
+export type UpdateNoteDto = {
+  text?: string;
+  noteDate?: string;
+};
 
 export type CreatePaymentDto = {
   patientId: string;

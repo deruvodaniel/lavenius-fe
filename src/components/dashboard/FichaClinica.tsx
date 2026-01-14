@@ -44,11 +44,12 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   useEffect(() => {
     if (patient) {
       fetchNotesByPatient(patient.id);
+      fetchUpcoming(); // Load upcoming sessions
     }
     return () => {
       clearNotes();
     };
-  }, [patient, fetchNotesByPatient, clearNotes]);
+  }, [patient, fetchNotesByPatient, clearNotes, fetchUpcoming]);
 
   if (!patient) return null;
 
@@ -423,7 +424,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
         }}
         onSave={handleSaveNote}
         note={selectedNote}
-        patientId={patient.id}
+        patientId={parseInt(patient.id, 10)}
       />
     </div>
   );

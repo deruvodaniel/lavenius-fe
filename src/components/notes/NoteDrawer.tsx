@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, FileText, Calendar as CalendarIcon, Save } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
-import { NoteType } from '@/lib/types/api.types';
+import { formatISODate } from '@/lib/utils/dateFormatters';
 import type { Note, CreateNoteDto, UpdateNoteDto } from '@/lib/types/api.types';
 
 interface NoteDrawerProps {
@@ -10,8 +10,7 @@ interface NoteDrawerProps {
   onClose: () => void;
   onSave: (data: CreateNoteDto | UpdateNoteDto, noteId?: string) => Promise<void>;
   note?: Note | null;
-  patientId: string;
-  sessionId?: string;
+  patientId: number;
 }
 
 /**
@@ -23,12 +22,11 @@ export function NoteDrawer({
   onClose, 
   onSave, 
   note, 
-  patientId,
-  sessionId
+  patientId
 }: NoteDrawerProps) {
   const [formData, setFormData] = useState({
-    content: '',
-    noteType: NoteType.SESSION,
+    text: '',
+    noteDate: new Date().toISOString(),
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -36,14 +34,14 @@ export function NoteDrawer({
   useEffect(() => {
     if (note) {
       setFormData({
-        content: note.content || '',
-        noteType: note.noteType || NoteType.SESSION,
+        text: note.text || '',
+        noteDate: note.noteDate ? new Date(note.noteDate).toISOString() : new Date().toISOString(),
       });
     } else {
       // Reset form when creating new note
       setFormData({
-        content: '',
-        noteType: NoteType.SESSION,
+        text: '',
+        noteDate: new Date().toISOString(),
       });
     }
   }, [note, isOpen]);
@@ -51,7 +49,7 @@ export function NoteDrawer({
   if (!isOpen) return null;
 
   const handleSave = async () => {
-    if (!formData.content.trim()) {
+    if (!formData.text.trim()) {
       return;
     }
 
@@ -60,25 +58,24 @@ export function NoteDrawer({
       if (note) {
         // Update existing note
         const updateData: UpdateNoteDto = {
-          content: formData.content,
-          noteType: formData.noteType,
+          text: formData.text,
+          noteDate: formData.noteDate,
         };
         await onSave(updateData, note.id);
       } else {
         // Create new note
         const createData: CreateNoteDto = {
-          content: formData.content,
-          noteType: formData.noteType,
+          text: formData.text,
+          noteDate: formData.noteDate,
           patientId,
-          sessionId,
         };
         await onSave(createData);
       }
 
       // Reset form and close
       setFormData({
-        content: '',
-        noteType: NoteType.SESSION,
+        text: '',
+        noteDate: new Date().toISOString(),
       });
       onClose();
     } catch (error) {
@@ -91,8 +88,8 @@ export function NoteDrawer({
   const handleClose = () => {
     if (!isSaving) {
       setFormData({
-        content: '',
-        noteType: NoteType.SESSION,
+        text: '',
+        noteDate: new Date().toISOString(),
       });
       onClose();
     }
@@ -129,22 +126,25 @@ export function NoteDrawer({
 
         {/* Form */}
         <div className="p-4 md:p-6 space-y-6">
-          {/* Note Type Selector */}
+          {/* Note Date */}
           <div>
             <label className="block text-gray-700 mb-2">
-              Tipo de nota
+              <CalendarIcon className="w-4 h-4 inline mr-1" />
+              Fecha de la nota
             </label>
-            <select
-              value={formData.noteType}
-              onChange={(e) => setFormData({ ...formData, noteType: e.target.value as NoteType })}
+            <input
+              type="date"
+              value={formatISODate(new Date(formData.noteDate))}
+              onChange={(e) => {
+                // Combine the date from input with current time
+                const selectedDate = new Date(e.target.value);
+                const now = new Date();
+                selectedDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+                setFormData({ ...formData, noteDate: selectedDate.toISOString() });
+              }}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               disabled={isSaving}
-            >
-              <option value="SESSION">Sesión</option>
-              <option value="GENERAL">General</option>
-              <option value="TREATMENT_PLAN">Plan de tratamiento</option>
-              <option value="PROGRESS">Progreso</option>
-            </select>
+            />
           </div>
 
           {/* Note Content */}
@@ -153,8 +153,8 @@ export function NoteDrawer({
               Contenido de la nota
             </label>
             <Textarea
-              value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              value={formData.text}
+              onChange={(e) => setFormData({ ...formData, text: e.target.value })}
               placeholder="Escribe aquí las observaciones de la sesión..."
               className="min-h-[300px] resize-none"
               disabled={isSaving}
@@ -176,7 +176,7 @@ export function NoteDrawer({
           </Button>
           <Button
             onClick={handleSave}
-            disabled={isSaving || !formData.content.trim()}
+            disabled={isSaving || !formData.text.trim()}
             className="bg-gradient-to-r from-indigo-600 to-indigo-700"
           >
             {isSaving ? (
