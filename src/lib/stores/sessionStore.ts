@@ -29,10 +29,10 @@ export const useSessionStore = create<SessionState>((set, _get) => ({
     set({ isLoading: true, error: null });
     try {
       const sessions = await sessionService.getUpcoming();
-      set({ sessions, isLoading: false });
+      set({ sessions: Array.isArray(sessions) ? sessions : [], isLoading: false });
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al cargar sesiones';
-      set({ error: errorMessage, isLoading: false });
+      set({ error: errorMessage, isLoading: false, sessions: [] });
     }
   },
 
@@ -43,10 +43,10 @@ export const useSessionStore = create<SessionState>((set, _get) => ({
     set({ isLoading: true, error: null });
     try {
       const sessions = await sessionService.getMonthly(year, month);
-      set({ sessions, isLoading: false });
+      set({ sessions: Array.isArray(sessions) ? sessions : [], isLoading: false });
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al cargar sesiones del mes';
-      set({ error: errorMessage, isLoading: false });
+      set({ error: errorMessage, isLoading: false, sessions: [] });
     }
   },
 

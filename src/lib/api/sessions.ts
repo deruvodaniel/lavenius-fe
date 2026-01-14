@@ -23,7 +23,8 @@ export const sessionService = {
    */
   async getUpcoming(): Promise<SessionResponse[]> {
     const response = await apiClient.get<SessionResponse[]>('/sessions/upcoming');
-    return response as unknown as SessionResponse[];
+    // Asegurar que siempre devolvemos un array
+    return Array.isArray(response) ? response : [];
   },
 
   /**
@@ -34,7 +35,8 @@ export const sessionService = {
    */
   async getMonthly(year: number, month: number): Promise<SessionResponse[]> {
     const response = await apiClient.get<SessionResponse[]>(`/sessions/monthly/${year}/${month}`);
-    return response as unknown as SessionResponse[];
+    // Asegurar que siempre devolvemos un array
+    return Array.isArray(response) ? response : [];
   },
 
   /**
