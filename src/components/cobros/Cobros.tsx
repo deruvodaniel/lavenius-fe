@@ -48,7 +48,7 @@ export function Cobros() {
       hora,
       modalidad: s.type as 'presential' | 'remote',
       estado: s.status.toLowerCase() as 'pendiente' | 'confirmado' | 'completado' | 'cancelled',
-      monto: s.cost || 0,
+      monto: Number(s.cost) || 0,
     };
   });
 

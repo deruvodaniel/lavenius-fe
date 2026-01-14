@@ -140,7 +140,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, on
       sessionSummary: formData.motivo || undefined,
       type: formData.sessionType,
       status: formData.estado,
-      cost: formData.monto,
+      cost: typeof formData.monto === 'number' && !isNaN(formData.monto) ? formData.monto : undefined,
     };
 
     onSave(sessionDto);

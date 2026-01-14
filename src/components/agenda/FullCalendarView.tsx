@@ -6,6 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import type { EventClickArg, DateSelectArg, EventContentArg } from '@fullcalendar/core';
 import { SessionStatus, SessionType, type SessionUI } from '@/lib/types/session';
+import { SESSION_STATUS_COLORS } from '@/lib/constants/sessionColors';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Calendar, List, Grid3x3, Clock } from 'lucide-react';
@@ -24,29 +25,23 @@ export function FullCalendarView({
   onEventDrop 
 }: FullCalendarViewProps) {
   const calendarRef = useRef<FullCalendar>(null);
-  const [currentView, setCurrentView] = useState('dayGridMonth');
+  const [currentView, setCurrentView] = useState('timeGridWeek');
 
   // Convert sessions to FullCalendar events
   const events = sessions.map(session => {
-    const statusColors: Record<SessionStatus, string> = {
-      [SessionStatus.PENDING]: '#f59e0b',
-      [SessionStatus.CONFIRMED]: '#3b82f6',
-      [SessionStatus.COMPLETED]: '#10b981',
-      [SessionStatus.CANCELLED]: '#ef4444',
-    };
-
     const typeIcons: Record<SessionType, string> = {
       [SessionType.PRESENTIAL]: '📍',
       [SessionType.REMOTE]: '💻',
     };
+
+    const className = `session-${session.status}`;
 
     return {
       id: session.id,
       title: `${typeIcons[session.sessionType]} ${session.patientName || 'Sin paciente'}`,
       start: session.scheduledFrom,
       end: session.scheduledTo,
-      backgroundColor: statusColors[session.status],
-      borderColor: statusColors[session.status],
+      classNames: [className],
       extendedProps: {
         session,
         status: session.status,
@@ -96,61 +91,57 @@ export function FullCalendarView({
   };
 
   return (
-    <Card className="p-4">
+    <Card className="p-3">
       {/* Toolbar personalizado */}
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between mb-3 gap-3">
+        {/* Botones de vista */}
+        <div className="flex items-center gap-1.5">
           <Button
-            variant={currentView === 'dayGridMonth' ? 'default' : 'outline'}
+            variant={currentView === 'dayGridMonth' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => changeView('dayGridMonth')}
+            className="h-8 px-2.5 text-xs"
           >
-            <Grid3x3 className="h-4 w-4 mr-1" />
+            <Grid3x3 className="h-3.5 w-3.5 mr-1" />
             Mes
           </Button>
           <Button
-            variant={currentView === 'timeGridWeek' ? 'default' : 'outline'}
+            variant={currentView === 'timeGridWeek' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => changeView('timeGridWeek')}
+            className="h-8 px-2.5 text-xs"
           >
-            <Calendar className="h-4 w-4 mr-1" />
+            <Calendar className="h-3.5 w-3.5 mr-1" />
             Semana
           </Button>
           <Button
-            variant={currentView === 'timeGridDay' ? 'default' : 'outline'}
+            variant={currentView === 'timeGridDay' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => changeView('timeGridDay')}
+            className="h-8 px-2.5 text-xs"
           >
-            <Clock className="h-4 w-4 mr-1" />
+            <Clock className="h-3.5 w-3.5 mr-1" />
             Día
-          </Button>
-          <Button
-            variant={currentView === 'listWeek' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => changeView('listWeek')}
-          >
-            <List className="h-4 w-4 mr-1" />
-            Lista
           </Button>
         </div>
 
         {/* Leyenda de estados */}
-        <div className="flex items-center gap-3 text-xs flex-wrap">
+        <div className="flex items-center gap-2.5 text-[11px] flex-wrap">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-amber-500" />
-            <span>Pendiente</span>
+            <div className="w-2.5 h-2.5 rounded-sm bg-amber-500" />
+            <span className="text-gray-600">Pendiente</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-blue-500" />
-            <span>Confirmada</span>
+            <div className="w-2.5 h-2.5 rounded-sm bg-blue-500" />
+            <span className="text-gray-600">Confirmada</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-green-500" />
-            <span>Completada</span>
+            <div className="w-2.5 h-2.5 rounded-sm bg-green-500" />
+            <span className="text-gray-600">Completada</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-red-500" />
-            <span>Cancelada</span>
+            <div className="w-2.5 h-2.5 rounded-sm bg-red-500" />
+            <span className="text-gray-600">Cancelada</span>
           </div>
         </div>
       </div>
@@ -160,7 +151,7 @@ export function FullCalendarView({
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
-          initialView="dayGridMonth"
+          initialView="timeGridWeek"
           headerToolbar={{
             left: 'prev,next today',
             center: 'title',
@@ -199,10 +190,6 @@ export function FullCalendarView({
           }}
           allDaySlot={false}
           nowIndicator={true}
-          eventClassNames={(arg) => {
-            const status = arg.event.extendedProps.status as SessionStatus;
-            return [`session-${status}`];
-          }}
         />
       </div>
 
@@ -285,11 +272,42 @@ export function FullCalendarView({
           padding: 2px 4px;
         }
 
-        /* Dark mode support */
-        .dark .fullcalendar-wrapper {
-          --fc-neutral-bg-color: hsl(var(--background));
-          --fc-neutral-text-color: hsl(var(--foreground));
-          --fc-page-bg-color: hsl(var(--background));
+        /* Asegurar que los colores de los eventos se vean en todas las vistas */
+        .fullcalendar-wrapper .fc-event-main {
+          color: white !important;
+        }
+
+        .fullcalendar-wrapper .fc-event-title,
+        .fullcalendar-wrapper .fc-event-time {
+          color: white !important;
+        }
+
+        /* Estilos específicos para eventos según estado */
+        .fullcalendar-wrapper .session-pending {
+          background-color: #f59e0b !important;
+          border-color: #f59e0b !important;
+        }
+
+        .fullcalendar-wrapper .session-confirmed {
+          background-color: #3b82f6 !important;
+          border-color: #3b82f6 !important;
+        }${SESSION_STATUS_COLORS.pending} !important;
+          border-color: ${SESSION_STATUS_COLORS.pending} !important;
+        }
+
+        .fullcalendar-wrapper .session-confirmed {
+          background-color: ${SESSION_STATUS_COLORS.confirmed} !important;
+          border-color: ${SESSION_STATUS_COLORS.confirmed} !important;
+        }
+
+        .fullcalendar-wrapper .session-completed {
+          background-color: ${SESSION_STATUS_COLORS.completed} !important;
+          border-color: ${SESSION_STATUS_COLORS.completed} !important;
+        }
+
+        .fullcalendar-wrapper .session-cancelled {
+          background-color: ${SESSION_STATUS_COLORS.cancelled} !important;
+          border-color: ${SESSION_STATUS_COLORS.cancelled}sl(var(--background));
         }
 
         .dark .fullcalendar-wrapper .fc-col-header-cell {

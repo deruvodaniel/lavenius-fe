@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { toast } from 'sonner';
 import { sessionService } from '../api/sessions';
 import type { CreateSessionDto, SessionResponse, SessionUI, UpdateSessionDto } from '../types/session';
 
@@ -34,7 +33,6 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al cargar sesiones';
       set({ error: errorMessage, isLoading: false });
-      toast.error(errorMessage);
     }
   },
 
@@ -49,7 +47,6 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al cargar sesiones del mes';
       set({ error: errorMessage, isLoading: false });
-      toast.error(errorMessage);
     }
   },
 
@@ -73,7 +70,6 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al crear sesión';
       set({ error: errorMessage, isLoading: false });
-      toast.error(errorMessage);
       throw error;
     }
   },
@@ -91,12 +87,10 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         isLoading: false
       }));
       
-      toast.success('Sesión actualizada exitosamente');
       return updated;
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al actualizar sesión';
       set({ error: errorMessage, isLoading: false });
-      toast.error(errorMessage);
       throw error;
     }
   },
@@ -113,12 +107,9 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         sessions: state.sessions.filter((s) => s.id !== id),
         isLoading: false
       }));
-      
-      toast.success('Sesión eliminada exitosamente');
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al eliminar sesión';
       set({ error: errorMessage, isLoading: false });
-      toast.error(errorMessage);
       throw error;
     }
   },
@@ -135,12 +126,9 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         sessions: state.sessions.map((s) => (s.id === id ? updated : s)),
         isLoading: false
       }));
-      
-      toast.success('Sesión marcada como completada');
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al completar sesión';
       set({ error: errorMessage, isLoading: false });
-      toast.error(errorMessage);
       throw error;
     }
   },
@@ -164,12 +152,6 @@ export const useSessions = () => {
     const scheduledFrom = new Date(session.scheduledFrom);
     const scheduledTo = new Date(session.scheduledTo);
     const now = new Date();
-    
-    console.log('Processing session:', {
-      id: session.id,
-      scheduledFrom: session.scheduledFrom,
-      patient: session.patient
-    });
     
     return {
       ...session,

@@ -2,12 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { Clock, Video, MapPin, Plus, Calendar, X, Edit2, CalendarX } from 'lucide-react';
 import { toast } from 'sonner';
 import { TurnoDrawer } from './TurnoDrawer';
+import { SessionDetailsModal } from './SessionDetailsModal';
 import { CalendarView, AnimatedSection, SkeletonList, EmptyState } from '../shared';
 import { FullCalendarView } from './FullCalendarView';
 import CalendarSyncButton from '../config/CalendarSyncButton';
 import { usePatients } from '@/lib/hooks';
 import { useSessions } from '@/lib/stores/sessionStore';
 import type { CreateSessionDto, SessionResponse } from '@/lib/types/session';
+import { SESSION_STATUS_BADGE_CLASSES, SESSION_STATUS_LABELS } from '@/lib/constants/sessionColors';
 
 export function Agenda() {
   const { sessionsUI, isLoading, error, fetchUpcoming, createSession, updateSession, deleteSession, clearError } = useSessions();
@@ -23,6 +25,7 @@ export function Agenda() {
   
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [turnoDrawerOpen, setTurnoDrawerOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<SessionResponse | null>(null);
   const [visibleCount, setVisibleCount] = useState(5); // For infinite scroll
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -74,7 +77,11 @@ export function Agenda() {
   // Map API data to component format
   const turnos = sessionsUI.map((s, index) => {
     const scheduledFrom = new Date(s.scheduledFrom);
-    const fecha = scheduledFrom.toISOString().split('T')[0];
+    // Use local date, not UTC
+    const year = scheduledFrom.getFullYear();
+    const month = (scheduledFrom.getMonth() + 1).toString().padStart(2, '0');
+    const day = scheduledFrom.getDate().toString().padStart(2, '0');
+    const fecha = `${year}-${month}-${day}`;
     const hora = `${scheduledFrom.getHours().toString().padStart(2, '0')}:${scheduledFrom.getMinutes().toString().padStart(2, '0')}`;
     const numericId = Number.parseInt(s.id, 10);
     const safeId = Number.isNaN(numericId) ? index : numericId;
@@ -121,12 +128,17 @@ export function Agenda() {
     };
   });
 
-  // Get future appointments
+  // Get future appointments (including today)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const futurosTurnos = turnos
-    .filter((turno) => new Date(turno.fecha) >= today)
+    .filter((turno) => {
+      // Parse fecha string as local date, not UTC
+      const [year, month, day] = turno.fecha.split('-').map(Number);
+      const turnoDate = new Date(year, month - 1, day);
+      return turnoDate >= today;
+    })
     .sort((a, b) => {
       const dateCompare = new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
       if (dateCompare !== 0) return dateCompare;
@@ -146,7 +158,24 @@ export function Agenda() {
   };
 
   const formatFecha = (fecha: string) => {
-    const date = new Date(fecha);
+    // Parse fecha string as local date to avoid timezone issues
+    const [year, month, day] = fecha.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const targetDate = new Date(date);
+    targetDate.setHours(0, 0, 0, 0);
+    
+    if (targetDate.getTime() === today.getTime()) {
+      return 'Hoy';
+    } else if (targetDate.getTime() === tomorrow.getTime()) {
+      return 'Mañana';
+    }
+    
     return date.toLocaleDateString('es-AR', {
       weekday: 'long',
       day: 'numeric',
@@ -208,10 +237,14 @@ export function Agenda() {
         // Update existing session
         await updateSession(selectedSession.id, sessionData);
         toast.success('Turno actualizado exitosamente');
+        // Refresh to ensure UI is in sync
+        await fetchUpcoming();
       } else {
-        // Create new session - store will add it to the list automatically
+        // Create new session
         await createSession(sessionData);
         toast.success('Turno creado exitosamente');
+        // Refresh to ensure UI is in sync
+        await fetchUpcoming();
       }
       setTurnoDrawerOpen(false);
       setSelectedSession(null);
@@ -229,9 +262,7 @@ export function Agenda() {
         errorMessage = error.message;
       }
       
-      toast.error(errorMessage, {
-        description: 'Verifica el horario e intenta nuevamente'
-      });
+      toast.error(errorMessage);
     }
   };
 
@@ -364,14 +395,10 @@ export function Agenda() {
                                   <div className="flex items-center gap-2 flex-shrink-0">
                                     <span
                                       className={`px-2 py-0.5 rounded text-xs whitespace-nowrap ${
-                                        turno.estado === 'confirmado'
-                                          ? 'bg-green-100 text-green-700'
-                                          : turno.estado === 'completado'
-                                          ? 'bg-blue-100 text-blue-700'
-                                          : 'bg-yellow-100 text-yellow-700'
+                                        SESSION_STATUS_BADGE_CLASSES[session.status]
                                       }`}
                                     >
-                                      {turno.estado === 'confirmado' ? 'Confirmado' : turno.estado === 'completado' ? 'Completado' : 'Pendiente'}
+                                      {SESSION_STATUS_LABELS[session.status]}
                                     </span>
                                     <button
                                       onClick={() => {
@@ -432,7 +459,7 @@ export function Agenda() {
               sessions={sessionsUI}
               onEventClick={(session) => {
                 setSelectedSession(session);
-                setTurnoDrawerOpen(true);
+                setDetailsModalOpen(true);
               }}
               onDateSelect={(start, end) => {
                 // Abrir drawer para crear nueva sesión con esas fechas
@@ -489,7 +516,7 @@ export function Agenda() {
                 onEventClick={(session) => {
                   setSelectedSession(session);
                   setCalendarDrawerOpen(false);
-                  setTurnoDrawerOpen(true);
+                  setDetailsModalOpen(true);
                 }}
                 onDateSelect={(start, end) => {
                   setSelectedSession(null);
@@ -527,6 +554,20 @@ export function Agenda() {
         pacienteId={selectedPatientId || undefined}
         onSave={handleSaveTurno}
         onDelete={handleDeleteTurno}
+      />
+
+      {/* Session Details Modal */}
+      <SessionDetailsModal
+        session={selectedSession}
+        isOpen={detailsModalOpen}
+        onClose={() => {
+          setDetailsModalOpen(false);
+          setSelectedSession(null);
+        }}
+        onEdit={() => {
+          setDetailsModalOpen(false);
+          setTurnoDrawerOpen(true);
+        }}
       />
     </div>
   );

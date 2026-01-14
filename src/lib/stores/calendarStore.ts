@@ -67,6 +67,37 @@ export const useCalendarStore = create<CalendarState>((set) => ({
       toast.info('Conectando con Google Calendar...', {
         description: 'Por favor autoriza la aplicación en la ventana que se abrió'
       });
+
+      // Listen for message from popup
+      const handleMessage = (event: MessageEvent) => {
+        // Verify message origin if needed
+        if (event.data.type === 'GOOGLE_CALENDAR_SUCCESS') {
+          window.removeEventListener('message', handleMessage);
+          
+          toast.success('¡Conectado exitosamente!', {
+            description: 'Google Calendar se conectó correctamente'
+          });
+          
+          // Update connection status
+          set({ isConnected: true });
+          
+          // Refresh calendar list
+          useCalendarStore.getState().checkConnection();
+        } else if (event.data.type === 'GOOGLE_CALENDAR_ERROR') {
+          window.removeEventListener('message', handleMessage);
+          
+          toast.error('Error al conectar', {
+            description: event.data.error || 'No se pudo conectar con Google Calendar'
+          });
+        }
+      };
+
+      window.addEventListener('message', handleMessage);
+
+      // Cleanup listener after 5 minutes (in case popup is closed without completing)
+      setTimeout(() => {
+        window.removeEventListener('message', handleMessage);
+      }, 5 * 60 * 1000);
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al conectar con Google Calendar';
       toast.error(errorMessage);
