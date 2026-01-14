@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Bell, DollarSign, Calendar, Clock, X, Plus } from 'lucide-react';
+import CalendarSync from './CalendarSync';
 
 export function Configuracion() {
   const [recordatoriosCobros, setRecordatoriosCobros] = useState(true);
@@ -23,6 +24,9 @@ export function Configuracion() {
       <h1 className="text-gray-900 mb-6">Configuración</h1>
 
       <div className="space-y-6">
+        {/* Google Calendar Sync */}
+        <CalendarSync />
+
         {/* Recordatorios de Cobros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">

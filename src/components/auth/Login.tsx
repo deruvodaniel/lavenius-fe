@@ -1,31 +1,20 @@
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useAuth, useErrorToast } from '@/lib/hooks';
-
-const loginSchema = z.object({
-  email: z.string().email('Email inválido'),
-  password: z.string().min(8, 'Contraseña debe tener al menos 8 caracteres'),
-  passphrase: z.string().min(6, 'Passphrase debe tener al menos 6 caracteres'),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+import { useAuth } from '@/lib/hooks';
+import { toast } from 'sonner';
+import type { LoginDto } from '@/lib/types/api.types';
 
 export function Login() {
   const navigate = useNavigate();
   const { login, isLoading, error, clearError } = useAuth();
 
-  useErrorToast(error, clearError);
-
-  const form = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<LoginDto>({
     defaultValues: {
       email: '',
       password: '',
@@ -33,16 +22,19 @@ export function Login() {
     },
   });
 
-  const onSubmit = async (data: LoginFormData) => {
-    // Prevent double submission
+  const onSubmit = async (data: LoginDto) => {
     if (isLoading) return;
+    
+    clearError();
     
     try {
       await login(data);
+      toast.success('¡Bienvenido!');
       navigate('/dashboard');
-    } catch (err) {
-      // Error is handled by store and displayed via useErrorToast
-      console.error('Login failed:', err);
+    } catch (err: any) {
+      // El error del backend se muestra automáticamente
+      const errorMsg = err?.message || 'Error al iniciar sesión';
+      toast.error(errorMsg);
     }
   };
 

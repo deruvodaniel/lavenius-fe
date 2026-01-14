@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Calendar, Clock, User, Video, MapPin, AlertTriangle } from 'lucide-react';
+import { X, Calendar, Clock, User, AlertTriangle } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores';
-import type { CreateAppointmentDto, Appointment, SessionType, AppointmentStatus, Patient } from '@/lib/types/api.types';
+import type { Patient } from '@/lib/types/api.types';
+import { SessionType, SessionStatus } from '@/lib/types/session';
+import type { CreateSessionDto, SessionResponse } from '@/lib/types/session';
 
 // Format date-time keeping the user's local offset so the backend stores the expected slot
 const formatLocalDateTime = (date: Date) => {
@@ -24,57 +26,61 @@ const formatLocalDateTime = (date: Date) => {
 interface TurnoDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  appointment?: Appointment | null;
+  session?: SessionResponse | null;
   patients: Patient[];
   pacienteId?: string | number;
-  onSave: (appointment: CreateAppointmentDto) => void;
-  onDelete?: (appointmentId: string) => void;
+  onSave: (session: CreateSessionDto) => void;
+  onDelete?: (sessionId: string) => void;
 }
 
-export function TurnoDrawer({ isOpen, onClose, appointment, patients, pacienteId, onSave, onDelete }: TurnoDrawerProps) {
+export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, onSave, onDelete }: TurnoDrawerProps) {
   const user = useAuthStore(state => state.user);
   
   const [formData, setFormData] = useState({
     pacienteId: '',
     fecha: '',
-    hora: '09:00',
+    horaInicio: '09:00',
+    horaFin: '10:00',
     motivo: '',
-    sessionType: 'presential' as SessionType,
-    estado: 'pending' as AppointmentStatus,
+    sessionType: SessionType.PRESENTIAL,
+    estado: SessionStatus.PENDING,
     monto: 8500,
   });
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
 
-  // Load appointment data when editing
+  // Load session data when editing
   useEffect(() => {
-    if (appointment) {
-      const dateTime = new Date(appointment.dateTime);
-      const fecha = dateTime.toISOString().split('T')[0];
-      const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
+    if (session) {
+      const scheduledFrom = new Date(session.scheduledFrom);
+      const scheduledTo = new Date(session.scheduledTo);
+      const fecha = scheduledFrom.toISOString().split('T')[0];
+      const horaInicio = `${scheduledFrom.getHours().toString().padStart(2, '0')}:${scheduledFrom.getMinutes().toString().padStart(2, '0')}`;
+      const horaFin = `${scheduledTo.getHours().toString().padStart(2, '0')}:${scheduledTo.getMinutes().toString().padStart(2, '0')}`;
       
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
-        pacienteId: appointment.patientId,
+        pacienteId: session.patient?.id || '',
         fecha,
-        hora,
-        motivo: appointment.description || '',
-        sessionType: appointment.sessionType,
-        estado: appointment.status,
-        monto: appointment.cost,
+        horaInicio,
+        horaFin,
+        motivo: session.sessionSummary || '',
+        sessionType: session.sessionType,
+        estado: session.status,
+        monto: session.cost || 8500,
       });
     } else if (pacienteId) {
       setFormData(prev => ({ ...prev, pacienteId: String(pacienteId) }));
     }
-  }, [appointment, pacienteId]);
+  }, [session, pacienteId]);
 
   if (!isOpen) return null;
 
-  const isEditing = !!appointment;
+  const isEditing = !!session;
   
   // Validate form
-  const isFormValid = formData.pacienteId && formData.fecha && formData.hora && formData.sessionType && formData.estado;
+  const isFormValid = formData.pacienteId && formData.fecha && formData.horaInicio && formData.horaFin && formData.sessionType && formData.estado;
 
   const handleSave = () => {
     // Validate before showing confirmation
@@ -86,8 +92,8 @@ export function TurnoDrawer({ isOpen, onClose, appointment, patients, pacienteId
       alert('Por favor seleccione una fecha');
       return;
     }
-    if (!formData.hora) {
-      alert('Por favor seleccione una hora');
+    if (!formData.horaInicio || !formData.horaFin) {
+      alert('Por favor seleccione hora de inicio y fin');
       return;
     }
     if (!formData.sessionType) {
@@ -103,59 +109,48 @@ export function TurnoDrawer({ isOpen, onClose, appointment, patients, pacienteId
   };
 
   const confirmSave = () => {
-    console.log('confirmSave called');
-    console.log('User:', user);
-    console.log('FormData:', formData);
-    console.log('SessionType value:', formData.sessionType);
-    console.log('SessionType type:', typeof formData.sessionType);
-    
     if (!user?.id) {
-      console.error('No user ID available');
       alert('Error: No se pudo obtener el ID del usuario. Por favor, inicie sesión nuevamente.');
       return;
     }
 
-    // Validate required fields (redundant but safe)
-    if (!formData.pacienteId) {
-      alert('Por favor seleccione un paciente');
+    if (!formData.pacienteId || !formData.fecha || !formData.horaInicio || !formData.horaFin) {
+      alert('Por favor complete todos los campos requeridos');
       return;
     }
 
-    if (!formData.fecha) {
-      alert('Por favor seleccione una fecha');
+    // Combine fecha and hora into ISO dateTime strings
+    const scheduledFromStr = `${formData.fecha}T${formData.horaInicio}:00`;
+    const scheduledToStr = `${formData.fecha}T${formData.horaFin}:00`;
+    const scheduledFrom = new Date(scheduledFromStr);
+    const scheduledTo = new Date(scheduledToStr);
+    
+    // Get patient email for calendar invite
+    const selectedPatient = patients.find(p => p.id === formData.pacienteId);
+    if (!selectedPatient?.email) {
+      alert('El paciente seleccionado no tiene email configurado. Por favor, actualice la información del paciente.');
       return;
     }
 
-    // Combine fecha and hora into ISO dateTime
-    const dateTimeStr = `${formData.fecha}T${formData.hora}:00`;
-    const dateTime = new Date(dateTimeStr);
-    const localDateTime = formatLocalDateTime(dateTime);
-
-    // Ensure sessionType is sent as literal string
-    const sessionType = formData.sessionType === 'remote' ? 'remote' as const : 'presential' as const;
-    const status = formData.estado as AppointmentStatus;
-
-    const appointmentDto: CreateAppointmentDto = {
+    const sessionDto: CreateSessionDto = {
       patientId: formData.pacienteId,
-      dateTime: localDateTime,
-      description: formData.motivo || undefined,
-      sessionType: sessionType as SessionType,
-      status: status,
+      scheduledFrom: formatLocalDateTime(scheduledFrom),
+      scheduledTo: formatLocalDateTime(scheduledTo),
+      attendeeEmail: selectedPatient.email,
+      sessionSummary: formData.motivo || undefined,
+      type: formData.sessionType,
+      status: formData.estado,
       cost: formData.monto,
     };
 
-    console.log('Appointment DTO:', appointmentDto);
-    console.log('DTO sessionType:', appointmentDto.sessionType);
-    console.log('DTO status:', appointmentDto.status);
-
-    onSave(appointmentDto);
+    onSave(sessionDto);
     setShowSaveConfirm(false);
     onClose();
   };
 
   const confirmDelete = () => {
-    if (appointment && onDelete) {
-      onDelete(appointment.id);
+    if (session && onDelete) {
+      onDelete(session.id);
       setShowDeleteConfirm(false);
       onClose();
     }
@@ -228,18 +223,35 @@ export function TurnoDrawer({ isOpen, onClose, appointment, patients, pacienteId
             />
           </div>
 
-          {/* Hora */}
+          {/* Hora Inicio */}
           <div>
             <label className="flex items-center gap-2 text-gray-700 mb-2">
               <Clock className="w-4 h-4" />
-              Hora <span className="text-red-500">*</span>
+              Hora Inicio <span className="text-red-500">*</span>
             </label>
             <select
-              value={formData.hora}
-              onChange={(e) => setFormData({ ...formData, hora: e.target.value })}
+              value={formData.horaInicio}
+              onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               {['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'].map((h) => (
+                <option key={h} value={h}>{h}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Hora Fin */}
+          <div>
+            <label className="flex items-center gap-2 text-gray-700 mb-2">
+              <Clock className="w-4 h-4" />
+              Hora Fin <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.horaFin}
+              onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {['09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'].map((h) => (
                 <option key={h} value={h}>{h}</option>
               ))}
             </select>
@@ -277,7 +289,7 @@ export function TurnoDrawer({ isOpen, onClose, appointment, patients, pacienteId
             <label className="block text-gray-700 mb-2">Estado</label>
             <select
               value={formData.estado}
-              onChange={(e) => setFormData({ ...formData, estado: e.target.value as AppointmentStatus })}
+              onChange={(e) => setFormData({ ...formData, estado: e.target.value as SessionStatus })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="pending">Pendiente</option>

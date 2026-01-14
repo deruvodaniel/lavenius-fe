@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Bell, CheckCircle, Clock, DollarSign, Calendar, Video, MapPin, Copy, MessageCircle, X, MoreVertical } from 'lucide-react';
-import { useAppointments, usePatients } from '@/lib/hooks';
+import { usePatients } from '@/lib/hooks';
+import { useSessions } from '@/lib/stores/sessionStore';
 
 export function Cobros() {
-  const { appointments, fetchAppointments } = useAppointments();
+  const { sessionsUI, fetchUpcoming } = useSessions();
   const { patients, fetchPatients } = usePatients();
   
   const [turnosCobrados, setTurnosCobrados] = useState<{ [key: number]: boolean }>({});
@@ -22,7 +23,7 @@ export function Cobros() {
         setIsLoading(true);
         try {
           await Promise.all([
-            fetchAppointments(),
+            fetchUpcoming(),
             fetchPatients()
           ]);
         } catch (error) {
@@ -36,18 +37,18 @@ export function Cobros() {
   }, []);
 
   // Map API data to component format
-  const turnos = appointments.map(a => {
-    const dateTime = new Date(a.dateTime);
-    const fecha = dateTime.toISOString().split('T')[0];
-    const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
+  const turnos = sessionsUI.map(s => {
+    const scheduledFrom = new Date(s.scheduledFrom);
+    const fecha = scheduledFrom.toISOString().split('T')[0];
+    const hora = s.formattedTime || `${scheduledFrom.getHours().toString().padStart(2, '0')}:${scheduledFrom.getMinutes().toString().padStart(2, '0')}`;
     return {
-      id: parseInt(a.id),
-      pacienteId: parseInt(a.patientId),
+      id: parseInt(s.id),
+      pacienteId: parseInt(s.patientId),
       fecha,
       hora,
-      modalidad: 'presencial' as const,
-      estado: a.status.toLowerCase() as 'pendiente' | 'confirmado' | 'completado',
-      monto: a.cost,
+      modalidad: s.type as 'presential' | 'remote',
+      estado: s.status.toLowerCase() as 'pendiente' | 'confirmado' | 'completado' | 'cancelled',
+      monto: s.cost || 0,
     };
   });
 

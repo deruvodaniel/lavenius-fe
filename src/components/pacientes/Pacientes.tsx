@@ -3,13 +3,12 @@ import { Video, MapPin, Calendar, Filter, Plus, Edit2, Trash2, Users } from 'luc
 import { toast } from 'sonner';
 import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
-import { usePatients, useAppointments, useErrorToast } from '@/lib/hooks';
+import { usePatients, useErrorToast } from '@/lib/hooks';
 import { AnimatedSection, AnimatedList, SkeletonCard, EmptyState } from '../shared';
 import type { CreatePatientDto } from '@/lib/types/api.types';
 
 export function Pacientes() {
   const { patients, isLoading, error, fetchPatients, createPatient, updatePatient, deletePatient, clearError } = usePatients();
-  const { appointments, fetchAppointments } = useAppointments();
   
   // Auto-display error toasts
   useErrorToast(error, clearError);
@@ -27,7 +26,6 @@ export function Pacientes() {
     if (!hasFetchedRef.current) {
       hasFetchedRef.current = true;
       fetchPatients().catch(() => {});
-      fetchAppointments().catch(() => {});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -115,33 +113,6 @@ export function Pacientes() {
     };
   });
 
-  // Map appointments to turnos format
-  const turnos = appointments.map((a, index) => {
-    const dateTime = new Date(a.dateTime);
-    const fecha = dateTime.toISOString().split('T')[0];
-    const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
-    const numericId = Number.parseInt(a.id, 10);
-    const safeId = Number.isNaN(numericId) ? index : numericId;
-    const numericPatientId = Number.parseInt(a.patientId, 10);
-
-    return {
-      id: safeId,
-      rawId: a.id,
-      pacienteId: Number.isNaN(numericPatientId) ? null : numericPatientId,
-      pacienteRawId: a.patientId,
-      fecha,
-      hora,
-      modalidad: 'presencial' as const,
-    };
-  });
-
-  // Get today and end of this week
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const endOfWeek = new Date(today);
-  endOfWeek.setDate(today.getDate() + (7 - today.getDay()));
-  endOfWeek.setHours(23, 59, 59, 999);
-
   // Filter patients
   const filteredPacientes = pacientes.filter((paciente) => {
     // Modalidad filter
@@ -154,34 +125,15 @@ export function Pacientes() {
       return false;
     }
 
-    // Appointments this week filter
-    if (soloTurnosEstaSemana) {
-      const tieneTurnoEstaSemana = turnos.some((turno) => {
-        const turnoDate = new Date(turno.fecha);
-        return turno.pacienteRawId === paciente.rawId && turnoDate >= today && turnoDate <= endOfWeek;
-      });
-      if (!tieneTurnoEstaSemana) {
-        return false;
-      }
-    }
+    // Note: soloTurnosEstaSemana filter removed - will be re-implemented with sessions if needed
 
     return true;
   });
 
-  // Get next appointment for a patient
+  // Get next appointment for a patient (simplified - can be enhanced later with sessions)
   const getProximoTurno = (pacienteId: string) => {
-    const turnosPaciente = turnos
-      .filter((t) => t.pacienteRawId === pacienteId && new Date(t.fecha) >= today)
-      .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
-
-    if (turnosPaciente.length === 0) return null;
-
-    const proximoTurno = turnosPaciente[0];
-    const turnoDate = new Date(proximoTurno.fecha);
-    const diffTime = turnoDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    return { turno: proximoTurno, dias: diffDays };
+    // TODO: Implement with sessions API
+    return null;
   };
 
   const getModalidadLabel = (modalidad: string) => {

@@ -3,19 +3,27 @@ import { Clock, Video, MapPin, Plus, Calendar, X, Edit2, CalendarX } from 'lucid
 import { toast } from 'sonner';
 import { TurnoDrawer } from './TurnoDrawer';
 import { CalendarView, AnimatedSection, SkeletonList, EmptyState } from '../shared';
-import { useAppointments, usePatients, useErrorToast } from '@/lib/hooks';
-import type { CreateAppointmentDto, Appointment } from '@/lib/types/api.types';
+import { FullCalendarView } from './FullCalendarView';
+import CalendarSyncButton from '../config/CalendarSyncButton';
+import { usePatients } from '@/lib/hooks';
+import { useSessions } from '@/lib/stores/sessionStore';
+import type { CreateSessionDto, SessionResponse } from '@/lib/types/session';
 
 export function Agenda() {
-  const { appointments, isLoading, error, fetchUpcoming, createAppointment, updateAppointment, deleteAppointment, clearError } = useAppointments();
+  const { sessionsUI, isLoading, error, fetchUpcoming, createSession, updateSession, deleteSession, clearError } = useSessions();
   const { patients, fetchPatients } = usePatients();
   
   // Auto-display error toasts
-  useErrorToast(error, clearError);
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      clearError();
+    }
+  }, [error, clearError]);
   
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [turnoDrawerOpen, setTurnoDrawerOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [selectedSession, setSelectedSession] = useState<SessionResponse | null>(null);
   const [visibleCount, setVisibleCount] = useState(5); // For infinite scroll
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -29,17 +37,8 @@ export function Agenda() {
   useEffect(() => {
     if (!hasFetchedRef.current) {
       hasFetchedRef.current = true;
-      console.log('[Agenda] Fetching appointments and patients...');
-      fetchUpcoming(100).then((data) => {
-        console.log('[Agenda] fetchUpcoming returned:', data);
-      }).catch((err) => {
-        console.error('[Agenda] fetchUpcoming error:', err);
-      });
-      fetchPatients().then((data) => {
-        console.log('[Agenda] fetchPatients returned:', data);
-      }).catch((err) => {
-        console.error('[Agenda] fetchPatients error:', err);
-      });
+      fetchUpcoming();
+      fetchPatients();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -73,11 +72,11 @@ export function Agenda() {
   }, [isLoadingMore]);
 
   // Map API data to component format
-  const turnos = appointments.map((a, index) => {
-    const dateTime = new Date(a.dateTime);
-    const fecha = dateTime.toISOString().split('T')[0];
-    const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
-    const numericId = Number.parseInt(a.id, 10);
+  const turnos = sessionsUI.map((s, index) => {
+    const scheduledFrom = new Date(s.scheduledFrom);
+    const fecha = scheduledFrom.toISOString().split('T')[0];
+    const hora = `${scheduledFrom.getHours().toString().padStart(2, '0')}:${scheduledFrom.getMinutes().toString().padStart(2, '0')}`;
+    const numericId = Number.parseInt(s.id, 10);
     const safeId = Number.isNaN(numericId) ? index : numericId;
 
     // Map status to legacy format for display
@@ -88,23 +87,21 @@ export function Agenda() {
       return 'pendiente';
     };
 
-    const numericPatientId = Number.parseInt(a.patientId, 10);
+    const patientId = s.patient?.id || '';
+    const numericPatientId = Number.parseInt(patientId, 10);
 
     return {
       id: safeId,
-      rawId: a.id,
+      rawId: s.id,
       pacienteId: Number.isNaN(numericPatientId) ? null : numericPatientId,
-      pacienteRawId: a.patientId,
+      pacienteRawId: patientId,
       fecha,
       hora,
-      modalidad: a.sessionType === 'remote' ? 'remoto' as const : 'presencial' as const,
-      estado: mapEstado(a.status),
-      motivo: a.description || '',
+      modalidad: s.sessionType === 'remote' ? 'remoto' as const : 'presencial' as const,
+      estado: mapEstado(s.status),
+      motivo: s.sessionSummary || '',
     };
   });
-
-  console.log('[Agenda] appointments from store:', appointments);
-  console.log('[Agenda] mapped turnos:', turnos);
 
   const pacientes = patients.map((p, index) => {
     const numericId = Number.parseInt(p.id, 10);
@@ -201,41 +198,53 @@ export function Agenda() {
 
 
   const handleNuevoTurno = () => {
-    setSelectedAppointment(null);
+    setSelectedSession(null);
     setTurnoDrawerOpen(true);
   };
 
-  const handleSaveTurno = async (appointmentData: CreateAppointmentDto) => {
+  const handleSaveTurno = async (sessionData: CreateSessionDto) => {
     try {
-      if (selectedAppointment) {
-        // Update existing appointment
-        await updateAppointment(selectedAppointment.id, appointmentData);
+      if (selectedSession) {
+        // Update existing session
+        await updateSession(selectedSession.id, sessionData);
         toast.success('Turno actualizado exitosamente');
       } else {
-        // Create new appointment
-        await createAppointment(appointmentData);
+        // Create new session - store will add it to the list automatically
+        await createSession(sessionData);
         toast.success('Turno creado exitosamente');
       }
       setTurnoDrawerOpen(false);
-      setSelectedAppointment(null);
-      // Refresh list
-      await fetchUpcoming(100);
-    } catch (error) {
-      console.error('Error saving appointment:', error);
-      toast.error('Error al guardar el turno');
+      setSelectedSession(null);
+    } catch (error: any) {
+      console.error('Error saving session:', error);
+      
+      // Show user-friendly error message
+      let errorMessage = 'Error al guardar el turno';
+      
+      if (error?.message?.includes('already exists')) {
+        errorMessage = 'Ya existe una sesión en este horario. Por favor elige otro horario.';
+      } else if (error?.statusCode === 409) {
+        errorMessage = 'Conflicto de horarios. Ya tienes una sesión programada en este momento.';
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage, {
+        description: 'Verifica el horario e intenta nuevamente'
+      });
     }
   };
 
-  const handleDeleteTurno = async (appointmentId: string) => {
+  const handleDeleteTurno = async (sessionId: string) => {
     try {
-      await deleteAppointment(appointmentId);
+      await deleteSession(sessionId);
       toast.success('Turno eliminado exitosamente');
       setTurnoDrawerOpen(false);
       // Refresh list
-      await fetchUpcoming(100);
+      await fetchUpcoming();
     } catch (error) {
-      console.error('Error deleting appointment:', error);
-      toast.error('Error al eliminar el turno');
+      console.error('Error deleting session:', error);
+      // Error toast is handled by the store
     }
   };
 
@@ -262,8 +271,8 @@ export function Agenda() {
         </div>
       </div>
 
-      {/* Layout Principal - Desktop: Grid 2 columnas | Mobile: Columna única */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-6 flex-1 overflow-hidden">
+      {/* Layout Principal - Desktop: Grid 2 columnas 50-50 | Mobile: Columna única */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 overflow-hidden">
         {/* Lista de Turnos - Izquierda */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col">
           <h2 className="text-gray-900 px-6 pt-6 pb-4 flex-shrink-0">Próximos Turnos</h2>
@@ -271,16 +280,21 @@ export function Agenda() {
             {isLoading ? (
               <SkeletonList items={5} />
             ) : visibleTurnosPorDia.length === 0 ? (
-              <EmptyState
-                icon={CalendarX}
-                title="No hay turnos programados"
-                description="Aún no tienes turnos agendados. Comienza creando un nuevo turno."
-                action={{
-                  label: "Crear primer turno",
-                  onClick: handleNuevoTurno
-                }}
-                variant="subtle"
-              />
+              <div className="space-y-6">
+                <EmptyState
+                  icon={CalendarX}
+                  title="No hay turnos programados"
+                  description="Aún no tienes turnos agendados. Comienza creando un nuevo turno o sincroniza con Google Calendar."
+                  action={{
+                    label: "Crear primer turno",
+                    onClick: handleNuevoTurno
+                  }}
+                  variant="subtle"
+                />
+                <div className="flex justify-center pt-4">
+                  <CalendarSyncButton variant="outline" />
+                </div>
+              </div>
             ) : (
               <div className="space-y-6">
                 {visibleTurnosPorDia.map(([fecha, turnosDelDia]) => {
@@ -299,7 +313,7 @@ export function Agenda() {
                     <div className="space-y-3">
                       {turnosDelDia.map((turno) => {
                         const paciente = getPaciente(turno.pacienteRawId ?? turno.pacienteId ?? null);
-                        const appointment = appointments.find(a => a.id === turno.rawId);
+                        const session = sessionsUI.find(s => s.id === turno.rawId);
 
                         return (
                           <div
@@ -361,8 +375,8 @@ export function Agenda() {
                                     </span>
                                     <button
                                       onClick={() => {
-                                        if (appointment) {
-                                          setSelectedAppointment(appointment);
+                                        if (session) {
+                                          setSelectedSession(session);
                                           setTurnoDrawerOpen(true);
                                         }
                                       }}
@@ -411,16 +425,34 @@ export function Agenda() {
           </div>
         </div>
 
-        {/* Calendario - Derecha (solo visible en desktop >=1024px) */}
-        <div className="hidden lg:block">
-          <div className="sticky top-4 bg-white rounded-lg shadow-sm p-6">
-            <CalendarView
-              calendarDate={calendarDate}
-              onPreviousMonth={goToPreviousMonth}
-              onNextMonth={goToNextMonth}
-              onToday={goToToday}
-              turnosCountPorDia={turnosCountPorDia}
-              today={today}
+        {/* FullCalendar - Derecha (solo visible en desktop >=1024px) */}
+        <div className="hidden lg:block overflow-auto">
+          <div className="sticky top-4">
+            <FullCalendarView
+              sessions={sessionsUI}
+              onEventClick={(session) => {
+                setSelectedSession(session);
+                setTurnoDrawerOpen(true);
+              }}
+              onDateSelect={(start, end) => {
+                // Abrir drawer para crear nueva sesión con esas fechas
+                setSelectedSession(null);
+                setTurnoDrawerOpen(true);
+                // TODO: Pre-fill con las fechas seleccionadas
+              }}
+              onEventDrop={async (sessionId, newStart, newEnd) => {
+                try {
+                  await updateSession(sessionId, {
+                    scheduledFrom: newStart.toISOString(),
+                    scheduledTo: newEnd.toISOString(),
+                  });
+                  toast.success('Turno reagendado exitosamente');
+                  await fetchUpcoming();
+                } catch (error) {
+                  console.error('Error rescheduling session:', error);
+                  toast.error('Error al reagendar el turno');
+                }
+              }}
             />
           </div>
         </div>
@@ -436,7 +468,7 @@ export function Agenda() {
           />
 
           {/* Drawer */}
-          <div className="relative ml-auto h-full w-full md:max-w-md bg-white shadow-2xl overflow-y-auto">
+          <div className="relative ml-auto h-full w-full bg-white shadow-2xl overflow-y-auto">
             {/* Header */}
             <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4">
               <div className="flex items-center justify-between">
@@ -450,33 +482,47 @@ export function Agenda() {
               </div>
             </div>
 
-            {/* Calendar Content */}
+            {/* FullCalendar Content */}
             <div className="p-4">
-              <CalendarView
-                calendarDate={calendarDate}
-                onPreviousMonth={goToPreviousMonth}
-                onNextMonth={goToNextMonth}
-                onToday={goToToday}
-                turnosCountPorDia={turnosCountPorDia}
-                today={today}
-                isMobile={true}
+              <FullCalendarView
+                sessions={sessionsUI}
+                onEventClick={(session) => {
+                  setSelectedSession(session);
+                  setCalendarDrawerOpen(false);
+                  setTurnoDrawerOpen(true);
+                }}
+                onDateSelect={(start, end) => {
+                  setSelectedSession(null);
+                  setCalendarDrawerOpen(false);
+                  setTurnoDrawerOpen(true);
+                }}
+                onEventDrop={async (sessionId, newStart, newEnd) => {
+                  try {
+                    await updateSession(sessionId, {
+                      scheduledFrom: newStart.toISOString(),
+                      scheduledTo: newEnd.toISOString(),
+                    });
+                    toast.success('Turno reagendado exitosamente');
+                    await fetchUpcoming();
+                  } catch (error) {
+                    console.error('Error rescheduling session:', error);
+                    toast.error('Error al reagendar el turno');
+                  }
+                }}
               />
             </div>
           </div>
         </div>
       )}
 
-      {/* Drawers */}
-      {/* TODO: Crear componente para ver detalles del paciente */}
-
       {/* Turno Drawer */}
       <TurnoDrawer
         isOpen={turnoDrawerOpen}
         onClose={() => {
           setTurnoDrawerOpen(false);
-          setSelectedAppointment(null);
+          setSelectedSession(null);
         }}
-        appointment={selectedAppointment}
+        session={selectedSession}
         patients={patients}
         pacienteId={selectedPatientId || undefined}
         onSave={handleSaveTurno}

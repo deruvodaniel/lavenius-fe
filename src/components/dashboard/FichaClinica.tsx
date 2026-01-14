@@ -2,8 +2,10 @@ import { ArrowLeft, Mail, Phone, Heart, Calendar, FileText, User, Clock, Flag, E
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { TurnoDrawer } from '../agenda';
-import { usePatients, useAppointments } from '@/lib/hooks';
-import type { Patient, CreateAppointmentDto } from '@/lib/types/api.types';
+import { usePatients } from '@/lib/hooks';
+import { useSessions } from '@/lib/stores/sessionStore';
+import type { Patient } from '@/lib/types/api.types';
+import type { CreateSessionDto } from '@/lib/types/session';
 
 interface FichaClinicaProps {
   patient: Patient | null;
@@ -12,7 +14,7 @@ interface FichaClinicaProps {
 
 export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   const { updatePatient } = usePatients();
-  const { appointments, fetchAppointments, createAppointment } = useAppointments();
+  const { sessionsUI, fetchUpcoming, createSession } = useSessions();
   
   // Estado para gestionar flag
   const [isFlagged, setIsFlagged] = useState(false);
@@ -84,20 +86,20 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     setIsEditing(false);
   };
 
-  const handleSaveTurno = async (appointmentData: CreateAppointmentDto) => {
+  const handleSaveTurno = async (sessionData: CreateSessionDto) => {
     try {
-      await createAppointment(appointmentData);
+      await createSession(sessionData);
       toast.success('Turno creado exitosamente');
-      await fetchAppointments();
+      await fetchUpcoming();
       setIsTurnoDrawerOpen(false);
     } catch (error) {
-      console.error('Error creating appointment:', error);
+      console.error('Error creating session:', error);
       toast.error('Error al crear el turno');
     }
   };
 
-  // Get patient's appointments
-  const turnosPaciente = appointments.filter((a) => a.patientId === patient.id);
+  // Get patient's sessions
+  const turnosPaciente = sessionsUI.filter((s) => s.patientId === patient.id);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
