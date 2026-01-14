@@ -30,6 +30,14 @@ export class PaymentService {
   }
 
   /**
+   * Get payments by session ID
+   */
+  async getBySessionId(sessionId: string): Promise<Payment[]> {
+    const payments = await this.getAll();
+    return payments.filter((payment) => payment.sessionId === sessionId);
+  }
+
+  /**
    * Get payments by status
    */
   async getByStatus(status: PaymentStatus): Promise<Payment[]> {

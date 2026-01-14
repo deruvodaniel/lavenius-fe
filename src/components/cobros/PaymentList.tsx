@@ -24,8 +24,7 @@ export const PaymentList = ({
         icon={Receipt}
         title="No hay pagos registrados"
         description="Comienza registrando el primer pago para este paciente o sesión."
-        actionLabel={onCreateNew ? "Registrar Pago" : undefined}
-        onAction={onCreateNew}
+        action={onCreateNew ? { label: "Registrar Pago", onClick: onCreateNew } : undefined}
       />
     );
   }

@@ -17,7 +17,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { LoadingSpinner } from '../shared/LoadingSpinner';
 import { formatISODate } from '@/lib/utils/dateFormatters';
 import type { Payment, CreatePaymentDto, UpdatePaymentDto } from '@/lib/types/api.types';
 import { PaymentMethod, PaymentStatus } from '@/lib/types/api.types';
@@ -240,16 +239,7 @@ export const PaymentDrawer = ({
               Cancelar
             </Button>
             <Button type="submit" className="flex-1" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <LoadingSpinner size="sm" className="mr-2" />
-                  Guardando...
-                </>
-              ) : payment ? (
-                'Guardar Cambios'
-              ) : (
-                'Registrar Pago'
-              )}
+              {isLoading ? 'Guardando...' : payment ? 'Guardar Cambios' : 'Registrar Pago'}
             </Button>
           </div>
         </form>

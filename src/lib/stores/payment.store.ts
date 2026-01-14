@@ -4,7 +4,7 @@ import type {
   CreatePaymentDto,
   UpdatePaymentDto,
 } from '@/lib/types/api.types';
-import { paymentApi } from '@/lib/api/payment.api';
+import { paymentService } from '@/lib/services/payment.service';
 
 interface PaymentStore {
   payments: Payment[];
@@ -33,7 +33,7 @@ export const usePaymentStore = create<PaymentStore>((set, get) => ({
   fetchPaymentsByPatient: async (patientId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const payments = await paymentApi.getPaymentsByPatient(patientId);
+      const payments = await paymentService.getByPatientId(patientId);
       set({ payments, isLoading: false });
     } catch (error) {
       set({
@@ -46,7 +46,7 @@ export const usePaymentStore = create<PaymentStore>((set, get) => ({
   fetchPaymentsBySession: async (sessionId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const payments = await paymentApi.getPaymentsBySession(sessionId);
+      const payments = await paymentService.getBySessionId(sessionId);
       set({ payments, isLoading: false });
     } catch (error) {
       set({
@@ -59,7 +59,7 @@ export const usePaymentStore = create<PaymentStore>((set, get) => ({
   fetchAllPayments: async () => {
     set({ isLoading: true, error: null });
     try {
-      const payments = await paymentApi.getAllPayments();
+      const payments = await paymentService.getAll();
       set({ payments, isLoading: false });
     } catch (error) {
       set({
@@ -72,7 +72,7 @@ export const usePaymentStore = create<PaymentStore>((set, get) => ({
   createPayment: async (data: CreatePaymentDto) => {
     set({ isLoading: true, error: null });
     try {
-      const newPayment = await paymentApi.createPayment(data);
+      const newPayment = await paymentService.create(data);
       set((state) => ({
         payments: [newPayment, ...state.payments],
         isLoading: false,
@@ -90,7 +90,7 @@ export const usePaymentStore = create<PaymentStore>((set, get) => ({
   updatePayment: async (id: string, data: UpdatePaymentDto) => {
     set({ isLoading: true, error: null });
     try {
-      const updatedPayment = await paymentApi.updatePayment(id, data);
+      const updatedPayment = await paymentService.update(id, data);
       set((state) => ({
         payments: state.payments.map((payment) =>
           payment.id === id ? updatedPayment : payment
@@ -112,7 +112,7 @@ export const usePaymentStore = create<PaymentStore>((set, get) => ({
   deletePayment: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      await paymentApi.deletePayment(id);
+      await paymentService.delete(id);
       set((state) => ({
         payments: state.payments.filter((payment) => payment.id !== id),
         selectedPayment: state.selectedPayment?.id === id ? null : state.selectedPayment,

@@ -1,11 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bell, CheckCircle, Clock, DollarSign, Calendar, Video, MapPin, Copy, MessageCircle, X, MoreVertical } from 'lucide-react';
+import { Bell, CheckCircle, Clock, DollarSign, Calendar, Video, MapPin, Copy, MessageCircle, X, MoreVertical, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { usePatients } from '@/lib/hooks';
 import { useSessions } from '@/lib/stores/sessionStore';
+import { usePayments } from '@/lib/hooks/usePayments';
+import { PaymentStats } from './PaymentStats';
+import { PaymentList } from './PaymentList';
+import { PaymentDrawer } from './PaymentDrawer';
+import { Button } from '@/components/ui/button';
+import type { Payment, CreatePaymentDto, UpdatePaymentDto } from '@/lib/types/api.types';
+import { PaymentStatus } from '@/lib/types/api.types';
 
 export function Cobros() {
   const { sessionsUI, fetchUpcoming } = useSessions();
   const { patients, fetchPatients } = usePatients();
+  const { payments, isLoading: isLoadingPayments, fetchAllPayments, createPayment, updatePayment, deletePayment, clearPayments } = usePayments();
   
   const [turnosCobrados, setTurnosCobrados] = useState<{ [key: number]: boolean }>({});
   const [showReminderModal, setShowReminderModal] = useState(false);
@@ -14,6 +23,10 @@ export function Cobros() {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const hasFetchedRef = useRef(false);
+  
+  // Payment drawer state
+  const [isPaymentDrawerOpen, setIsPaymentDrawerOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
 
   // Fetch data on mount (only once)
   useEffect(() => {
@@ -24,15 +37,24 @@ export function Cobros() {
         try {
           await Promise.all([
             fetchUpcoming(),
-            fetchPatients()
+            fetchPatients(),
+            fetchAllPayments(),
           ]);
-        } catch {
-          // Ignore errors
+        } catch (error) {
+          console.error('Error fetching data:', error);
         }
         setIsLoading(false);
       };
       fetchData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      clearPayments();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -134,6 +156,52 @@ export function Cobros() {
     setShowReminderModal(false);
   };
 
+  // Payment handlers
+  const handleCreatePayment = () => {
+    setSelectedPayment(null);
+    setIsPaymentDrawerOpen(true);
+  };
+
+  const handleEditPayment = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsPaymentDrawerOpen(true);
+  };
+
+  const handleSavePayment = async (data: CreatePaymentDto | UpdatePaymentDto) => {
+    try {
+      if (selectedPayment) {
+        await updatePayment(selectedPayment.id, data as UpdatePaymentDto);
+        toast.success('Pago actualizado correctamente');
+      } else {
+        await createPayment(data as CreatePaymentDto);
+        toast.success('Pago registrado correctamente');
+      }
+    } catch (error) {
+      toast.error('No se pudo guardar el pago. Por favor intenta nuevamente.');
+    }
+  };
+
+  const handleDeletePayment = async (id: string) => {
+    try {
+      await deletePayment(id);
+      toast.success('Pago eliminado correctamente');
+    } catch (error) {
+      toast.error('No se pudo eliminar el pago. Por favor intenta nuevamente.');
+    }
+  };
+
+  // Create patient names map for PaymentList
+  const patientNames = patients.reduce((acc, p) => {
+    acc[p.id] = `${p.firstName} ${p.lastName}`;
+    return acc;
+  }, {} as Record<string, string>);
+
+  // Filter payments for current week (reuse same week calculation from above)
+  const paymentsThisWeek = payments.filter((payment) => {
+    const paymentDate = new Date(payment.paymentDate);
+    return paymentDate >= startOfWeek && paymentDate <= endOfWeek;
+  });
+
   const totalCobrado = turnosEstaSemana
     .filter((t) => turnosCobrados[t.id])
     .reduce((sum, t) => sum + (t.monto || 0), 0);
@@ -143,16 +211,71 @@ export function Cobros() {
     .reduce((sum, t) => sum + (t.monto || 0), 0);
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      <h1 className="text-gray-900 mb-6">Cobros</h1>
+    <div className="p-4 md:p-6 lg:p-8 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-gray-900">Cobros y Pagos</h1>
+        <Button onClick={handleCreatePayment}>
+          <Plus className="h-4 w-4 mr-2" />
+          Registrar Pago
+        </Button>
+      </div>
 
-      {/* Summary Mini Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      {/* Payment Statistics */}
+      <div>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Estadísticas de Pagos</h2>
+        {isLoadingPayments ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-32 bg-gray-100 animate-pulse rounded-lg" />
+            ))}
+          </div>
+        ) : (
+          <PaymentStats payments={paymentsThisWeek} />
+        )}
+      </div>
+
+      {/* Registered Payments */}
+      <div>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Pagos Registrados</h2>
+        {isLoadingPayments ? (
+          <div className="py-20 flex flex-col items-center gap-4">
+            <div className="inline-flex items-center gap-2">
+              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+            <p className="text-sm text-gray-500">Cargando pagos...</p>
+          </div>
+        ) : (
+          <PaymentList
+            payments={paymentsThisWeek}
+            patientNames={patientNames}
+            onEdit={handleEditPayment}
+            onDelete={handleDeletePayment}
+            onCreateNew={handleCreatePayment}
+          />
+        )}
+      </div>
+
+      {/* Payment Drawer */}
+      <PaymentDrawer
+        isOpen={isPaymentDrawerOpen}
+        onClose={() => {
+          setIsPaymentDrawerOpen(false);
+          setSelectedPayment(null);
+        }}
+        onSave={handleSavePayment}
+        payment={selectedPayment}
+        isLoading={isLoadingPayments}
+      />
+
+      {/* Summary Mini Cards (Legacy - para referencia de turnos) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
           <div className="flex items-center gap-3">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <div>
-              <p className="text-green-800 text-sm">Total cobrado esta semana</p>
+              <p className="text-green-800 text-sm">Turnos cobrados esta semana</p>
               <p className="text-green-900 text-xl">{formatMonto(totalCobrado)}</p>
             </div>
           </div>
@@ -161,7 +284,7 @@ export function Cobros() {
           <div className="flex items-center gap-3">
             <Clock className="w-5 h-5 text-yellow-600" />
             <div>
-              <p className="text-yellow-800 text-sm">Total pendiente esta semana</p>
+              <p className="text-yellow-800 text-sm">Turnos pendientes esta semana</p>
               <p className="text-yellow-900 text-xl">{formatMonto(totalPendiente)}</p>
             </div>
           </div>
