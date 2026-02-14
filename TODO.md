@@ -6,15 +6,15 @@ Plan de mejoras basado en auditoría de código.
 
 ## CRÍTICO
 
-### 1. Configuracion.tsx - Settings no persisten
+### ~~1. Configuracion.tsx - Settings no persisten~~ ✅ DONE
 - **Archivo**: `src/components/config/Configuracion.tsx`
 - **Problema**: Los settings solo muestran toast pero no guardan nada
-- **Fix**: Implementar persistencia con backend o localStorage
+- **Fix**: Implementado persistencia con localStorage
 
-### 2. Pacientes.tsx - getProximoTurno siempre null
-- **Archivo**: `src/components/pacientes/Pacientes.tsx:135`
+### ~~2. Pacientes.tsx - getProximoTurno siempre null~~ ✅ DONE
+- **Archivo**: `src/components/pacientes/Pacientes.tsx`
 - **Problema**: TODO en código - función siempre retorna null
-- **Fix**: Implementar lógica consultando sesiones del paciente
+- **Fix**: Implementado usando session store para obtener próximas sesiones
 
 ### 3. Backend - Session update 500 error
 - **Archivo**: `lavenius-be/src/sessions/session.service.ts:199-213`
@@ -100,10 +100,10 @@ interface ApiError {
 - **44 instancias** en producción
 - **Fix**: Remover o usar logger condicional (`if (import.meta.env.DEV)`)
 
-### 16. CSS duplicado
+### ~~16. CSS duplicado~~ ✅ DONE
 - **Archivo**: `src/index.css`
 - **Problema**: Regla `body` duplicada (líneas 56-72)
-- **Fix**: Eliminar duplicado
+- **Fix**: Eliminado duplicado
 
 ### 17. Naming inconsistente en stores
 - `sessionStore.ts` vs `appointment.store.ts` vs `payment.store.ts`

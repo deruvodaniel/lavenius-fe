@@ -1,9 +1,57 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Bell, DollarSign, Calendar, X, Plus, Save } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
+
+// ============================================================================
+// SETTINGS STORAGE
+// ============================================================================
+
+const SETTINGS_KEY = 'lavenius_settings';
+
+interface AppSettings {
+  recordatoriosCobros: boolean;
+  frecuenciaRecordatorio: string;
+  minimoTurnos: number;
+  recordatoriosPacientes: boolean;
+  horasAnticipacion: number;
+  diasOff: { id: number; fecha: string; motivo: string }[];
+}
+
+const defaultSettings: AppSettings = {
+  recordatoriosCobros: true,
+  frecuenciaRecordatorio: 'semanal',
+  minimoTurnos: 3,
+  recordatoriosPacientes: true,
+  horasAnticipacion: 24,
+  diasOff: [
+    { id: 1, fecha: '2025-12-25', motivo: 'Navidad' },
+    { id: 2, fecha: '2026-01-01', motivo: 'Año Nuevo' },
+  ],
+};
+
+const loadSettings = (): AppSettings => {
+  try {
+    const stored = localStorage.getItem(SETTINGS_KEY);
+    if (stored) {
+      return { ...defaultSettings, ...JSON.parse(stored) };
+    }
+  } catch (error) {
+    console.error('Error loading settings:', error);
+  }
+  return defaultSettings;
+};
+
+const saveSettings = (settings: AppSettings): void => {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch (error) {
+    console.error('Error saving settings:', error);
+    throw error;
+  }
+};
 
 // ============================================================================
 // SECTION WRAPPER COMPONENT
@@ -71,25 +119,44 @@ const ToggleRow = ({ checked, onChange, label, description }: ToggleRowProps) =>
 // ============================================================================
 
 export function Configuracion() {
-  // Recordatorios de cobros
-  const [recordatoriosCobros, setRecordatoriosCobros] = useState(true);
-  const [frecuenciaRecordatorio, setFrecuenciaRecordatorio] = useState('semanal');
-  const [minimoTurnos, setMinimoTurnos] = useState(3);
+  // Load settings from localStorage on mount
+  const [settings, setSettings] = useState<AppSettings>(loadSettings);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
-  // Recordatorios para pacientes
-  const [recordatoriosPacientes, setRecordatoriosPacientes] = useState(true);
-  const [horasAnticipacion, setHorasAnticipacion] = useState(24);
-  
-  // Días/horarios off
-  const [diasOff, setDiasOff] = useState<{ id: number; fecha: string; motivo: string }[]>([
-    { id: 1, fecha: '2025-12-25', motivo: 'Navidad' },
-    { id: 2, fecha: '2026-01-01', motivo: 'Año Nuevo' },
-  ]);
+  // UI state
   const [showAddDiaOff, setShowAddDiaOff] = useState(false);
   const [newDiaOff, setNewDiaOff] = useState({ fecha: '', motivo: '' });
 
+  // Update a setting and mark as changed
+  const updateSetting = useCallback(<K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
+    setHasChanges(true);
+  }, []);
+
+  // Warn user about unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasChanges]);
+
   const handleSave = () => {
-    toast.success('Configuración guardada correctamente');
+    setIsSaving(true);
+    try {
+      saveSettings(settings);
+      setHasChanges(false);
+      toast.success('Configuración guardada correctamente');
+    } catch {
+      toast.error('Error al guardar la configuración');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAddDiaOff = () => {
@@ -97,14 +164,14 @@ export function Configuracion() {
       toast.error('Selecciona una fecha');
       return;
     }
-    setDiasOff([...diasOff, { id: Date.now(), ...newDiaOff }]);
+    updateSetting('diasOff', [...settings.diasOff, { id: Date.now(), ...newDiaOff }]);
     setNewDiaOff({ fecha: '', motivo: '' });
     setShowAddDiaOff(false);
     toast.success('Día off agregado');
   };
 
   const handleRemoveDiaOff = (id: number) => {
-    setDiasOff(diasOff.filter(d => d.id !== id));
+    updateSetting('diasOff', settings.diasOff.filter(d => d.id !== id));
     toast.success('Día off eliminado');
   };
 
@@ -139,13 +206,13 @@ export function Configuracion() {
         >
           <div className="space-y-4">
             <ToggleRow
-              checked={recordatoriosCobros}
-              onChange={setRecordatoriosCobros}
+              checked={settings.recordatoriosCobros}
+              onChange={(v) => updateSetting('recordatoriosCobros', v)}
               label="Activar recordatorios de cobros pendientes"
               description="Te notificaremos cuando tengas turnos realizados sin marcar como cobrados"
             />
 
-            {recordatoriosCobros && (
+            {settings.recordatoriosCobros && (
               <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-100">
                 {/* Frecuencia */}
                 <div className="space-y-2">
@@ -153,8 +220,8 @@ export function Configuracion() {
                     Frecuencia de recordatorio
                   </label>
                   <select
-                    value={frecuenciaRecordatorio}
-                    onChange={(e) => setFrecuenciaRecordatorio(e.target.value)}
+                    value={settings.frecuenciaRecordatorio}
+                    onChange={(e) => updateSetting('frecuenciaRecordatorio', e.target.value)}
                     className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
                   >
                     <option value="diario">Diariamente</option>
@@ -173,12 +240,12 @@ export function Configuracion() {
                       type="number"
                       min="1"
                       max="20"
-                      value={minimoTurnos}
-                      onChange={(e) => setMinimoTurnos(Number(e.target.value))}
+                      value={settings.minimoTurnos}
+                      onChange={(e) => updateSetting('minimoTurnos', Number(e.target.value))}
                       className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
                     />
                     <span className="text-sm text-gray-600">
-                      {minimoTurnos === 1 ? 'turno sin cobrar' : 'turnos sin cobrar'}
+                      {settings.minimoTurnos === 1 ? 'turno sin cobrar' : 'turnos sin cobrar'}
                     </span>
                   </div>
                 </div>
@@ -186,7 +253,7 @@ export function Configuracion() {
                 {/* Preview */}
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
                   <p className="text-xs sm:text-sm text-orange-800">
-                    <span className="font-medium">Ejemplo:</span> Tienes {minimoTurnos} {minimoTurnos === 1 ? 'turno' : 'turnos'} de la semana pasada sin marcar como {minimoTurnos === 1 ? 'cobrado' : 'cobrados'}.
+                    <span className="font-medium">Ejemplo:</span> Tienes {settings.minimoTurnos} {settings.minimoTurnos === 1 ? 'turno' : 'turnos'} de la semana pasada sin marcar como {settings.minimoTurnos === 1 ? 'cobrado' : 'cobrados'}.
                   </p>
                 </div>
               </div>
@@ -204,13 +271,13 @@ export function Configuracion() {
         >
           <div className="space-y-4">
             <ToggleRow
-              checked={recordatoriosPacientes}
-              onChange={setRecordatoriosPacientes}
+              checked={settings.recordatoriosPacientes}
+              onChange={(v) => updateSetting('recordatoriosPacientes', v)}
               label="Activar recordatorios para pacientes"
               description="Te avisaremos cuando sea momento de recordar a tus pacientes sus turnos"
             />
 
-            {recordatoriosPacientes && (
+            {settings.recordatoriosPacientes && (
               <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-100">
                 {/* Horas de anticipación */}
                 <div className="space-y-2">
@@ -222,8 +289,8 @@ export function Configuracion() {
                       type="number"
                       min="1"
                       max="72"
-                      value={horasAnticipacion}
-                      onChange={(e) => setHorasAnticipacion(Number(e.target.value))}
+                      value={settings.horasAnticipacion}
+                      onChange={(e) => updateSetting('horasAnticipacion', Number(e.target.value))}
                       className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
                     />
                     <span className="text-sm text-gray-600">horas antes del turno</span>
@@ -233,7 +300,7 @@ export function Configuracion() {
                 {/* Preview */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <p className="text-xs sm:text-sm text-blue-800">
-                    <span className="font-medium">Ejemplo:</span> Recordatorio para paciente con turno en {horasAnticipacion} {horasAnticipacion === 1 ? 'hora' : 'horas'}.
+                    <span className="font-medium">Ejemplo:</span> Recordatorio para paciente con turno en {settings.horasAnticipacion} {settings.horasAnticipacion === 1 ? 'hora' : 'horas'}.
                   </p>
                 </div>
               </div>
@@ -251,9 +318,9 @@ export function Configuracion() {
         >
           <div className="space-y-4">
             {/* Lista de días off */}
-            {diasOff.length > 0 ? (
+            {settings.diasOff.length > 0 ? (
               <div className="space-y-2">
-                {diasOff.map(dia => (
+                {settings.diasOff.map(dia => (
                   <div 
                     key={dia.id} 
                     className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg group hover:bg-gray-100 transition-colors"
@@ -338,13 +405,17 @@ export function Configuracion() {
         </ConfigSection>
 
         {/* Botón Guardar */}
-        <div className="flex justify-end pt-4 border-t border-gray-200">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+          {hasChanges && (
+            <span className="text-sm text-amber-600">Hay cambios sin guardar</span>
+          )}
           <Button 
-            onClick={handleSave} 
-            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
+            onClick={handleSave}
+            disabled={!hasChanges || isSaving}
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save className="w-4 h-4 mr-2" />
-            Guardar Cambios
+            {isSaving ? 'Guardando...' : 'Guardar Cambios'}
           </Button>
         </div>
       </div>

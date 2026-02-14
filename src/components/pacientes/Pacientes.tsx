@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Video, MapPin, Calendar, Plus, Edit2, Trash2, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
 import { usePatients, useErrorToast } from '@/lib/hooks';
+import { useSessionStore } from '@/lib/stores/sessionStore';
+import { SessionStatus } from '@/lib/types/session';
 import { AnimatedList, SkeletonCard, EmptyState } from '../shared';
 import type { CreatePatientDto } from '@/lib/types/api.types';
 
 export function Pacientes() {
   const { patients, isLoading, error, fetchPatients, createPatient, updatePatient, deletePatient, clearError } = usePatients();
+  const { sessions, fetchUpcoming } = useSessionStore();
   
   // Auto-display error toasts
   useErrorToast(error, clearError);
@@ -26,9 +29,43 @@ export function Pacientes() {
     if (!hasFetchedRef.current) {
       hasFetchedRef.current = true;
       fetchPatients().catch(() => {});
+      fetchUpcoming().catch(() => {});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Build a map of patient ID -> next session date for quick lookup
+  const nextSessionByPatient = useMemo(() => {
+    const map = new Map<string, Date>();
+    const now = new Date();
+    
+    // Sessions should already be sorted by date, but filter for future ones
+    const upcomingSessions = sessions
+      .filter(s => new Date(s.scheduledFrom) >= now && s.status !== SessionStatus.CANCELLED)
+      .sort((a, b) => new Date(a.scheduledFrom).getTime() - new Date(b.scheduledFrom).getTime());
+    
+    // For each session, only keep the first (earliest) one per patient
+    for (const session of upcomingSessions) {
+      const patientId = session.patient?.id;
+      if (patientId && !map.has(patientId)) {
+        map.set(patientId, new Date(session.scheduledFrom));
+      }
+    }
+    
+    return map;
+  }, [sessions]);
+
+  // Get next appointment for a patient
+  const getProximoTurno = (pacienteId: string): { dias: number } | null => {
+    const nextDate = nextSessionByPatient.get(pacienteId);
+    if (!nextDate) return null;
+    
+    const now = new Date();
+    const diffTime = nextDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return { dias: Math.max(0, diffDays) };
+  };
 
   // If a patient is selected, show their clinical record
   if (selectedPatientId !== null) {
@@ -125,16 +162,16 @@ export function Pacientes() {
       return false;
     }
 
-    // Note: soloTurnosEstaSemana filter removed - will be re-implemented with sessions if needed
+    // Filter for patients with appointments this week
+    if (soloTurnosEstaSemana) {
+      const turno = getProximoTurno(paciente.rawId);
+      if (!turno || turno.dias > 7) {
+        return false;
+      }
+    }
 
     return true;
   });
-
-  // Get next appointment for a patient (simplified - can be enhanced later with sessions)
-  const getProximoTurno = (_pacienteId: string): { dias: number } | null => {
-    // TODO: Implement with sessions API
-    return null;
-  };
 
   const getModalidadLabel = (modalidad: string) => {
     switch (modalidad) {
