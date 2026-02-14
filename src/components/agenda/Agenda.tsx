@@ -305,7 +305,8 @@ export function Agenda() {
       await fetchUpcoming();
     } catch (error) {
       console.error('Error deleting session:', error);
-      // Error toast is handled by the store
+      toast.error('Error al eliminar el turno');
+      throw error; // Re-throw so drawer can handle it
     }
   };
 
@@ -597,6 +598,7 @@ export function Agenda() {
           <div className="sticky top-4">
             <FullCalendarView
               sessions={sessionsUI}
+              isLoading={isLoading}
               isSessionPaid={isSessionPaid}
               onEventClick={(session) => {
                 setSelectedSession(session);
@@ -654,6 +656,7 @@ export function Agenda() {
             <div className="p-4">
               <FullCalendarView
                 sessions={sessionsUI}
+                isLoading={isLoading}
                 isSessionPaid={isSessionPaid}
                 onEventClick={(session) => {
                   setSelectedSession(session);

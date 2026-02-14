@@ -118,3 +118,130 @@ export function SkeletonList({ items = 3 }: { items?: number }) {
     </div>
   );
 }
+
+/**
+ * Calendar skeleton - shows a loading state for calendar views
+ */
+export function SkeletonCalendar() {
+  return (
+    <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <Skeleton width={120} height={28} />
+        <div className="flex gap-2">
+          <Skeleton width={32} height={32} className="rounded" />
+          <Skeleton width={32} height={32} className="rounded" />
+        </div>
+      </div>
+      {/* Week days header */}
+      <div className="grid grid-cols-7 gap-2 mb-2">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <Skeleton key={i} height={20} className="rounded" />
+        ))}
+      </div>
+      {/* Calendar grid */}
+      <div className="grid grid-cols-7 gap-2">
+        {Array.from({ length: 35 }).map((_, i) => (
+          <Skeleton key={i} height={60} className="rounded" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Stats card skeleton - for payment stats and dashboard metrics
+ */
+export function SkeletonStats({ cards = 4 }: { cards?: number }) {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {Array.from({ length: cards }).map((_, i) => (
+        <div key={i} className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+          <div className="flex items-center gap-3 mb-3">
+            <Skeleton variant="circular" width={40} height={40} />
+            <Skeleton width="60%" height={16} />
+          </div>
+          <Skeleton width="80%" height={28} className="mb-1" />
+          <Skeleton width="50%" height={14} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Notes skeleton - for clinical notes list
+ */
+export function SkeletonNotes({ items = 3 }: { items?: number }) {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: items }).map((_, i) => (
+        <div key={i} className="bg-white rounded-lg p-4 border border-gray-200">
+          <div className="flex items-start justify-between mb-2">
+            <Skeleton width="40%" height={18} />
+            <Skeleton width={80} height={14} />
+          </div>
+          <div className="space-y-2">
+            <Skeleton width="100%" height={14} />
+            <Skeleton width="90%" height={14} />
+            <Skeleton width="70%" height={14} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Session card skeleton - for upcoming sessions
+ */
+export function SkeletonSessionCard() {
+  return (
+    <div className="bg-white rounded-lg p-4 border border-gray-200">
+      <div className="flex items-center gap-3 mb-3">
+        <Skeleton variant="circular" width={36} height={36} />
+        <div className="flex-1">
+          <Skeleton width="50%" height={16} className="mb-1" />
+          <Skeleton width="30%" height={12} />
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <Skeleton width={60} height={24} className="rounded-full" />
+        <Skeleton width={80} height={24} className="rounded-full" />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Full page loading overlay with spinner
+ */
+export function LoadingOverlay({ message = 'Cargando...' }: { message?: string }) {
+  return (
+    <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+        <p className="text-gray-600 text-sm">{message}</p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Inline spinner for buttons and small loading states
+ */
+export function Spinner({ size = 'md', className = '' }: { size?: 'sm' | 'md' | 'lg'; className?: string }) {
+  const sizes = {
+    sm: 'w-4 h-4 border-2',
+    md: 'w-6 h-6 border-2',
+    lg: 'w-8 h-8 border-3'
+  };
+  
+  return (
+    <div 
+      className={`${sizes[size]} border-current border-t-transparent rounded-full animate-spin ${className}`}
+      role="status"
+      aria-label="Cargando"
+    />
+  );
+}

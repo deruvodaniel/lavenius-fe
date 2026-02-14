@@ -8,6 +8,7 @@ import { PaymentDrawer } from './PaymentDrawer';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SkeletonList } from '@/components/shared/Skeleton';
 import type { CreatePaymentDto, Payment } from '@/lib/types/api.types';
 import type { SessionUI } from '@/lib/types/session';
 import { SessionStatus } from '@/lib/types/session';
@@ -60,14 +61,6 @@ const StatusBadge = ({ status }: { status: PaymentStatusType }) => {
     </span>
   );
 };
-
-const LoadingSkeleton = () => (
-  <div className="space-y-3">
-    {[1, 2, 3].map((i) => (
-      <div key={i} className="h-24 sm:h-20 bg-gray-100 animate-pulse rounded-lg" />
-    ))}
-  </div>
-);
 
 const EmptyState = ({ icon: Icon, title, subtitle, variant = 'default' }: { 
   icon: React.ElementType; 
@@ -464,7 +457,7 @@ export function Cobros() {
         {/* Pendientes Tab */}
         <TabsContent value="pendientes" className="mt-4">
           {isLoading ? (
-            <LoadingSkeleton />
+            <SkeletonList items={3} />
           ) : sessionsPendingPayment.length === 0 ? (
             <EmptyState 
               icon={DollarSign} 
@@ -490,7 +483,7 @@ export function Cobros() {
         {/* Historial Tab */}
         <TabsContent value="historial" className="mt-4">
           {isLoading ? (
-            <LoadingSkeleton />
+            <SkeletonList items={3} />
           ) : paidPayments.length === 0 ? (
             <EmptyState 
               icon={History} 

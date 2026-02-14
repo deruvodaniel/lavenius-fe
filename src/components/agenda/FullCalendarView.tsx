@@ -10,9 +10,11 @@ import { SESSION_STATUS_COLORS } from '@/lib/constants/sessionColors';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Calendar, Grid3x3, Clock } from 'lucide-react';
+import { LoadingOverlay } from '../shared/Skeleton';
 
 interface FullCalendarViewProps {
   sessions: SessionUI[];
+  isLoading?: boolean;
   onEventClick?: (session: SessionUI) => void;
   onDateSelect?: (start: Date, end: Date) => void;
   onEventDrop?: (sessionId: string, newStart: Date, newEnd: Date) => void;
@@ -21,6 +23,7 @@ interface FullCalendarViewProps {
 
 export function FullCalendarView({ 
   sessions, 
+  isLoading = false,
   onEventClick, 
   onDateSelect,
   onEventDrop,
@@ -107,7 +110,10 @@ export function FullCalendarView({
   };
 
   return (
-    <Card className="p-3">
+    <Card className="p-3 relative">
+      {/* Loading Overlay */}
+      {isLoading && <LoadingOverlay message="Cargando turnos..." />}
+      
       {/* Toolbar personalizado */}
       <div className="flex items-center justify-between mb-3 gap-3">
         {/* Botones de vista */}

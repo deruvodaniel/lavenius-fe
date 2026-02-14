@@ -1,5 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils/dateFormatters';
+import { SkeletonStats } from '@/components/shared/Skeleton';
 import { TrendingUp, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 
 /**
@@ -25,22 +26,9 @@ interface PaymentStatsProps {
   isLoading?: boolean;
 }
 
-const LoadingSkeleton = () => (
-  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-    {[1, 2, 3, 4].map((i) => (
-      <Card key={i} className="p-3 sm:p-4 lg:p-6">
-        <div className="animate-pulse">
-          <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2 mb-2" />
-          <div className="h-6 sm:h-8 bg-gray-200 rounded w-3/4" />
-        </div>
-      </Card>
-    ))}
-  </div>
-);
-
 export const PaymentStats = ({ totals, isLoading }: PaymentStatsProps) => {
   if (isLoading || !totals) {
-    return <LoadingSkeleton />;
+    return <SkeletonStats cards={4} />;
   }
 
   const statCards = [

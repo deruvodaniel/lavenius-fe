@@ -30,8 +30,8 @@ interface TurnoDrawerProps {
   patients: Patient[];
   pacienteId?: string | number;
   initialDate?: Date; // Pre-fill date when creating from calendar selection
-  onSave: (session: CreateSessionDto) => void;
-  onDelete?: (sessionId: string) => void;
+  onSave: (session: CreateSessionDto) => Promise<void>;
+  onDelete?: (sessionId: string) => Promise<void>;
 }
 
 export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, initialDate, onSave, onDelete }: TurnoDrawerProps) {
@@ -50,6 +50,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Load session data when editing
   useEffect(() => {
@@ -60,7 +61,6 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       const horaInicio = `${scheduledFrom.getHours().toString().padStart(2, '0')}:${scheduledFrom.getMinutes().toString().padStart(2, '0')}`;
       const horaFin = `${scheduledTo.getHours().toString().padStart(2, '0')}:${scheduledTo.getMinutes().toString().padStart(2, '0')}`;
       
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         pacienteId: session.patient?.id || '',
         fecha,
@@ -143,7 +143,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     setShowSaveConfirm(true);
   };
 
-  const confirmSave = () => {
+  const confirmSave = async () => {
     if (!user?.id) {
       alert('Error: No se pudo obtener el ID del usuario. Por favor, inicie sesión nuevamente.');
       return;
@@ -178,16 +178,33 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       cost: typeof formData.monto === 'number' && !isNaN(formData.monto) ? formData.monto : undefined,
     };
 
-    onSave(sessionDto);
-    setShowSaveConfirm(false);
-    onClose();
+    setIsSaving(true);
+    try {
+      await onSave(sessionDto);
+      setShowSaveConfirm(false);
+      onClose();
+    } catch {
+      // Error is handled by parent component (shows toast)
+      // Keep drawer open so user can retry
+      setShowSaveConfirm(false);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (session && onDelete) {
-      onDelete(session.id);
-      setShowDeleteConfirm(false);
-      onClose();
+      setIsSaving(true);
+      try {
+        await onDelete(session.id);
+        setShowDeleteConfirm(false);
+        onClose();
+      } catch {
+        // Error is handled by parent component
+        setShowDeleteConfirm(false);
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -392,15 +409,17 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
             <div className="flex gap-3">
               <button
                 onClick={() => setShowSaveConfirm(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                disabled={isSaving}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 onClick={confirmSave}
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                disabled={isSaving}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Confirmar
+                {isSaving ? 'Guardando...' : 'Confirmar'}
               </button>
             </div>
           </div>
@@ -423,15 +442,17 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                disabled={isSaving}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 onClick={confirmDelete}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                disabled={isSaving}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Eliminar
+                {isSaving ? 'Eliminando...' : 'Eliminar'}
               </button>
             </div>
           </div>

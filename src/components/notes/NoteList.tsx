@@ -1,10 +1,12 @@
 import { FileText } from 'lucide-react';
 import { NoteCard } from './NoteCard';
 import { EmptyState } from '../shared/EmptyState';
+import { SkeletonNotes } from '../shared/Skeleton';
 import type { Note } from '@/lib/types/api.types';
 
 interface NoteListProps {
   notes: Note[];
+  isLoading?: boolean;
   onEdit?: (note: Note) => void;
   onDelete?: (id: string) => void;
   onCreateNew?: () => void;
@@ -14,16 +16,21 @@ interface NoteListProps {
 
 /**
  * NoteList Component
- * Displays a list of notes with empty state
+ * Displays a list of notes with empty state and loading skeleton
  */
 export function NoteList({ 
   notes, 
+  isLoading = false,
   onEdit, 
   onDelete, 
   onCreateNew,
   readOnly = false,
   emptyMessage = 'No hay notas registradas'
 }: NoteListProps) {
+  if (isLoading) {
+    return <SkeletonNotes items={3} />;
+  }
+
   if (notes.length === 0) {
     return (
       <EmptyState

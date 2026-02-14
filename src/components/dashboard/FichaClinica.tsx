@@ -7,6 +7,7 @@ import { NoteList } from '../notes/NoteList';
 import { usePatients } from '@/lib/hooks';
 import { useNotes } from '@/lib/hooks/useNotes';
 import { useSessions } from '@/lib/stores/sessionStore';
+import { SkeletonNotes, SkeletonSessionCard } from '../shared/Skeleton';
 import type { Patient, CreateNoteDto, UpdateNoteDto, Note } from '@/lib/types/api.types';
 import type { CreateSessionDto } from '@/lib/types/session';
 
@@ -17,7 +18,7 @@ interface FichaClinicaProps {
 
 export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   const { updatePatient } = usePatients();
-  const { sessionsUI, fetchUpcoming, createSession } = useSessions();
+  const { sessionsUI, isLoading: isLoadingSessions, fetchUpcoming, createSession } = useSessions();
   const { notes, isLoading: isLoadingNotes, fetchNotesByPatient, createNote, updateNote, deleteNote, clearNotes } = useNotes();
   
   // Estado para gestionar flag
@@ -322,7 +323,12 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               <Clock className="w-5 h-5 text-indigo-600" />
               Próximos Turnos
             </h3>
-            {proximosTurnos.length > 0 ? (
+            {isLoadingSessions ? (
+              <div className="space-y-3">
+                <SkeletonSessionCard />
+                <SkeletonSessionCard />
+              </div>
+            ) : proximosTurnos.length > 0 ? (
               <div className="space-y-3">
                 {proximosTurnos.map((turno) => {
                   const dateTime = new Date(turno.scheduledFrom);
@@ -410,7 +416,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
             </div>
             
             {isLoadingNotes ? (
-              <p className="text-gray-500 text-sm">Cargando notas...</p>
+              <SkeletonNotes items={3} />
             ) : (
               <NoteList
                 notes={notes}
