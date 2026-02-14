@@ -88,7 +88,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex">
+    <div className="fixed inset-0 z-50 flex !top-0 !mt-0">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"

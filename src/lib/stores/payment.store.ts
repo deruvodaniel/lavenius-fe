@@ -2,140 +2,208 @@ import { create } from 'zustand';
 import type {
   Payment,
   CreatePaymentDto,
-  UpdatePaymentDto,
+  WeeklyPaymentStats,
 } from '@/lib/types/api.types';
+import { PaymentStatus } from '@/lib/types/api.types';
 import { paymentService } from '@/lib/services/payment.service';
 
-interface PaymentStore {
-  payments: Payment[];
-  selectedPayment: Payment | null;
-  isLoading: boolean;
-  error: Error | null;
+/**
+ * Payment Store - Single Source of Truth
+ * 
+ * Data flow:
+ * 1. fetchPayments() loads weeklyStats from /payments/weekly
+ * 2. All derived data computed from weeklyStats.payments
+ * 3. After mutations, we refresh to stay in sync with backend
+ * 
+ * Request deduplication:
+ * - Uses fetchStatus to prevent concurrent duplicate requests
+ * - lastFetchTime to enable smart refresh decisions
+ */
 
-  // Actions
-  fetchPaymentsByPatient: (patientId: string) => Promise<void>;
-  fetchPaymentsBySession: (sessionId: string) => Promise<void>;
-  fetchAllPayments: () => Promise<void>;
-  createPayment: (data: CreatePaymentDto) => Promise<Payment>;
-  updatePayment: (id: string, data: UpdatePaymentDto) => Promise<Payment>;
-  deletePayment: (id: string) => Promise<void>;
-  setSelectedPayment: (payment: Payment | null) => void;
-  clearPayments: () => void;
-  clearError: () => void;
+type FetchStatus = 'idle' | 'loading' | 'success' | 'error';
+
+interface PaymentState {
+  weeklyStats: WeeklyPaymentStats | null;
+  fetchStatus: FetchStatus;
+  error: Error | null;
+  lastFetchTime: number | null;
 }
 
-export const usePaymentStore = create<PaymentStore>((set, get) => ({
-  payments: [],
-  selectedPayment: null,
-  isLoading: false,
+interface PaymentActions {
+  fetchPayments: (force?: boolean) => Promise<void>;
+  createPayment: (data: CreatePaymentDto) => Promise<Payment>;
+  markAsPaid: (id: string) => Promise<Payment>;
+  deletePayment: (id: string) => Promise<void>;
+  reset: () => void;
+}
+
+// Cache duration: 30 seconds
+const CACHE_DURATION = 30 * 1000;
+
+const initialState: PaymentState = {
+  weeklyStats: null,
+  fetchStatus: 'idle',
   error: null,
+  lastFetchTime: null,
+};
 
-  fetchPaymentsByPatient: async (patientId: string) => {
-    set({ isLoading: true, error: null });
+export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) => ({
+  ...initialState,
+
+  fetchPayments: async (force = false) => {
+    const { fetchStatus, lastFetchTime } = get();
+    
+    // Prevent duplicate concurrent requests
+    if (fetchStatus === 'loading') {
+      console.log('[PaymentStore] Skipping fetch - already loading');
+      return;
+    }
+    
+    // Use cache if valid and not forced
+    if (!force && lastFetchTime && Date.now() - lastFetchTime < CACHE_DURATION) {
+      console.log('[PaymentStore] Using cached data');
+      return;
+    }
+
+    set({ fetchStatus: 'loading', error: null });
+    
     try {
-      const payments = await paymentService.getByPatientId(patientId);
-      set({ payments, isLoading: false });
+      const weeklyStats = await paymentService.getWeeklyStats();
+      console.log('[PaymentStore] Fetched weeklyStats:', weeklyStats);
+      set({ 
+        weeklyStats, 
+        fetchStatus: 'success',
+        lastFetchTime: Date.now(),
+      });
     } catch (error) {
+      console.error('[PaymentStore] Fetch error:', error);
       set({
         error: error instanceof Error ? error : new Error('Failed to fetch payments'),
-        isLoading: false,
-      });
-    }
-  },
-
-  fetchPaymentsBySession: async (sessionId: string) => {
-    set({ isLoading: true, error: null });
-    try {
-      const payments = await paymentService.getBySessionId(sessionId);
-      set({ payments, isLoading: false });
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error : new Error('Failed to fetch payments'),
-        isLoading: false,
-      });
-    }
-  },
-
-  fetchAllPayments: async () => {
-    set({ isLoading: true, error: null });
-    try {
-      const payments = await paymentService.getAll();
-      set({ payments, isLoading: false });
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error : new Error('Failed to fetch payments'),
-        isLoading: false,
-      });
-    }
-  },
-
-  createPayment: async (data: CreatePaymentDto) => {
-    set({ isLoading: true, error: null });
-    try {
-      const newPayment = await paymentService.create(data);
-      set((state) => ({
-        payments: [newPayment, ...state.payments],
-        isLoading: false,
-      }));
-      return newPayment;
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error : new Error('Failed to create payment'),
-        isLoading: false,
+        fetchStatus: 'error',
       });
       throw error;
     }
   },
 
-  updatePayment: async (id: string, data: UpdatePaymentDto) => {
-    set({ isLoading: true, error: null });
+  createPayment: async (data: CreatePaymentDto) => {
+    set({ fetchStatus: 'loading', error: null });
     try {
-      const updatedPayment = await paymentService.update(id, data);
-      set((state) => ({
-        payments: state.payments.map((payment) =>
-          payment.id === id ? updatedPayment : payment
-        ),
-        selectedPayment:
-          state.selectedPayment?.id === id ? updatedPayment : state.selectedPayment,
-        isLoading: false,
-      }));
+      const newPayment = await paymentService.create(data);
+      console.log('[PaymentStore] Created payment:', newPayment);
+      
+      // Backend creates payments as 'pending', so we need to mark it as paid
+      // This is the expected flow: create payment record, then mark as paid
+      if (newPayment.id && newPayment.status !== PaymentStatus.PAID) {
+        console.log('[PaymentStore] Marking payment as paid:', newPayment.id);
+        await paymentService.markAsPaid(newPayment.id);
+      }
+      
+      // Force refresh to get updated data from backend
+      await get().fetchPayments(true);
+      return newPayment;
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error : new Error('Failed to create payment'),
+        fetchStatus: 'error',
+      });
+      throw error;
+    }
+  },
+
+  markAsPaid: async (id: string) => {
+    set({ fetchStatus: 'loading', error: null });
+    try {
+      const updatedPayment = await paymentService.markAsPaid(id);
+      // Force refresh to get updated data from backend
+      await get().fetchPayments(true);
       return updatedPayment;
     } catch (error) {
       set({
-        error: error instanceof Error ? error : new Error('Failed to update payment'),
-        isLoading: false,
+        error: error instanceof Error ? error : new Error('Failed to mark payment as paid'),
+        fetchStatus: 'error',
       });
       throw error;
     }
   },
 
   deletePayment: async (id: string) => {
-    set({ isLoading: true, error: null });
+    set({ fetchStatus: 'loading', error: null });
     try {
       await paymentService.delete(id);
-      set((state) => ({
-        payments: state.payments.filter((payment) => payment.id !== id),
-        selectedPayment: state.selectedPayment?.id === id ? null : state.selectedPayment,
-        isLoading: false,
-      }));
+      // Force refresh to get updated data from backend
+      await get().fetchPayments(true);
     } catch (error) {
       set({
         error: error instanceof Error ? error : new Error('Failed to delete payment'),
-        isLoading: false,
+        fetchStatus: 'error',
       });
       throw error;
     }
   },
 
-  setSelectedPayment: (payment: Payment | null) => {
-    set({ selectedPayment: payment });
-  },
-
-  clearPayments: () => {
-    set({ payments: [], selectedPayment: null, error: null });
-  },
-
-  clearError: () => {
-    set({ error: null });
-  },
+  reset: () => set(initialState),
 }));
+
+// ============================================================================
+// SELECTORS - Pure functions for derived data
+// ============================================================================
+
+export const paymentSelectors = {
+  getPayments: (state: PaymentState): Payment[] => 
+    state.weeklyStats?.payments ?? [],
+  
+  getPaidPayments: (state: PaymentState): Payment[] =>
+    state.weeklyStats?.payments?.filter(p => p.status === PaymentStatus.PAID) ?? [],
+  
+  getPendingPayments: (state: PaymentState): Payment[] =>
+    state.weeklyStats?.payments?.filter(p => 
+      p.status === PaymentStatus.PENDING || p.status === PaymentStatus.OVERDUE
+    ) ?? [],
+  
+  getOverduePayments: (state: PaymentState): Payment[] =>
+    state.weeklyStats?.payments?.filter(p => p.status === PaymentStatus.OVERDUE) ?? [],
+
+  /** 
+   * Check if a session has been paid
+   * Looks for any payment linked to this session with status PAID
+   */
+  isSessionPaid: (state: PaymentState, sessionId: string): boolean =>
+    state.weeklyStats?.payments?.some(
+      p => p.sessionId === sessionId && p.status === PaymentStatus.PAID
+    ) ?? false,
+
+  /**
+   * Get payment for a specific session
+   */
+  getPaymentBySessionId: (state: PaymentState, sessionId: string): Payment | undefined =>
+    state.weeklyStats?.payments?.find(p => p.sessionId === sessionId),
+
+  /**
+   * Calculate totals from payments array (more accurate than backend totals)
+   * Note: Backend may return amount as string, so we convert to number
+   */
+  calculateTotals: (state: PaymentState) => {
+    const payments = state.weeklyStats?.payments ?? [];
+    
+    const paidPayments = payments.filter(p => p.status === PaymentStatus.PAID);
+    const pendingPayments = payments.filter(p => 
+      p.status === PaymentStatus.PENDING || p.status === PaymentStatus.OVERDUE
+    );
+    const overduePayments = payments.filter(p => p.status === PaymentStatus.OVERDUE);
+
+    // Helper to safely sum amounts (handles string/number)
+    const sumAmounts = (items: typeof payments) => 
+      items.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+
+    return {
+      totalAmount: sumAmounts(payments),
+      paidAmount: sumAmounts(paidPayments),
+      pendingAmount: sumAmounts(pendingPayments),
+      overdueAmount: sumAmounts(overduePayments),
+      totalCount: payments.length,
+      paidCount: paidPayments.length,
+      pendingCount: pendingPayments.length,
+      overdueCount: overduePayments.length,
+    };
+  },
+};

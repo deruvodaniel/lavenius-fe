@@ -29,11 +29,12 @@ interface TurnoDrawerProps {
   session?: SessionResponse | null;
   patients: Patient[];
   pacienteId?: string | number;
+  initialDate?: Date; // Pre-fill date when creating from calendar selection
   onSave: (session: CreateSessionDto) => void;
   onDelete?: (sessionId: string) => void;
 }
 
-export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, onSave, onDelete }: TurnoDrawerProps) {
+export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, initialDate, onSave, onDelete }: TurnoDrawerProps) {
   const user = useAuthStore(state => state.user);
   
   const [formData, setFormData] = useState({
@@ -70,10 +71,50 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, on
         estado: session.status,
         monto: session.cost || 8500,
       });
-    } else if (pacienteId) {
-      setFormData(prev => ({ ...prev, pacienteId: String(pacienteId) }));
+    } else {
+      // Reset form when creating new session
+      const newFormData = {
+        pacienteId: pacienteId ? String(pacienteId) : '',
+        fecha: '',
+        horaInicio: '09:00',
+        horaFin: '10:00',
+        motivo: '',
+        sessionType: SessionType.PRESENTIAL,
+        estado: SessionStatus.PENDING,
+        monto: 8500,
+      };
+      
+      // Pre-fill date and time from calendar selection
+      if (initialDate) {
+        const year = initialDate.getFullYear();
+        const month = (initialDate.getMonth() + 1).toString().padStart(2, '0');
+        const day = initialDate.getDate().toString().padStart(2, '0');
+        newFormData.fecha = `${year}-${month}-${day}`;
+        
+        // Pre-fill time from calendar selection
+        const hours = initialDate.getHours();
+        const minutes = initialDate.getMinutes();
+        
+        // Always set the time from the calendar selection (even if it's a specific hour like 9:00)
+        // Only skip if it's exactly midnight which indicates a day selection, not a time slot
+        const isTimeSlotSelection = hours !== 0 || minutes !== 0 || 
+          (initialDate.getHours() === 0 && initialDate.getMinutes() === 0 && 
+           initialDate.getSeconds() === 0 && initialDate.getMilliseconds() === 0);
+        
+        // If hours > 0 or minutes > 0, it's definitely a time slot selection
+        if (hours > 0 || minutes > 0) {
+          newFormData.horaInicio = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+          // Set end time 1 hour later
+          const endHours = Math.min(hours + 1, 23);
+          newFormData.horaFin = `${endHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        }
+        
+        console.log('📅 TurnoDrawer - initialDate received:', initialDate, 'hours:', hours, 'minutes:', minutes);
+      }
+      
+      setFormData(newFormData);
     }
-  }, [session, pacienteId]);
+  }, [session, pacienteId, initialDate]);
 
   if (!isOpen) return null;
 
@@ -157,7 +198,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, on
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex">
+    <div className="fixed inset-0 z-50 flex !top-0 !mt-0">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"

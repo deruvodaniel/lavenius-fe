@@ -1,8 +1,77 @@
 import { useState } from 'react';
-import { Bell, DollarSign, Calendar, Clock, X, Plus } from 'lucide-react';
+import { Bell, DollarSign, Calendar, Clock, X, Plus, Save } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
 
+// ============================================================================
+// SECTION WRAPPER COMPONENT
+// ============================================================================
+
+interface ConfigSectionProps {
+  icon: React.ElementType;
+  iconColor: string;
+  iconBg: string;
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}
+
+const ConfigSection = ({ icon: Icon, iconColor, iconBg, title, description, children }: ConfigSectionProps) => (
+  <Card className="overflow-hidden">
+    <div className="p-4 sm:p-6 border-b border-gray-100 bg-gray-50/50">
+      <div className="flex items-start gap-3 sm:gap-4">
+        <div className={`w-10 h-10 sm:w-12 sm:h-12 ${iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+          <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${iconColor}`} />
+        </div>
+        <div className="min-w-0">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900">{title}</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">{description}</p>
+        </div>
+      </div>
+    </div>
+    <div className="p-4 sm:p-6">
+      {children}
+    </div>
+  </Card>
+);
+
+// ============================================================================
+// TOGGLE ROW COMPONENT
+// ============================================================================
+
+interface ToggleRowProps {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  label: string;
+  description?: string;
+}
+
+const ToggleRow = ({ checked, onChange, label, description }: ToggleRowProps) => (
+  <label className="flex items-start gap-3 cursor-pointer group">
+    <div className="relative mt-0.5">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="sr-only peer"
+      />
+      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+    </div>
+    <div className="flex-1">
+      <span className="text-sm font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">{label}</span>
+      {description && <p className="text-xs text-gray-500 mt-0.5">{description}</p>}
+    </div>
+  </label>
+);
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
 export function Configuracion() {
+  // Recordatorios de cobros
   const [recordatoriosCobros, setRecordatoriosCobros] = useState(true);
   const [frecuenciaRecordatorio, setFrecuenciaRecordatorio] = useState('semanal');
   const [minimoTurnos, setMinimoTurnos] = useState(3);
@@ -19,262 +88,264 @@ export function Configuracion() {
   const [showAddDiaOff, setShowAddDiaOff] = useState(false);
   const [newDiaOff, setNewDiaOff] = useState({ fecha: '', motivo: '' });
 
-  return (
-    <div className="p-8 max-w-5xl">
-      <h1 className="text-gray-900 mb-6">Configuración</h1>
+  const handleSave = () => {
+    toast.success('Configuración guardada correctamente');
+  };
 
-      <div className="space-y-6">
+  const handleAddDiaOff = () => {
+    if (!newDiaOff.fecha) {
+      toast.error('Selecciona una fecha');
+      return;
+    }
+    setDiasOff([...diasOff, { id: Date.now(), ...newDiaOff }]);
+    setNewDiaOff({ fecha: '', motivo: '' });
+    setShowAddDiaOff(false);
+    toast.success('Día off agregado');
+  };
+
+  const handleRemoveDiaOff = (id: number) => {
+    setDiasOff(diasOff.filter(d => d.id !== id));
+    toast.success('Día off eliminado');
+  };
+
+  const formatDateDisplay = (fecha: string) => {
+    return new Date(fecha + 'T00:00:00').toLocaleDateString('es-AR', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+  return (
+    <div className="p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Configuración</h1>
+        <p className="text-sm text-gray-500">Personaliza tu experiencia en Lavenius</p>
+      </div>
+
+      <div className="space-y-4 sm:space-y-6">
         {/* Google Calendar Sync */}
         <CalendarSync />
 
         {/* Recordatorios de Cobros */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-gray-900 flex items-center gap-2">
-              <Bell className="w-5 h-5 text-indigo-600" />
-              Recordatorios de Cobros
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <DollarSign className="w-6 h-6 text-orange-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-gray-900 mb-2">Notificaciones de turnos sin cobrar</h3>
-                <p className="text-gray-600 text-sm mb-6">
-                  Recibe recordatorios cuando tengas turnos realizados que aún no has marcado como cobrados
-                </p>
+        <ConfigSection
+          icon={DollarSign}
+          iconColor="text-orange-600"
+          iconBg="bg-orange-100"
+          title="Recordatorios de Cobros"
+          description="Recibe notificaciones de turnos sin cobrar"
+        >
+          <div className="space-y-4">
+            <ToggleRow
+              checked={recordatoriosCobros}
+              onChange={setRecordatoriosCobros}
+              label="Activar recordatorios de cobros pendientes"
+              description="Te notificaremos cuando tengas turnos realizados sin marcar como cobrados"
+            />
 
-                <div className="space-y-4">
-                  {/* Toggle principal */}
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={recordatoriosCobros}
-                      onChange={(e) => setRecordatoriosCobros(e.target.checked)}
-                      className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                    />
-                    <span className="text-gray-700">Activar recordatorios de cobros pendientes</span>
+            {recordatoriosCobros && (
+              <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-100">
+                {/* Frecuencia */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Frecuencia de recordatorio
                   </label>
-
-                  {/* Opciones adicionales cuando está activo */}
-                  {recordatoriosCobros && (
-                    <div className="ml-8 space-y-4 pt-4 border-t border-gray-200">
-                      {/* Frecuencia */}
-                      <div>
-                        <label className="block text-gray-700 mb-2 text-sm">
-                          Frecuencia de recordatorio
-                        </label>
-                        <select
-                          value={frecuenciaRecordatorio}
-                          onChange={(e) => setFrecuenciaRecordatorio(e.target.value)}
-                          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-                        >
-                          <option value="diario">Diariamente</option>
-                          <option value="semanal">Semanalmente (lunes)</option>
-                          <option value="quincenal">Cada 15 días</option>
-                        </select>
-                      </div>
-
-                      {/* Mínimo de turnos */}
-                      <div>
-                        <label className="block text-gray-700 mb-2 text-sm">
-                          Recordar cuando haya al menos
-                        </label>
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="number"
-                            min="1"
-                            max="20"
-                            value={minimoTurnos}
-                            onChange={(e) => setMinimoTurnos(Number(e.target.value))}
-                            className="w-24 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          />
-                          <span className="text-gray-700 text-sm">
-                            {minimoTurnos === 1 ? 'turno sin cobrar' : 'turnos sin cobrar'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Preview/Example */}
-                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                        <p className="text-orange-800 text-sm">
-                          <strong>Ejemplo de notificación:</strong> Tienes {minimoTurnos} {minimoTurnos === 1 ? 'turno' : 'turnos'} de la semana pasada sin marcar como {minimoTurnos === 1 ? 'cobrado' : 'cobrados'}. Revisa la sección de Cobros.
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                  <select
+                    value={frecuenciaRecordatorio}
+                    onChange={(e) => setFrecuenciaRecordatorio(e.target.value)}
+                    className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                  >
+                    <option value="diario">Diariamente</option>
+                    <option value="semanal">Semanalmente (lunes)</option>
+                    <option value="quincenal">Cada 15 días</option>
+                  </select>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Recordatorios para pacientes */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-gray-900 flex items-center gap-2">
-              <Bell className="w-5 h-5 text-indigo-600" />
-              Recordatorios para pacientes
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Clock className="w-6 h-6 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-gray-900 mb-2">Notificaciones de turnos próximos</h3>
-                <p className="text-gray-600 text-sm mb-6">
-                  Recibe recordatorios cuando tengas turnos próximos para que los pacientes no se olviden
-                </p>
-
-                <div className="space-y-4">
-                  {/* Toggle principal */}
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={recordatoriosPacientes}
-                      onChange={(e) => setRecordatoriosPacientes(e.target.checked)}
-                      className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                    />
-                    <span className="text-gray-700">Activar recordatorios para pacientes</span>
+                {/* Mínimo de turnos */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Recordar cuando haya al menos
                   </label>
-
-                  {/* Opciones adicionales cuando está activo */}
-                  {recordatoriosPacientes && (
-                    <div className="ml-8 space-y-4 pt-4 border-t border-gray-200">
-                      {/* Horas de anticipación */}
-                      <div>
-                        <label className="block text-gray-700 mb-2 text-sm">
-                          Horas de anticipación
-                        </label>
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="number"
-                            min="1"
-                            max="24"
-                            value={horasAnticipacion}
-                            onChange={(e) => setHorasAnticipacion(Number(e.target.value))}
-                            className="w-24 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          />
-                          <span className="text-gray-700 text-sm">
-                            horas antes del turno
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Preview/Example */}
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <p className="text-blue-800 text-sm">
-                          <strong>Ejemplo de notificación:</strong> Tu turno con Dr. Smith está programado para {horasAnticipacion} {horasAnticipacion === 1 ? 'hora' : 'horas'} desde ahora. Por favor, acuérdate de llegar a tiempo.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Días/Horarios Off */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-gray-900 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-indigo-600" />
-              Días/Horarios Off
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Calendar className="w-6 h-6 text-gray-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-gray-900 mb-2">Días/Horarios Off</h3>
-                <p className="text-gray-600 text-sm mb-6">
-                  Configura los días y horarios en los que no estarás disponible
-                </p>
-
-                <div className="space-y-4">
-                  {/* Lista de días off */}
-                  <div className="space-y-2">
-                    {diasOff.map(dia => (
-                      <div key={dia.id} className="flex items-center gap-3">
-                        <Calendar className="w-5 h-5 text-gray-600" />
-                        <span className="text-gray-700">{dia.fecha}</span>
-                        <span className="text-gray-500">({dia.motivo})</span>
-                        <button
-                          className="ml-auto px-2 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                          onClick={() => setDiasOff(diasOff.filter(d => d.id !== dia.id))}
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={minimoTurnos}
+                      onChange={(e) => setMinimoTurnos(Number(e.target.value))}
+                      className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                    />
+                    <span className="text-sm text-gray-600">
+                      {minimoTurnos === 1 ? 'turno sin cobrar' : 'turnos sin cobrar'}
+                    </span>
                   </div>
+                </div>
 
-                  {/* Formulario para agregar nuevo día off */}
-                  {showAddDiaOff && (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3">
-                        <Calendar className="w-5 h-5 text-gray-600" />
-                        <input
-                          type="date"
-                          value={newDiaOff.fecha}
-                          onChange={(e) => setNewDiaOff({ ...newDiaOff, fecha: e.target.value })}
-                          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        />
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Clock className="w-5 h-5 text-gray-600" />
-                        <input
-                          type="text"
-                          value={newDiaOff.motivo}
-                          onChange={(e) => setNewDiaOff({ ...newDiaOff, motivo: e.target.value })}
-                          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          placeholder="Motivo"
-                        />
-                      </div>
-                      <button
-                        className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                        onClick={() => {
-                          setDiasOff([...diasOff, { id: diasOff.length + 1, ...newDiaOff }]);
-                          setNewDiaOff({ fecha: '', motivo: '' });
-                          setShowAddDiaOff(false);
-                        }}
-                      >
-                        Agregar
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Botón para agregar nuevo día off */}
-                  {!showAddDiaOff && (
-                    <button
-                      className="flex items-center gap-2 px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-                      onClick={() => setShowAddDiaOff(true)}
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>Agregar Día Off</span>
-                    </button>
-                  )}
+                {/* Preview */}
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                  <p className="text-xs sm:text-sm text-orange-800">
+                    <span className="font-medium">Ejemplo:</span> Tienes {minimoTurnos} {minimoTurnos === 1 ? 'turno' : 'turnos'} de la semana pasada sin marcar como {minimoTurnos === 1 ? 'cobrado' : 'cobrados'}.
+                  </p>
                 </div>
               </div>
-            </div>
+            )}
           </div>
-        </div>
+        </ConfigSection>
 
-        {/* Botones de acción */}
-        <div className="flex gap-3 justify-end">
-          <button className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-            Cancelar
-          </button>
-          <button className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-            Guardar cambios
-          </button>
+        {/* Recordatorios para Pacientes */}
+        <ConfigSection
+          icon={Bell}
+          iconColor="text-blue-600"
+          iconBg="bg-blue-100"
+          title="Recordatorios para Pacientes"
+          description="Notificaciones de turnos próximos"
+        >
+          <div className="space-y-4">
+            <ToggleRow
+              checked={recordatoriosPacientes}
+              onChange={setRecordatoriosPacientes}
+              label="Activar recordatorios para pacientes"
+              description="Te avisaremos cuando sea momento de recordar a tus pacientes sus turnos"
+            />
+
+            {recordatoriosPacientes && (
+              <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-100">
+                {/* Horas de anticipación */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Horas de anticipación
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      max="72"
+                      value={horasAnticipacion}
+                      onChange={(e) => setHorasAnticipacion(Number(e.target.value))}
+                      className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                    />
+                    <span className="text-sm text-gray-600">horas antes del turno</span>
+                  </div>
+                </div>
+
+                {/* Preview */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-xs sm:text-sm text-blue-800">
+                    <span className="font-medium">Ejemplo:</span> Recordatorio para paciente con turno en {horasAnticipacion} {horasAnticipacion === 1 ? 'hora' : 'horas'}.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </ConfigSection>
+
+        {/* Días Off */}
+        <ConfigSection
+          icon={Calendar}
+          iconColor="text-gray-600"
+          iconBg="bg-gray-100"
+          title="Días Off"
+          description="Configura los días en los que no atenderás"
+        >
+          <div className="space-y-4">
+            {/* Lista de días off */}
+            {diasOff.length > 0 ? (
+              <div className="space-y-2">
+                {diasOff.map(dia => (
+                  <div 
+                    key={dia.id} 
+                    className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg group hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-900">{formatDateDisplay(dia.fecha)}</p>
+                        {dia.motivo && <p className="text-xs text-gray-500 truncate">{dia.motivo}</p>}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveDiaOff(dia.id)}
+                      className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors opacity-0 group-hover:opacity-100"
+                      title="Eliminar"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-4">No hay días off configurados</p>
+            )}
+
+            {/* Formulario para agregar */}
+            {showAddDiaOff ? (
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Fecha</label>
+                    <input
+                      type="date"
+                      value={newDiaOff.fecha}
+                      onChange={(e) => setNewDiaOff({ ...newDiaOff, fecha: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Motivo (opcional)</label>
+                    <input
+                      type="text"
+                      value={newDiaOff.motivo}
+                      onChange={(e) => setNewDiaOff({ ...newDiaOff, motivo: e.target.value })}
+                      placeholder="Ej: Feriado, Vacaciones..."
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 justify-end">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowAddDiaOff(false);
+                      setNewDiaOff({ fecha: '', motivo: '' });
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleAddDiaOff}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  >
+                    Agregar
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAddDiaOff(true)}
+                className="w-full sm:w-auto"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Agregar Día Off
+              </Button>
+            )}
+          </div>
+        </ConfigSection>
+
+        {/* Botón Guardar */}
+        <div className="flex justify-end pt-4 border-t border-gray-200">
+          <Button 
+            onClick={handleSave} 
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            Guardar Cambios
+          </Button>
         </div>
       </div>
     </div>

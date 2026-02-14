@@ -11,6 +11,7 @@ interface SessionDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onEdit: () => void;
+  isPaid?: boolean;
 }
 
 const SESSION_TYPE_LABELS = {
@@ -27,7 +28,8 @@ export function SessionDetailsModal({
   session, 
   isOpen, 
   onClose,
-  onEdit 
+  onEdit,
+  isPaid 
 }: SessionDetailsModalProps) {
   if (!session) return null;
 
@@ -91,9 +93,17 @@ export function SessionDetailsModal({
                 <DollarSign className="h-3.5 w-3.5" />
                 Costo
               </h3>
-              <p className="text-base font-medium">
-                ${session.cost.toLocaleString('es-AR')}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-base font-medium">
+                  ${session.cost.toLocaleString('es-AR')}
+                </p>
+                {isPaid && (
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-green-100 text-green-700">
+                    <DollarSign className="w-3 h-3" />
+                    Pagado
+                  </span>
+                )}
+              </div>
             </div>
           )}
 
@@ -112,7 +122,7 @@ export function SessionDetailsModal({
           <Button variant="outline" onClick={onClose}>
             Cerrar
           </Button>
-          <Button onClick={onEdit} className="gap-2">
+          <Button onClick={onEdit} className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
             <Edit2 className="h-4 w-4" />
             Editar Sesión
           </Button>

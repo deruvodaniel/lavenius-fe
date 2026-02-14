@@ -1,11 +1,11 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import type { EventClickArg, DateSelectArg, EventContentArg } from '@fullcalendar/core';
-import { SessionType, type SessionUI } from '@/lib/types/session';
+import { SessionType, SessionStatus, type SessionUI } from '@/lib/types/session';
 import { SESSION_STATUS_COLORS } from '@/lib/constants/sessionColors';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
@@ -16,24 +16,34 @@ interface FullCalendarViewProps {
   onEventClick?: (session: SessionUI) => void;
   onDateSelect?: (start: Date, end: Date) => void;
   onEventDrop?: (sessionId: string, newStart: Date, newEnd: Date) => void;
+  isSessionPaid?: (sessionId: string) => boolean;
 }
 
 export function FullCalendarView({ 
   sessions, 
   onEventClick, 
   onDateSelect,
-  onEventDrop 
+  onEventDrop,
+  isSessionPaid 
 }: FullCalendarViewProps) {
   const calendarRef = useRef<FullCalendar>(null);
   const [currentView, setCurrentView] = useState('timeGridWeek');
 
-  // Convert sessions to FullCalendar events
-  const events = sessions.map(session => {
+  // Generate a key based on sessions data to force FullCalendar to re-render when sessions change
+  const calendarKey = useMemo(() => {
+    return sessions.map(s => `${s.id}-${s.status}-${s.scheduledFrom}`).join('|');
+  }, [sessions]);
+
+  // Convert sessions to FullCalendar events (filter out cancelled sessions)
+  const events = sessions
+    .filter(session => session.status !== SessionStatus.CANCELLED)
+    .map(session => {
     const typeIcons: Record<SessionType, string> = {
       [SessionType.PRESENTIAL]: '📍',
       [SessionType.REMOTE]: '💻',
     };
 
+    const isPaid = isSessionPaid?.(session.id) ?? false;
     const className = `session-${session.status}`;
 
     return {
@@ -48,6 +58,7 @@ export function FullCalendarView({
         type: session.sessionType,
         patientName: session.patientName,
         cost: session.cost,
+        isPaid,
       },
     };
   });
@@ -67,11 +78,16 @@ export function FullCalendarView({
   };
 
   const renderEventContent = (eventInfo: EventContentArg) => {
-    const { status: _status, patientName: _patientName, cost } = eventInfo.event.extendedProps;
+    const { status: _status, patientName: _patientName, cost, isPaid } = eventInfo.event.extendedProps;
     
     return (
       <div className="fc-event-main-frame px-1 py-0.5 text-xs">
-        <div className="fc-event-time font-semibold">{eventInfo.timeText}</div>
+        <div className="fc-event-time font-semibold flex items-center gap-1">
+          {eventInfo.timeText}
+          {isPaid && (
+            <span className="text-green-300" title="Pagado">$</span>
+          )}
+        </div>
         <div className="fc-event-title truncate">{eventInfo.event.title}</div>
         {cost && (
           <div className="fc-event-cost text-[10px] opacity-90">
@@ -139,16 +155,13 @@ export function FullCalendarView({
             <div className="w-2.5 h-2.5 rounded-sm bg-green-500" />
             <span className="text-gray-600">Completada</span>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2.5 h-2.5 rounded-sm bg-red-500" />
-            <span className="text-gray-600">Cancelada</span>
-          </div>
         </div>
       </div>
 
       {/* FullCalendar */}
       <div className="fullcalendar-wrapper">
         <FullCalendar
+          key={calendarKey}
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
           initialView="timeGridWeek"
@@ -284,14 +297,7 @@ export function FullCalendarView({
 
         /* Estilos específicos para eventos según estado */
         .fullcalendar-wrapper .session-pending {
-          background-color: #f59e0b !important;
-          border-color: #f59e0b !important;
-        }
-
-        .fullcalendar-wrapper .session-confirmed {
-          background-color: #3b82f6 !important;
-          border-color: #3b82f6 !important;
-        }${SESSION_STATUS_COLORS.pending} !important;
+          background-color: ${SESSION_STATUS_COLORS.pending} !important;
           border-color: ${SESSION_STATUS_COLORS.pending} !important;
         }
 
@@ -307,7 +313,7 @@ export function FullCalendarView({
 
         .fullcalendar-wrapper .session-cancelled {
           background-color: ${SESSION_STATUS_COLORS.cancelled} !important;
-          border-color: ${SESSION_STATUS_COLORS.cancelled}sl(var(--background));
+          border-color: ${SESSION_STATUS_COLORS.cancelled} !important;
         }
 
         .dark .fullcalendar-wrapper .fc-col-header-cell {

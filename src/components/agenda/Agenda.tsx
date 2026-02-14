@@ -1,19 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
-import { Clock, Video, MapPin, Plus, Calendar, X, Edit2, CalendarX } from 'lucide-react';
+import { Clock, Video, MapPin, Plus, Calendar, X, Edit2, CalendarX, MessageCircle, DollarSign } from 'lucide-react';
 import { toast } from 'sonner';
 import { TurnoDrawer } from './TurnoDrawer';
 import { SessionDetailsModal } from './SessionDetailsModal';
 import { SkeletonList, EmptyState } from '../shared';
 import { FullCalendarView } from './FullCalendarView';
 import CalendarSyncButton from '../config/CalendarSyncButton';
+import { FichaClinica } from '../dashboard/FichaClinica';
 import { usePatients } from '@/lib/hooks';
 import { useSessions } from '@/lib/stores/sessionStore';
-import type { CreateSessionDto, SessionResponse } from '@/lib/types/session';
+import { usePayments } from '@/lib/hooks/usePayments';
+import type { CreateSessionDto, SessionResponse, UpdateSessionDto } from '@/lib/types/session';
 import { SESSION_STATUS_BADGE_CLASSES, SESSION_STATUS_LABELS } from '@/lib/constants/sessionColors';
 
 export function Agenda() {
   const { sessionsUI, isLoading, error, fetchUpcoming, createSession, updateSession, deleteSession, clearError } = useSessions();
   const { patients, fetchPatients } = usePatients();
+  const { isSessionPaid, fetchPayments } = usePayments();
   
   // Auto-display error toasts
   useEffect(() => {
@@ -27,6 +30,7 @@ export function Agenda() {
   const [turnoDrawerOpen, setTurnoDrawerOpen] = useState(false);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<SessionResponse | null>(null);
+  const [selectedInitialDate, setSelectedInitialDate] = useState<Date | undefined>(undefined);
   const [visibleCount, setVisibleCount] = useState(5); // For infinite scroll
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -42,6 +46,7 @@ export function Agenda() {
       hasFetchedRef.current = true;
       fetchUpcoming();
       fetchPatients();
+      fetchPayments();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -228,14 +233,39 @@ export function Agenda() {
 
   const handleNuevoTurno = () => {
     setSelectedSession(null);
+    setSelectedInitialDate(undefined);
     setTurnoDrawerOpen(true);
   };
 
   const handleSaveTurno = async (sessionData: CreateSessionDto) => {
     try {
       if (selectedSession) {
-        // Update existing session
-        await updateSession(selectedSession.id, sessionData);
+        // Update existing session - only send fields that actually changed
+        const updateData: UpdateSessionDto = {};
+        
+        // Compare dates by timestamp (ms) to avoid timezone/format issues
+        const originalFromMs = new Date(selectedSession.scheduledFrom).getTime();
+        const originalToMs = new Date(selectedSession.scheduledTo).getTime();
+        const newFromMs = new Date(sessionData.scheduledFrom).getTime();
+        const newToMs = new Date(sessionData.scheduledTo).getTime();
+        
+        // Only include scheduledFrom/scheduledTo if they actually changed (to avoid triggering calendar update)
+        const datesChanged = originalFromMs !== newFromMs || originalToMs !== newToMs;
+        
+        if (datesChanged) {
+          updateData.scheduledFrom = sessionData.scheduledFrom;
+          updateData.scheduledTo = sessionData.scheduledTo;
+        }
+        
+        // Only include fields that have values
+        if (sessionData.status) updateData.status = sessionData.status;
+        if (sessionData.sessionSummary !== undefined) updateData.sessionSummary = sessionData.sessionSummary;
+        if (sessionData.cost !== undefined) updateData.cost = sessionData.cost;
+        if (sessionData.type) updateData.type = sessionData.type;
+        
+        console.log('📝 Update session data:', { datesChanged, updateData });
+        
+        await updateSession(selectedSession.id, updateData);
         toast.success('Turno actualizado exitosamente');
         // Refresh to ensure UI is in sync
         await fetchUpcoming();
@@ -279,10 +309,41 @@ export function Agenda() {
     }
   };
 
+  // Send WhatsApp reminder for a turno
+  const handleSendWhatsAppReminder = (paciente: { nombre: string; telefono: string } | undefined, turno: { fecha: string; hora: string }) => {
+    if (!paciente?.telefono) {
+      toast.info('El paciente no tiene número de teléfono registrado');
+      return;
+    }
+
+    const fechaFormateada = formatFecha(turno.fecha);
+    const message = `Hola ${paciente.nombre}! Te recuerdo tu turno el ${fechaFormateada} a las ${turno.hora}. ¡Te espero!`;
+    const phone = paciente.telefono.replace(/\D/g, '');
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+  };
+
+  // If a patient is selected, show their FichaClinica
+  if (selectedPatientId !== null) {
+    const selectedPatient = patients.find(p => p.id === selectedPatientId);
+    return (
+      <FichaClinica
+        patient={selectedPatient || null}
+        onBack={() => setSelectedPatientId(null)}
+      />
+    );
+  }
+
   return (
-    <div className="p-4 md:p-6 lg:p-8 flex flex-col h-[calc(100vh-100px)]">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 flex-shrink-0">
-        <h1 className="text-gray-900">Agenda</h1>
+    <div className="p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6 flex flex-col h-[calc(100vh-100px)]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Agenda</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+            Gestiona tus turnos y citas
+          </p>
+        </div>
         <div className="flex gap-2">
           {/* Botón Mostrar Calendario - solo visible en mobile/tablet */}
           <button
@@ -345,15 +406,89 @@ export function Agenda() {
                       {turnosDelDia.map((turno) => {
                         const paciente = getPaciente(turno.pacienteRawId ?? turno.pacienteId ?? null);
                         const session = sessionsUI.find(s => s.id === turno.rawId);
+                        const isPaid = session && isSessionPaid(session.id);
 
                         return (
                           <div
                             key={turno.rawId ?? turno.id}
                             className="p-3 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors group"
                           >
-                            <div className="flex items-center gap-3">
+                            {/* Mobile Layout (< sm) */}
+                            <div className="sm:hidden space-y-2">
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span className="text-indigo-600 text-xs font-semibold">
+                                      {paciente ? paciente.nombre.split(' ').map((n) => n[0]).join('').slice(0, 2) : '?'}
+                                    </span>
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-medium text-gray-900 truncate">{paciente?.nombre || 'Sin nombre'}</p>
+                                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                                      <Clock className="w-3 h-3" />
+                                      <span>{turno.hora}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1 flex-shrink-0">
+                                  <button
+                                    onClick={() => handleSendWhatsAppReminder(paciente, turno)}
+                                    className="p-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                                    title="WhatsApp"
+                                  >
+                                    <MessageCircle className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      if (session) {
+                                        setSelectedSession(session);
+                                        setTurnoDrawerOpen(true);
+                                      }
+                                    }}
+                                    className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                                    title="Editar"
+                                  >
+                                    <Edit2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span
+                                    className={`px-2 py-0.5 rounded text-xs ${
+                                      session ? SESSION_STATUS_BADGE_CLASSES[session.status] : ''
+                                    }`}
+                                  >
+                                    {session ? SESSION_STATUS_LABELS[session.status] : ''}
+                                  </span>
+                                  {isPaid && (
+                                    <span className="flex items-center gap-0.5 px-2 py-0.5 rounded text-xs bg-green-100 text-green-700">
+                                      <DollarSign className="w-3 h-3" />
+                                      Pagado
+                                    </span>
+                                  )}
+                                  <span
+                                    className={`flex items-center gap-0.5 text-xs ${
+                                      turno.modalidad === 'remoto' ? 'text-blue-600' : 'text-purple-600'
+                                    }`}
+                                  >
+                                    {turno.modalidad === 'remoto' ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
+                                    {turno.modalidad === 'remoto' ? 'Remoto' : 'Presencial'}
+                                  </span>
+                                </div>
+                                <button
+                                  onClick={() => setSelectedPatientId(paciente?.rawId || null)}
+                                  className="text-indigo-600 text-xs hover:text-indigo-700 transition-colors whitespace-nowrap"
+                                >
+                                  Ver ficha
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Desktop Layout (>= sm) */}
+                            <div className="hidden sm:flex items-center gap-3">
                               {/* Time */}
-                              <div className="flex items-center gap-1 text-gray-600">
+                              <div className="flex items-center gap-1 text-gray-600 flex-shrink-0 w-16">
                                 <Clock className="w-4 h-4" />
                                 <span className="text-sm font-medium">{turno.hora}</span>
                               </div>
@@ -361,65 +496,70 @@ export function Agenda() {
                               {/* Avatar */}
                               <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
                                 <span className="text-indigo-600 text-xs font-semibold">
-                                  {paciente ? paciente.nombre.split(' ').map((n) => n[0]).join('') : '?'}
+                                  {paciente ? paciente.nombre.split(' ').map((n) => n[0]).join('').slice(0, 2) : '?'}
                                 </span>
                               </div>
 
-                              {/* Info */}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between gap-2">
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-900 truncate">{paciente?.nombre || 'Paciente sin nombre'}</p>
-                                    <div className="flex items-center gap-2 mt-0.5">
-                                      <div
-                                        className={`flex items-center gap-1 text-xs ${
-                                          turno.modalidad === 'remoto' ? 'text-blue-600' : 'text-purple-600'
-                                        }`}
-                                      >
-                                        {turno.modalidad === 'remoto' ? (
-                                          <>
-                                            <Video className="w-3 h-3" />
-                                            <span>Remoto</span>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <MapPin className="w-3 h-3" />
-                                            <span>Presencial</span>
-                                          </>
-                                        )}
-                                      </div>
-                                      <span className="text-gray-400">•</span>
-                                      <p className="text-gray-600 text-xs truncate">{turno.motivo}</p>
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center gap-2 flex-shrink-0">
-                                    <span
-                                      className={`px-2 py-0.5 rounded text-xs whitespace-nowrap ${
-                                        session ? SESSION_STATUS_BADGE_CLASSES[session.status] : ''
-                                      }`}
-                                    >
-                                      {session ? SESSION_STATUS_LABELS[session.status] : ''}
-                                    </span>
-                                    <button
-                                      onClick={() => {
-                                        if (session) {
-                                          setSelectedSession(session);
-                                          setTurnoDrawerOpen(true);
-                                        }
-                                      }}
-                                      className="p-1.5 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
-                                      title="Editar turno"
-                                    >
-                                      <Edit2 className="w-3.5 h-3.5" />
-                                    </button>
-                                    <button
-                                      onClick={() => setSelectedPatientId(paciente?.rawId || null)}
-                                      className="text-indigo-600 text-xs hover:text-indigo-700 transition-colors whitespace-nowrap"
-                                    >
-                                      Ver ficha
-                                    </button>
-                                  </div>
+                              {/* Patient Name */}
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-gray-900 truncate">{paciente?.nombre || 'Paciente sin nombre'}</p>
+                                <div
+                                  className={`flex items-center gap-1 text-xs ${
+                                    turno.modalidad === 'remoto' ? 'text-blue-600' : 'text-purple-600'
+                                  }`}
+                                >
+                                  {turno.modalidad === 'remoto' ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
+                                  <span>{turno.modalidad === 'remoto' ? 'Remoto' : 'Presencial'}</span>
                                 </div>
+                              </div>
+
+                              {/* Badges */}
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <span
+                                  className={`px-2 py-0.5 rounded text-xs whitespace-nowrap ${
+                                    session ? SESSION_STATUS_BADGE_CLASSES[session.status] : ''
+                                  }`}
+                                >
+                                  {session ? SESSION_STATUS_LABELS[session.status] : ''}
+                                </span>
+                                {isPaid && (
+                                  <span
+                                    className="flex items-center gap-0.5 px-2 py-0.5 rounded text-xs whitespace-nowrap bg-green-100 text-green-700"
+                                    title="Pagado"
+                                  >
+                                    <DollarSign className="w-3 h-3" />
+                                    Pagado
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Actions */}
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <button
+                                  onClick={() => handleSendWhatsAppReminder(paciente, turno)}
+                                  className="p-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                                  title="Enviar recordatorio por WhatsApp"
+                                >
+                                  <MessageCircle className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (session) {
+                                      setSelectedSession(session);
+                                      setTurnoDrawerOpen(true);
+                                    }
+                                  }}
+                                  className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                                  title="Editar turno"
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => setSelectedPatientId(paciente?.rawId || null)}
+                                  className="text-indigo-600 text-xs hover:text-indigo-700 transition-colors whitespace-nowrap ml-1"
+                                >
+                                  Ver ficha
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -457,15 +597,16 @@ export function Agenda() {
           <div className="sticky top-4">
             <FullCalendarView
               sessions={sessionsUI}
+              isSessionPaid={isSessionPaid}
               onEventClick={(session) => {
                 setSelectedSession(session);
                 setDetailsModalOpen(true);
               }}
-              onDateSelect={(_start, _end) => {
-                // Abrir drawer para crear nueva sesión con esas fechas
+              onDateSelect={(start, _end) => {
+                // Abrir drawer para crear nueva sesión con la fecha seleccionada
                 setSelectedSession(null);
+                setSelectedInitialDate(start);
                 setTurnoDrawerOpen(true);
-                // TODO: Pre-fill con las fechas seleccionadas
               }}
               onEventDrop={async (sessionId, _newStart, _newEnd) => {
                 try {
@@ -487,7 +628,7 @@ export function Agenda() {
 
       {/* Calendar Drawer - Solo para Mobile y Tablet */}
       {calendarDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex lg:hidden">
+        <div className="fixed inset-0 z-50 flex lg:hidden !top-0 !mt-0">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
@@ -513,13 +654,15 @@ export function Agenda() {
             <div className="p-4">
               <FullCalendarView
                 sessions={sessionsUI}
+                isSessionPaid={isSessionPaid}
                 onEventClick={(session) => {
                   setSelectedSession(session);
                   setCalendarDrawerOpen(false);
                   setDetailsModalOpen(true);
                 }}
-                onDateSelect={(_start, _end) => {
+                onDateSelect={(start, _end) => {
                   setSelectedSession(null);
+                  setSelectedInitialDate(start);
                   setCalendarDrawerOpen(false);
                   setTurnoDrawerOpen(true);
                 }}
@@ -548,10 +691,12 @@ export function Agenda() {
         onClose={() => {
           setTurnoDrawerOpen(false);
           setSelectedSession(null);
+          setSelectedInitialDate(undefined);
         }}
         session={selectedSession}
         patients={patients}
         pacienteId={selectedPatientId || undefined}
+        initialDate={selectedInitialDate}
         onSave={handleSaveTurno}
         onDelete={handleDeleteTurno}
       />
@@ -560,6 +705,7 @@ export function Agenda() {
       <SessionDetailsModal
         session={selectedSession}
         isOpen={detailsModalOpen}
+        isPaid={selectedSession ? isSessionPaid(selectedSession.id) : false}
         onClose={() => {
           setDetailsModalOpen(false);
           setSelectedSession(null);

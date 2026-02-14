@@ -1,661 +1,528 @@
-import { useState, useEffect, useRef } from 'react';
-import { Bell, CheckCircle, Clock, DollarSign, Calendar, Video, MapPin, Copy, MessageCircle, X, MoreVertical, Plus } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Bell, Copy, MessageCircle, X, Plus, Video, MapPin, DollarSign, Calendar, History, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { usePatients } from '@/lib/hooks';
 import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
 import { PaymentStats } from './PaymentStats';
-import { PaymentList } from './PaymentList';
 import { PaymentDrawer } from './PaymentDrawer';
 import { Button } from '@/components/ui/button';
-import type { Payment, CreatePaymentDto, UpdatePaymentDto } from '@/lib/types/api.types';
-import { PaymentStatus } from '@/lib/types/api.types';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import type { CreatePaymentDto, Payment } from '@/lib/types/api.types';
+import type { SessionUI } from '@/lib/types/session';
+import { SessionStatus } from '@/lib/types/session';
+
+// ============================================================================
+// UTILITIES
+// ============================================================================
+
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString('es-AR', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  });
+};
+
+const formatTime = (dateStr: string) => {
+  return new Date(dateStr).toLocaleTimeString('es-AR', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
+};
+
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+  }).format(amount);
+};
+
+const getInitials = (name: string) => 
+  name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
+
+type PaymentStatusType = 'overdue' | 'today' | 'upcoming';
+
+const StatusBadge = ({ status }: { status: PaymentStatusType }) => {
+  const config = {
+    overdue: { label: 'Vencido', className: 'bg-red-100 text-red-800' },
+    today: { label: 'Hoy', className: 'bg-orange-100 text-orange-800' },
+    upcoming: { label: 'Pendiente', className: 'bg-yellow-100 text-yellow-800' },
+  };
+  const { label, className } = config[status];
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${className}`}>
+      {label}
+    </span>
+  );
+};
+
+const LoadingSkeleton = () => (
+  <div className="space-y-3">
+    {[1, 2, 3].map((i) => (
+      <div key={i} className="h-24 sm:h-20 bg-gray-100 animate-pulse rounded-lg" />
+    ))}
+  </div>
+);
+
+const EmptyState = ({ icon: Icon, title, subtitle, variant = 'default' }: { 
+  icon: React.ElementType; 
+  title: string; 
+  subtitle: string;
+  variant?: 'default' | 'success';
+}) => (
+  <Card className="p-6 sm:p-8 text-center">
+    <div className="flex flex-col items-center gap-2 sm:gap-3">
+      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${
+        variant === 'success' ? 'bg-green-100' : 'bg-gray-100'
+      }`}>
+        <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${
+          variant === 'success' ? 'text-green-600' : 'text-gray-400'
+        }`} />
+      </div>
+      <div>
+        <p className="font-medium text-gray-900">{title}</p>
+        <p className="text-xs sm:text-sm text-gray-500">{subtitle}</p>
+      </div>
+    </div>
+  </Card>
+);
+
+// ============================================================================
+// SESSION CARD (Pendientes Tab)
+// ============================================================================
+
+interface SessionCardProps {
+  session: SessionUI;
+  status: PaymentStatusType;
+  onReminder: () => void;
+  onCollect: () => void;
+}
+
+const SessionCard = ({ session, status, onReminder, onCollect }: SessionCardProps) => {
+  const patientName = session.patientName || session.patient?.firstName || 'Sin paciente';
+  const initials = getInitials(patientName);
+  const borderColor = {
+    overdue: 'border-l-red-500',
+    today: 'border-l-orange-500',
+    upcoming: 'border-l-yellow-500',
+  }[status];
+
+  return (
+    <Card className={`p-3 sm:p-4 transition-all hover:shadow-md border-l-4 ${borderColor}`}>
+      {/* Mobile Layout */}
+      <div className="sm:hidden space-y-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-9 h-9 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-indigo-600 text-xs font-semibold">{initials}</span>
+            </div>
+            <div className="min-w-0">
+              <p className="font-medium text-gray-900 text-sm truncate">{patientName}</p>
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <span className="capitalize">{formatDate(session.scheduledFrom)}</span>
+                <span>{formatTime(session.scheduledFrom)}</span>
+              </div>
+            </div>
+          </div>
+          <StatusBadge status={status} />
+        </div>
+        
+        <div className="flex items-center justify-between text-sm">
+          <span className="flex items-center gap-1 text-gray-500">
+            {session.sessionType === 'remote' ? (
+              <><Video className="w-3 h-3" /><span>Remoto</span></>
+            ) : (
+              <><MapPin className="w-3 h-3" /><span>Presencial</span></>
+            )}
+          </span>
+          <p className="font-semibold text-gray-900">{formatCurrency(session.cost || 0)}</p>
+        </div>
+        
+        <div className="flex gap-2 pt-2 border-t border-gray-100">
+          <Button size="sm" variant="outline" className="flex-1" onClick={onReminder}>
+            <Bell className="h-4 w-4 mr-1.5" />
+            Recordatorio
+          </Button>
+          <Button size="sm" className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={onCollect}>
+            <DollarSign className="h-4 w-4 mr-1.5" />
+            Cobrar
+          </Button>
+        </div>
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden sm:flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <span className="text-indigo-600 text-sm font-semibold">{initials}</span>
+          </div>
+          <div className="min-w-0">
+            <p className="font-medium text-gray-900 truncate">{patientName}</p>
+            <div className="flex items-center gap-3 text-sm text-gray-500">
+              <span className="capitalize">{formatDate(session.scheduledFrom)}</span>
+              <span>{formatTime(session.scheduledFrom)}</span>
+              <span className="flex items-center gap-1">
+                {session.sessionType === 'remote' ? (
+                  <><Video className="w-3 h-3" /><span>Remoto</span></>
+                ) : (
+                  <><MapPin className="w-3 h-3" /><span>Presencial</span></>
+                )}
+              </span>
+            </div>
+          </div>
+        </div>
+        <StatusBadge status={status} />
+        <div className="flex items-center gap-4">
+          <p className="font-semibold text-gray-900 min-w-[100px] text-right">
+            {formatCurrency(session.cost || 0)}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={onReminder} title="Enviar recordatorio">
+              <Bell className="h-4 w-4" />
+            </Button>
+            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white" onClick={onCollect}>
+              <DollarSign className="h-4 w-4 mr-1" />
+              Cobrar
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+// ============================================================================
+// PAYMENT CARD (Historial Tab)
+// ============================================================================
+
+interface PaymentCardProps {
+  payment: Payment;
+}
+
+const PaymentCard = ({ payment }: PaymentCardProps) => {
+  const patientName = payment.patient 
+    ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
+    : 'Sin paciente';
+  const initials = getInitials(patientName);
+
+  return (
+    <Card className="p-3 sm:p-4 border-l-4 border-l-green-500">
+      {/* Mobile Layout */}
+      <div className="sm:hidden space-y-2">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-medium text-gray-900 text-sm truncate">{patientName}</p>
+              <p className="text-xs text-gray-500">{formatDate(payment.paymentDate)}</p>
+            </div>
+          </div>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Pagado
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          {payment.description && (
+            <p className="text-xs text-gray-500 truncate flex-1">{payment.description}</p>
+          )}
+          <p className="font-semibold text-gray-900">{formatCurrency(payment.amount)}</p>
+        </div>
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden sm:flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-medium text-gray-900 truncate">{patientName}</p>
+            <div className="flex items-center gap-3 text-sm text-gray-500">
+              <span>{formatDate(payment.paymentDate)}</span>
+              {payment.description && (
+                <span className="truncate max-w-[200px]">{payment.description}</span>
+              )}
+            </div>
+          </div>
+        </div>
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          Pagado
+        </span>
+        <p className="font-semibold text-gray-900 min-w-[100px] text-right">
+          {formatCurrency(payment.amount)}
+        </p>
+      </div>
+    </Card>
+  );
+};
+
+// ============================================================================
+// REMINDER MODAL
+// ============================================================================
+
+interface ReminderModalProps {
+  session: SessionUI;
+  onClose: () => void;
+}
+
+const ReminderModal = ({ session, onClose }: ReminderModalProps) => {
+  const patientName = session.patientName || session.patient?.firstName || 'Paciente';
+  const defaultMessage = `Hola ${patientName}! Te escribo para recordarte que tenés pendiente el pago de la sesión del ${formatDate(session.scheduledFrom)} a las ${formatTime(session.scheduledFrom)}. El monto es de ${formatCurrency(session.cost || 0)}. ¡Gracias!`;
+  
+  const [message, setMessage] = useState(defaultMessage);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(message);
+    toast.success('Mensaje copiado al portapapeles');
+  };
+
+  const handleWhatsApp = () => {
+    const phone = session.patient?.phone;
+    if (phone) {
+      const cleanPhone = phone.replace(/\D/g, '');
+      window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
+    } else {
+      toast.info('El paciente no tiene número de teléfono registrado');
+    }
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-0 sm:p-4">
+      <div className="bg-white rounded-t-xl sm:rounded-lg shadow-2xl p-4 sm:p-6 w-full sm:max-w-md">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">Recordatorio de Pago</h3>
+          <button className="text-gray-500 hover:text-gray-700 p-1" onClick={onClose}>
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="mb-4">
+          <label className="text-gray-700 text-sm block mb-2">Mensaje</label>
+          <textarea
+            className="w-full h-28 sm:h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm resize-none"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
+          <Button variant="outline" className="flex-1" onClick={handleCopy}>
+            <Copy className="w-4 h-4 mr-2" />
+            Copiar
+          </Button>
+          <Button className="flex-1 bg-green-600 hover:bg-green-700" onClick={handleWhatsApp}>
+            <MessageCircle className="w-4 h-4 mr-2" />
+            WhatsApp
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
 
 export function Cobros() {
   const { sessionsUI, fetchUpcoming } = useSessions();
-  const { patients, fetchPatients } = usePatients();
-  const { payments, isLoading: isLoadingPayments, fetchAllPayments, createPayment, updatePayment, deletePayment, clearPayments } = usePayments();
+  const { 
+    paidPayments,
+    totals,
+    isLoading: isLoadingPayments, 
+    fetchPayments, 
+    createPayment,
+    isSessionPaid,
+  } = usePayments();
   
-  const [turnosCobrados, setTurnosCobrados] = useState<{ [key: number]: boolean }>({});
-  const [showReminderModal, setShowReminderModal] = useState(false);
-  const [_selectedTurno, setSelectedTurno] = useState<any>(null);
-  const [reminderMessage, setReminderMessage] = useState('');
-  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const hasFetchedRef = useRef(false);
-  
-  // Payment drawer state
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isPaymentDrawerOpen, setIsPaymentDrawerOpen] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [preselectedSession, setPreselectedSession] = useState<SessionUI | null>(null);
+  const [reminderSession, setReminderSession] = useState<SessionUI | null>(null);
 
-  // Fetch data on mount (only once)
+  // Single fetch on mount
   useEffect(() => {
-    if (!hasFetchedRef.current) {
-      hasFetchedRef.current = true;
-      const fetchData = async () => {
-        setIsLoading(true);
-        try {
-          await Promise.all([
-            fetchUpcoming(),
-            fetchPatients(),
-            fetchAllPayments(),
-          ]);
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-        setIsLoading(false);
-      };
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      clearPayments();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Map API data to component format
-  const turnos = sessionsUI.map(s => {
-    const scheduledFrom = new Date(s.scheduledFrom);
-    const fecha = scheduledFrom.toISOString().split('T')[0];
-    const hora = s.formattedTime || `${scheduledFrom.getHours().toString().padStart(2, '0')}:${scheduledFrom.getMinutes().toString().padStart(2, '0')}`;
-    return {
-      id: parseInt(s.id),
-      pacienteId: s.patient ? parseInt(s.patient.id) : 0,
-      fecha,
-      hora,
-      modalidad: s.sessionType as 'presential' | 'remote',
-      estado: s.status.toLowerCase() as 'pendiente' | 'confirmado' | 'completado' | 'cancelled',
-      monto: Number(s.cost) || 0,
-    };
-  });
-
-  const pacientes = patients.map(p => ({
-    id: parseInt(p.id),
-    nombre: `${p.firstName} ${p.lastName}`,
-    telefono: p.phone || '',
-    email: p.email || '',
-  }));
-
-  const getPaciente = (pacienteId: number) => {
-    return pacientes.find((p) => p.id === pacienteId);
-  };
-
-  const formatFecha = (fecha: string) => {
-    const date = new Date(fecha);
-    return date.toLocaleDateString('es-AR', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-    });
-  };
-
-  const formatMonto = (monto: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-    }).format(monto);
-  };
-
-  // Get current week turnos (Sunday to Saturday)
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  // Get start of week (Sunday)
-  const startOfWeek = new Date(today);
-  const dayOfWeek = today.getDay();
-  startOfWeek.setDate(today.getDate() - dayOfWeek);
-  startOfWeek.setHours(0, 0, 0, 0);
-  
-  // Get end of week (Saturday)
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6);
-  endOfWeek.setHours(23, 59, 59, 999);
-
-  const turnosEstaSemana = turnos
-    .filter((turno) => {
-      const turnoDate = new Date(turno.fecha);
-      return turnoDate >= startOfWeek && turnoDate <= endOfWeek;
-    })
-    .sort((a, b) => {
-      const dateCompare = new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
-      if (dateCompare === 0) {
-        return a.hora.localeCompare(b.hora);
+    const loadData = async () => {
+      try {
+        await Promise.all([
+          fetchUpcoming(),
+          fetchPayments(),
+        ]);
+      } catch (error) {
+        console.error('Error fetching initial data:', error);
+      } finally {
+        setIsInitialLoading(false);
       }
-      return dateCompare;
-    });
+    };
+    loadData();
+  }, []);
 
-  const handleToggleCobrado = (turnoId: number) => {
-    setTurnosCobrados((prev) => ({
-      ...prev,
-      [turnoId]: !prev[turnoId],
-    }));
-  };
+  // Today for status calculation
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
 
-  const handleOpenReminderModal = (turno: any) => {
-    const paciente = getPaciente(turno.pacienteId);
-    const defaultMessage = `Hola ${paciente?.nombre}! Te escribo para recordarte que tenés pendiente el pago de la sesión del ${formatFecha(turno.fecha)} a las ${turno.hora}. El monto es de ${formatMonto(turno.monto || 0)}. ¡Gracias!`;
-    setReminderMessage(defaultMessage);
-    setSelectedTurno(turno);
-    setShowReminderModal(true);
-  };
+  // Sessions pending payment: not cancelled, not paid
+  // No week filter - show all upcoming sessions that need payment
+  const sessionsPendingPayment = useMemo(() => {
+    return sessionsUI
+      .filter((session) => {
+        const isNotCancelled = session.status !== SessionStatus.CANCELLED;
+        const notPaid = !isSessionPaid(session.id);
+        return isNotCancelled && notPaid;
+      })
+      .sort((a, b) => new Date(a.scheduledFrom).getTime() - new Date(b.scheduledFrom).getTime());
+  }, [sessionsUI, isSessionPaid]);
 
-  const handleCopyMessage = () => {
-    navigator.clipboard.writeText(reminderMessage);
-    alert('Mensaje copiado al portapapeles');
-  };
+  // Get session payment status for display
+  const getSessionStatus = useCallback((session: SessionUI): PaymentStatusType => {
+    const sessionDate = new Date(session.scheduledFrom);
+    sessionDate.setHours(0, 0, 0, 0);
+    if (sessionDate < today) return 'overdue';
+    if (sessionDate.getTime() === today.getTime()) return 'today';
+    return 'upcoming';
+  }, [today]);
 
-  const handleSendWhatsApp = () => {
-    // Esta funcionalidad se implementará más adelante
-    console.log('Enviar por WhatsApp:', reminderMessage);
-    alert('Integración con WhatsApp próximamente');
-    setShowReminderModal(false);
-  };
-
-  // Payment handlers
-  const handleCreatePayment = () => {
-    setSelectedPayment(null);
+  // Handlers
+  const handleCreatePayment = useCallback(() => {
+    setPreselectedSession(null);
     setIsPaymentDrawerOpen(true);
-  };
+  }, []);
 
-  const handleEditPayment = (payment: Payment) => {
-    setSelectedPayment(payment);
+  const handleCollectPayment = useCallback((session: SessionUI) => {
+    setPreselectedSession(session);
     setIsPaymentDrawerOpen(true);
-  };
+  }, []);
 
-  const handleSavePayment = async (data: CreatePaymentDto | UpdatePaymentDto) => {
+  const handleSavePayment = useCallback(async (data: CreatePaymentDto) => {
     try {
-      if (selectedPayment) {
-        await updatePayment(selectedPayment.id, data as UpdatePaymentDto);
-        toast.success('Pago actualizado correctamente');
-      } else {
-        await createPayment(data as CreatePaymentDto);
-        toast.success('Pago registrado correctamente');
-      }
+      await createPayment(data);
+      toast.success('Pago registrado correctamente');
+      setIsPaymentDrawerOpen(false);
+      setPreselectedSession(null);
+      // Refresh sessions to update the pending list
+      await fetchUpcoming();
     } catch (error) {
+      console.error('Error creating payment:', error);
       toast.error('No se pudo guardar el pago. Por favor intenta nuevamente.');
     }
-  };
+  }, [createPayment, fetchUpcoming]);
 
-  const handleDeletePayment = async (id: string) => {
-    try {
-      await deletePayment(id);
-      toast.success('Pago eliminado correctamente');
-    } catch (error) {
-      toast.error('No se pudo eliminar el pago. Por favor intenta nuevamente.');
-    }
-  };
+  const handleCloseDrawer = useCallback(() => {
+    setIsPaymentDrawerOpen(false);
+    setPreselectedSession(null);
+  }, []);
 
-  // Create patient names map for PaymentList
-  const patientNames = patients.reduce((acc, p) => {
-    acc[p.id] = `${p.firstName} ${p.lastName}`;
-    return acc;
-  }, {} as Record<string, string>);
-
-  // Filter payments for current week (reuse same week calculation from above)
-  const paymentsThisWeek = payments.filter((payment) => {
-    const paymentDate = new Date(payment.paymentDate);
-    return paymentDate >= startOfWeek && paymentDate <= endOfWeek;
-  });
-
-  const totalCobrado = turnosEstaSemana
-    .filter((t) => turnosCobrados[t.id])
-    .reduce((sum, t) => sum + (t.monto || 0), 0);
-
-  const totalPendiente = turnosEstaSemana
-    .filter((t) => !turnosCobrados[t.id])
-    .reduce((sum, t) => sum + (t.monto || 0), 0);
+  const isLoading = isInitialLoading;
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-gray-900">Cobros y Pagos</h1>
-        <Button onClick={handleCreatePayment}>
+    <div className="p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Cobros</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+            Gestiona los pagos de tus sesiones
+          </p>
+        </div>
+        <Button onClick={handleCreatePayment} className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white">
           <Plus className="h-4 w-4 mr-2" />
           Registrar Pago
         </Button>
       </div>
 
-      {/* Payment Statistics */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Estadísticas de Pagos</h2>
-        {isLoadingPayments ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-32 bg-gray-100 animate-pulse rounded-lg" />
-            ))}
-          </div>
-        ) : (
-          <PaymentStats payments={paymentsThisWeek} />
-        )}
-      </div>
+      {/* Stats Cards */}
+      <PaymentStats totals={totals} isLoading={isLoading} />
 
-      {/* Registered Payments */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Pagos Registrados</h2>
-        {isLoadingPayments ? (
-          <div className="py-20 flex flex-col items-center gap-4">
-            <div className="inline-flex items-center gap-2">
-              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+      {/* Tabs */}
+      <Tabs defaultValue="pendientes" className="w-full">
+        <TabsList className="w-full sm:w-auto">
+          <TabsTrigger value="pendientes" className="flex-1 sm:flex-none gap-2">
+            <Calendar className="h-4 w-4" />
+            Pendientes
+            <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-1.5 py-0.5 rounded-full">
+              {sessionsPendingPayment.length}
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="historial" className="flex-1 sm:flex-none gap-2">
+            <History className="h-4 w-4" />
+            Historial
+            <span className="bg-green-100 text-green-800 text-xs font-medium px-1.5 py-0.5 rounded-full">
+              {paidPayments.length}
+            </span>
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Pendientes Tab */}
+        <TabsContent value="pendientes" className="mt-4">
+          {isLoading ? (
+            <LoadingSkeleton />
+          ) : sessionsPendingPayment.length === 0 ? (
+            <EmptyState 
+              icon={DollarSign} 
+              title="¡Todo al día!" 
+              subtitle="No hay sesiones pendientes de cobro"
+              variant="success"
+            />
+          ) : (
+            <div className="space-y-3">
+              {sessionsPendingPayment.map((session) => (
+                <SessionCard
+                  key={session.id}
+                  session={session}
+                  status={getSessionStatus(session)}
+                  onReminder={() => setReminderSession(session)}
+                  onCollect={() => handleCollectPayment(session)}
+                />
+              ))}
             </div>
-            <p className="text-sm text-gray-500">Cargando pagos...</p>
-          </div>
-        ) : (
-          <PaymentList
-            payments={paymentsThisWeek}
-            patientNames={patientNames}
-            onEdit={handleEditPayment}
-            onDelete={handleDeletePayment}
-            onCreateNew={handleCreatePayment}
-          />
-        )}
-      </div>
+          )}
+        </TabsContent>
+
+        {/* Historial Tab */}
+        <TabsContent value="historial" className="mt-4">
+          {isLoading ? (
+            <LoadingSkeleton />
+          ) : paidPayments.length === 0 ? (
+            <EmptyState 
+              icon={History} 
+              title="Sin historial" 
+              subtitle="Aún no hay pagos registrados" 
+            />
+          ) : (
+            <div className="space-y-3">
+              {paidPayments.map((payment) => (
+                <PaymentCard key={payment.id} payment={payment} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Payment Drawer */}
       <PaymentDrawer
         isOpen={isPaymentDrawerOpen}
-        onClose={() => {
-          setIsPaymentDrawerOpen(false);
-          setSelectedPayment(null);
-        }}
+        onClose={handleCloseDrawer}
         onSave={handleSavePayment}
-        payment={selectedPayment}
+        sessions={sessionsUI}
+        preselectedSessionId={preselectedSession?.id}
         isLoading={isLoadingPayments}
       />
 
-      {/* Summary Mini Cards (Legacy - para referencia de turnos) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-          <div className="flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <div>
-              <p className="text-green-800 text-sm">Turnos cobrados esta semana</p>
-              <p className="text-green-900 text-xl">{formatMonto(totalCobrado)}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-4 border border-yellow-200">
-          <div className="flex items-center gap-3">
-            <Clock className="w-5 h-5 text-yellow-600" />
-            <div>
-              <p className="text-yellow-800 text-sm">Turnos pendientes esta semana</p>
-              <p className="text-yellow-900 text-xl">{formatMonto(totalPendiente)}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Turnos Table - Desktop */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-4 md:p-6 border-b border-gray-200">
-          <h2 className="text-gray-900 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-indigo-600" />
-            Turnos de esta semana
-          </h2>
-          <p className="text-gray-600 text-sm mt-1">
-            Del {formatFecha(startOfWeek.toISOString())} al {formatFecha(endOfWeek.toISOString())}
-          </p>
-        </div>
-
-        {/* Desktop Table View */}
-        <div className="hidden lg:block overflow-x-auto">
-          {isLoading ? (
-            <div className="py-20 flex flex-col items-center gap-4">
-              <div className="inline-flex items-center gap-2">
-                <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-              </div>
-              <p className="text-sm text-gray-500">Cargando turnos...</p>
-            </div>
-          ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 text-gray-600">Fecha y Hora</th>
-                <th className="text-left py-3 px-4 text-gray-600">Paciente</th>
-                <th className="text-left py-3 px-4 text-gray-600">Modalidad</th>
-                <th className="text-right py-3 px-4 text-gray-600">Monto</th>
-                <th className="text-center py-3 px-4 text-gray-600">Estado</th>
-                <th className="text-center py-3 px-4 text-gray-600">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {turnosEstaSemana.length > 0 ? (
-                turnosEstaSemana.map((turno) => {
-                  const paciente = getPaciente(turno.pacienteId);
-                  const turnoDate = new Date(turno.fecha);
-                  const isPast = turnoDate < today;
-                  const isToday = turnoDate.toDateString() === today.toDateString();
-                  const isCobrado = turnosCobrados[turno.id];
-
-                  return (
-                    <tr
-                      key={turno.id}
-                      className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-                        isCobrado ? 'bg-green-50/50' : ''
-                      }`}
-                    >
-                      <td className="py-4 px-4">
-                        <div>
-                          <p className="text-gray-900 capitalize">
-                            {formatFecha(turno.fecha)}
-                          </p>
-                          <p className="text-gray-500 text-sm">{turno.hora}</p>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                            <span className="text-indigo-600 text-xs">
-                              {paciente?.nombre.split(' ').map((n) => n[0]).join('')}
-                            </span>
-                          </div>
-                          <span className="text-gray-900">{paciente?.nombre}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-2">
-                          {/* @ts-expect-error - using mock data structure */}
-                          {turno.modalidad === 'remoto' ? (
-                            <>
-                              <Video className="w-4 h-4 text-blue-600" />
-                              <span className="text-gray-700 text-sm">Remoto</span>
-                            </>
-                          ) : (
-                            <>
-                              <MapPin className="w-4 h-4 text-purple-600" />
-                              <span className="text-gray-700 text-sm">Presencial</span>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 text-right">
-                        <span className="text-gray-900">
-                          {formatMonto(turno.monto || 0)}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        {isCobrado ? (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-green-100 text-green-700">
-                            <CheckCircle className="w-3 h-3" />
-                            Cobrado
-                          </span>
-                        ) : isPast ? (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-red-100 text-red-700">
-                            <DollarSign className="w-3 h-3" />
-                            Vencido
-                          </span>
-                        ) : isToday ? (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-orange-100 text-orange-700">
-                            <Clock className="w-3 h-3" />
-                            Hoy
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-700">
-                            <Clock className="w-3 h-3" />
-                            Pendiente
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center justify-center relative">
-                          <button
-                            onClick={() => setOpenMenuId(openMenuId === turno.id ? null : turno.id)}
-                            className="p-2 text-gray-500 hover:bg-gray-100 rounded transition-colors"
-                            title="Más opciones"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </button>
-                          
-                          {/* Dropdown Menu */}
-                          {openMenuId === turno.id && (
-                            <>
-                              <div 
-                                className="fixed inset-0 z-10" 
-                                onClick={() => setOpenMenuId(null)}
-                              />
-                              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
-                                <div className="py-1">
-                                  <button
-                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                                    onClick={() => {
-                                      handleToggleCobrado(turno.id);
-                                      setOpenMenuId(null);
-                                    }}
-                                  >
-                                    <CheckCircle className="w-4 h-4" />
-                                    {isCobrado ? 'Marcar como no cobrado' : 'Marcar como cobrado'}
-                                  </button>
-                                  {!isCobrado && (
-                                    <button
-                                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                                      onClick={() => {
-                                        handleOpenReminderModal(turno);
-                                        setOpenMenuId(null);
-                                      }}
-                                    >
-                                      <Bell className="w-4 h-4" />
-                                      Enviar recordatorio de pago
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-gray-500">
-                    No hay turnos programados para esta semana
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          )}
-        </div>
-
-        {/* Mobile/Tablet Card View */}
-        <div className="lg:hidden p-4">
-          {isLoading ? (
-            <div className="py-20 flex flex-col items-center gap-4">
-              <div className="inline-flex items-center gap-2">
-                <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-              </div>
-              <p className="text-sm text-gray-500">Cargando turnos...</p>
-            </div>
-          ) : turnosEstaSemana.length > 0 ? (
-            <div className="space-y-3">
-              {turnosEstaSemana.map((turno) => {
-                const paciente = getPaciente(turno.pacienteId);
-                const turnoDate = new Date(turno.fecha);
-                const isPast = turnoDate < today;
-                const isToday = turnoDate.toDateString() === today.toDateString();
-                const isCobrado = turnosCobrados[turno.id];
-
-                return (
-                  <div
-                    key={turno.id}
-                    className={`p-4 rounded-lg border transition-colors ${
-                      isCobrado 
-                        ? 'bg-green-50 border-green-200' 
-                        : 'border-gray-200 hover:border-indigo-300'
-                    }`}
-                  >
-                    {/* Header: Fecha y Estado */}
-                    <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-200">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 capitalize">
-                          {formatFecha(turno.fecha)}
-                        </p>
-                        <p className="text-xs text-gray-500">{turno.hora}</p>
-                      </div>
-                      {isCobrado ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
-                          <CheckCircle className="w-3 h-3" />
-                          Cobrado
-                        </span>
-                      ) : isPast ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-red-100 text-red-700">
-                          <DollarSign className="w-3 h-3" />
-                          Vencido
-                        </span>
-                      ) : isToday ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-700">
-                          <Clock className="w-3 h-3" />
-                          Hoy
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-700">
-                          <Clock className="w-3 h-3" />
-                          Pendiente
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Body: Paciente y Detalles */}
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-indigo-600 text-sm font-semibold">
-                            {paciente?.nombre.split(' ').map((n) => n[0]).join('')}
-                          </span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {paciente?.nombre}
-                          </p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            {/* @ts-expect-error - using mock data structure */}
-                            {turno.modalidad === 'remoto' ? (
-                              <div className="flex items-center gap-1 text-xs text-blue-600">
-                                <Video className="w-3 h-3" />
-                                <span>Remoto</span>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-1 text-xs text-purple-600">
-                                <MapPin className="w-3 h-3" />
-                                <span>Presencial</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Monto */}
-                      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                        <span className="text-xs text-gray-600">Monto</span>
-                        <span className="text-sm font-semibold text-gray-900">
-                          {formatMonto(turno.monto || 0)}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2">
-                      <button
-                        onClick={() => handleToggleCobrado(turno.id)}
-                        className={`flex-1 px-3 py-2 rounded text-xs font-medium transition-colors ${
-                          isCobrado
-                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            : 'bg-green-600 text-white hover:bg-green-700'
-                        }`}
-                      >
-                        {isCobrado ? 'Desmarcar' : 'Marcar cobrado'}
-                      </button>
-                      {!isCobrado && (
-                        <button
-                          onClick={() => handleOpenReminderModal(turno)}
-                          className="flex-1 px-3 py-2 bg-indigo-600 text-white rounded text-xs font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1"
-                        >
-                          <Bell className="w-3 h-3" />
-                          Recordatorio
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="py-12 text-center text-gray-500">
-              No hay turnos programados para esta semana
-            </div>
-          )}
-        </div>
-
-        {/* Footer Summary */}
-        {!isLoading && turnosEstaSemana.length > 0 && (
-          <div className="p-4 bg-gray-50 border-t border-gray-200">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">
-                Total de turnos: {turnosEstaSemana.length}
-              </span>
-              <div className="flex items-center gap-6">
-                <span className="text-green-700">
-                  Cobrados: {Object.values(turnosCobrados).filter(Boolean).length}
-                </span>
-                <span className="text-yellow-700">
-                  Pendientes: {turnosEstaSemana.length - Object.values(turnosCobrados).filter(Boolean).length}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
       {/* Reminder Modal */}
-      {showReminderModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-900">Recordatorio de Pago</h3>
-              <button
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-                onClick={() => setShowReminderModal(false)}
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="mb-4">
-              <label className="text-gray-700 text-sm block mb-2">Mensaje</label>
-              <textarea
-                className="w-full h-32 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                value={reminderMessage}
-                onChange={(e) => setReminderMessage(e.target.value)}
-              />
-            </div>
-            <div className="flex gap-3">
-              <button
-                className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors"
-                onClick={handleCopyMessage}
-              >
-                <Copy className="w-4 h-4" />
-                <span>Copiar mensaje</span>
-              </button>
-              <button
-                className="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
-                onClick={handleSendWhatsApp}
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>WhatsApp</span>
-              </button>
-            </div>
-          </div>
-        </div>
+      {reminderSession && (
+        <ReminderModal 
+          session={reminderSession} 
+          onClose={() => setReminderSession(null)} 
+        />
       )}
     </div>
   );

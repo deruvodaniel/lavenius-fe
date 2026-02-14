@@ -81,9 +81,10 @@ export function formatISODate(date: Date | string): string {
  * Formatea un valor numérico como moneda
  * @example "$ 1.500,00"
  */
-export function formatCurrency(amount: number): string {
+export function formatCurrency(amount: number | undefined | null): string {
+  const safeAmount = typeof amount === 'number' && !Number.isNaN(amount) ? amount : 0;
   return new Intl.NumberFormat('es-AR', {
     style: 'currency',
     currency: 'ARS',
-  }).format(amount);
+  }).format(safeAmount);
 }

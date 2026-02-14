@@ -69,6 +69,7 @@ export function NoteDrawer({
           noteDate: formData.noteDate,
           patientId,
         };
+        console.log('📝 Creating note with data:', createData);
         await onSave(createData);
       }
 
@@ -96,7 +97,7 @@ export function NoteDrawer({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex">
+    <div className="fixed inset-0 z-50 flex !top-0 !mt-0">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
@@ -177,7 +178,7 @@ export function NoteDrawer({
           <Button
             onClick={handleSave}
             disabled={isSaving || !formData.text.trim()}
-            className="bg-gradient-to-r from-indigo-600 to-indigo-700"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white"
           >
             {isSaving ? (
               'Guardando...'

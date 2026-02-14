@@ -1,99 +1,103 @@
 import { Card } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils/dateFormatters';
-import { TrendingUp, Clock, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
-import type { Payment } from '@/lib/types/api.types';
-import { PaymentStatus } from '@/lib/types/api.types';
+import { TrendingUp, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 
-interface PaymentStatsProps {
-  payments: Payment[];
+/**
+ * PaymentStats Component
+ * 
+ * Displays payment statistics cards.
+ * Uses pre-calculated totals from the hook for accuracy.
+ */
+
+interface PaymentTotals {
+  totalAmount: number;
+  paidAmount: number;
+  pendingAmount: number;
+  overdueAmount: number;
+  totalCount: number;
+  paidCount: number;
+  pendingCount: number;
+  overdueCount: number;
 }
 
-export const PaymentStats = ({ payments }: PaymentStatsProps) => {
-  const calculateStats = () => {
-    const total = payments.reduce((sum, p) => sum + p.amount, 0);
-    
-    const completed = payments
-      .filter((p) => p.status === PaymentStatus.COMPLETED)
-      .reduce((sum, p) => sum + p.amount, 0);
-    
-    const pending = payments
-      .filter((p) => p.status === PaymentStatus.PENDING)
-      .reduce((sum, p) => sum + p.amount, 0);
-    
-    const cancelled = payments
-      .filter((p) => p.status === PaymentStatus.CANCELLED)
-      .reduce((sum, p) => sum + p.amount, 0);
-    
-    const refunded = payments
-      .filter((p) => p.status === PaymentStatus.REFUNDED)
-      .reduce((sum, p) => sum + p.amount, 0);
+interface PaymentStatsProps {
+  totals: PaymentTotals | null;
+  isLoading?: boolean;
+}
 
-    return {
-      total,
-      completed,
-      pending,
-      cancelled,
-      refunded,
-      count: payments.length,
-    };
-  };
+const LoadingSkeleton = () => (
+  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    {[1, 2, 3, 4].map((i) => (
+      <Card key={i} className="p-3 sm:p-4 lg:p-6">
+        <div className="animate-pulse">
+          <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2 mb-2" />
+          <div className="h-6 sm:h-8 bg-gray-200 rounded w-3/4" />
+        </div>
+      </Card>
+    ))}
+  </div>
+);
 
-  const stats = calculateStats();
+export const PaymentStats = ({ totals, isLoading }: PaymentStatsProps) => {
+  if (isLoading || !totals) {
+    return <LoadingSkeleton />;
+  }
 
   const statCards = [
     {
-      label: 'Total Ingresos',
-      value: stats.completed,
+      label: 'Total Semanal',
+      value: totals.totalAmount,
       icon: TrendingUp,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
+      count: totals.totalCount,
     },
     {
-      label: 'Pendientes',
-      value: stats.pending,
-      icon: Clock,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50',
-    },
-    {
-      label: 'Completados',
-      value: stats.completed,
+      label: 'Cobrado',
+      value: totals.paidAmount,
       icon: CheckCircle,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
-      count: payments.filter((p) => p.status === PaymentStatus.COMPLETED).length,
+      count: totals.paidCount,
     },
     {
-      label: 'Reembolsados',
-      value: stats.refunded,
-      icon: RotateCcw,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
+      label: 'Pendiente',
+      value: totals.pendingAmount,
+      icon: Clock,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-50',
+      count: totals.pendingCount,
+    },
+    {
+      label: 'Vencido',
+      value: totals.overdueAmount,
+      icon: AlertTriangle,
+      color: 'text-red-600',
+      bgColor: 'bg-red-50',
+      count: totals.overdueCount,
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {statCards.map((stat, index) => {
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {statCards.map((stat) => {
         const Icon = stat.icon;
         return (
-          <Card key={index} className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
+          <Card key={stat.label} className="p-3 sm:p-4 lg:p-6">
+            <div className="flex items-start sm:items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
                   {stat.label}
                 </p>
-                <p className="text-2xl font-bold mt-2">
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold mt-1 sm:mt-2 truncate">
                   {formatCurrency(stat.value)}
                 </p>
-                {stat.count !== undefined && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {stat.count} {stat.count === 1 ? 'pago' : 'pagos'}
-                  </p>
-                )}
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
+                  {stat.count} {stat.count === 1 ? 'pago' : 'pagos'}
+                </p>
               </div>
-              <div className={`${stat.bgColor} p-3 rounded-full`}>
-                <Icon className={`h-6 w-6 ${stat.color}`} />
+              <div className={`${stat.bgColor} p-2 sm:p-3 rounded-full flex-shrink-0`}>
+                <Icon className={`h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 ${stat.color}`} />
               </div>
             </div>
           </Card>
