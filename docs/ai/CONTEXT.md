@@ -1,6 +1,6 @@
 # System Context
 
-> **Actualizado**: Enero 14, 2026
+> **Actualizado**: Febrero 14, 2026
 
 ## Tech Stack
 - React 18.3.1 + TypeScript 5.9.3
@@ -14,14 +14,14 @@
 ## Backend
 - NestJS 10.0.0 + PostgreSQL 17-alpine
 - BFF pattern with E2E encryption (AES-256-GCM)
-- Port: 3001
-- Database: PostgreSQL:5433
-- ngrok URL: https://3fb8d8db4949.ngrok-free.app
+- Production API URL (configured via VITE_API_URL)
 
 ## Deployment
 - Frontend: Vercel (lavenius-fe.vercel.app)
-- Backend: ngrok (local dev)
-- Git: github.com/deruvodaniel/lavenius-fe
+- Backend: Production infrastructure (no longer using ngrok)
+- Git repos:
+  - github.com/deruvodaniel/lavenius-fe (Vercel deploy)
+  - github.com/laveniusnet/lavenius-fe (main repo)
 
 ## Architecture Patterns
 
@@ -59,26 +59,33 @@ src/
 │   ├── stores/
 │   │   ├── auth.store.ts
 │   │   ├── patient.store.ts
-│   │   ├── appointment.store.ts
-│   │   └── note.store.ts
+│   │   ├── sessionStore.ts
+│   │   ├── note.store.ts
+│   │   └── payment.store.ts
 │   ├── hooks/
 │   │   ├── useAuth.ts
 │   │   ├── usePatients.ts
-│   │   ├── useAppointments.ts
-│   │   └── useNotes.ts
+│   │   ├── useSessions.ts
+│   │   ├── useNotes.ts
+│   │   ├── usePayments.ts
+│   │   └── useMediaQuery.ts
 │   └── types/
 │       └── api.types.ts           # Central type definitions
 ├── components/
 │   ├── ui/                        # shadcn components (DO NOT EDIT)
 │   ├── shared/                    # Reusable components
 │   │   ├── EmptyState.tsx
-│   │   ├── LoadingSpinner.tsx
+│   │   ├── Skeleton.tsx
+│   │   ├── NotFound.tsx
 │   │   └── ErrorBoundary.tsx
 │   ├── auth/                      # Login/Register
 │   ├── pacientes/                 # Pacientes, PacienteDrawer
-│   ├── agenda/                    # Calendar, appointments
+│   ├── agenda/                    # Agenda, FullCalendarView, TurnoDrawer
+│   ├── cobros/                    # Cobros, PaymentStats, PaymentDrawer
+│   ├── config/                    # Configuracion, CalendarSync
+│   ├── perfil/                    # Perfil (user profile editing)
 │   ├── dashboard/                 # FichaClinica, Dashboard
-│   └── notes/                     # NoteCard, NoteList, NoteDrawer
+│   └── layout/                    # Sidebar, Header
 ├── utils/                         # Helpers
 │   ├── dateFormatters.ts
 │   └── validators.ts

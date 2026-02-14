@@ -1,61 +1,183 @@
-**Add your own guidelines here**
-<!--
+# Lavenius Frontend Guidelines
 
-System Guidelines
+> Última actualización: Febrero 14, 2026
 
-Use this file to provide the AI with rules and guidelines you want it to follow.
-This template outlines a few examples of things you can add. You can add your own sections and format it to suit your needs
-
-TIP: More context isn't always better. It can confuse the LLM. Try and add the most important rules you need
-
-# General guidelines
-
-Any general rules you want the AI to follow.
-For example:
+## General Guidelines
 
 * Only use absolute positioning when necessary. Opt for responsive and well structured layouts that use flexbox and grid by default
 * Refactor code as you go to keep code clean
-* Keep file sizes small and put helper functions and components in their own files.
+* Keep file sizes small (<200 lines) and put helper functions and components in their own files
+* Use existing UI components (`Input`, `Button`, `Card`) from shadcn/ui - NEVER edit files in components/ui/
+* All changes must be frontend only - no backend changes allowed
+* Follow DRY/KISS principles
+* TypeScript strict mode - no `any`, no implicit any
 
---------------
+## Design System Guidelines
 
-# Design system guidelines
-Rules for how the AI should make generations look like your company's design system
+### Colors (Minimalistas)
+- **Icons only** should have color (e.g., `text-red-500`, `text-indigo-600`)
+- **Text** in gray tones (`text-gray-900`, `text-gray-500`, `text-gray-400`)
+- **Backgrounds** neutral or white (`bg-white`, `bg-gray-50`)
+- **Badges** with soft colors (`bg-red-100 text-red-800`, `bg-green-100 text-green-800`)
+- **Primary actions** use indigo (`bg-indigo-600 hover:bg-indigo-700`)
 
-Additionally, if you select a design system to use in the prompt box, you can reference
-your design system's components, tokens, variables and components.
-For example:
+### Card Components
+All Card components MUST have `bg-white` for visual consistency:
 
-* Use a base font-size of 14px
-* Date formats should always be in the format “Jun 10”
-* The bottom toolbar should only ever have a maximum of 4 items
-* Never use the floating action button with the bottom toolbar
-* Chips should always come in sets of 3 or more
-* Don't use a dropdown if there are 2 or fewer options
+```tsx
+// ✅ Correct
+<Card className="p-4 bg-white">
+  {/* content */}
+</Card>
 
-You can also create sub sections and add more specific details
-For example:
+// ✅ With left border accent
+<Card className="p-4 bg-white border-l-4 border-l-indigo-500">
+  {/* content */}
+</Card>
 
+// ❌ Incorrect - missing bg-white
+<Card className="p-4">
+  {/* content */}
+</Card>
+```
 
-## Button
-The Button component is a fundamental interactive element in our design system, designed to trigger actions or navigate
-users through the application. It provides visual feedback and clear affordances to enhance user experience.
+### Container Components
+Main containers should have consistent styling:
 
-### Usage
-Buttons should be used for important actions that users need to take, such as form submissions, confirming choices,
-or initiating processes. They communicate interactivity and should have clear, action-oriented labels.
+```tsx
+// ✅ Standard container
+<div className="bg-white rounded-lg shadow-sm border border-gray-200">
+  {/* content */}
+</div>
 
-### Variants
-* Primary Button
-  * Purpose : Used for the main action in a section or page
-  * Visual Style : Bold, filled with the primary brand color
-  * Usage : One primary button per section to guide users toward the most important action
-* Secondary Button
-  * Purpose : Used for alternative or supporting actions
-  * Visual Style : Outlined with the primary color, transparent background
-  * Usage : Can appear alongside a primary button for less important actions
-* Tertiary Button
-  * Purpose : Used for the least important actions
-  * Visual Style : Text-only with no border, using primary color
-  * Usage : For actions that should be available but not emphasized
--->
+// ✅ With overflow control
+<div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+  {/* content */}
+</div>
+```
+
+### ConfigSection Pattern
+For configuration cards, use this pattern:
+
+```tsx
+const ConfigSection = ({ title, description, icon: Icon, children, iconColor }) => (
+  <Card className="p-6 bg-white">
+    <div className="flex items-start gap-4">
+      <div className="p-2 bg-gray-100 rounded-lg">
+        <Icon className={`h-5 w-5 ${iconColor || 'text-gray-600'}`} />
+      </div>
+      <div className="flex-1">
+        <h3 className="font-medium text-gray-900">{title}</h3>
+        <p className="text-sm text-gray-500 mt-1">{description}</p>
+        <div className="mt-4">{children}</div>
+      </div>
+    </div>
+  </Card>
+);
+```
+
+### Empty States
+Use the shared EmptyState component:
+
+```tsx
+<EmptyState
+  icon={SearchIcon}
+  title="No results found"
+  description="Try adjusting your search criteria"
+  action={{ label: "Clear filters", onClick: handleClear }}
+/>
+```
+
+### Loading States
+Use SkeletonCard/SkeletonList for loading:
+
+```tsx
+{isLoading ? (
+  <SkeletonList items={5} />
+) : (
+  <ActualContent />
+)}
+```
+
+### "Coming Soon" Overlay
+For features not yet implemented:
+
+```tsx
+<div className="relative">
+  {/* Feature content */}
+  <div className="absolute inset-0 bg-white/80 backdrop-blur-[1px] flex items-center justify-center rounded-lg">
+    <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+      PRÓXIMAMENTE
+    </span>
+  </div>
+</div>
+```
+
+## Component Patterns
+
+### Sorting Controls
+```tsx
+<select
+  value={sortBy}
+  onChange={(e) => onSortChange(e.target.value)}
+  className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white"
+>
+  <option value="date-desc">Más reciente</option>
+  <option value="date-asc">Más antiguo</option>
+  <option value="name-asc">A-Z</option>
+  <option value="name-desc">Z-A</option>
+</select>
+```
+
+### View Toggle (List/Table)
+```tsx
+<div className="flex border border-gray-200 rounded-md overflow-hidden">
+  <button
+    onClick={() => setViewMode('cards')}
+    className={`p-2 ${viewMode === 'cards' ? 'bg-indigo-50 text-indigo-600' : 'bg-white text-gray-500'}`}
+  >
+    <LayoutGrid className="h-4 w-4" />
+  </button>
+  <button
+    onClick={() => setViewMode('table')}
+    className={`p-2 ${viewMode === 'table' ? 'bg-indigo-50 text-indigo-600' : 'bg-white text-gray-500'}`}
+  >
+    <List className="h-4 w-4" />
+  </button>
+</div>
+```
+
+## File Structure
+
+```
+src/
+├── components/
+│   ├── ui/              # shadcn (DO NOT EDIT)
+│   ├── shared/          # EmptyState, Skeleton, NotFound
+│   ├── agenda/          # Agenda, FullCalendarView, TurnoDrawer
+│   ├── cobros/          # Cobros, PaymentStats, PaymentDrawer
+│   ├── config/          # Configuracion, CalendarSync
+│   ├── pacientes/       # Pacientes, PacienteDrawer
+│   ├── perfil/          # Perfil (user profile)
+│   └── layout/          # Sidebar, Header
+├── lib/
+│   ├── hooks/           # useAuth, usePatients, useSessions, usePayments
+│   ├── stores/          # Zustand stores
+│   └── types/           # TypeScript types
+```
+
+## Git Commit Style
+
+```bash
+# Feature
+feat(ui): add user profile section with sidebar navigation
+
+# Fix
+fix(calendar): add null checks for resize errors
+
+# Style/UI
+style(cards): add bg-white for visual consistency
+
+# Refactor
+refactor(config): reorganize días off section
+```

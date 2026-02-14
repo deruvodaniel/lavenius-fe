@@ -1,23 +1,27 @@
 # Implementation Status
 
-> Última actualización: Enero 14, 2026
+> Última actualización: Febrero 14, 2026
 
 ## ✅ Completado
 
 ### Infraestructura
 - [x] LLM-friendly documentation structure (docs/ai/)
-- [x] Custom hooks (useAuth, usePatients, useAppointments, useNotes, useErrorToast)
+- [x] Custom hooks (useAuth, usePatients, useSessions, useNotes, usePayments, useErrorToast, useMediaQuery)
 - [x] Error Boundary component
-- [x] Zustand stores (auth, patient, appointment, note)
+- [x] Zustand stores (auth, patient, session, note, payment)
 - [x] API integration layer (lib/api/)
 
 ### Componentes Migrados
 - [x] Login/Registro (auth flow completo con JWT)
-- [x] Pacientes component
+- [x] Pacientes component (con sorting y vista tabla)
 - [x] PacienteDrawer component
-- [x] Agenda component
+- [x] Agenda component (con FullCalendar mejorado)
 - [x] Dashboard component
 - [x] FichaClinica component
+- [x] Cobros component (con sorting y filtros)
+- [x] Configuración component (reorganizado)
+- [x] Perfil component (nuevo - edición de usuario)
+- [x] NotFound 404 page (nuevo)
 
 ### Features Implementadas
 - [x] Session Notes (NoteCard, NoteList, NoteDrawer)
@@ -25,6 +29,21 @@
   - 4 tipos: SESSION, GENERAL, TREATMENT_PLAN, PROGRESS
   - Integración con FichaClinica
   - Encriptación E2E en backend
+
+- [x] Payment Management
+  - PaymentDrawer component
+  - PaymentStats component (con bg-white)
+  - Sorting por fecha/precio
+  - Filtros por rango de fecha
+  - Paginación desktop / Infinite scroll mobile
+
+- [x] UX/UI Consistency (Febrero 2026)
+  - Cards con bg-white en todas las secciones
+  - Bordes consistentes (border-gray-200)
+  - FullCalendar con diseño moderno
+  - Sidebar con perfil clickeable
+  - Días Off sincronizados en calendario
+  - Overlay "PRÓXIMAMENTE" en features pendientes
 
 ### Documentación
 - [x] Documentación consolidada en docs/
@@ -35,22 +54,20 @@
 
 ## 📝 Next Steps (Prioridad)
 
-1. **Payment Management** (Alta prioridad)
-   - PaymentDrawer component
-   - PaymentList component
-   - PaymentStats component
-   - payment.store.ts
-   - Integración en Dashboard
-
-2. **Google Calendar OAuth**
+1. **Google Calendar OAuth** (Alta prioridad)
    - Agregar test users en Google Cloud Console
-   - Configurar redirect URIs (ngrok + Vercel)
-   - Testing de sincronización
+   - Configurar redirect URIs para producción
+   - Testing de sincronización completa
+
+2. **Notificaciones y Recordatorios**
+   - Implementar sistema de recordatorios (actualmente "PRÓXIMAMENTE")
+   - Notificaciones push
+   - Email reminders
 
 3. **Code Cleanup**
    - Archivar mockData.ts y turnos2026.ts
    - Remover console.logs
-   - Code splitting para optimizar bundle
+   - Code splitting para optimizar bundle (actualmente ~885KB)
 
 ## 🎯 Pattern Established
 
@@ -99,7 +116,36 @@ const form = useForm({ resolver: zodResolver(schema) });
 ```
 
 ## 📊 Métricas
-- Bundle size: 816.82 kB (⚠️ considerar code splitting)
-- Build time: ~11s
+- Bundle size: 885.78 kB (⚠️ considerar code splitting)
+- Build time: ~8s
 - TypeScript strict: ✅
 - ESLint warnings: <10
+
+## 🎨 UI/UX Guidelines Establecidas
+
+### Card Styling
+```tsx
+// Todas las cards deben tener bg-white para consistencia
+<Card className="p-4 bg-white">
+  {/* contenido */}
+</Card>
+
+// Cards con borde izquierdo de color
+<Card className="p-4 bg-white border-l-4 border-l-indigo-500">
+  {/* contenido */}
+</Card>
+```
+
+### Container Styling
+```tsx
+// Contenedores principales con borde
+<div className="bg-white rounded-lg shadow-sm border border-gray-200">
+  {/* contenido */}
+</div>
+```
+
+### Colores (minimalistas)
+- Solo iconos con color (ej: text-red-500, text-indigo-600)
+- Texto en tonos grises (text-gray-900, text-gray-500)
+- Fondos neutros o blancos
+- Badges con colores suaves (bg-red-100 text-red-800)
