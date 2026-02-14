@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import type {
   Payment,
   CreatePaymentDto,
-  WeeklyPaymentStats,
 } from '@/lib/types/api.types';
 import { PaymentStatus } from '@/lib/types/api.types';
 import { paymentService } from '@/lib/services/payment.service';
@@ -11,8 +10,8 @@ import { paymentService } from '@/lib/services/payment.service';
  * Payment Store - Single Source of Truth
  * 
  * Data flow:
- * 1. fetchPayments() loads weeklyStats from /payments/weekly
- * 2. All derived data computed from weeklyStats.payments
+ * 1. fetchPayments() loads all payments from /payments
+ * 2. All derived data computed from payments array
  * 3. After mutations, we refresh to stay in sync with backend
  * 
  * Request deduplication:
@@ -23,7 +22,7 @@ import { paymentService } from '@/lib/services/payment.service';
 type FetchStatus = 'idle' | 'loading' | 'success' | 'error';
 
 interface PaymentState {
-  weeklyStats: WeeklyPaymentStats | null;
+  payments: Payment[];
   fetchStatus: FetchStatus;
   error: Error | null;
   lastFetchTime: number | null;
@@ -41,7 +40,7 @@ interface PaymentActions {
 const CACHE_DURATION = 30 * 1000;
 
 const initialState: PaymentState = {
-  weeklyStats: null,
+  payments: [],
   fetchStatus: 'idle',
   error: null,
   lastFetchTime: null,
@@ -68,10 +67,10 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
     set({ fetchStatus: 'loading', error: null });
     
     try {
-      const weeklyStats = await paymentService.getWeeklyStats();
-      console.log('[PaymentStore] Fetched weeklyStats:', weeklyStats);
+      const payments = await paymentService.getAll();
+      console.log('[PaymentStore] Fetched payments:', payments);
       set({ 
-        weeklyStats, 
+        payments, 
         fetchStatus: 'success',
         lastFetchTime: Date.now(),
       });
@@ -86,20 +85,16 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
   },
 
   createPayment: async (data: CreatePaymentDto) => {
-    set({ fetchStatus: 'loading', error: null });
     try {
-      const newPayment = await paymentService.create(data);
-      console.log('[PaymentStore] Created payment:', newPayment);
+      // Create payment directly as PAID with paidDate
+      const paymentData: CreatePaymentDto = {
+        ...data,
+        status: PaymentStatus.PAID,
+        paidDate: new Date().toISOString(),
+      };
       
-      // Backend creates payments as 'pending', so we need to mark it as paid
-      // This is the expected flow: create payment record, then mark as paid
-      if (newPayment.id && newPayment.status !== PaymentStatus.PAID) {
-        console.log('[PaymentStore] Marking payment as paid:', newPayment.id);
-        await paymentService.markAsPaid(newPayment.id);
-      }
+      const newPayment = await paymentService.create(paymentData);
       
-      // Force refresh to get updated data from backend
-      await get().fetchPayments(true);
       return newPayment;
     } catch (error) {
       set({
@@ -114,8 +109,14 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
     set({ fetchStatus: 'loading', error: null });
     try {
       const updatedPayment = await paymentService.markAsPaid(id);
-      // Force refresh to get updated data from backend
-      await get().fetchPayments(true);
+      
+      // Update local state immediately
+      const currentPayments = get().payments;
+      set({ 
+        payments: currentPayments.map(p => p.id === id ? updatedPayment : p),
+        fetchStatus: 'success',
+      });
+      
       return updatedPayment;
     } catch (error) {
       set({
@@ -130,8 +131,13 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
     set({ fetchStatus: 'loading', error: null });
     try {
       await paymentService.delete(id);
-      // Force refresh to get updated data from backend
-      await get().fetchPayments(true);
+      
+      // Update local state immediately
+      const currentPayments = get().payments;
+      set({ 
+        payments: currentPayments.filter(p => p.id !== id),
+        fetchStatus: 'success',
+      });
     } catch (error) {
       set({
         error: error instanceof Error ? error : new Error('Failed to delete payment'),
@@ -150,25 +156,25 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
 
 export const paymentSelectors = {
   getPayments: (state: PaymentState): Payment[] => 
-    state.weeklyStats?.payments ?? [],
+    state.payments ?? [],
   
   getPaidPayments: (state: PaymentState): Payment[] =>
-    state.weeklyStats?.payments?.filter(p => p.status === PaymentStatus.PAID) ?? [],
+    state.payments?.filter(p => p.status === PaymentStatus.PAID) ?? [],
   
   getPendingPayments: (state: PaymentState): Payment[] =>
-    state.weeklyStats?.payments?.filter(p => 
+    state.payments?.filter(p => 
       p.status === PaymentStatus.PENDING || p.status === PaymentStatus.OVERDUE
     ) ?? [],
   
   getOverduePayments: (state: PaymentState): Payment[] =>
-    state.weeklyStats?.payments?.filter(p => p.status === PaymentStatus.OVERDUE) ?? [],
+    state.payments?.filter(p => p.status === PaymentStatus.OVERDUE) ?? [],
 
   /** 
    * Check if a session has been paid
    * Looks for any payment linked to this session with status PAID
    */
   isSessionPaid: (state: PaymentState, sessionId: string): boolean =>
-    state.weeklyStats?.payments?.some(
+    state.payments?.some(
       p => p.sessionId === sessionId && p.status === PaymentStatus.PAID
     ) ?? false,
 
@@ -176,14 +182,14 @@ export const paymentSelectors = {
    * Get payment for a specific session
    */
   getPaymentBySessionId: (state: PaymentState, sessionId: string): Payment | undefined =>
-    state.weeklyStats?.payments?.find(p => p.sessionId === sessionId),
+    state.payments?.find(p => p.sessionId === sessionId),
 
   /**
-   * Calculate totals from payments array (more accurate than backend totals)
+   * Calculate totals from payments array
    * Note: Backend may return amount as string, so we convert to number
    */
   calculateTotals: (state: PaymentState) => {
-    const payments = state.weeklyStats?.payments ?? [];
+    const payments = state.payments ?? [];
     
     const paidPayments = payments.filter(p => p.status === PaymentStatus.PAID);
     const pendingPayments = payments.filter(p => 

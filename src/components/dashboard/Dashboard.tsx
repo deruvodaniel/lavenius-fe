@@ -3,10 +3,11 @@ import { Agenda } from '../agenda';
 import { Pacientes } from '../pacientes';
 import { Cobros } from '../cobros';
 import { Configuracion } from '../config';
+import { Perfil } from '../perfil';
 import { AppLayout, Sidebar } from '../layout';
 import { useAuth } from '@/lib/hooks/useAuth';
 
-type View = 'agenda' | 'pacientes' | 'cobros' | 'configuracion';
+type View = 'agenda' | 'pacientes' | 'cobros' | 'configuracion' | 'perfil';
 
 export function Dashboard() {
   const [currentView, setCurrentView] = useState<View>('agenda');
@@ -32,6 +33,7 @@ export function Dashboard() {
       {currentView === 'pacientes' && <Pacientes />}
       {currentView === 'cobros' && <Cobros />}
       {currentView === 'configuracion' && <Configuracion />}
+      {currentView === 'perfil' && <Perfil />}
     </AppLayout>
   );
 }

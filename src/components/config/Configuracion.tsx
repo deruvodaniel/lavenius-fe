@@ -64,11 +64,22 @@ interface ConfigSectionProps {
   title: string;
   description: string;
   children: React.ReactNode;
+  comingSoon?: boolean;
 }
 
-const ConfigSection = ({ icon: Icon, iconColor, iconBg, title, description, children }: ConfigSectionProps) => (
-  <Card className="overflow-hidden">
-    <div className="p-4 sm:p-6 border-b border-gray-100 bg-gray-50/50">
+const ConfigSection = ({ icon: Icon, iconColor, iconBg, title, description, children, comingSoon }: ConfigSectionProps) => (
+  <Card className={`overflow-hidden relative bg-white ${comingSoon ? 'select-none' : ''}`}>
+    {/* Coming Soon Overlay */}
+    {comingSoon && (
+      <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-[1px] z-10 flex items-center justify-center">
+        <div className="bg-white/90 border border-gray-200 shadow-lg rounded-lg px-4 py-2 transform -rotate-3">
+          <span className="text-sm font-bold text-gray-500 tracking-wider uppercase">
+            Proximamente
+          </span>
+        </div>
+      </div>
+    )}
+    <div className="p-4 sm:p-6 border-b border-gray-100">
       <div className="flex items-start gap-3 sm:gap-4">
         <div className={`w-10 h-10 sm:w-12 sm:h-12 ${iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
           <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${iconColor}`} />
@@ -196,6 +207,111 @@ export function Configuracion() {
         {/* Google Calendar Sync */}
         <CalendarSync />
 
+        {/* Días Off - Right after Calendar Sync */}
+        <ConfigSection
+          icon={Calendar}
+          iconColor="text-rose-600"
+          iconBg="bg-rose-100"
+          title="Días Off"
+          description="Configura los días en los que no atenderás"
+        >
+          <div className="space-y-4">
+            {/* Lista de días off */}
+            {settings.diasOff.length > 0 ? (
+              <div className="space-y-2">
+                {settings.diasOff.map(dia => (
+                  <div 
+                    key={dia.id} 
+                    className="flex items-center justify-between gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg group hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-4 h-4 text-rose-600" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-900">{formatDateDisplay(dia.fecha)}</p>
+                        {dia.motivo && (
+                          <p className="text-xs text-gray-500 truncate">{dia.motivo}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveDiaOff(dia.id)}
+                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                      title="Eliminar"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                <Calendar className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm text-gray-500">No hay días off configurados</p>
+                <p className="text-xs text-gray-400 mt-1">Agrega días para bloquearlos en tu agenda</p>
+              </div>
+            )}
+
+            {/* Formulario para agregar */}
+            {showAddDiaOff ? (
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Fecha</label>
+                    <input
+                      type="date"
+                      value={newDiaOff.fecha}
+                      onChange={(e) => setNewDiaOff({ ...newDiaOff, fecha: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Motivo (opcional)</label>
+                    <input
+                      type="text"
+                      value={newDiaOff.motivo}
+                      onChange={(e) => setNewDiaOff({ ...newDiaOff, motivo: e.target.value })}
+                      placeholder="Ej: Feriado, Vacaciones..."
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 justify-end">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowAddDiaOff(false);
+                      setNewDiaOff({ fecha: '', motivo: '' });
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleAddDiaOff}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Agregar
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAddDiaOff(true)}
+                className="w-full sm:w-auto"
+              >
+                <Plus className="w-4 h-4 mr-2 text-rose-600" />
+                Agregar Día Off
+              </Button>
+            )}
+          </div>
+        </ConfigSection>
+
         {/* Recordatorios de Cobros */}
         <ConfigSection
           icon={DollarSign}
@@ -203,6 +319,7 @@ export function Configuracion() {
           iconBg="bg-orange-100"
           title="Recordatorios de Cobros"
           description="Recibe notificaciones de turnos sin cobrar"
+          comingSoon
         >
           <div className="space-y-4">
             <ToggleRow
@@ -268,6 +385,7 @@ export function Configuracion() {
           iconBg="bg-blue-100"
           title="Recordatorios para Pacientes"
           description="Notificaciones de turnos próximos"
+          comingSoon
         >
           <div className="space-y-4">
             <ToggleRow
@@ -304,102 +422,6 @@ export function Configuracion() {
                   </p>
                 </div>
               </div>
-            )}
-          </div>
-        </ConfigSection>
-
-        {/* Días Off */}
-        <ConfigSection
-          icon={Calendar}
-          iconColor="text-gray-600"
-          iconBg="bg-gray-100"
-          title="Días Off"
-          description="Configura los días en los que no atenderás"
-        >
-          <div className="space-y-4">
-            {/* Lista de días off */}
-            {settings.diasOff.length > 0 ? (
-              <div className="space-y-2">
-                {settings.diasOff.map(dia => (
-                  <div 
-                    key={dia.id} 
-                    className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg group hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900">{formatDateDisplay(dia.fecha)}</p>
-                        {dia.motivo && <p className="text-xs text-gray-500 truncate">{dia.motivo}</p>}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveDiaOff(dia.id)}
-                      className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors opacity-0 group-hover:opacity-100"
-                      title="Eliminar"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500 text-center py-4">No hay días off configurados</p>
-            )}
-
-            {/* Formulario para agregar */}
-            {showAddDiaOff ? (
-              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Fecha</label>
-                    <input
-                      type="date"
-                      value={newDiaOff.fecha}
-                      onChange={(e) => setNewDiaOff({ ...newDiaOff, fecha: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Motivo (opcional)</label>
-                    <input
-                      type="text"
-                      value={newDiaOff.motivo}
-                      onChange={(e) => setNewDiaOff({ ...newDiaOff, motivo: e.target.value })}
-                      placeholder="Ej: Feriado, Vacaciones..."
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 justify-end">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setShowAddDiaOff(false);
-                      setNewDiaOff({ fecha: '', motivo: '' });
-                    }}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleAddDiaOff}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                  >
-                    Agregar
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAddDiaOff(true)}
-                className="w-full sm:w-auto"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Agregar Día Off
-              </Button>
             )}
           </div>
         </ConfigSection>

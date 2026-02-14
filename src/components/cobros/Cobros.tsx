@@ -1,17 +1,26 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Bell, Copy, MessageCircle, X, Plus, Video, MapPin, DollarSign, Calendar, History, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Bell, Copy, MessageCircle, X, Plus, Video, MapPin, DollarSign, Calendar, History, CheckCircle2, Search, ChevronLeft, ChevronRight, Filter, ArrowUpDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
+import { useResponsive } from '@/lib/hooks';
 import { PaymentStats } from './PaymentStats';
 import { PaymentDrawer } from './PaymentDrawer';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SkeletonList } from '@/components/shared/Skeleton';
+import { Input } from '@/components/ui/input';
 import type { CreatePaymentDto, Payment } from '@/lib/types/api.types';
 import type { SessionUI } from '@/lib/types/session';
 import { SessionStatus } from '@/lib/types/session';
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const ITEMS_PER_PAGE = 10;
+const INFINITE_SCROLL_BATCH = 10;
 
 // ============================================================================
 // UTILITIES
@@ -68,7 +77,7 @@ const EmptyState = ({ icon: Icon, title, subtitle, variant = 'default' }: {
   subtitle: string;
   variant?: 'default' | 'success';
 }) => (
-  <Card className="p-6 sm:p-8 text-center">
+  <Card className="p-6 sm:p-8 text-center bg-white">
     <div className="flex flex-col items-center gap-2 sm:gap-3">
       <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${
         variant === 'success' ? 'bg-green-100' : 'bg-gray-100'
@@ -84,6 +93,195 @@ const EmptyState = ({ icon: Icon, title, subtitle, variant = 'default' }: {
     </div>
   </Card>
 );
+
+// ============================================================================
+// FILTERS COMPONENT
+// ============================================================================
+
+type SortOption = 'date-desc' | 'date-asc' | 'price-desc' | 'price-asc';
+
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: 'date-desc', label: 'Más reciente' },
+  { value: 'date-asc', label: 'Más antiguo' },
+  { value: 'price-desc', label: 'Mayor precio' },
+  { value: 'price-asc', label: 'Menor precio' },
+];
+
+interface FiltersProps {
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  dateFrom: string;
+  dateTo: string;
+  onDateFromChange: (value: string) => void;
+  onDateToChange: (value: string) => void;
+  onClearFilters: () => void;
+  hasActiveFilters: boolean;
+  sortBy: SortOption;
+  onSortChange: (sort: SortOption) => void;
+}
+
+const Filters = ({ 
+  searchTerm, 
+  onSearchChange, 
+  dateFrom, 
+  dateTo, 
+  onDateFromChange, 
+  onDateToChange,
+  onClearFilters,
+  hasActiveFilters,
+  sortBy,
+  onSortChange,
+}: FiltersProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="space-y-3">
+      {/* Search bar - always visible */}
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            type="text"
+            placeholder="Buscar por paciente..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        {/* Sort dropdown */}
+        <div className="relative">
+          <select
+            value={sortBy}
+            onChange={(e) => onSortChange(e.target.value as SortOption)}
+            className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
+          >
+            {SORT_OPTIONS.map(option => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+          <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+        </div>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={hasActiveFilters ? 'border-indigo-500 text-indigo-600' : ''}
+        >
+          <Filter className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Expanded filters */}
+      {isExpanded && (
+        <Card className="p-3 space-y-3 bg-white">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Desde</label>
+              <Input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => onDateFromChange(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Hasta</label>
+              <Input
+                type="date"
+                value={dateTo}
+                onChange={(e) => onDateToChange(e.target.value)}
+              />
+            </div>
+          </div>
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" onClick={onClearFilters} className="text-gray-500">
+              Limpiar filtros
+            </Button>
+          )}
+        </Card>
+      )}
+    </div>
+  );
+};
+
+// ============================================================================
+// PAGINATION COMPONENT
+// ============================================================================
+
+interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  onPageChange: (page: number) => void;
+}
+
+const Pagination = ({ currentPage, totalPages, totalItems, onPageChange }: PaginationProps) => {
+  if (totalPages <= 1) return null;
+
+  const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
+
+  return (
+    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+      <p className="text-sm text-gray-500">
+        {startItem}-{endItem} de {totalItems}
+      </p>
+      <div className="flex items-center gap-1">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="h-8 w-8"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <span className="px-3 text-sm text-gray-600">
+          {currentPage} / {totalPages}
+        </span>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="h-8 w-8"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================================
+// INFINITE SCROLL LOADER COMPONENT
+// ============================================================================
+
+interface InfiniteScrollLoaderProps {
+  isLoading: boolean;
+  hasMore: boolean;
+  loadMoreRef: React.RefObject<HTMLDivElement | null>;
+}
+
+const InfiniteScrollLoader = ({ isLoading, hasMore, loadMoreRef }: InfiniteScrollLoaderProps) => {
+  if (!hasMore) return null;
+
+  return (
+    <div ref={loadMoreRef} className="py-6 text-center">
+      {isLoading ? (
+        <div className="flex flex-col items-center gap-3">
+          <div className="inline-flex items-center gap-2">
+            <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          </div>
+          <p className="text-sm text-gray-500">Cargando más...</p>
+        </div>
+      ) : (
+        <div className="h-4"></div>
+      )}
+    </div>
+  );
+};
 
 // ============================================================================
 // SESSION CARD (Pendientes Tab)
@@ -106,7 +304,7 @@ const SessionCard = ({ session, status, onReminder, onCollect }: SessionCardProp
   }[status];
 
   return (
-    <Card className={`p-3 sm:p-4 transition-all hover:shadow-md border-l-4 ${borderColor}`}>
+    <Card className={`p-3 sm:p-4 transition-all hover:shadow-md border-l-4 bg-white ${borderColor}`}>
       {/* Mobile Layout */}
       <div className="sm:hidden space-y-3">
         <div className="flex items-start justify-between gap-2">
@@ -203,7 +401,7 @@ const PaymentCard = ({ payment }: PaymentCardProps) => {
     : 'Sin paciente';
 
   return (
-    <Card className="p-3 sm:p-4 border-l-4 border-l-green-500">
+    <Card className="p-3 sm:p-4 border-l-4 border-l-green-500 bg-white">
       {/* Mobile Layout */}
       <div className="sm:hidden space-y-2">
         <div className="flex items-start justify-between gap-2">
@@ -332,11 +530,103 @@ export function Cobros() {
     createPayment,
     isSessionPaid,
   } = usePayments();
+  const { isMobile } = useResponsive();
   
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isPaymentDrawerOpen, setIsPaymentDrawerOpen] = useState(false);
   const [preselectedSession, setPreselectedSession] = useState<SessionUI | null>(null);
   const [reminderSession, setReminderSession] = useState<SessionUI | null>(null);
+
+  // Filter state
+  const [pendingSearch, setPendingSearch] = useState('');
+  const [pendingDateFrom, setPendingDateFrom] = useState('');
+  const [pendingDateTo, setPendingDateTo] = useState('');
+  const [pendingPage, setPendingPage] = useState(1);
+  const [pendingSortBy, setPendingSortBy] = useState<SortOption>('date-desc');
+
+  const [historySearch, setHistorySearch] = useState('');
+  const [historyDateFrom, setHistoryDateFrom] = useState('');
+  const [historyDateTo, setHistoryDateTo] = useState('');
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historySortBy, setHistorySortBy] = useState<SortOption>('date-desc');
+
+  // Infinite scroll state (for mobile)
+  const [pendingVisibleCount, setPendingVisibleCount] = useState(INFINITE_SCROLL_BATCH);
+  const [historyVisibleCount, setHistoryVisibleCount] = useState(INFINITE_SCROLL_BATCH);
+  const [isLoadingMorePending, setIsLoadingMorePending] = useState(false);
+  const [isLoadingMoreHistory, setIsLoadingMoreHistory] = useState(false);
+  const pendingLoadMoreRef = useRef<HTMLDivElement>(null);
+  const historyLoadMoreRef = useRef<HTMLDivElement>(null);
+
+  // Reset page/visible count when filters change
+  useEffect(() => { 
+    setPendingPage(1); 
+    setPendingVisibleCount(INFINITE_SCROLL_BATCH);
+  }, [pendingSearch, pendingDateFrom, pendingDateTo, pendingSortBy]);
+  
+  useEffect(() => { 
+    setHistoryPage(1); 
+    setHistoryVisibleCount(INFINITE_SCROLL_BATCH);
+  }, [historySearch, historyDateFrom, historyDateTo, historySortBy]);
+
+  // Infinite scroll effect for pending sessions (mobile only)
+  useEffect(() => {
+    if (!isMobile) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMorePending) {
+          setIsLoadingMorePending(true);
+          setTimeout(() => {
+            setPendingVisibleCount((prev) => prev + INFINITE_SCROLL_BATCH);
+            setIsLoadingMorePending(false);
+          }, 500);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentRef = pendingLoadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [isMobile, isLoadingMorePending]);
+
+  // Infinite scroll effect for history (mobile only)
+  useEffect(() => {
+    if (!isMobile) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMoreHistory) {
+          setIsLoadingMoreHistory(true);
+          setTimeout(() => {
+            setHistoryVisibleCount((prev) => prev + INFINITE_SCROLL_BATCH);
+            setIsLoadingMoreHistory(false);
+          }, 500);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentRef = historyLoadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [isMobile, isLoadingMoreHistory]);
 
   // Single fetch on mount
   useEffect(() => {
@@ -353,7 +643,7 @@ export function Cobros() {
       }
     };
     loadData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentional: only run on mount, functions are stable from zustand store
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Today for status calculation
@@ -364,16 +654,133 @@ export function Cobros() {
   }, []);
 
   // Sessions pending payment: not cancelled, not paid
-  // No week filter - show all upcoming sessions that need payment
   const sessionsPendingPayment = useMemo(() => {
-    return sessionsUI
-      .filter((session) => {
-        const isNotCancelled = session.status !== SessionStatus.CANCELLED;
-        const notPaid = !isSessionPaid(session.id);
-        return isNotCancelled && notPaid;
-      })
-      .sort((a, b) => new Date(a.scheduledFrom).getTime() - new Date(b.scheduledFrom).getTime());
+    return sessionsUI.filter((session) => {
+      const isNotCancelled = session.status !== SessionStatus.CANCELLED;
+      const notPaid = !isSessionPaid(session.id);
+      return isNotCancelled && notPaid;
+    });
   }, [sessionsUI, isSessionPaid]);
+
+  // Filtered and sorted pending sessions
+  const filteredPendingSessions = useMemo(() => {
+    let filtered = [...sessionsPendingPayment];
+
+    // Filter by patient name
+    if (pendingSearch.trim()) {
+      const search = pendingSearch.toLowerCase();
+      filtered = filtered.filter(session => {
+        const name = (session.patientName || session.patient?.firstName || '').toLowerCase();
+        return name.includes(search);
+      });
+    }
+
+    // Filter by date range
+    if (pendingDateFrom) {
+      const from = new Date(pendingDateFrom);
+      from.setHours(0, 0, 0, 0);
+      filtered = filtered.filter(session => new Date(session.scheduledFrom) >= from);
+    }
+    if (pendingDateTo) {
+      const to = new Date(pendingDateTo);
+      to.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(session => new Date(session.scheduledFrom) <= to);
+    }
+
+    // Sort by selected option
+    filtered.sort((a, b) => {
+      switch (pendingSortBy) {
+        case 'date-desc':
+          return new Date(b.scheduledFrom).getTime() - new Date(a.scheduledFrom).getTime();
+        case 'date-asc':
+          return new Date(a.scheduledFrom).getTime() - new Date(b.scheduledFrom).getTime();
+        case 'price-desc':
+          return (b.cost || 0) - (a.cost || 0);
+        case 'price-asc':
+          return (a.cost || 0) - (b.cost || 0);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [sessionsPendingPayment, pendingSearch, pendingDateFrom, pendingDateTo, pendingSortBy]);
+
+  // Pagination for desktop, infinite scroll for mobile
+  const pendingTotalPages = Math.ceil(filteredPendingSessions.length / ITEMS_PER_PAGE);
+  const hasMorePending = pendingVisibleCount < filteredPendingSessions.length;
+  
+  const displayedPendingSessions = useMemo(() => {
+    if (isMobile) {
+      // Infinite scroll: show items up to visibleCount
+      return filteredPendingSessions.slice(0, pendingVisibleCount);
+    } else {
+      // Pagination: show items for current page
+      const start = (pendingPage - 1) * ITEMS_PER_PAGE;
+      return filteredPendingSessions.slice(start, start + ITEMS_PER_PAGE);
+    }
+  }, [filteredPendingSessions, pendingPage, pendingVisibleCount, isMobile]);
+
+  // Filtered and sorted history
+  const filteredPaidPayments = useMemo(() => {
+    let filtered = [...paidPayments];
+
+    // Filter by patient name
+    if (historySearch.trim()) {
+      const search = historySearch.toLowerCase();
+      filtered = filtered.filter(payment => {
+        const name = payment.patient 
+          ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.toLowerCase()
+          : '';
+        return name.includes(search);
+      });
+    }
+
+    // Filter by date range
+    if (historyDateFrom) {
+      const from = new Date(historyDateFrom);
+      from.setHours(0, 0, 0, 0);
+      filtered = filtered.filter(payment => new Date(payment.paymentDate) >= from);
+    }
+    if (historyDateTo) {
+      const to = new Date(historyDateTo);
+      to.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(payment => new Date(payment.paymentDate) <= to);
+    }
+
+    // Sort by selected option
+    filtered.sort((a, b) => {
+      switch (historySortBy) {
+        case 'date-desc':
+          return new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime();
+        case 'date-asc':
+          return new Date(a.paymentDate).getTime() - new Date(b.paymentDate).getTime();
+        case 'price-desc':
+          return (b.amount || 0) - (a.amount || 0);
+        case 'price-asc':
+          return (a.amount || 0) - (b.amount || 0);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [paidPayments, historySearch, historyDateFrom, historyDateTo, historySortBy]);
+
+  // Pagination for desktop, infinite scroll for mobile
+  const historyTotalPages = Math.ceil(filteredPaidPayments.length / ITEMS_PER_PAGE);
+  const hasMoreHistory = historyVisibleCount < filteredPaidPayments.length;
+  
+  const displayedPaidPayments = useMemo(() => {
+    if (isMobile) {
+      // Infinite scroll: show items up to visibleCount
+      return filteredPaidPayments.slice(0, historyVisibleCount);
+    } else {
+      // Pagination: show items for current page
+      const start = (historyPage - 1) * ITEMS_PER_PAGE;
+      return filteredPaidPayments.slice(start, start + ITEMS_PER_PAGE);
+    }
+  }, [filteredPaidPayments, historyPage, historyVisibleCount, isMobile]);
 
   // Get session payment status for display
   const getSessionStatus = useCallback((session: SessionUI): PaymentStatusType => {
@@ -397,24 +804,45 @@ export function Cobros() {
 
   const handleSavePayment = useCallback(async (data: CreatePaymentDto) => {
     try {
+      setIsRefreshing(true);
       await createPayment(data);
       toast.success('Pago registrado correctamente');
       setIsPaymentDrawerOpen(false);
       setPreselectedSession(null);
-      // Refresh sessions to update the pending list
-      await fetchUpcoming();
+      // Refresh all data to update lists and stats
+      await Promise.all([
+        fetchUpcoming(),
+        fetchPayments(true),
+      ]);
     } catch (error) {
       console.error('Error creating payment:', error);
       toast.error('No se pudo guardar el pago. Por favor intenta nuevamente.');
+    } finally {
+      setIsRefreshing(false);
     }
-  }, [createPayment, fetchUpcoming]);
+  }, [createPayment, fetchUpcoming, fetchPayments]);
 
   const handleCloseDrawer = useCallback(() => {
     setIsPaymentDrawerOpen(false);
     setPreselectedSession(null);
   }, []);
 
-  const isLoading = isInitialLoading;
+  const clearPendingFilters = useCallback(() => {
+    setPendingSearch('');
+    setPendingDateFrom('');
+    setPendingDateTo('');
+  }, []);
+
+  const clearHistoryFilters = useCallback(() => {
+    setHistorySearch('');
+    setHistoryDateFrom('');
+    setHistoryDateTo('');
+  }, []);
+
+  const hasPendingFilters = pendingSearch || pendingDateFrom || pendingDateTo;
+  const hasHistoryFilters = historySearch || historyDateFrom || historyDateTo;
+
+  const isLoading = isInitialLoading || isRefreshing;
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6">
@@ -455,47 +883,109 @@ export function Cobros() {
         </TabsList>
 
         {/* Pendientes Tab */}
-        <TabsContent value="pendientes" className="mt-4">
+        <TabsContent value="pendientes" className="mt-4 space-y-4">
+          <Filters
+            searchTerm={pendingSearch}
+            onSearchChange={setPendingSearch}
+            dateFrom={pendingDateFrom}
+            dateTo={pendingDateTo}
+            onDateFromChange={setPendingDateFrom}
+            onDateToChange={setPendingDateTo}
+            onClearFilters={clearPendingFilters}
+            hasActiveFilters={!!hasPendingFilters}
+            sortBy={pendingSortBy}
+            onSortChange={setPendingSortBy}
+          />
+
           {isLoading ? (
             <SkeletonList items={3} />
-          ) : sessionsPendingPayment.length === 0 ? (
+          ) : filteredPendingSessions.length === 0 ? (
             <EmptyState 
               icon={DollarSign} 
-              title="¡Todo al día!" 
-              subtitle="No hay sesiones pendientes de cobro"
-              variant="success"
+              title={hasPendingFilters ? "Sin resultados" : "¡Todo al día!"}
+              subtitle={hasPendingFilters ? "No hay sesiones que coincidan con los filtros" : "No hay sesiones pendientes de cobro"}
+              variant={hasPendingFilters ? 'default' : 'success'}
             />
           ) : (
-            <div className="space-y-3">
-              {sessionsPendingPayment.map((session) => (
-                <SessionCard
-                  key={session.id}
-                  session={session}
-                  status={getSessionStatus(session)}
-                  onReminder={() => setReminderSession(session)}
-                  onCollect={() => handleCollectPayment(session)}
+            <>
+              <div className="space-y-3">
+                {displayedPendingSessions.map((session) => (
+                  <SessionCard
+                    key={session.id}
+                    session={session}
+                    status={getSessionStatus(session)}
+                    onReminder={() => setReminderSession(session)}
+                    onCollect={() => handleCollectPayment(session)}
+                  />
+                ))}
+              </div>
+              
+              {/* Desktop: Pagination | Mobile: Infinite Scroll */}
+              {isMobile ? (
+                <InfiniteScrollLoader
+                  isLoading={isLoadingMorePending}
+                  hasMore={hasMorePending}
+                  loadMoreRef={pendingLoadMoreRef}
                 />
-              ))}
-            </div>
+              ) : (
+                <Pagination
+                  currentPage={pendingPage}
+                  totalPages={pendingTotalPages}
+                  totalItems={filteredPendingSessions.length}
+                  onPageChange={setPendingPage}
+                />
+              )}
+            </>
           )}
         </TabsContent>
 
         {/* Historial Tab */}
-        <TabsContent value="historial" className="mt-4">
+        <TabsContent value="historial" className="mt-4 space-y-4">
+          <Filters
+            searchTerm={historySearch}
+            onSearchChange={setHistorySearch}
+            dateFrom={historyDateFrom}
+            dateTo={historyDateTo}
+            onDateFromChange={setHistoryDateFrom}
+            onDateToChange={setHistoryDateTo}
+            onClearFilters={clearHistoryFilters}
+            hasActiveFilters={!!hasHistoryFilters}
+            sortBy={historySortBy}
+            onSortChange={setHistorySortBy}
+          />
+
           {isLoading ? (
             <SkeletonList items={3} />
-          ) : paidPayments.length === 0 ? (
+          ) : filteredPaidPayments.length === 0 ? (
             <EmptyState 
               icon={History} 
-              title="Sin historial" 
-              subtitle="Aún no hay pagos registrados" 
+              title={hasHistoryFilters ? "Sin resultados" : "Sin historial"}
+              subtitle={hasHistoryFilters ? "No hay pagos que coincidan con los filtros" : "Aún no hay pagos registrados"}
             />
           ) : (
-            <div className="space-y-3">
-              {paidPayments.map((payment) => (
-                <PaymentCard key={payment.id} payment={payment} />
-              ))}
-            </div>
+            <>
+              <div className="space-y-3">
+                {displayedPaidPayments.map((payment) => (
+                  <PaymentCard key={payment.id} payment={payment} />
+                ))}
+              </div>
+              
+              {/* Desktop: Pagination | Mobile: Infinite Scroll */}
+              {isMobile ? (
+                <InfiniteScrollLoader
+                  isLoading={isLoadingMoreHistory}
+                  hasMore={hasMoreHistory}
+                  loadMoreRef={historyLoadMoreRef}
+                />
+              ) : (
+                <Pagination
+                  currentPage={historyPage}
+                  totalPages={historyTotalPages}
+                  totalItems={filteredPaidPayments.length}
+                  onPageChange={setHistoryPage}
+                />
+              )}
+            </>
           )}
         </TabsContent>
       </Tabs>

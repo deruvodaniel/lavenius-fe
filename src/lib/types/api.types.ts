@@ -252,6 +252,8 @@ export type CreatePaymentDto = {
   amount: number;
   paymentDate: string;
   description?: string;
+  status?: PaymentStatus;
+  paidDate?: string;
 };
 
 export type UpdatePaymentDto = Partial<CreatePaymentDto>;

@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { Clock, Video, MapPin, Plus, Calendar, X, Edit2, CalendarX, MessageCircle, DollarSign } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { Clock, Video, MapPin, Plus, Calendar, X, Edit2, CalendarX, MessageCircle, DollarSign, Search, List, LayoutGrid } from 'lucide-react';
 import { toast } from 'sonner';
 import { TurnoDrawer } from './TurnoDrawer';
 import { SessionDetailsModal } from './SessionDetailsModal';
@@ -7,16 +7,73 @@ import { SkeletonList, EmptyState } from '../shared';
 import { FullCalendarView } from './FullCalendarView';
 import CalendarSyncButton from '../config/CalendarSyncButton';
 import { FichaClinica } from '../dashboard/FichaClinica';
-import { usePatients } from '@/lib/hooks';
+import { usePatients, useResponsive } from '@/lib/hooks';
 import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
+import { Input } from '@/components/ui/input';
 import type { CreateSessionDto, SessionResponse, UpdateSessionDto } from '@/lib/types/session';
 import { SESSION_STATUS_BADGE_CLASSES, SESSION_STATUS_LABELS } from '@/lib/constants/sessionColors';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+type ViewMode = 'list' | 'calendar' | 'both';
+
+// ============================================================================
+// VIEW MODE TOGGLE COMPONENT
+// ============================================================================
+
+interface ViewModeToggleProps {
+  value: ViewMode;
+  onChange: (mode: ViewMode) => void;
+  isMobile: boolean;
+}
+
+const ViewModeToggle = ({ value, onChange, isMobile }: ViewModeToggleProps) => {
+  // Mobile: Only list and calendar options (segmented control)
+  // Desktop: List, Calendar, Both options
+  const options: { value: ViewMode; label: string; icon: React.ReactNode }[] = isMobile
+    ? [
+        { value: 'list', label: 'Lista', icon: <List className="w-4 h-4" /> },
+        { value: 'calendar', label: 'Calendario', icon: <Calendar className="w-4 h-4" /> },
+      ]
+    : [
+        { value: 'list', label: 'Lista', icon: <List className="w-4 h-4" /> },
+        { value: 'both', label: 'Ambos', icon: <LayoutGrid className="w-4 h-4" /> },
+        { value: 'calendar', label: 'Calendario', icon: <Calendar className="w-4 h-4" /> },
+      ];
+
+  return (
+    <div className="inline-flex items-center bg-gray-100 rounded-lg p-1 gap-0.5">
+      {options.map((option) => {
+        const isActive = value === option.value;
+        return (
+          <button
+            key={option.value}
+            onClick={() => onChange(option.value)}
+            className={`
+              flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all
+              ${isActive 
+                ? 'bg-white text-indigo-600 shadow-sm' 
+                : 'text-gray-600 hover:text-gray-900'
+              }
+            `}
+          >
+            {option.icon}
+            <span className={isMobile ? 'hidden xs:inline' : ''}>{option.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 export function Agenda() {
   const { sessionsUI, isLoading, error, fetchUpcoming, createSession, updateSession, deleteSession, clearError } = useSessions();
   const { patients, fetchPatients } = usePatients();
   const { isSessionPaid, fetchPayments } = usePayments();
+  const { isMobile, isDesktop } = useResponsive();
   
   // Auto-display error toasts
   useEffect(() => {
@@ -34,11 +91,23 @@ export function Agenda() {
   const [visibleCount, setVisibleCount] = useState(5); // For infinite scroll
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const [calendarDrawerOpen, setCalendarDrawerOpen] = useState(false);
   const hasFetchedRef = useRef(false);
+  
+  // View mode state - default to 'both' on desktop, 'list' on mobile
+  const [viewMode, setViewMode] = useState<ViewMode>(() => isDesktop ? 'both' : 'list');
+  
+  // Search state
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Estado para el mes/año del calendario
   const [calendarDate, setCalendarDate] = useState(new Date());
+
+  // Update view mode when screen size changes
+  useEffect(() => {
+    if (isMobile && viewMode === 'both') {
+      setViewMode('list');
+    }
+  }, [isMobile, viewMode]);
 
   // Fetch data on mount (only once)
   useEffect(() => {
@@ -137,18 +206,51 @@ export function Agenda() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const futurosTurnos = turnos
-    .filter((turno) => {
-      // Parse fecha string as local date, not UTC
-      const [year, month, day] = turno.fecha.split('-').map(Number);
-      const turnoDate = new Date(year, month - 1, day);
-      return turnoDate >= today;
-    })
-    .sort((a, b) => {
-      const dateCompare = new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
-      if (dateCompare !== 0) return dateCompare;
-      return a.hora.localeCompare(b.hora);
+  // Helper to get patient name for a turno
+  const getPatientNameForTurno = (turno: typeof turnos[0]) => {
+    const paciente = pacientes.find(p => 
+      p.rawId === turno.pacienteRawId || p.id === turno.pacienteId
+    );
+    return paciente?.nombre || '';
+  };
+
+  // Filter and sort future appointments
+  const futurosTurnos = useMemo(() => {
+    return turnos
+      .filter((turno) => {
+        // Parse fecha string as local date, not UTC
+        const [year, month, day] = turno.fecha.split('-').map(Number);
+        const turnoDate = new Date(year, month - 1, day);
+        const isFuture = turnoDate >= today;
+        
+        // Apply search filter
+        if (searchTerm.trim()) {
+          const patientName = getPatientNameForTurno(turno).toLowerCase();
+          const search = searchTerm.toLowerCase().trim();
+          if (!patientName.includes(search)) {
+            return false;
+          }
+        }
+        
+        return isFuture;
+      })
+      .sort((a, b) => {
+        const dateCompare = new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
+        if (dateCompare !== 0) return dateCompare;
+        return a.hora.localeCompare(b.hora);
+      });
+  }, [turnos, pacientes, searchTerm, today]);
+
+  // Filter sessions for calendar (apply search filter too)
+  const filteredSessionsForCalendar = useMemo(() => {
+    if (!searchTerm.trim()) return sessionsUI;
+    
+    const search = searchTerm.toLowerCase().trim();
+    return sessionsUI.filter(session => {
+      const patientName = (session.patientName || '').toLowerCase();
+      return patientName.includes(search);
     });
+  }, [sessionsUI, searchTerm]);
 
   const getPaciente = (pacienteId: number | string | null) => {
     if (pacienteId === null || pacienteId === undefined) {
@@ -189,14 +291,21 @@ export function Agenda() {
   };
 
   // Group appointments by date
-  const turnosPorDia = futurosTurnos.reduce((acc, turno) => {
-    const fecha = turno.fecha;
-    if (!acc[fecha]) {
-      acc[fecha] = [];
-    }
-    acc[fecha].push(turno);
-    return acc;
-  }, {} as Record<string, typeof turnos>);
+  const turnosPorDia = useMemo(() => {
+    return futurosTurnos.reduce((acc, turno) => {
+      const fecha = turno.fecha;
+      if (!acc[fecha]) {
+        acc[fecha] = [];
+      }
+      acc[fecha].push(turno);
+      return acc;
+    }, {} as Record<string, typeof turnos>);
+  }, [futurosTurnos]);
+
+  // Reset visible count when search changes
+  useEffect(() => {
+    setVisibleCount(5);
+  }, [searchTerm]);
 
   // Get visible appointments based on scroll
   const turnosPorDiaEntries = Object.entries(turnosPorDia);
@@ -338,86 +447,130 @@ export function Agenda() {
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6 flex flex-col h-[calc(100vh-100px)]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Agenda</h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
-            Gestiona tus turnos y citas
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {/* Botón Mostrar Calendario - solo visible en mobile/tablet */}
-          <button
-            onClick={() => setCalendarDrawerOpen(true)}
-            className="lg:hidden flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <Calendar className="w-4 h-4" />
-            Mostrar calendario
-          </button>
+      <div className="flex flex-col gap-3 flex-shrink-0">
+        {/* Title row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Agenda</h1>
+            <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+              Gestiona tus turnos y citas
+            </p>
+          </div>
           <button
             onClick={handleNuevoTurno}
-            className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors w-full sm:w-auto"
           >
             <Plus className="w-4 h-4" />
             Nuevo Turno
           </button>
         </div>
+
+        {/* Search + View Toggle row */}
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+          {/* Search */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Buscar por paciente..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          {/* View Mode Toggle */}
+          <ViewModeToggle 
+            value={viewMode} 
+            onChange={setViewMode} 
+            isMobile={!isDesktop}
+          />
+        </div>
+
+        {/* Search results count */}
+        {searchTerm && (
+          <p className="text-sm text-gray-500">
+            {futurosTurnos.length} turno{futurosTurnos.length !== 1 ? 's' : ''} encontrado{futurosTurnos.length !== 1 ? 's' : ''}
+            {searchTerm && ` para "${searchTerm}"`}
+          </p>
+        )}
       </div>
 
-      {/* Layout Principal - Desktop: Grid 2 columnas 50-50 | Mobile: Columna única */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 overflow-hidden">
-        {/* Lista de Turnos - Izquierda */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col">
-          <h2 className="text-gray-900 px-6 pt-6 pb-4 flex-shrink-0">Próximos Turnos</h2>
-          <div className="flex-1 overflow-y-auto px-6 pb-6">
-            {isLoading ? (
-              <SkeletonList items={5} />
-            ) : visibleTurnosPorDia.length === 0 ? (
-              <div className="space-y-6">
-                <EmptyState
-                  icon={CalendarX}
-                  title="No hay turnos programados"
-                  description="Aún no tienes turnos agendados. Comienza creando un nuevo turno o sincroniza con Google Calendar."
-                  action={{
-                    label: "Crear primer turno",
-                    onClick: handleNuevoTurno
-                  }}
-                  variant="subtle"
-                />
-                <div className="flex justify-center pt-4">
-                  <CalendarSyncButton variant="outline" />
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {visibleTurnosPorDia.map(([fecha, turnosDelDia]) => {
-                const isToday = new Date(fecha).toDateString() === today.toDateString();
-
-                return (
-                  <div key={fecha} className="space-y-3">
-                    {/* Date Header */}
-                    <div className={`pb-2 border-b-2 ${isToday ? 'border-indigo-600' : 'border-gray-200'}`}>
-                      <h3 className={`capitalize ${isToday ? 'text-indigo-600' : 'text-gray-700'}`}>
-                        {formatFecha(fecha)}
-                      </h3>
+      {/* Layout Principal - Based on viewMode */}
+      <div className={`flex-1 overflow-hidden ${
+        viewMode === 'both' 
+          ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' 
+          : 'flex'
+      }`}>
+        {/* Lista de Turnos */}
+        {(viewMode === 'list' || viewMode === 'both') && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col flex-1">
+            <h2 className="text-gray-900 px-6 pt-6 pb-4 flex-shrink-0">Próximos Turnos</h2>
+            <div className="flex-1 overflow-y-auto px-6 pb-6">
+              {isLoading ? (
+                <SkeletonList items={5} />
+              ) : visibleTurnosPorDia.length === 0 ? (
+                <div className="space-y-6">
+                  <EmptyState
+                    icon={searchTerm ? Search : CalendarX}
+                    title={searchTerm ? "Sin resultados" : "No hay turnos programados"}
+                    description={searchTerm 
+                      ? `No se encontraron turnos para "${searchTerm}"`
+                      : "Aún no tienes turnos agendados. Comienza creando un nuevo turno o sincroniza con Google Calendar."
+                    }
+                    action={searchTerm ? {
+                      label: "Limpiar búsqueda",
+                      onClick: () => setSearchTerm('')
+                    } : {
+                      label: "Crear primer turno",
+                      onClick: handleNuevoTurno
+                    }}
+                    variant="subtle"
+                  />
+                  {!searchTerm && (
+                    <div className="flex justify-center pt-4">
+                      <CalendarSyncButton variant="outline" />
                     </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {visibleTurnosPorDia.map(([fecha, turnosDelDia]) => {
+                  const isToday = new Date(fecha).toDateString() === today.toDateString();
 
-                    {/* Appointments for this day */}
-                    <div className="space-y-3">
-                      {turnosDelDia.map((turno) => {
-                        const paciente = getPaciente(turno.pacienteRawId ?? turno.pacienteId ?? null);
-                        const session = sessionsUI.find(s => s.id === turno.rawId);
-                        const isPaid = session && isSessionPaid(session.id);
+                  return (
+                    <div key={fecha} className="space-y-3">
+                      {/* Date Header */}
+                      <div className={`pb-2 border-b-2 ${isToday ? 'border-indigo-600' : 'border-gray-200'}`}>
+                        <h3 className={`capitalize ${isToday ? 'text-indigo-600' : 'text-gray-700'}`}>
+                          {formatFecha(fecha)}
+                        </h3>
+                      </div>
 
-                        return (
-                          <div
-                            key={turno.rawId ?? turno.id}
-                            className="p-3 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors group"
-                          >
-                            {/* Mobile Layout (< sm) */}
-                            <div className="sm:hidden space-y-2">
-                              <div className="flex items-center justify-between gap-2">
-                                <div className="flex items-center gap-2 min-w-0">
+                      {/* Appointments for this day */}
+                      <div className="space-y-3">
+                        {turnosDelDia.map((turno) => {
+                          const paciente = getPaciente(turno.pacienteRawId ?? turno.pacienteId ?? null);
+                          const session = sessionsUI.find(s => s.id === turno.rawId);
+                          const isPaid = session && isSessionPaid(session.id);
+
+                          return (
+                            <div
+                              key={turno.rawId ?? turno.id}
+                              className="p-3 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors group"
+                            >
+                              {/* Mobile Layout (< sm) */}
+                              <div className="sm:hidden space-y-2">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2 min-w-0">
                                   <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
                                     <span className="text-indigo-600 text-xs font-semibold">
                                       {paciente ? paciente.nombre.split(' ').map((n) => n[0]).join('').slice(0, 2) : '?'}
@@ -592,88 +745,31 @@ export function Agenda() {
             )}
           </div>
         </div>
+        )}
 
-        {/* FullCalendar - Derecha (solo visible en desktop >=1024px) */}
-        <div className="hidden lg:block overflow-auto">
-          <div className="sticky top-4">
-            <FullCalendarView
-              sessions={sessionsUI}
-              isLoading={isLoading}
-              isSessionPaid={isSessionPaid}
-              onEventClick={(session) => {
-                setSelectedSession(session);
-                setDetailsModalOpen(true);
-              }}
-              onDateSelect={(start, _end) => {
-                // Abrir drawer para crear nueva sesión con la fecha seleccionada
-                setSelectedSession(null);
-                setSelectedInitialDate(start);
-                setTurnoDrawerOpen(true);
-              }}
-              onEventDrop={async (sessionId, _newStart, _newEnd) => {
-                try {
-                  await updateSession(sessionId, {
-                    scheduledFrom: _newStart.toISOString(),
-                    scheduledTo: _newEnd.toISOString(),
-                  });
-                  toast.success('Turno reagendado exitosamente');
-                  await fetchUpcoming();
-                } catch (error) {
-                  console.error('Error rescheduling session:', error);
-                  toast.error('Error al reagendar el turno');
-                }
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Calendar Drawer - Solo para Mobile y Tablet */}
-      {calendarDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex lg:hidden !top-0 !mt-0">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
-            onClick={() => setCalendarDrawerOpen(false)}
-          />
-
-          {/* Drawer */}
-          <div className="relative ml-auto h-full w-full bg-white shadow-2xl overflow-y-auto">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-white text-xl">Calendario</h2>
-                <button
-                  onClick={() => setCalendarDrawerOpen(false)}
-                  className="text-indigo-200 hover:text-white transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-
-            {/* FullCalendar Content */}
-            <div className="p-4">
+        {/* FullCalendar - Shows based on viewMode */}
+        {(viewMode === 'calendar' || viewMode === 'both') && (
+          <div className="overflow-auto flex-1">
+            <div className="sticky top-4">
               <FullCalendarView
-                sessions={sessionsUI}
+                sessions={filteredSessionsForCalendar}
                 isLoading={isLoading}
                 isSessionPaid={isSessionPaid}
                 onEventClick={(session) => {
                   setSelectedSession(session);
-                  setCalendarDrawerOpen(false);
                   setDetailsModalOpen(true);
                 }}
                 onDateSelect={(start, _end) => {
+                  // Abrir drawer para crear nueva sesión con la fecha seleccionada
                   setSelectedSession(null);
                   setSelectedInitialDate(start);
-                  setCalendarDrawerOpen(false);
                   setTurnoDrawerOpen(true);
                 }}
-                onEventDrop={async (sessionId, newStart, newEnd) => {
+                onEventDrop={async (sessionId, _newStart, _newEnd) => {
                   try {
                     await updateSession(sessionId, {
-                      scheduledFrom: newStart.toISOString(),
-                      scheduledTo: newEnd.toISOString(),
+                      scheduledFrom: _newStart.toISOString(),
+                      scheduledTo: _newEnd.toISOString(),
                     });
                     toast.success('Turno reagendado exitosamente');
                     await fetchUpcoming();
@@ -685,8 +781,8 @@ export function Agenda() {
               />
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Turno Drawer */}
       <TurnoDrawer

@@ -12,9 +12,8 @@ import type { Payment } from '../types/api.types';
 export const usePayments = () => {
   const store = usePaymentStore();
   
-  // Extract weeklyStats for dependency tracking
-  const weeklyStats = store.weeklyStats;
-  const paymentsArray = weeklyStats?.payments;
+  // Extract payments for dependency tracking
+  const paymentsArray = store.payments;
   
   // Memoized derived data - recalculates when payments array changes
   const payments = useMemo(
@@ -36,7 +35,7 @@ export const usePayments = () => {
 
   // Calculated totals with safe defaults
   const totals = useMemo(() => {
-    if (!paymentsArray) {
+    if (!paymentsArray || paymentsArray.length === 0) {
       return {
         totalAmount: 0,
         paidAmount: 0,
@@ -74,7 +73,7 @@ export const usePayments = () => {
   // Utility: check if session is paid
   // Note: needs fresh store reference each call
   const isSessionPaid = (sessionId: string): boolean => {
-    const currentPayments = usePaymentStore.getState().weeklyStats?.payments;
+    const currentPayments = usePaymentStore.getState().payments;
     return currentPayments?.some(
       (p: Payment) => p.sessionId === sessionId && p.status === PaymentStatus.PAID
     ) ?? false;
@@ -82,12 +81,11 @@ export const usePayments = () => {
 
   return {
     // State
-    weeklyStats: store.weeklyStats,
+    payments,
     isLoading: store.fetchStatus === 'loading',
     error: store.error,
     
     // Derived data
-    payments,
     paidPayments,
     pendingPayments,
     

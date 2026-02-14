@@ -1,15 +1,8 @@
 import { useEffect } from 'react';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { Button } from '../ui/button';
-import { Calendar as CalendarIcon, RefreshCw, Link2Off } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '../ui/card';
-import { Badge } from '../ui/badge';
+import { Calendar as CalendarIcon, RefreshCw, Link2Off, CheckCircle2, Circle, ExternalLink } from 'lucide-react';
+import { Card } from '../ui/card';
 
 export default function CalendarSync() {
   const {
@@ -27,46 +20,57 @@ export default function CalendarSync() {
   }, [checkConnection]);
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CalendarIcon className="h-5 w-5 text-primary" />
-            <CardTitle>Google Calendar</CardTitle>
+    <Card className="overflow-hidden bg-white">
+      {/* Header */}
+      <div className="p-4 sm:p-6 border-b border-gray-100">
+        <div className="flex items-start gap-3 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <CalendarIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
           </div>
-          {isConnected && (
-            <Badge variant="default" className="bg-green-500">
-              Conectado
-            </Badge>
-          )}
-          {!isConnected && !isCheckingConnection && (
-            <Badge variant="secondary">Desconectado</Badge>
-          )}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900">Google Calendar</h2>
+              {isConnected && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                  <CheckCircle2 className="w-3 h-3" />
+                  Conectado
+                </span>
+              )}
+              {!isConnected && !isCheckingConnection && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                  <Circle className="w-3 h-3" />
+                  Desconectado
+                </span>
+              )}
+            </div>
+            <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
+              {isConnected
+                ? 'Tu calendario está sincronizado con Google Calendar'
+                : 'Conecta tu cuenta de Google para sincronizar tus sesiones'}
+            </p>
+          </div>
         </div>
-        <CardDescription>
-          {isConnected
-            ? 'Tu calendario está sincronizado con Google Calendar'
-            : 'Conecta tu cuenta de Google para sincronizar tus sesiones'}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+      </div>
+
+      {/* Content */}
+      <div className="p-4 sm:p-6 space-y-4">
         {!isConnected && (
           <Button
             onClick={connectCalendar}
             disabled={isCheckingConnection}
-            className="w-full"
+            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+            <ExternalLink className="mr-2 h-4 w-4" />
             Conectar Google Calendar
           </Button>
         )}
 
         {isConnected && (
-          <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Button
               onClick={syncCalendar}
               disabled={isSyncing}
-              className="w-full"
+              className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white"
             >
               <RefreshCw className={`mr-2 h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
               {isSyncing ? 'Sincronizando...' : 'Sincronizar Ahora'}
@@ -75,7 +79,7 @@ export default function CalendarSync() {
             <Button
               onClick={disconnectCalendar}
               variant="outline"
-              className="w-full text-destructive hover:text-destructive"
+              className="flex-1 sm:flex-none text-gray-600 hover:text-red-600 hover:border-red-200 hover:bg-red-50"
             >
               <Link2Off className="mr-2 h-4 w-4" />
               Desconectar
@@ -83,15 +87,25 @@ export default function CalendarSync() {
           </div>
         )}
 
-        <div className="text-sm text-muted-foreground">
-          <p className="font-medium mb-1">¿Qué se sincroniza?</p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Todas tus sesiones agendadas</li>
-            <li>Cambios en horarios de sesiones</li>
-            <li>Cancelación de sesiones</li>
+        {/* Info section */}
+        <div className="bg-blue-50/50 border border-blue-100 rounded-lg p-4">
+          <p className="text-sm font-medium text-gray-700 mb-2">¿Qué se sincroniza?</p>
+          <ul className="space-y-1.5">
+            <li className="flex items-center gap-2 text-sm text-gray-600">
+              <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
+              Todas tus sesiones agendadas
+            </li>
+            <li className="flex items-center gap-2 text-sm text-gray-600">
+              <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
+              Cambios en horarios de sesiones
+            </li>
+            <li className="flex items-center gap-2 text-sm text-gray-600">
+              <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
+              Cancelación de sesiones
+            </li>
           </ul>
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 }

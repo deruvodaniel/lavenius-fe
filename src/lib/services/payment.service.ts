@@ -2,27 +2,21 @@ import { apiClient } from '../api/client';
 import type {
   Payment,
   CreatePaymentDto,
-  WeeklyPaymentStats,
 } from '../types/api.types';
 
 /**
  * Payment Service
  * 
- * Single endpoint strategy: /payments/weekly provides all needed data
- * - Weekly stats (totals)
- * - Payments array with patient info
- * 
- * This avoids multiple API calls and ensures data consistency
+ * Uses /payments endpoint to get all payments (no week filter)
  */
 class PaymentService {
   private readonly basePath = '/payments';
 
   /**
-   * Get weekly payment data (stats + payments list)
-   * This is the primary data source for the payments feature
+   * Get all payments for the therapist
    */
-  async getWeeklyStats(): Promise<WeeklyPaymentStats> {
-    return apiClient.get<WeeklyPaymentStats>(`${this.basePath}/weekly`);
+  async getAll(): Promise<Payment[]> {
+    return apiClient.get<Payment[]>(this.basePath);
   }
 
   /**
@@ -40,6 +34,14 @@ class PaymentService {
     
     if (data.description) {
       payload.description = data.description;
+    }
+
+    if (data.status) {
+      payload.status = data.status;
+    }
+
+    if (data.paidDate) {
+      payload.paidDate = data.paidDate;
     }
     
     return apiClient.post<Payment>(this.basePath, payload);

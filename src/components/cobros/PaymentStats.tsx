@@ -71,7 +71,7 @@ export const PaymentStats = ({ totals, isLoading }: PaymentStatsProps) => {
       {statCards.map((stat) => {
         const Icon = stat.icon;
         return (
-          <Card key={stat.label} className="p-3 sm:p-4 lg:p-6">
+          <Card key={stat.label} className="p-3 sm:p-4 lg:p-6 bg-white">
             <div className="flex items-start sm:items-center justify-between gap-2">
               <div className="min-w-0 flex-1">
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
