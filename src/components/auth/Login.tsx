@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { User } from 'lucide-react';
+import { User, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
@@ -8,13 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/lib/hooks';
 import { toast } from 'sonner';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { LoginDto } from '@/lib/types/api.types';
 
 export function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { login, isLoading, error: _error, clearError } = useAuth();
+  const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   
   // Show success message if coming from registration
   useEffect(() => {
@@ -37,15 +38,33 @@ export function Login() {
     if (isLoading) return;
     
     clearError();
+    setShowSignupPrompt(false);
     
     try {
       await login(data);
       toast.success('¡Bienvenido!');
       navigate('/dashboard');
     } catch (err: any) {
-      // El error del backend se muestra automáticamente
       const errorMsg = err?.message || 'Error al iniciar sesión';
-      toast.error(errorMsg);
+      const errorMsgLower = errorMsg.toLowerCase();
+      
+      // Check if error indicates user doesn't exist or invalid credentials
+      const isAuthError = 
+        errorMsgLower.includes('authentication') ||
+        errorMsgLower.includes('unauthorized') ||
+        errorMsgLower.includes('invalid') ||
+        errorMsgLower.includes('credentials') ||
+        errorMsgLower.includes('not found') ||
+        errorMsgLower.includes('no existe');
+      
+      if (isAuthError) {
+        setShowSignupPrompt(true);
+        toast.error('Credenciales incorrectas', {
+          description: '¿No tienes cuenta? Regístrate para comenzar.'
+        });
+      } else {
+        toast.error(errorMsg);
+      }
     }
   };
 
@@ -133,6 +152,23 @@ export function Login() {
               >
                 {isLoading ? 'Ingresando...' : 'Ingresar'}
               </Button>
+
+              {/* Signup prompt when auth fails */}
+              {showSignupPrompt && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
+                  <p className="text-amber-800 text-sm">
+                    ¿Es tu primera vez? Necesitas crear una cuenta para comenzar.
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={() => navigate('/register')}
+                    className="w-full h-10 bg-amber-500 hover:bg-amber-600 text-white font-medium"
+                  >
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Crear cuenta nueva
+                  </Button>
+                </div>
+              )}
 
               <div className="text-center mt-4">
                 <button

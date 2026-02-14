@@ -214,6 +214,13 @@ export function Agenda() {
     return paciente?.nombre || '';
   };
 
+  // Fallback function to get patient name by ID (used when session.patientName is not available)
+  const getPatientNameById = (patientId: string | undefined): string | undefined => {
+    if (!patientId) return undefined;
+    const paciente = pacientes.find(p => p.rawId === patientId);
+    return paciente?.nombre;
+  };
+
   // Filter and sort future appointments
   const futurosTurnos = useMemo(() => {
     return turnos
@@ -565,29 +572,56 @@ export function Agenda() {
                           return (
                             <div
                               key={turno.rawId ?? turno.id}
-                              className="p-3 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors group"
+                              className="p-4 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors group"
                             >
-                              {/* Mobile Layout (< sm) */}
-                              <div className="sm:hidden space-y-2">
-                                <div className="flex items-center justify-between gap-2">
-                                  <div className="flex items-center gap-2 min-w-0">
+                              {/* Fluid Layout - wraps to multiple lines when needed */}
+                              <div className="flex flex-wrap items-center gap-3">
+                                {/* Time */}
+                                <div className="flex items-center gap-1.5 text-gray-600">
+                                  <Clock className="w-4 h-4 flex-shrink-0" />
+                                  <span className="text-sm font-medium">{turno.hora}</span>
+                                </div>
+
+                                {/* Avatar + Name */}
+                                <div className="flex items-center gap-2 min-w-0 flex-1 basis-40">
                                   <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
                                     <span className="text-indigo-600 text-xs font-semibold">
                                       {paciente ? paciente.nombre.split(' ').map((n) => n[0]).join('').slice(0, 2) : '?'}
                                     </span>
                                   </div>
-                                  <div className="min-w-0">
-                                    <p className="text-sm font-medium text-gray-900 truncate">{paciente?.nombre || 'Sin nombre'}</p>
-                                    <div className="flex items-center gap-1 text-xs text-gray-500">
-                                      <Clock className="w-3 h-3" />
-                                      <span>{turno.hora}</span>
-                                    </div>
-                                  </div>
+                                  <p className="text-sm font-medium text-gray-900 truncate">{paciente?.nombre || 'Sin nombre'}</p>
                                 </div>
-                                <div className="flex items-center gap-1 flex-shrink-0">
+
+                                {/* Badges - wrap when needed */}
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span
+                                    className={`px-2 py-1 rounded text-xs whitespace-nowrap ${
+                                      session ? SESSION_STATUS_BADGE_CLASSES[session.status] : ''
+                                    }`}
+                                  >
+                                    {session ? SESSION_STATUS_LABELS[session.status] : ''}
+                                  </span>
+                                  {isPaid && (
+                                    <span className="flex items-center gap-1 px-2 py-1 rounded text-xs whitespace-nowrap bg-green-100 text-green-700">
+                                      <DollarSign className="w-3 h-3" />
+                                      Pagado
+                                    </span>
+                                  )}
+                                  <span
+                                    className={`flex items-center gap-1 px-2 py-1 rounded text-xs whitespace-nowrap ${
+                                      turno.modalidad === 'remoto' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
+                                    }`}
+                                  >
+                                    {turno.modalidad === 'remoto' ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
+                                    {turno.modalidad === 'remoto' ? 'Remoto' : 'Presencial'}
+                                  </span>
+                                </div>
+
+                                {/* Actions - always at end */}
+                                <div className="flex items-center gap-1 ml-auto">
                                   <button
                                     onClick={() => handleSendWhatsAppReminder(paciente, turno)}
-                                    className="p-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                                    className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                                     title="WhatsApp"
                                   >
                                     <MessageCircle className="w-4 h-4" />
@@ -599,125 +633,21 @@ export function Agenda() {
                                         setTurnoDrawerOpen(true);
                                       }
                                     }}
-                                    className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                                    className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                                     title="Editar"
                                   >
                                     <Edit2 className="w-4 h-4" />
                                   </button>
-                                </div>
-                              </div>
-                              <div className="flex items-center justify-between gap-2">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span
-                                    className={`px-2 py-0.5 rounded text-xs ${
-                                      session ? SESSION_STATUS_BADGE_CLASSES[session.status] : ''
-                                    }`}
+                                  <button
+                                    onClick={() => setSelectedPatientId(paciente?.rawId || null)}
+                                    className="text-indigo-600 text-xs font-medium hover:text-indigo-700 transition-colors whitespace-nowrap px-2"
                                   >
-                                    {session ? SESSION_STATUS_LABELS[session.status] : ''}
-                                  </span>
-                                  {isPaid && (
-                                    <span className="flex items-center gap-0.5 px-2 py-0.5 rounded text-xs bg-green-100 text-green-700">
-                                      <DollarSign className="w-3 h-3" />
-                                      Pagado
-                                    </span>
-                                  )}
-                                  <span
-                                    className={`flex items-center gap-0.5 text-xs ${
-                                      turno.modalidad === 'remoto' ? 'text-blue-600' : 'text-purple-600'
-                                    }`}
-                                  >
-                                    {turno.modalidad === 'remoto' ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-                                    {turno.modalidad === 'remoto' ? 'Remoto' : 'Presencial'}
-                                  </span>
+                                    Ver ficha
+                                  </button>
                                 </div>
-                                <button
-                                  onClick={() => setSelectedPatientId(paciente?.rawId || null)}
-                                  className="text-indigo-600 text-xs hover:text-indigo-700 transition-colors whitespace-nowrap"
-                                >
-                                  Ver ficha
-                                </button>
                               </div>
                             </div>
-
-                            {/* Desktop Layout (>= sm) */}
-                            <div className="hidden sm:flex items-center gap-3">
-                              {/* Time */}
-                              <div className="flex items-center gap-1 text-gray-600 flex-shrink-0 w-16">
-                                <Clock className="w-4 h-4" />
-                                <span className="text-sm font-medium">{turno.hora}</span>
-                              </div>
-
-                              {/* Avatar */}
-                              <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                <span className="text-indigo-600 text-xs font-semibold">
-                                  {paciente ? paciente.nombre.split(' ').map((n) => n[0]).join('').slice(0, 2) : '?'}
-                                </span>
-                              </div>
-
-                              {/* Patient Name */}
-                              <div className="min-w-0 flex-1">
-                                <p className="text-sm font-medium text-gray-900 truncate">{paciente?.nombre || 'Paciente sin nombre'}</p>
-                                <div
-                                  className={`flex items-center gap-1 text-xs ${
-                                    turno.modalidad === 'remoto' ? 'text-blue-600' : 'text-purple-600'
-                                  }`}
-                                >
-                                  {turno.modalidad === 'remoto' ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-                                  <span>{turno.modalidad === 'remoto' ? 'Remoto' : 'Presencial'}</span>
-                                </div>
-                              </div>
-
-                              {/* Badges */}
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <span
-                                  className={`px-2 py-0.5 rounded text-xs whitespace-nowrap ${
-                                    session ? SESSION_STATUS_BADGE_CLASSES[session.status] : ''
-                                  }`}
-                                >
-                                  {session ? SESSION_STATUS_LABELS[session.status] : ''}
-                                </span>
-                                {isPaid && (
-                                  <span
-                                    className="flex items-center gap-0.5 px-2 py-0.5 rounded text-xs whitespace-nowrap bg-green-100 text-green-700"
-                                    title="Pagado"
-                                  >
-                                    <DollarSign className="w-3 h-3" />
-                                    Pagado
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Actions */}
-                              <div className="flex items-center gap-1 flex-shrink-0">
-                                <button
-                                  onClick={() => handleSendWhatsAppReminder(paciente, turno)}
-                                  className="p-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-                                  title="Enviar recordatorio por WhatsApp"
-                                >
-                                  <MessageCircle className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    if (session) {
-                                      setSelectedSession(session);
-                                      setTurnoDrawerOpen(true);
-                                    }
-                                  }}
-                                  className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
-                                  title="Editar turno"
-                                >
-                                  <Edit2 className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => setSelectedPatientId(paciente?.rawId || null)}
-                                  className="text-indigo-600 text-xs hover:text-indigo-700 transition-colors whitespace-nowrap ml-1"
-                                >
-                                  Ver ficha
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        );
+                          );
                       })}
                     </div>
                   </div>
@@ -755,6 +685,7 @@ export function Agenda() {
                 sessions={filteredSessionsForCalendar}
                 isLoading={isLoading}
                 isSessionPaid={isSessionPaid}
+                getPatientNameFallback={getPatientNameById}
                 onEventClick={(session) => {
                   setSelectedSession(session);
                   setDetailsModalOpen(true);

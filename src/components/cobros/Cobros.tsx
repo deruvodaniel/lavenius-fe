@@ -3,6 +3,7 @@ import { Bell, Copy, MessageCircle, X, Plus, Video, MapPin, DollarSign, Calendar
 import { toast } from 'sonner';
 import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
+import { usePaymentStore } from '@/lib/stores/payment.store';
 import { useResponsive } from '@/lib/hooks';
 import { PaymentStats } from './PaymentStats';
 import { PaymentDrawer } from './PaymentDrawer';
@@ -524,10 +525,12 @@ export function Cobros() {
   const { sessionsUI, fetchUpcoming } = useSessions();
   const { 
     paidPayments,
+    pendingPayments,
     totals,
     isLoading: isLoadingPayments, 
     fetchPayments, 
     createPayment,
+    markAsPaid,
     isSessionPaid,
   } = usePayments();
   const { isMobile } = useResponsive();
@@ -802,11 +805,50 @@ export function Cobros() {
     setIsPaymentDrawerOpen(true);
   }, []);
 
+  // Get existing payment for a session (to update instead of create)
+  const getExistingPayment = useCallback((sessionId: string) => {
+    return paidPayments.find(p => p.sessionId === sessionId) 
+      || pendingPayments.find(p => p.sessionId === sessionId);
+  }, [paidPayments, pendingPayments]);
+
   const handleSavePayment = useCallback(async (data: CreatePaymentDto) => {
     try {
       setIsRefreshing(true);
-      await createPayment(data);
-      toast.success('Pago registrado correctamente');
+      
+      // Check if there's an existing payment for this session
+      const existingPayment = getExistingPayment(data.sessionId);
+      
+      if (existingPayment && existingPayment.status !== 'paid') {
+        // Update existing payment to paid
+        try {
+          await markAsPaid(existingPayment.id);
+          toast.success('Pago marcado como cobrado');
+        } catch (markError) {
+          // Backend may return error but still process the payment
+          // Refresh data to verify actual state
+          console.warn('markAsPaid returned error, verifying payment state...', markError);
+          await fetchPayments(true);
+          
+          // Check if payment was actually processed
+          const updatedPayment = usePaymentStore.getState().payments.find(
+            p => p.id === existingPayment.id
+          );
+          
+          if (updatedPayment?.status === 'paid') {
+            toast.success('Pago marcado como cobrado');
+          } else {
+            throw markError; // Re-throw if payment wasn't actually processed
+          }
+        }
+      } else if (!existingPayment) {
+        // Create new payment
+        await createPayment(data);
+        toast.success('Pago registrado correctamente');
+      } else {
+        // Already paid
+        toast.info('Esta sesión ya está marcada como pagada');
+      }
+      
       setIsPaymentDrawerOpen(false);
       setPreselectedSession(null);
       // Refresh all data to update lists and stats
@@ -815,12 +857,12 @@ export function Cobros() {
         fetchPayments(true),
       ]);
     } catch (error) {
-      console.error('Error creating payment:', error);
+      console.error('Error saving payment:', error);
       toast.error('No se pudo guardar el pago. Por favor intenta nuevamente.');
     } finally {
       setIsRefreshing(false);
     }
-  }, [createPayment, fetchUpcoming, fetchPayments]);
+  }, [createPayment, markAsPaid, getExistingPayment, fetchUpcoming, fetchPayments]);
 
   const handleCloseDrawer = useCallback(() => {
     setIsPaymentDrawerOpen(false);

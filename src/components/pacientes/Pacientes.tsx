@@ -216,17 +216,6 @@ export function Pacientes() {
     return { dias: Math.max(0, diffDays) };
   }, [nextSessionByPatient]);
 
-  // If a patient is selected, show their clinical record
-  if (selectedPatientId !== null) {
-    const selectedPatient = patients.find(p => p.id === selectedPatientId);
-    return (
-      <FichaClinica
-        patient={selectedPatient || null}
-        onBack={() => setSelectedPatientId(null)}
-      />
-    );
-  }
-
   const handleNuevoPaciente = () => {
     setPacienteDrawerOpen(true);
   };
@@ -285,6 +274,18 @@ export function Pacientes() {
     const numericId = Number.parseInt(p.id, 10);
     const safeId = Number.isNaN(numericId) ? index : numericId;
 
+    // Map sessionType from API to display values
+    const mapSessionType = (sessionType?: string): 'presencial' | 'remoto' | 'mixto' => {
+      switch (sessionType) {
+        case 'remote':
+          return 'remoto';
+        case 'presential':
+          return 'presencial';
+        default:
+          return 'presencial';
+      }
+    };
+
     return {
       id: safeId,
       rawId: p.id,
@@ -293,8 +294,8 @@ export function Pacientes() {
       email: p.email || '',
       edad,
       obraSocial: p.healthInsurance || '',
-      modalidad: 'presencial' as 'presencial' | 'remoto' | 'mixto',
-      frecuencia: 'semanal' as const,
+      modalidad: mapSessionType(p.sessionType),
+      frecuencia: (p.frequency as 'semanal' | 'quincenal' | 'mensual') || 'semanal',
       historiaClinica: p.notes || '',
     };
   });
@@ -393,6 +394,17 @@ export function Pacientes() {
         return frecuencia;
     }
   };
+
+  // If a patient is selected, show their clinical record
+  if (selectedPatientId) {
+    const selectedPatient = patients.find(p => p.id === selectedPatientId) || null;
+    return (
+      <FichaClinica
+        patient={selectedPatient}
+        onBack={() => setSelectedPatientId(null)}
+      />
+    );
+  }
 
   // Otherwise, show the list of patients
   return (
@@ -754,9 +766,11 @@ export function Pacientes() {
                   {getFrecuenciaLabel(paciente.frecuencia)}
                 </span>
 
-                <span className="px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700">
-                  {paciente.obraSocial}
-                </span>
+                {paciente.obraSocial && (
+                  <span className="px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700">
+                    {paciente.obraSocial}
+                  </span>
+                )}
               </div>
 
               {/* Next Appointment */}

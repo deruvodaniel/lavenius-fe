@@ -49,6 +49,8 @@ interface FullCalendarViewProps {
   onDateSelect?: (start: Date, end: Date) => void;
   onEventDrop?: (sessionId: string, newStart: Date, newEnd: Date) => void;
   isSessionPaid?: (sessionId: string) => boolean;
+  /** Fallback function to get patient name when session.patientName is not available */
+  getPatientNameFallback?: (patientId: string | undefined) => string | undefined;
 }
 
 export function FullCalendarView({ 
@@ -57,7 +59,8 @@ export function FullCalendarView({
   onEventClick, 
   onDateSelect,
   onEventDrop,
-  isSessionPaid 
+  isSessionPaid,
+  getPatientNameFallback
 }: FullCalendarViewProps) {
   const calendarRef = useRef<FullCalendar>(null);
   const [currentView, setCurrentView] = useState('timeGridWeek');
@@ -90,10 +93,15 @@ export function FullCalendarView({
 
         const isPaid = isSessionPaid?.(session.id) ?? false;
         const className = `session-${session.status}`;
+        
+        // Try to get patient name from session, or use fallback
+        const patientName = session.patientName 
+          || getPatientNameFallback?.(session.patient?.id) 
+          || 'Sin paciente';
 
         return {
           id: session.id,
-          title: `${typeIcons[session.sessionType]} ${session.patientName || 'Sin paciente'}`,
+          title: `${typeIcons[session.sessionType]} ${patientName}`,
           start: session.scheduledFrom,
           end: session.scheduledTo,
           classNames: [className],
@@ -101,13 +109,13 @@ export function FullCalendarView({
             session,
             status: session.status,
             type: session.sessionType,
-            patientName: session.patientName,
+            patientName,
             cost: session.cost,
             isPaid,
           },
         };
       });
-  }, [sessions, isSessionPaid]);
+  }, [sessions, isSessionPaid, getPatientNameFallback]);
 
   // Create background events for días off
   const diaOffEvents = useMemo(() => {
@@ -198,40 +206,40 @@ export function FullCalendarView({
       {isLoading && <LoadingOverlay message="Cargando turnos..." />}
       
       {/* Toolbar personalizado */}
-      <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mb-4 gap-3">
         {/* Botones de vista */}
-        <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-lg">
+        <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-lg w-full sm:w-auto justify-center sm:justify-start">
           <Button
             variant={currentView === 'dayGridMonth' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => changeView('dayGridMonth')}
-            className={`h-8 px-3 text-xs ${currentView === 'dayGridMonth' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'}`}
+            className={`h-8 px-2 sm:px-3 text-xs flex-1 sm:flex-none ${currentView === 'dayGridMonth' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'}`}
           >
-            <Grid3x3 className="h-3.5 w-3.5 mr-1.5" />
-            Mes
+            <Grid3x3 className="h-3.5 w-3.5 sm:mr-1.5" />
+            <span className="hidden sm:inline">Mes</span>
           </Button>
           <Button
             variant={currentView === 'timeGridWeek' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => changeView('timeGridWeek')}
-            className={`h-8 px-3 text-xs ${currentView === 'timeGridWeek' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'}`}
+            className={`h-8 px-2 sm:px-3 text-xs flex-1 sm:flex-none ${currentView === 'timeGridWeek' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'}`}
           >
-            <Calendar className="h-3.5 w-3.5 mr-1.5" />
-            Semana
+            <Calendar className="h-3.5 w-3.5 sm:mr-1.5" />
+            <span className="hidden sm:inline">Semana</span>
           </Button>
           <Button
             variant={currentView === 'timeGridDay' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => changeView('timeGridDay')}
-            className={`h-8 px-3 text-xs ${currentView === 'timeGridDay' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'}`}
+            className={`h-8 px-2 sm:px-3 text-xs flex-1 sm:flex-none ${currentView === 'timeGridDay' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'}`}
           >
-            <Clock className="h-3.5 w-3.5 mr-1.5" />
-            Día
+            <Clock className="h-3.5 w-3.5 sm:mr-1.5" />
+            <span className="hidden sm:inline">Día</span>
           </Button>
         </div>
 
         {/* Leyenda de estados */}
-        <div className="flex items-center gap-3 text-[11px] flex-wrap">
+        <div className="flex items-center justify-center sm:justify-end gap-3 text-[11px] flex-wrap">
           <div className="flex items-center gap-1">
             <div className="w-2.5 h-2.5 rounded-sm bg-amber-500" />
             <span className="text-gray-600">Pendiente</span>
@@ -317,16 +325,74 @@ export function FullCalendarView({
           background: white;
         }
 
-        /* Toolbar styling */
+        /* Toolbar styling - Responsive */
         .fullcalendar-wrapper .fc-toolbar {
           margin-bottom: 1rem !important;
-          gap: 0.75rem;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+
+        .fullcalendar-wrapper .fc-toolbar-chunk {
+          display: flex;
+          align-items: center;
         }
 
         .fullcalendar-wrapper .fc-toolbar-title {
           font-size: 1.25rem;
           font-weight: 600;
           color: #111827;
+        }
+
+        /* Mobile: Stack toolbar vertically */
+        @media (max-width: 640px) {
+          .fullcalendar-wrapper .fc-toolbar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.75rem;
+          }
+
+          .fullcalendar-wrapper .fc-toolbar-chunk {
+            justify-content: center;
+          }
+
+          .fullcalendar-wrapper .fc-toolbar-chunk:first-child {
+            order: 2;
+          }
+
+          .fullcalendar-wrapper .fc-toolbar-chunk:nth-child(2) {
+            order: 1;
+          }
+
+          .fullcalendar-wrapper .fc-toolbar-title {
+            font-size: 1.1rem;
+            text-align: center;
+          }
+
+          .fullcalendar-wrapper .fc-button {
+            padding: 0.4rem 0.75rem !important;
+            font-size: 0.8rem !important;
+          }
+
+          .fullcalendar-wrapper .fc-button-group {
+            display: flex;
+            gap: 2px;
+          }
+        }
+
+        /* Small tablets */
+        @media (min-width: 641px) and (max-width: 768px) {
+          .fullcalendar-wrapper .fc-toolbar {
+            gap: 0.5rem;
+          }
+
+          .fullcalendar-wrapper .fc-toolbar-title {
+            font-size: 1.1rem;
+          }
+
+          .fullcalendar-wrapper .fc-button {
+            padding: 0.4rem 0.75rem !important;
+            font-size: 0.8rem !important;
+          }
         }
 
         .fullcalendar-wrapper .fc-button {

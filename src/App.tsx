@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { Landing } from './components/landing';
 import { Login, Register } from './components/auth';
 import { Dashboard } from './components/dashboard';
 import { NotFound } from './components/shared';
@@ -17,13 +18,13 @@ export default function App() {
 
   return (
     <Routes>
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route 
         path="/dashboard" 
         element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />} 
       />
-      <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
       {/* 404 - Catch all unmatched routes */}
       <Route path="*" element={<NotFound />} />
     </Routes>
