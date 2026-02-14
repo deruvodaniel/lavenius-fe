@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { Button } from '../ui/button';
-import { Calendar as CalendarIcon, RefreshCw, Link2Off, CheckCircle2, Circle, ExternalLink } from 'lucide-react';
+import { Calendar as CalendarIcon, RefreshCw, Link2Off, CheckCircle2, Circle, ExternalLink, AlertTriangle } from 'lucide-react';
 import { Card } from '../ui/card';
 
 export default function CalendarSync() {
@@ -104,6 +104,20 @@ export default function CalendarSync() {
               Cancelación de sesiones
             </li>
           </ul>
+        </div>
+
+        {/* Disclaimer - One-way sync warning */}
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex gap-3">
+            <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-red-800">Sincronización unidireccional</p>
+              <p className="text-sm text-red-600 mt-1">
+                La sincronización funciona solo desde Lavenius hacia Google Calendar. 
+                Los cambios que realices directamente en Google Calendar <strong>no se reflejarán</strong> en la aplicación.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </Card>
