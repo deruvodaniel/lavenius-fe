@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
-import { usePaymentStore, paymentSelectors } from '../stores/payment.store';
+import { usePaymentStore } from '../stores/payment.store';
+import { PaymentStatus } from '../types/api.types';
+import type { Payment } from '../types/api.types';
 
 /**
  * usePayments Hook
@@ -10,25 +12,31 @@ import { usePaymentStore, paymentSelectors } from '../stores/payment.store';
 export const usePayments = () => {
   const store = usePaymentStore();
   
-  // Memoized derived data - recalculates when weeklyStats changes
+  // Extract weeklyStats for dependency tracking
+  const weeklyStats = store.weeklyStats;
+  const paymentsArray = weeklyStats?.payments;
+  
+  // Memoized derived data - recalculates when payments array changes
   const payments = useMemo(
-    () => paymentSelectors.getPayments(store),
-    [store.weeklyStats]
+    () => paymentsArray ?? [],
+    [paymentsArray]
   );
   
   const paidPayments = useMemo(
-    () => paymentSelectors.getPaidPayments(store),
-    [store.weeklyStats]
+    () => paymentsArray?.filter((p: Payment) => p.status === PaymentStatus.PAID) ?? [],
+    [paymentsArray]
   );
   
   const pendingPayments = useMemo(
-    () => paymentSelectors.getPendingPayments(store),
-    [store.weeklyStats]
+    () => paymentsArray?.filter((p: Payment) => 
+      p.status === PaymentStatus.PENDING || p.status === PaymentStatus.OVERDUE
+    ) ?? [],
+    [paymentsArray]
   );
 
   // Calculated totals with safe defaults
   const totals = useMemo(() => {
-    if (!store.weeklyStats?.payments) {
+    if (!paymentsArray) {
       return {
         totalAmount: 0,
         paidAmount: 0,
@@ -40,13 +48,37 @@ export const usePayments = () => {
         overdueCount: 0,
       };
     }
-    return paymentSelectors.calculateTotals(store);
-  }, [store.weeklyStats]);
+    
+    const paid = paymentsArray.filter((p: Payment) => p.status === PaymentStatus.PAID);
+    const pending = paymentsArray.filter((p: Payment) => 
+      p.status === PaymentStatus.PENDING || p.status === PaymentStatus.OVERDUE
+    );
+    const overdue = paymentsArray.filter((p: Payment) => p.status === PaymentStatus.OVERDUE);
+
+    // Helper to safely sum amounts (handles string/number)
+    const sumAmounts = (items: Payment[]) => 
+      items.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+
+    return {
+      totalAmount: sumAmounts(paymentsArray),
+      paidAmount: sumAmounts(paid),
+      pendingAmount: sumAmounts(pending),
+      overdueAmount: sumAmounts(overdue),
+      totalCount: paymentsArray.length,
+      paidCount: paid.length,
+      pendingCount: pending.length,
+      overdueCount: overdue.length,
+    };
+  }, [paymentsArray]);
 
   // Utility: check if session is paid
   // Note: needs fresh store reference each call
-  const isSessionPaid = (sessionId: string): boolean => 
-    paymentSelectors.isSessionPaid(usePaymentStore.getState(), sessionId);
+  const isSessionPaid = (sessionId: string): boolean => {
+    const currentPayments = usePaymentStore.getState().weeklyStats?.payments;
+    return currentPayments?.some(
+      (p: Payment) => p.sessionId === sessionId && p.status === PaymentStatus.PAID
+    ) ?? false;
+  };
 
   return {
     // State

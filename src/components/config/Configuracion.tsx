@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, DollarSign, Calendar, Clock, X, Plus, Save } from 'lucide-react';
+import { Bell, DollarSign, Calendar, X, Plus, Save } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';

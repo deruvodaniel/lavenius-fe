@@ -15,6 +15,7 @@ export interface PatientInfo {
   lastName?: string;
   age?: number;
   email?: string;
+  phone?: string;
 }
 
 export interface PaymentInfo {

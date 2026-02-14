@@ -5,16 +5,14 @@ import type { Payment } from '@/lib/types/api.types';
 
 interface PaymentListProps {
   payments: Payment[];
-  patientNames?: Record<string, string>;
-  onEdit: (payment: Payment) => void;
+  onMarkAsPaid: (id: string) => void;
   onDelete: (id: string) => void;
   onCreateNew?: () => void;
 }
 
 export const PaymentList = ({
   payments,
-  patientNames = {},
-  onEdit,
+  onMarkAsPaid,
   onDelete,
   onCreateNew,
 }: PaymentListProps) => {
@@ -35,8 +33,7 @@ export const PaymentList = ({
         <PaymentCard
           key={payment.id}
           payment={payment}
-          patientName={patientNames[payment.patientId]}
-          onEdit={onEdit}
+          onMarkAsPaid={onMarkAsPaid}
           onDelete={onDelete}
         />
       ))}

@@ -1,4 +1,4 @@
-import { ArrowLeft, Mail, Phone, Heart, Calendar, FileText, User, Clock, Flag, Edit2, Save, X, Plus } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Heart, Calendar, FileText, User, Clock, Flag, Edit2, Save, X, Plus, MessageCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { TurnoDrawer } from '../agenda';
@@ -116,18 +116,20 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   };
 
   const handleSaveNote = async (data: CreateNoteDto | UpdateNoteDto, noteId?: string) => {
+    console.log('🎯 FichaClinica.handleSaveNote - Received data:', JSON.stringify(data, null, 2));
     try {
       if (noteId) {
         await updateNote(noteId, data as UpdateNoteDto);
         toast.success('Nota actualizada exitosamente');
       } else {
+        console.log('🎯 About to call createNote with:', data);
         await createNote(data as CreateNoteDto);
         toast.success('Nota creada exitosamente');
       }
       setIsNoteDrawerOpen(false);
       setSelectedNote(null);
     } catch (error) {
-      console.error('Error saving note:', error);
+      console.error('❌ Error saving note:', error);
       toast.error('Error al guardar la nota');
     }
   };
@@ -150,6 +152,19 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   const handleCreateNote = () => {
     setSelectedNote(null);
     setIsNoteDrawerOpen(true);
+  };
+
+  // Send WhatsApp message to patient
+  const handleSendWhatsApp = (message?: string) => {
+    if (!editableData.telefono) {
+      toast.info('El paciente no tiene número de teléfono registrado');
+      return;
+    }
+
+    const phone = editableData.telefono.replace(/\D/g, '');
+    const defaultMessage = `Hola ${patient.firstName}!`;
+    const encodedMessage = encodeURIComponent(message || defaultMessage);
+    window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
   };
 
   // Get patient's sessions
@@ -193,16 +208,18 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               </div>
             </div>
           </div>
-          {/* Flag Icon */}
-          <button
-            onClick={() => setIsFlagged(!isFlagged)}
-            className="p-3 rounded-lg hover:bg-indigo-600 transition-colors"
-            title={isFlagged ? "Quitar marcador" : "Marcar paciente"}
-          >
-            <Flag
-              className={`w-6 h-6 ${isFlagged ? 'fill-yellow-400 text-yellow-400' : 'text-indigo-200'}`}
-            />
-          </button>
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsFlagged(!isFlagged)}
+              className="p-3 rounded-lg hover:bg-indigo-600 transition-colors"
+              title={isFlagged ? "Quitar marcador" : "Marcar paciente"}
+            >
+              <Flag
+                className={`w-6 h-6 ${isFlagged ? 'fill-yellow-400 text-yellow-400' : 'text-indigo-200'}`}
+              />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -237,9 +254,20 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
                     className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 ) : (
-                  <div className="flex items-center gap-2 text-gray-900">
-                    <Phone className="w-4 h-4 text-gray-400" />
-                    <span>{editableData.telefono}</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-gray-900">
+                      <Phone className="w-4 h-4 text-gray-400" />
+                      <span>{editableData.telefono}</span>
+                    </div>
+                    {editableData.telefono && (
+                      <button
+                        onClick={() => handleSendWhatsApp()}
+                        className="p-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                        title="Enviar WhatsApp"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -388,7 +416,6 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
                 notes={notes}
                 onEdit={handleEditNote}
                 onDelete={handleDeleteNote}
-                onCreateNew={handleCreateNote}
                 emptyMessage="No hay notas registradas para este paciente"
               />
             )}

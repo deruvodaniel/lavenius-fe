@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Video, MapPin, Calendar, Filter, Plus, Edit2, Trash2, Users } from 'lucide-react';
+import { Video, MapPin, Calendar, Plus, Edit2, Trash2, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
@@ -164,12 +164,14 @@ export function Pacientes() {
 
   // Otherwise, show the list of patients
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div className="flex items-center gap-2 text-gray-600">
-          <h1 className="text-gray-900">Pacientes</h1>
-          <Filter className="w-4 h-4 ml-4" />
-          <span className="text-sm">{filteredPacientes.length} pacientes</span>
+    <div className="p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Pacientes</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+            {filteredPacientes.length} pacientes registrados
+          </p>
         </div>
         <button
           onClick={handleNuevoPaciente}
@@ -181,7 +183,7 @@ export function Pacientes() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
+      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Modalidad Filter */}
           <div>

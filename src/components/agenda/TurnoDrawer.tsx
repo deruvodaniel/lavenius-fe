@@ -95,12 +95,6 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         const hours = initialDate.getHours();
         const minutes = initialDate.getMinutes();
         
-        // Always set the time from the calendar selection (even if it's a specific hour like 9:00)
-        // Only skip if it's exactly midnight which indicates a day selection, not a time slot
-        const isTimeSlotSelection = hours !== 0 || minutes !== 0 || 
-          (initialDate.getHours() === 0 && initialDate.getMinutes() === 0 && 
-           initialDate.getSeconds() === 0 && initialDate.getMilliseconds() === 0);
-        
         // If hours > 0 or minutes > 0, it's definitely a time slot selection
         if (hours > 0 || minutes > 0) {
           newFormData.horaInicio = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;

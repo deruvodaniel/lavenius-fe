@@ -49,11 +49,13 @@ export enum PaymentMethod {
   OTHER = 'OTHER',
 }
 
+/**
+ * Payment Status - matches backend PaymentStatus enum
+ */
 export enum PaymentStatus {
-  PENDING = 'PENDING',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
-  REFUNDED = 'REFUNDED',
+  PENDING = 'pending',
+  OVERDUE = 'overdue',
+  PAID = 'paid',
 }
 
 export enum NoteType {
@@ -137,18 +139,33 @@ export type Note = {
   updatedAt: string;
 };
 
+/**
+ * Payment - matches backend PaymentResponse
+ */
 export type Payment = {
   id: string;
-  therapistId: string;
-  patientId: string;
-  sessionId?: string;
   amount: number;
   paymentDate: string;
-  paymentMethod: PaymentMethod;
+  dueDate?: string;
+  paidDate?: string;
   status: PaymentStatus;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
+  description?: string;
+  sessionId: string;
+  patient?: {
+    id: string;
+    firstName: string;
+    lastName?: string;
+    email?: string;
+  };
+};
+
+/**
+ * Weekly Payment Statistics - matches backend findWeeklyPayments response
+ */
+export type WeeklyPaymentStats = {
+  total: number;
+  totalPending: number;
+  payments: Payment[];
 };
 
 export type Settings = {
@@ -227,17 +244,17 @@ export type UpdateNoteDto = {
   noteDate?: string;
 };
 
+/**
+ * CreatePaymentDto - matches backend CreatePaymentDto
+ */
 export type CreatePaymentDto = {
-  patientId: string;
-  sessionId?: string;
+  sessionId: string;
   amount: number;
   paymentDate: string;
-  paymentMethod: PaymentMethod;
-  status: PaymentStatus;
-  notes?: string;
+  description?: string;
 };
 
-export type UpdatePaymentDto = Partial<Omit<CreatePaymentDto, 'patientId'>>;
+export type UpdatePaymentDto = Partial<CreatePaymentDto>;
 
 // ==================== Auth Response Types ====================
 

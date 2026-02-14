@@ -108,7 +108,6 @@ export class ApiClient {
       headers: {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true', // Skip ngrok warning page
-        'User-Agent': 'Lavenius-Frontend', // Custom user agent for ngrok
       },
     });
 

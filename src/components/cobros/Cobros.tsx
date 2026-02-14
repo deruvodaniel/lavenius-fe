@@ -208,7 +208,6 @@ const PaymentCard = ({ payment }: PaymentCardProps) => {
   const patientName = payment.patient 
     ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
     : 'Sin paciente';
-  const initials = getInitials(patientName);
 
   return (
     <Card className="p-3 sm:p-4 border-l-4 border-l-green-500">
@@ -361,6 +360,7 @@ export function Cobros() {
       }
     };
     loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentional: only run on mount, functions are stable from zustand store
   }, []);
 
   // Today for status calculation
