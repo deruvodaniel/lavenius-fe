@@ -1,8 +1,18 @@
 import { useState, useEffect } from 'react';
-import { X, User, Phone, Mail, Heart, Video, MapPin, Calendar } from 'lucide-react';
+import { X, User, Phone, Mail, Heart, Video, MapPin, Calendar, AlertCircle } from 'lucide-react';
 import type { CreatePatientDto, Patient, SessionType } from '../../lib/types/api.types';
 
 type PatientSessionType = 'remote' | 'presential';
+type Frecuencia = 'semanal' | 'quincenal' | 'mensual' | 'otra';
+
+interface ValidationErrors {
+  nombre?: string;
+  apellido?: string;
+  telefono?: string;
+  email?: string;
+  edad?: string;
+  frecuenciaOtra?: string;
+}
 
 interface PacienteDrawerProps {
   isOpen: boolean;
@@ -10,6 +20,31 @@ interface PacienteDrawerProps {
   onSave: (patient: CreatePatientDto) => void;
   patient?: Patient | null;
 }
+
+// Validation helpers
+const validateEmail = (email: string): boolean => {
+  if (!email) return true; // Optional field
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validatePhone = (phone: string): boolean => {
+  if (!phone) return true; // Optional field
+  // Allow digits, spaces, +, -, (, )
+  const phoneRegex = /^[\d\s+\-()]+$/;
+  return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 8;
+};
+
+const validateAge = (age: string): boolean => {
+  if (!age) return true; // Optional field
+  const ageNum = parseInt(age, 10);
+  return !isNaN(ageNum) && ageNum >= 0 && ageNum <= 120;
+};
+
+const validateName = (name: string): boolean => {
+  if (!name) return false; // Required field
+  return name.trim().length >= 2;
+};
 
 export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDrawerProps) {
   const [formData, setFormData] = useState({
@@ -20,16 +55,33 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
     email: '',
     obraSocial: '',
     tipoSesion: 'presential' as PatientSessionType,
-    frecuencia: '',
+    frecuencia: 'semanal' as Frecuencia,
+    frecuenciaOtra: '',
     diagnostico: '',
     tratamientoActual: '',
     observaciones: '',
   });
 
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
   // Load patient data when editing
   useEffect(() => {
     if (patient) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // Map frequency to our radio options
+      let frecuencia: Frecuencia = 'semanal';
+      let frecuenciaOtra = '';
+      
+      if (patient.frequency) {
+        const freq = patient.frequency.toLowerCase();
+        if (freq === 'semanal' || freq === 'quincenal' || freq === 'mensual') {
+          frecuencia = freq;
+        } else {
+          frecuencia = 'otra';
+          frecuenciaOtra = patient.frequency;
+        }
+      }
+
       setFormData({
         nombre: patient.firstName || '',
         apellido: patient.lastName || '',
@@ -38,53 +90,141 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
         email: patient.email || '',
         obraSocial: patient.healthInsurance || '',
         tipoSesion: (patient.sessionType as PatientSessionType) || 'presential',
-        frecuencia: patient.frequency || '',
+        frecuencia,
+        frecuenciaOtra,
         diagnostico: patient.diagnosis || '',
         tratamientoActual: patient.currentTreatment || '',
         observaciones: patient.observations || '',
       });
+      setErrors({});
+      setTouched({});
+    } else {
+      // Reset form for new patient
+      setFormData({
+        nombre: '',
+        apellido: '',
+        edad: '',
+        telefono: '',
+        email: '',
+        obraSocial: '',
+        tipoSesion: 'presential',
+        frecuencia: 'semanal',
+        frecuenciaOtra: '',
+        diagnostico: '',
+        tratamientoActual: '',
+        observaciones: '',
+      });
+      setErrors({});
+      setTouched({});
     }
-  }, [patient]);
+  }, [patient, isOpen]);
+
+  // Validate field on change
+  const validateField = (field: string, value: string): string | undefined => {
+    switch (field) {
+      case 'nombre':
+        return !validateName(value) ? 'El nombre es requerido (mínimo 2 caracteres)' : undefined;
+      case 'apellido':
+        return !value.trim() ? 'El apellido es requerido' : undefined;
+      case 'email':
+        return !validateEmail(value) ? 'Email inválido' : undefined;
+      case 'telefono':
+        return !validatePhone(value) ? 'Teléfono inválido (mínimo 8 dígitos)' : undefined;
+      case 'edad':
+        return !validateAge(value) ? 'Edad inválida (0-120)' : undefined;
+      case 'frecuenciaOtra':
+        return formData.frecuencia === 'otra' && !value.trim() ? 'Especifica la frecuencia' : undefined;
+      default:
+        return undefined;
+    }
+  };
+
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+    
+    // Validate on change if field was touched
+    if (touched[field]) {
+      const error = validateField(field, value);
+      setErrors({ ...errors, [field]: error });
+    }
+  };
+
+  const handleFieldBlur = (field: string) => {
+    setTouched({ ...touched, [field]: true });
+    const error = validateField(field, formData[field as keyof typeof formData] as string);
+    setErrors({ ...errors, [field]: error });
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: ValidationErrors = {
+      nombre: validateField('nombre', formData.nombre),
+      apellido: validateField('apellido', formData.apellido),
+      email: validateField('email', formData.email),
+      telefono: validateField('telefono', formData.telefono),
+      edad: validateField('edad', formData.edad),
+      frecuenciaOtra: validateField('frecuenciaOtra', formData.frecuenciaOtra),
+    };
+
+    setErrors(newErrors);
+    setTouched({
+      nombre: true,
+      apellido: true,
+      email: true,
+      telefono: true,
+      edad: true,
+      frecuenciaOtra: true,
+    });
+
+    return !Object.values(newErrors).some(error => error);
+  };
 
   if (!isOpen) return null;
 
   const handleSave = () => {
-    // Split nombre into firstName and lastName
-    const nameParts = formData.nombre.trim().split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || formData.apellido;
+    if (!validateForm()) {
+      return;
+    }
+
+    // Determine final frequency value
+    const frequency = formData.frecuencia === 'otra' 
+      ? formData.frecuenciaOtra 
+      : formData.frecuencia;
 
     const patientDto: CreatePatientDto = {
-      firstName,
-      lastName,
-      email: formData.email || undefined,
-      phone: formData.telefono || undefined,
+      firstName: formData.nombre.trim(),
+      lastName: formData.apellido.trim(),
+      email: formData.email.trim() || undefined,
+      phone: formData.telefono.trim() || undefined,
       age: formData.edad ? Number(formData.edad) : undefined,
-      healthInsurance: formData.obraSocial || undefined,
+      healthInsurance: formData.obraSocial.trim() || undefined,
       sessionType: formData.tipoSesion as SessionType,
-      frequency: formData.frecuencia || undefined,
-      diagnosis: formData.diagnostico || undefined,
-      currentTreatment: formData.tratamientoActual || undefined,
-      observations: formData.observaciones || undefined,
+      frequency: frequency || undefined,
+      diagnosis: formData.diagnostico.trim() || undefined,
+      currentTreatment: formData.tratamientoActual.trim() || undefined,
+      observations: formData.observaciones.trim() || undefined,
     };
 
     onSave(patientDto);
+  };
+
+  const handleClose = () => {
+    setErrors({});
+    setTouched({});
     onClose();
-    
-    // Reset form
-    setFormData({
-      nombre: '',
-      apellido: '',
-      edad: '',
-      telefono: '',
-      email: '',
-      obraSocial: '',
-      tipoSesion: 'presential',
-      frecuencia: '',
-      diagnostico: '',
-      tratamientoActual: '',
-      observaciones: '',
-    });
+  };
+
+  const isFormValid = formData.nombre.trim() && formData.apellido.trim() && 
+    !errors.nombre && !errors.apellido && !errors.email && !errors.telefono && !errors.edad &&
+    (formData.frecuencia !== 'otra' || formData.frecuenciaOtra.trim());
+
+  const InputError = ({ error }: { error?: string }) => {
+    if (!error) return null;
+    return (
+      <div className="flex items-center gap-1.5 mt-1.5 text-red-600">
+        <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+        <span className="text-xs">{error}</span>
+      </div>
+    );
   };
 
   return (
@@ -92,7 +232,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
-        onClick={onClose}
+        onClick={handleClose}
       />
 
       {/* Drawer */}
@@ -102,7 +242,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
           <div className="flex items-center justify-between">
             <h2 className="text-white text-xl">{patient ? 'Editar Paciente' : 'Nuevo Paciente'}</h2>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="text-indigo-200 hover:text-white transition-colors"
             >
               <X className="w-6 h-6" />
@@ -114,7 +254,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
         <div className="p-4 md:p-6 space-y-4 md:space-y-6">
           <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
             <p className="text-indigo-800 text-sm">
-              Todos los campos son opcionales. Completa solo la información que tengas disponible.
+              Los campos marcados con <span className="text-red-500">*</span> son obligatorios.
             </p>
           </div>
 
@@ -127,36 +267,54 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
 
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 mb-2">Nombre</label>
+                <label className="block text-gray-700 mb-2">
+                  Nombre <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   value={formData.nombre}
-                  onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                  onChange={(e) => handleFieldChange('nombre', e.target.value)}
+                  onBlur={() => handleFieldBlur('nombre')}
                   placeholder="Ej: Juan"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                    errors.nombre && touched.nombre ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
                 />
+                <InputError error={touched.nombre ? errors.nombre : undefined} />
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">Apellido</label>
+                <label className="block text-gray-700 mb-2">
+                  Apellido <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   value={formData.apellido}
-                  onChange={(e) => setFormData({ ...formData, apellido: e.target.value })}
+                  onChange={(e) => handleFieldChange('apellido', e.target.value)}
+                  onBlur={() => handleFieldBlur('apellido')}
                   placeholder="Ej: Pérez"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                    errors.apellido && touched.apellido ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
                 />
+                <InputError error={touched.apellido ? errors.apellido : undefined} />
               </div>
 
               <div>
                 <label className="block text-gray-700 mb-2">Edad</label>
                 <input
                   type="number"
+                  min="0"
+                  max="120"
                   value={formData.edad}
-                  onChange={(e) => setFormData({ ...formData, edad: e.target.value })}
+                  onChange={(e) => handleFieldChange('edad', e.target.value)}
+                  onBlur={() => handleFieldBlur('edad')}
                   placeholder="Ej: 30"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                    errors.edad && touched.edad ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
                 />
+                <InputError error={touched.edad ? errors.edad : undefined} />
               </div>
 
               <div>
@@ -167,10 +325,14 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                 <input
                   type="tel"
                   value={formData.telefono}
-                  onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                  onChange={(e) => handleFieldChange('telefono', e.target.value)}
+                  onBlur={() => handleFieldBlur('telefono')}
                   placeholder="+54 11 1234-5678"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                    errors.telefono && touched.telefono ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
                 />
+                <InputError error={touched.telefono ? errors.telefono : undefined} />
               </div>
 
               <div>
@@ -181,10 +343,14 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) => handleFieldChange('email', e.target.value)}
+                  onBlur={() => handleFieldBlur('email')}
                   placeholder="ejemplo@email.com"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                    errors.email && touched.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
                 />
+                <InputError error={touched.email ? errors.email : undefined} />
               </div>
 
               <div>
@@ -242,14 +408,51 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">Frecuencia</label>
-                <input
-                  type="text"
-                  value={formData.frecuencia}
-                  onChange={(e) => setFormData({ ...formData, frecuencia: e.target.value })}
-                  placeholder="Ej: semanal, quincenal, mensual"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+                <label className="block text-gray-700 mb-3">Frecuencia</label>
+                <div className="space-y-2">
+                  {(['semanal', 'quincenal', 'mensual', 'otra'] as const).map((freq) => (
+                    <label
+                      key={freq}
+                      className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                        formData.frecuencia === freq
+                          ? 'border-indigo-600 bg-indigo-50'
+                          : 'border-gray-200 hover:border-indigo-300'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="frecuencia"
+                        value={freq}
+                        checked={formData.frecuencia === freq}
+                        onChange={(e) => setFormData({ ...formData, frecuencia: e.target.value as Frecuencia })}
+                        className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                      />
+                      <span className={`text-sm font-medium ${formData.frecuencia === freq ? 'text-indigo-700' : 'text-gray-700'}`}>
+                        {freq === 'semanal' && 'Semanal'}
+                        {freq === 'quincenal' && 'Quincenal'}
+                        {freq === 'mensual' && 'Mensual'}
+                        {freq === 'otra' && 'Otra'}
+                      </span>
+                    </label>
+                  ))}
+                  
+                  {/* Custom frequency input */}
+                  {formData.frecuencia === 'otra' && (
+                    <div className="ml-7 mt-2">
+                      <input
+                        type="text"
+                        value={formData.frecuenciaOtra}
+                        onChange={(e) => handleFieldChange('frecuenciaOtra', e.target.value)}
+                        onBlur={() => handleFieldBlur('frecuenciaOtra')}
+                        placeholder="Especificar frecuencia (ej: cada 3 semanas)"
+                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm ${
+                          errors.frecuenciaOtra && touched.frecuenciaOtra ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                        }`}
+                      />
+                      <InputError error={touched.frecuenciaOtra ? errors.frecuenciaOtra : undefined} />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -297,15 +500,19 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancelar
             </button>
             <button
               onClick={handleSave}
-              className="flex-1 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors"
-              disabled={!formData.nombre}
+              className={`flex-1 py-3 rounded-lg transition-colors ${
+                isFormValid
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+              disabled={!isFormValid}
             >
               {patient ? 'Actualizar' : 'Crear Paciente'}
             </button>

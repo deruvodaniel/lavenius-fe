@@ -33,7 +33,7 @@ export const PaymentStats = ({ totals, isLoading }: PaymentStatsProps) => {
 
   const statCards = [
     {
-      label: 'Total Semanal',
+      label: 'Total Sesiones',
       value: totals.totalAmount,
       icon: TrendingUp,
       color: 'text-green-600',

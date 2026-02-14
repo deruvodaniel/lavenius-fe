@@ -426,15 +426,15 @@ export function Agenda() {
     }
   };
 
-  // Send WhatsApp reminder for a turno
-  const handleSendWhatsAppReminder = (paciente: { nombre: string; telefono: string } | undefined, turno: { fecha: string; hora: string }) => {
+  // Send WhatsApp confirmation request for a turno
+  const handleSendWhatsAppConfirmation = (paciente: { nombre: string; telefono: string } | undefined, turno: { fecha: string; hora: string }) => {
     if (!paciente?.telefono) {
       toast.info('El paciente no tiene número de teléfono registrado');
       return;
     }
 
     const fechaFormateada = formatFecha(turno.fecha);
-    const message = `Hola ${paciente.nombre}! Te recuerdo tu turno el ${fechaFormateada} a las ${turno.hora}. ¡Te espero!`;
+    const message = `Hola ${paciente.nombre}! Tenés un turno agendado para el ${fechaFormateada} a las ${turno.hora}. ¿Confirmás tu asistencia? Respondé "Sí" para confirmar o "No" si necesitás cancelar. ¡Gracias!`;
     const phone = paciente.telefono.replace(/\D/g, '');
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
@@ -592,37 +592,45 @@ export function Agenda() {
                                   <p className="text-sm font-medium text-gray-900 truncate">{paciente?.nombre || 'Sin nombre'}</p>
                                 </div>
 
-                                {/* Badges - wrap when needed */}
+                                {/* Badges - wrap when needed, icon-only in 'both' view for space */}
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <span
                                     className={`px-2 py-1 rounded text-xs whitespace-nowrap ${
                                       session ? SESSION_STATUS_BADGE_CLASSES[session.status] : ''
                                     }`}
+                                    title={session ? SESSION_STATUS_LABELS[session.status] : ''}
                                   >
-                                    {session ? SESSION_STATUS_LABELS[session.status] : ''}
+                                    {viewMode === 'both' 
+                                      ? (session?.status === 'pending' ? '⏳' : session?.status === 'confirmed' ? '✓' : session?.status === 'completed' ? '✔' : '✗')
+                                      : (session ? SESSION_STATUS_LABELS[session.status] : '')
+                                    }
                                   </span>
                                   {isPaid && (
-                                    <span className="flex items-center gap-1 px-2 py-1 rounded text-xs whitespace-nowrap bg-green-100 text-green-700">
+                                    <span 
+                                      className="flex items-center gap-1 px-2 py-1 rounded text-xs whitespace-nowrap bg-green-100 text-green-700"
+                                      title="Pagado"
+                                    >
                                       <DollarSign className="w-3 h-3" />
-                                      Pagado
+                                      {viewMode !== 'both' && 'Pagado'}
                                     </span>
                                   )}
                                   <span
                                     className={`flex items-center gap-1 px-2 py-1 rounded text-xs whitespace-nowrap ${
                                       turno.modalidad === 'remoto' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
                                     }`}
+                                    title={turno.modalidad === 'remoto' ? 'Remoto' : 'Presencial'}
                                   >
                                     {turno.modalidad === 'remoto' ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-                                    {turno.modalidad === 'remoto' ? 'Remoto' : 'Presencial'}
+                                    {viewMode !== 'both' && (turno.modalidad === 'remoto' ? 'Remoto' : 'Presencial')}
                                   </span>
                                 </div>
 
                                 {/* Actions - always at end */}
                                 <div className="flex items-center gap-1 ml-auto">
                                   <button
-                                    onClick={() => handleSendWhatsAppReminder(paciente, turno)}
+                                    onClick={() => handleSendWhatsAppConfirmation(paciente, turno)}
                                     className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                    title="WhatsApp"
+                                    title="Confirmar por WhatsApp"
                                   >
                                     <MessageCircle className="w-4 h-4" />
                                   </button>

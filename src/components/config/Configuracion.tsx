@@ -253,6 +253,13 @@ export function Configuracion() {
               </div>
             )}
 
+            {/* Coming soon: Time slots feature */}
+            <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+              <p className="text-xs sm:text-sm text-indigo-700">
+                <span className="font-medium">Próximamente:</span> Podrás configurar franjas horarias específicas para cada día (ej: no atender de 12:00 a 14:00).
+              </p>
+            </div>
+
             {/* Formulario para agregar */}
             {showAddDiaOff ? (
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">

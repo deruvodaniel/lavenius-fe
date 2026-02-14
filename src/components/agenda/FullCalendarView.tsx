@@ -172,22 +172,12 @@ export function FullCalendarView({
   };
 
   const renderEventContent = (eventInfo: EventContentArg) => {
-    const { status: _status, patientName: _patientName, cost, isPaid } = eventInfo.event.extendedProps;
-    
     return (
       <div className="fc-event-main-frame px-1 py-0.5 text-xs">
-        <div className="fc-event-time font-semibold flex items-center gap-1">
+        <div className="fc-event-time font-semibold">
           {eventInfo.timeText}
-          {isPaid && (
-            <span className="text-green-300" title="Pagado">$</span>
-          )}
         </div>
         <div className="fc-event-title truncate">{eventInfo.event.title}</div>
-        {cost && (
-          <div className="fc-event-cost text-[10px] opacity-90">
-            ${cost.toLocaleString()}
-          </div>
-        )}
       </div>
     );
   };
@@ -242,7 +232,7 @@ export function FullCalendarView({
         <div className="flex items-center justify-center sm:justify-end gap-3 text-[11px] flex-wrap">
           <div className="flex items-center gap-1">
             <div className="w-2.5 h-2.5 rounded-sm bg-amber-500" />
-            <span className="text-gray-600">Pendiente</span>
+            <span className="text-gray-600">Agendada</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-2.5 h-2.5 rounded-sm bg-blue-500" />

@@ -127,6 +127,16 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       alert('Por favor seleccione una fecha');
       return;
     }
+    
+    // Validate that date is not in the past
+    const selectedDate = new Date(`${formData.fecha}T${formData.horaInicio}:00`);
+    const now = new Date();
+    if (selectedDate < now && !session) {
+      // Only block past dates for new appointments, allow editing existing ones
+      alert('No se pueden agendar turnos en fechas pasadas. Por favor seleccione una fecha futura.');
+      return;
+    }
+    
     if (!formData.horaInicio || !formData.horaFin) {
       alert('Por favor seleccione hora de inicio y fin');
       return;
@@ -344,10 +354,10 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               onChange={(e) => setFormData({ ...formData, estado: e.target.value as SessionStatus })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="pending">Pendiente</option>
-              <option value="confirmed">Confirmado</option>
-              <option value="completed">Completado</option>
-              <option value="cancelled">Cancelado</option>
+              <option value="pending">Agendada</option>
+              <option value="confirmed">Confirmada</option>
+              <option value="completed">Completada</option>
+              <option value="cancelled">Cancelada</option>
             </select>
           </div>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Bell, Copy, MessageCircle, X, Plus, Video, MapPin, DollarSign, Calendar, History, CheckCircle2, Search, ChevronLeft, ChevronRight, Filter, ArrowUpDown } from 'lucide-react';
+import { Bell, Copy, MessageCircle, X, Plus, Video, MapPin, DollarSign, Calendar, History, CheckCircle2, Search, ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
@@ -100,6 +100,7 @@ const EmptyState = ({ icon: Icon, title, subtitle, variant = 'default' }: {
 // ============================================================================
 
 type SortOption = 'date-desc' | 'date-asc' | 'price-desc' | 'price-asc';
+type QuickFilter = 'all' | 'week' | 'month' | 'custom';
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'date-desc', label: 'Más reciente' },
@@ -107,6 +108,36 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'price-desc', label: 'Mayor precio' },
   { value: 'price-asc', label: 'Menor precio' },
 ];
+
+// Helper functions to get date ranges
+const getWeekRange = () => {
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - diffToMonday);
+  monday.setHours(0, 0, 0, 0);
+  
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  
+  return {
+    from: monday.toISOString().split('T')[0],
+    to: sunday.toISOString().split('T')[0],
+  };
+};
+
+const getMonthRange = () => {
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+  return {
+    from: firstDay.toISOString().split('T')[0],
+    to: lastDay.toISOString().split('T')[0],
+  };
+};
 
 interface FiltersProps {
   searchTerm: string;
@@ -119,6 +150,9 @@ interface FiltersProps {
   hasActiveFilters: boolean;
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
+  quickFilter: QuickFilter;
+  onQuickFilterChange: (filter: QuickFilter) => void;
+  showSearchAndSort?: boolean;
 }
 
 const Filters = ({ 
@@ -132,48 +166,104 @@ const Filters = ({
   hasActiveFilters,
   sortBy,
   onSortChange,
+  quickFilter,
+  onQuickFilterChange,
+  showSearchAndSort = true,
 }: FiltersProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const handleQuickFilter = (filter: QuickFilter) => {
+    onQuickFilterChange(filter);
+    
+    if (filter === 'week') {
+      const { from, to } = getWeekRange();
+      onDateFromChange(from);
+      onDateToChange(to);
+      setIsExpanded(false);
+    } else if (filter === 'month') {
+      const { from, to } = getMonthRange();
+      onDateFromChange(from);
+      onDateToChange(to);
+      setIsExpanded(false);
+    } else if (filter === 'all') {
+      onDateFromChange('');
+      onDateToChange('');
+      setIsExpanded(false);
+    } else if (filter === 'custom') {
+      setIsExpanded(true);
+    }
+  };
+
   return (
     <div className="space-y-3">
-      {/* Search bar - always visible */}
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Buscar por paciente..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        {/* Sort dropdown */}
-        <div className="relative">
-          <select
-            value={sortBy}
-            onChange={(e) => onSortChange(e.target.value as SortOption)}
-            className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
-          >
-            {SORT_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-          </select>
-          <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-        </div>
+      {/* Quick filter buttons */}
+      <div className="flex flex-wrap gap-2">
         <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className={hasActiveFilters ? 'border-indigo-500 text-indigo-600' : ''}
+          variant={quickFilter === 'all' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => handleQuickFilter('all')}
+          className={quickFilter === 'all' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
         >
-          <Filter className="h-4 w-4" />
+          Todos
+        </Button>
+        <Button
+          variant={quickFilter === 'week' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => handleQuickFilter('week')}
+          className={quickFilter === 'week' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
+        >
+          Semana actual
+        </Button>
+        <Button
+          variant={quickFilter === 'month' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => handleQuickFilter('month')}
+          className={quickFilter === 'month' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
+        >
+          Mes actual
+        </Button>
+        <Button
+          variant={quickFilter === 'custom' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => handleQuickFilter('custom')}
+          className={quickFilter === 'custom' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
+        >
+          <Calendar className="h-4 w-4 mr-1.5" />
+          Rango
         </Button>
       </div>
 
-      {/* Expanded filters */}
-      {isExpanded && (
+      {/* Search bar and sort - only shown when showSearchAndSort is true */}
+      {showSearchAndSort && (
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Buscar por paciente..."
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          {/* Sort dropdown */}
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => onSortChange(e.target.value as SortOption)}
+              className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
+            >
+              {SORT_OPTIONS.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+            <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+          </div>
+        </div>
+      )}
+
+      {/* Custom date range (expanded when "Rango" is selected) */}
+      {(isExpanded || quickFilter === 'custom') && (
         <Card className="p-3 space-y-3 bg-white">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -181,7 +271,10 @@ const Filters = ({
               <Input
                 type="date"
                 value={dateFrom}
-                onChange={(e) => onDateFromChange(e.target.value)}
+                onChange={(e) => {
+                  onDateFromChange(e.target.value);
+                  onQuickFilterChange('custom');
+                }}
               />
             </div>
             <div>
@@ -189,7 +282,10 @@ const Filters = ({
               <Input
                 type="date"
                 value={dateTo}
-                onChange={(e) => onDateToChange(e.target.value)}
+                onChange={(e) => {
+                  onDateToChange(e.target.value);
+                  onQuickFilterChange('custom');
+                }}
               />
             </div>
           </div>
@@ -203,6 +299,44 @@ const Filters = ({
     </div>
   );
 };
+
+// ============================================================================
+// SEARCH AND SORT COMPONENT (for tabs)
+// ============================================================================
+
+interface SearchAndSortProps {
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  sortBy: SortOption;
+  onSortChange: (sort: SortOption) => void;
+}
+
+const SearchAndSort = ({ searchTerm, onSearchChange, sortBy, onSortChange }: SearchAndSortProps) => (
+  <div className="flex gap-2">
+    <div className="relative flex-1">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+      <Input
+        type="text"
+        placeholder="Buscar por paciente..."
+        value={searchTerm}
+        onChange={(e) => onSearchChange(e.target.value)}
+        className="pl-9"
+      />
+    </div>
+    <div className="relative">
+      <select
+        value={sortBy}
+        onChange={(e) => onSortChange(e.target.value as SortOption)}
+        className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
+      >
+        {SORT_OPTIONS.map(option => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+      <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+    </div>
+  </div>
+);
 
 // ============================================================================
 // PAGINATION COMPONENT
@@ -524,9 +658,9 @@ const ReminderModal = ({ session, onClose }: ReminderModalProps) => {
 export function Cobros() {
   const { sessionsUI, fetchUpcoming } = useSessions();
   const { 
+    payments,
     paidPayments,
     pendingPayments,
-    totals,
     isLoading: isLoadingPayments, 
     fetchPayments, 
     createPayment,
@@ -541,16 +675,17 @@ export function Cobros() {
   const [preselectedSession, setPreselectedSession] = useState<SessionUI | null>(null);
   const [reminderSession, setReminderSession] = useState<SessionUI | null>(null);
 
-  // Filter state
+  // Global filter state (affects stats and lists)
+  const [globalDateFrom, setGlobalDateFrom] = useState('');
+  const [globalDateTo, setGlobalDateTo] = useState('');
+  const [globalQuickFilter, setGlobalQuickFilter] = useState<QuickFilter>('all');
+
+  // Tab-specific filter state (search and sort only)
   const [pendingSearch, setPendingSearch] = useState('');
-  const [pendingDateFrom, setPendingDateFrom] = useState('');
-  const [pendingDateTo, setPendingDateTo] = useState('');
   const [pendingPage, setPendingPage] = useState(1);
   const [pendingSortBy, setPendingSortBy] = useState<SortOption>('date-desc');
 
   const [historySearch, setHistorySearch] = useState('');
-  const [historyDateFrom, setHistoryDateFrom] = useState('');
-  const [historyDateTo, setHistoryDateTo] = useState('');
   const [historyPage, setHistoryPage] = useState(1);
   const [historySortBy, setHistorySortBy] = useState<SortOption>('date-desc');
 
@@ -566,12 +701,12 @@ export function Cobros() {
   useEffect(() => { 
     setPendingPage(1); 
     setPendingVisibleCount(INFINITE_SCROLL_BATCH);
-  }, [pendingSearch, pendingDateFrom, pendingDateTo, pendingSortBy]);
+  }, [pendingSearch, globalDateFrom, globalDateTo, pendingSortBy]);
   
   useEffect(() => { 
     setHistoryPage(1); 
     setHistoryVisibleCount(INFINITE_SCROLL_BATCH);
-  }, [historySearch, historyDateFrom, historyDateTo, historySortBy]);
+  }, [historySearch, globalDateFrom, globalDateTo, historySortBy]);
 
   // Infinite scroll effect for pending sessions (mobile only)
   useEffect(() => {
@@ -665,29 +800,89 @@ export function Cobros() {
     });
   }, [sessionsUI, isSessionPaid]);
 
+  // Helper to check if a date is within the global filter range
+  const isInDateRange = useCallback((dateStr: string) => {
+    if (!globalDateFrom && !globalDateTo) return true;
+    
+    const date = new Date(dateStr);
+    date.setHours(0, 0, 0, 0);
+    
+    if (globalDateFrom) {
+      const from = new Date(globalDateFrom);
+      from.setHours(0, 0, 0, 0);
+      if (date < from) return false;
+    }
+    if (globalDateTo) {
+      const to = new Date(globalDateTo);
+      to.setHours(23, 59, 59, 999);
+      if (date > to) return false;
+    }
+    return true;
+  }, [globalDateFrom, globalDateTo]);
+
+  // Sessions filtered by global date range (for stats and list)
+  const sessionsInRange = useMemo(() => {
+    return sessionsPendingPayment.filter(session => isInDateRange(session.scheduledFrom));
+  }, [sessionsPendingPayment, isInDateRange]);
+
+  // All payments filtered by global date range (for stats)
+  const paymentsInRange = useMemo(() => {
+    return payments.filter(payment => isInDateRange(payment.paymentDate));
+  }, [payments, isInDateRange]);
+
+  // Paid payments filtered by global date range (for historial list)
+  const paidPaymentsInRange = useMemo(() => {
+    return paidPayments.filter(payment => isInDateRange(payment.paymentDate));
+  }, [paidPayments, isInDateRange]);
+
+  // Calculate filtered totals for stats (same logic as usePayments hook)
+  const filteredTotals = useMemo(() => {
+    if (paymentsInRange.length === 0 && sessionsInRange.length === 0) {
+      return {
+        totalAmount: 0,
+        paidAmount: 0,
+        pendingAmount: 0,
+        overdueAmount: 0,
+        totalCount: 0,
+        paidCount: 0,
+        pendingCount: 0,
+        overdueCount: 0,
+      };
+    }
+
+    // Helper to safely sum amounts
+    const sumAmounts = (items: { amount: number }[]) => 
+      items.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+
+    // Filter payments by status
+    const paidInRange = paymentsInRange.filter(p => p.status === 'paid');
+    const pendingInRange = paymentsInRange.filter(p => p.status === 'pending' || p.status === 'overdue');
+    const overdueInRange = paymentsInRange.filter(p => p.status === 'overdue');
+
+    return {
+      totalAmount: sumAmounts(paymentsInRange),
+      paidAmount: sumAmounts(paidInRange),
+      pendingAmount: sumAmounts(pendingInRange),
+      overdueAmount: sumAmounts(overdueInRange),
+      totalCount: paymentsInRange.length,
+      paidCount: paidInRange.length,
+      pendingCount: pendingInRange.length,
+      overdueCount: overdueInRange.length,
+    };
+  }, [paymentsInRange, sessionsInRange]);
+
   // Filtered and sorted pending sessions
   const filteredPendingSessions = useMemo(() => {
-    let filtered = [...sessionsPendingPayment];
+    // Start with sessions in the global date range
+    let filtered = [...sessionsInRange];
 
-    // Filter by patient name
+    // Filter by patient name (tab-specific search)
     if (pendingSearch.trim()) {
       const search = pendingSearch.toLowerCase();
       filtered = filtered.filter(session => {
         const name = (session.patientName || session.patient?.firstName || '').toLowerCase();
         return name.includes(search);
       });
-    }
-
-    // Filter by date range
-    if (pendingDateFrom) {
-      const from = new Date(pendingDateFrom);
-      from.setHours(0, 0, 0, 0);
-      filtered = filtered.filter(session => new Date(session.scheduledFrom) >= from);
-    }
-    if (pendingDateTo) {
-      const to = new Date(pendingDateTo);
-      to.setHours(23, 59, 59, 999);
-      filtered = filtered.filter(session => new Date(session.scheduledFrom) <= to);
     }
 
     // Sort by selected option
@@ -707,7 +902,7 @@ export function Cobros() {
     });
 
     return filtered;
-  }, [sessionsPendingPayment, pendingSearch, pendingDateFrom, pendingDateTo, pendingSortBy]);
+  }, [sessionsInRange, pendingSearch, pendingSortBy]);
 
   // Pagination for desktop, infinite scroll for mobile
   const pendingTotalPages = Math.ceil(filteredPendingSessions.length / ITEMS_PER_PAGE);
@@ -726,9 +921,10 @@ export function Cobros() {
 
   // Filtered and sorted history
   const filteredPaidPayments = useMemo(() => {
-    let filtered = [...paidPayments];
+    // Start with payments in the global date range
+    let filtered = [...paidPaymentsInRange];
 
-    // Filter by patient name
+    // Filter by patient name (tab-specific search)
     if (historySearch.trim()) {
       const search = historySearch.toLowerCase();
       filtered = filtered.filter(payment => {
@@ -737,18 +933,6 @@ export function Cobros() {
           : '';
         return name.includes(search);
       });
-    }
-
-    // Filter by date range
-    if (historyDateFrom) {
-      const from = new Date(historyDateFrom);
-      from.setHours(0, 0, 0, 0);
-      filtered = filtered.filter(payment => new Date(payment.paymentDate) >= from);
-    }
-    if (historyDateTo) {
-      const to = new Date(historyDateTo);
-      to.setHours(23, 59, 59, 999);
-      filtered = filtered.filter(payment => new Date(payment.paymentDate) <= to);
     }
 
     // Sort by selected option
@@ -768,7 +952,7 @@ export function Cobros() {
     });
 
     return filtered;
-  }, [paidPayments, historySearch, historyDateFrom, historyDateTo, historySortBy]);
+  }, [paidPaymentsInRange, historySearch, historySortBy]);
 
   // Pagination for desktop, infinite scroll for mobile
   const historyTotalPages = Math.ceil(filteredPaidPayments.length / ITEMS_PER_PAGE);
@@ -869,20 +1053,15 @@ export function Cobros() {
     setPreselectedSession(null);
   }, []);
 
-  const clearPendingFilters = useCallback(() => {
-    setPendingSearch('');
-    setPendingDateFrom('');
-    setPendingDateTo('');
+  const clearGlobalFilters = useCallback(() => {
+    setGlobalDateFrom('');
+    setGlobalDateTo('');
+    setGlobalQuickFilter('all');
   }, []);
 
-  const clearHistoryFilters = useCallback(() => {
-    setHistorySearch('');
-    setHistoryDateFrom('');
-    setHistoryDateTo('');
-  }, []);
-
-  const hasPendingFilters = pendingSearch || pendingDateFrom || pendingDateTo;
-  const hasHistoryFilters = historySearch || historyDateFrom || historyDateTo;
+  const hasGlobalFilters = globalDateFrom || globalDateTo;
+  const hasPendingFilters = pendingSearch;
+  const hasHistoryFilters = historySearch;
 
   const isLoading = isInitialLoading || isRefreshing;
 
@@ -902,8 +1081,25 @@ export function Cobros() {
         </Button>
       </div>
 
+      {/* Global Filters (affects stats and both tabs) */}
+      <Filters
+        searchTerm=""
+        onSearchChange={() => {}}
+        dateFrom={globalDateFrom}
+        dateTo={globalDateTo}
+        onDateFromChange={setGlobalDateFrom}
+        onDateToChange={setGlobalDateTo}
+        onClearFilters={clearGlobalFilters}
+        hasActiveFilters={!!hasGlobalFilters}
+        sortBy="date-desc"
+        onSortChange={() => {}}
+        quickFilter={globalQuickFilter}
+        onQuickFilterChange={setGlobalQuickFilter}
+        showSearchAndSort={false}
+      />
+
       {/* Stats Cards */}
-      <PaymentStats totals={totals} isLoading={isLoading} />
+      <PaymentStats totals={filteredTotals} isLoading={isLoading} />
 
       {/* Tabs */}
       <Tabs defaultValue="pendientes" className="w-full">
@@ -912,29 +1108,23 @@ export function Cobros() {
             <Calendar className="h-4 w-4" />
             Pendientes
             <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-1.5 py-0.5 rounded-full">
-              {sessionsPendingPayment.length}
+              {sessionsInRange.length}
             </span>
           </TabsTrigger>
           <TabsTrigger value="historial" className="flex-1 sm:flex-none gap-2">
             <History className="h-4 w-4" />
             Historial
             <span className="bg-green-100 text-green-800 text-xs font-medium px-1.5 py-0.5 rounded-full">
-              {paidPayments.length}
+              {paidPaymentsInRange.length}
             </span>
           </TabsTrigger>
         </TabsList>
 
         {/* Pendientes Tab */}
         <TabsContent value="pendientes" className="mt-4 space-y-4">
-          <Filters
+          <SearchAndSort
             searchTerm={pendingSearch}
             onSearchChange={setPendingSearch}
-            dateFrom={pendingDateFrom}
-            dateTo={pendingDateTo}
-            onDateFromChange={setPendingDateFrom}
-            onDateToChange={setPendingDateTo}
-            onClearFilters={clearPendingFilters}
-            hasActiveFilters={!!hasPendingFilters}
             sortBy={pendingSortBy}
             onSortChange={setPendingSortBy}
           />
@@ -944,9 +1134,9 @@ export function Cobros() {
           ) : filteredPendingSessions.length === 0 ? (
             <EmptyState 
               icon={DollarSign} 
-              title={hasPendingFilters ? "Sin resultados" : "¡Todo al día!"}
-              subtitle={hasPendingFilters ? "No hay sesiones que coincidan con los filtros" : "No hay sesiones pendientes de cobro"}
-              variant={hasPendingFilters ? 'default' : 'success'}
+              title={(hasPendingFilters || hasGlobalFilters) ? "Sin resultados" : "¡Todo al día!"}
+              subtitle={(hasPendingFilters || hasGlobalFilters) ? "No hay sesiones que coincidan con los filtros" : "No hay sesiones pendientes de cobro"}
+              variant={(hasPendingFilters || hasGlobalFilters) ? 'default' : 'success'}
             />
           ) : (
             <>
@@ -983,15 +1173,9 @@ export function Cobros() {
 
         {/* Historial Tab */}
         <TabsContent value="historial" className="mt-4 space-y-4">
-          <Filters
+          <SearchAndSort
             searchTerm={historySearch}
             onSearchChange={setHistorySearch}
-            dateFrom={historyDateFrom}
-            dateTo={historyDateTo}
-            onDateFromChange={setHistoryDateFrom}
-            onDateToChange={setHistoryDateTo}
-            onClearFilters={clearHistoryFilters}
-            hasActiveFilters={!!hasHistoryFilters}
             sortBy={historySortBy}
             onSortChange={setHistorySortBy}
           />
@@ -1001,8 +1185,8 @@ export function Cobros() {
           ) : filteredPaidPayments.length === 0 ? (
             <EmptyState 
               icon={History} 
-              title={hasHistoryFilters ? "Sin resultados" : "Sin historial"}
-              subtitle={hasHistoryFilters ? "No hay pagos que coincidan con los filtros" : "Aún no hay pagos registrados"}
+              title={(hasHistoryFilters || hasGlobalFilters) ? "Sin resultados" : "Sin historial"}
+              subtitle={(hasHistoryFilters || hasGlobalFilters) ? "No hay pagos que coincidan con los filtros" : "Aún no hay pagos registrados"}
             />
           ) : (
             <>

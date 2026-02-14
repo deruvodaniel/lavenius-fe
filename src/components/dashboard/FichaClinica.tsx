@@ -1,14 +1,15 @@
-import { ArrowLeft, Mail, Phone, Heart, Calendar, FileText, User, Clock, Flag, Edit2, Save, X, Plus, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Heart, Calendar, FileText, User, Clock, Flag, Edit2, Save, X, Plus, MessageCircle, Pencil, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { TurnoDrawer } from '../agenda';
 import { NoteDrawer } from '../notes/NoteDrawer';
 import { NoteList } from '../notes/NoteList';
+import { PacienteDrawer } from '../pacientes/PacienteDrawer';
 import { usePatients } from '@/lib/hooks';
 import { useNotes } from '@/lib/hooks/useNotes';
 import { useSessions } from '@/lib/stores/sessionStore';
 import { SkeletonNotes, SkeletonSessionCard } from '../shared/Skeleton';
-import type { Patient, CreateNoteDto, UpdateNoteDto, Note } from '@/lib/types/api.types';
+import type { Patient, CreateNoteDto, UpdateNoteDto, Note, CreatePatientDto } from '@/lib/types/api.types';
 import type { CreateSessionDto } from '@/lib/types/session';
 
 interface FichaClinicaProps {
@@ -16,16 +17,34 @@ interface FichaClinicaProps {
   onBack: () => void;
 }
 
+// Helper to format frequency label
+const getFrecuenciaLabel = (frecuencia?: string) => {
+  switch (frecuencia?.toLowerCase()) {
+    case 'semanal':
+      return 'Semanal';
+    case 'quincenal':
+      return 'Quincenal';
+    case 'mensual':
+      return 'Mensual';
+    default:
+      return frecuencia || 'No especificada';
+  }
+};
+
 export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
-  const { updatePatient } = usePatients();
+  const { updatePatient, fetchPatients } = usePatients();
   const { sessionsUI, isLoading: isLoadingSessions, fetchUpcoming, createSession } = useSessions();
   const { notes, isLoading: isLoadingNotes, fetchNotesByPatient, createNote, updateNote, deleteNote, clearNotes } = useNotes();
   
-  // Estado para gestionar flag
-  const [isFlagged, setIsFlagged] = useState(false);
+  // Estado para gestionar flag (basado en riskLevel del paciente)
+  const [isFlagged, setIsFlagged] = useState(patient?.riskLevel === 'high');
+  const [isSavingFlag, setIsSavingFlag] = useState(false);
   
-  // Estado para modo edición
+  // Estado para modo edición inline (contacto)
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Estado para drawer de edición completa del paciente
+  const [isPacienteDrawerOpen, setIsPacienteDrawerOpen] = useState(false);
   
   // Estado para datos editables
   const [editableData, setEditableData] = useState({
@@ -40,6 +59,13 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   const [isTurnoDrawerOpen, setIsTurnoDrawerOpen] = useState(false);
   const [isNoteDrawerOpen, setIsNoteDrawerOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+
+  // Update flag state when patient changes
+  useEffect(() => {
+    if (patient) {
+      setIsFlagged(patient.riskLevel === 'high');
+    }
+  }, [patient]);
 
   // Load notes when patient changes
   useEffect(() => {
@@ -73,6 +99,29 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
       month: 'long',
       year: 'numeric',
     });
+  };
+
+  // Toggle flag and persist to backend
+  const handleToggleFlag = async () => {
+    const newFlagValue = !isFlagged;
+    setIsFlagged(newFlagValue);
+    setIsSavingFlag(true);
+    
+    try {
+      await updatePatient(patient.id, {
+        riskLevel: newFlagValue ? 'high' : 'low',
+      });
+      toast.success(newFlagValue ? 'Paciente marcado como riesgo alto' : 'Marcador de riesgo removido');
+      // Refresh patients list to update other views
+      await fetchPatients();
+    } catch (error) {
+      // Revert on error
+      setIsFlagged(!newFlagValue);
+      console.error('Error updating patient flag:', error);
+      toast.error('Error al actualizar el marcador');
+    } finally {
+      setIsSavingFlag(false);
+    }
   };
 
   const handleSaveEdit = async () => {
@@ -155,6 +204,28 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     setIsNoteDrawerOpen(true);
   };
 
+  // Handler para guardar paciente desde el drawer
+  const handleSavePatientFromDrawer = async (patientData: CreatePatientDto) => {
+    try {
+      await updatePatient(patient.id, patientData);
+      toast.success('Paciente actualizado exitosamente');
+      setIsPacienteDrawerOpen(false);
+      // Refresh para actualizar la vista
+      await fetchPatients();
+      // Actualizar datos locales editables
+      setEditableData({
+        telefono: patientData.phone || '',
+        email: patientData.email || '',
+        diagnostico: patientData.diagnosis || '',
+        tratamientoActual: patientData.currentTreatment || '',
+        observaciones: patientData.observations || '',
+      });
+    } catch (error) {
+      console.error('Error updating patient:', error);
+      toast.error('Error al actualizar el paciente');
+    }
+  };
+
   // Send WhatsApp message to patient
   const handleSendWhatsApp = (message?: string) => {
     if (!editableData.telefono) {
@@ -189,15 +260,27 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
       </button>
 
       {/* Patient Header */}
-      <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white rounded-lg p-4 md:p-6 lg:p-8 mb-6">
+      <div className={`bg-gradient-to-r ${isFlagged ? 'from-red-900 to-red-700' : 'from-indigo-900 to-indigo-700'} text-white rounded-lg p-4 md:p-6 lg:p-8 mb-6 transition-colors`}>
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+          <div className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 ${isFlagged ? 'bg-red-600' : 'bg-indigo-600'} rounded-full flex items-center justify-center flex-shrink-0 relative`}>
             <span className="text-white text-xl sm:text-2xl md:text-3xl">
               {`${patient.firstName} ${patient.lastName}`.split(' ').map((n) => n[0]).join('')}
             </span>
+            {isFlagged && (
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                <Flag className="w-3.5 h-3.5 text-red-900 fill-current" />
+              </div>
+            )}
           </div>
           <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-white text-2xl md:text-3xl mb-2">{patient.firstName} {patient.lastName}</h1>
+            <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
+              <h1 className="text-white text-2xl md:text-3xl">{patient.firstName} {patient.lastName}</h1>
+              {isFlagged && (
+                <span className="px-2 py-0.5 bg-yellow-400 text-red-900 text-xs font-bold rounded">
+                  RIESGO ALTO
+                </span>
+              )}
+            </div>
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-indigo-200">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4" />
@@ -207,14 +290,26 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
                 <Heart className="w-4 h-4" />
                 <span>{patient.healthInsurance || 'Sin obra social'}</span>
               </div>
+              <div className="flex items-center gap-2">
+                <RefreshCw className="w-4 h-4" />
+                <span>{getFrecuenciaLabel(patient.frequency)}</span>
+              </div>
             </div>
           </div>
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setIsFlagged(!isFlagged)}
-              className="p-3 rounded-lg hover:bg-indigo-600 transition-colors"
-              title={isFlagged ? "Quitar marcador" : "Marcar paciente"}
+              onClick={() => setIsPacienteDrawerOpen(true)}
+              className={`p-3 rounded-lg ${isFlagged ? 'hover:bg-red-600' : 'hover:bg-indigo-600'} transition-colors`}
+              title="Editar información del paciente"
+            >
+              <Pencil className={`w-6 h-6 ${isFlagged ? 'text-red-200 hover:text-white' : 'text-indigo-200 hover:text-white'}`} />
+            </button>
+            <button
+              onClick={handleToggleFlag}
+              disabled={isSavingFlag}
+              className={`p-3 rounded-lg ${isFlagged ? 'hover:bg-red-600' : 'hover:bg-indigo-600'} transition-colors disabled:opacity-50`}
+              title={isFlagged ? "Quitar marcador de riesgo" : "Marcar como riesgo alto"}
             >
               <Flag
                 className={`w-6 h-6 ${isFlagged ? 'fill-yellow-400 text-yellow-400' : 'text-indigo-200'}`}
@@ -258,7 +353,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-gray-900">
                       <Phone className="w-4 h-4 text-gray-400" />
-                      <span>{editableData.telefono}</span>
+                      <span>{editableData.telefono || 'No registrado'}</span>
                     </div>
                     {editableData.telefono && (
                       <button
@@ -284,7 +379,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
                 ) : (
                   <div className="flex items-center gap-2 text-gray-900">
                     <Mail className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">{editableData.email}</span>
+                    <span className="text-sm">{editableData.email || 'No registrado'}</span>
                   </div>
                 )}
               </div>
@@ -346,6 +441,15 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
             ) : (
               <p className="text-gray-500 text-sm">No hay turnos próximos</p>
             )}
+            
+            {/* Botón Agendar Turno - ahora debajo de Próximos Turnos */}
+            <button
+              onClick={() => setIsTurnoDrawerOpen(true)}
+              className="w-full mt-4 flex items-center justify-center gap-2 bg-indigo-600 text-white py-2.5 rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Agendar Turno
+            </button>
           </div>
         </div>
 
@@ -362,7 +466,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               />
             ) : (
               <p className="text-gray-700 leading-relaxed">
-                {editableData.diagnostico}
+                {editableData.diagnostico || 'Sin diagnóstico registrado'}
               </p>
             )}
           </div>
@@ -378,7 +482,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               />
             ) : (
               <p className="text-gray-700 leading-relaxed">
-                {editableData.tratamientoActual}
+                {editableData.tratamientoActual || 'Sin tratamiento registrado'}
               </p>
             )}
           </div>
@@ -399,8 +503,17 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
             )}
           </div>
 
-          {/* Notas de Sesión */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          {/* Notas de Sesión - con overlay Próximamente */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6 relative overflow-hidden">
+            {/* Coming Soon Overlay */}
+            <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-[1px] z-10 flex items-center justify-center">
+              <div className="bg-white/90 border border-gray-200 shadow-lg rounded-lg px-4 py-2 transform -rotate-3">
+                <span className="text-sm font-bold text-gray-500 tracking-wider uppercase">
+                  Próximamente
+                </span>
+              </div>
+            </div>
+            
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-gray-900 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-indigo-600" />
@@ -426,16 +539,6 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               />
             )}
           </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={() => setIsTurnoDrawerOpen(true)}
-              className="flex-1 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              Agendar Turno
-            </button>
-          </div>
         </div>
       </div>
 
@@ -458,6 +561,14 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
         onSave={handleSaveNote}
         note={selectedNote}
         patientId={parseInt(patient.id, 10)}
+      />
+
+      {/* Paciente Drawer - para edición completa */}
+      <PacienteDrawer
+        isOpen={isPacienteDrawerOpen}
+        onClose={() => setIsPacienteDrawerOpen(false)}
+        onSave={handleSavePatientFromDrawer}
+        patient={patient}
       />
     </div>
   );

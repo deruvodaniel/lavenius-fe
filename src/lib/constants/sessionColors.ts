@@ -31,7 +31,7 @@ export const SESSION_STATUS_BADGE_CLASSES: Record<SessionStatus, string> = {
  * Textos legibles para los estados de sesión
  */
 export const SESSION_STATUS_LABELS: Record<SessionStatus, string> = {
-  [SessionStatus.PENDING]: 'Pendiente',
+  [SessionStatus.PENDING]: 'Agendada',
   [SessionStatus.CONFIRMED]: 'Confirmada',
   [SessionStatus.COMPLETED]: 'Completada',
   [SessionStatus.CANCELLED]: 'Cancelada',
