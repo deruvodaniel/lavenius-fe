@@ -14,6 +14,72 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001
 const API_TIMEOUT = Number(import.meta.env.VITE_API_TIMEOUT) || 30000;
 
 /**
+ * Error message translations from English to Spanish
+ */
+const ERROR_TRANSLATIONS: Record<string, string> = {
+  // Validation errors
+  'Validation failed': 'Error de validación',
+  'Validation failed (numeric string is expected)': 'Error de validación en los datos enviados',
+  'Validation failed (uuid is expected)': 'Error de validación: se esperaba un identificador válido',
+  'Bad Request': 'Solicitud inválida',
+  'Invalid credentials': 'Credenciales inválidas',
+  'Invalid passphrase': 'Frase de seguridad incorrecta',
+  
+  // Auth errors
+  'Unauthorized': 'No autorizado',
+  'Token expired': 'Sesión expirada, por favor inicia sesión nuevamente',
+  'Access denied': 'Acceso denegado',
+  'Forbidden': 'No tienes permisos para realizar esta acción',
+  
+  // Resource errors
+  'Not found': 'No encontrado',
+  'Resource not found': 'Recurso no encontrado',
+  'Patient not found': 'Paciente no encontrado',
+  'Session not found': 'Sesión no encontrada',
+  'Note not found': 'Nota no encontrada',
+  'Payment not found': 'Pago no encontrado',
+  
+  // Conflict errors
+  'Conflict': 'Conflicto',
+  'Already exists': 'Ya existe un registro con estos datos',
+  'Email already exists': 'Este correo electrónico ya está registrado',
+  'Duplicate entry': 'Ya existe un registro con estos datos',
+  
+  // Server errors
+  'Internal server error': 'Error interno del servidor',
+  'Service unavailable': 'Servicio no disponible',
+  'Gateway timeout': 'Tiempo de espera agotado',
+  
+  // Calendar errors
+  'Calendar not connected': 'Calendario no conectado',
+  'Failed to sync calendar': 'Error al sincronizar el calendario',
+  'Google Calendar authentication failed': 'Error de autenticación con Google Calendar',
+};
+
+/**
+ * Translate error message to Spanish
+ */
+function translateErrorMessage(message: string | string[]): string {
+  const msg = Array.isArray(message) ? message.join(', ') : message;
+  
+  // Check for exact match
+  if (ERROR_TRANSLATIONS[msg]) {
+    return ERROR_TRANSLATIONS[msg];
+  }
+  
+  // Check for partial matches (case-insensitive)
+  const lowerMsg = msg.toLowerCase();
+  for (const [key, translation] of Object.entries(ERROR_TRANSLATIONS)) {
+    if (lowerMsg.includes(key.toLowerCase())) {
+      return translation;
+    }
+  }
+  
+  // Return original if no translation found
+  return msg;
+}
+
+/**
  * Custom error class for API errors
  */
 export class ApiClientError extends Error {
@@ -28,10 +94,11 @@ export class ApiClientError extends Error {
   }
 
   static fromApiError(error: ApiError): ApiClientError {
+    const translatedMessage = translateErrorMessage(error.message);
     return new ApiClientError(
       error.statusCode,
       error.error,
-      error.message,
+      translatedMessage,
       error.path
     );
   }
