@@ -70,7 +70,12 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
     set({ fetchStatus: 'loading', error: null, currentFilters: filters || null });
     
     try {
-      const payments = await paymentService.getAll(filters);
+      const response = await paymentService.getAll(filters);
+      // Ensure payments is always an array (API might return object with payments property)
+      const payments = Array.isArray(response) ? response : [];
+      if (!Array.isArray(response)) {
+        console.warn('[PaymentStore] API returned non-array response:', response);
+      }
       set({ 
         payments, 
         fetchStatus: 'success',
@@ -158,40 +163,50 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
 
 export const paymentSelectors = {
   getPayments: (state: PaymentState): Payment[] => 
-    state.payments ?? [],
+    Array.isArray(state.payments) ? state.payments : [],
   
-  getPaidPayments: (state: PaymentState): Payment[] =>
-    state.payments?.filter(p => p.status === PaymentStatus.PAID) ?? [],
+  getPaidPayments: (state: PaymentState): Payment[] => {
+    const payments = Array.isArray(state.payments) ? state.payments : [];
+    return payments.filter(p => p.status === PaymentStatus.PAID);
+  },
   
-  getPendingPayments: (state: PaymentState): Payment[] =>
-    state.payments?.filter(p => 
+  getPendingPayments: (state: PaymentState): Payment[] => {
+    const payments = Array.isArray(state.payments) ? state.payments : [];
+    return payments.filter(p => 
       p.status === PaymentStatus.PENDING || p.status === PaymentStatus.OVERDUE
-    ) ?? [],
+    );
+  },
   
-  getOverduePayments: (state: PaymentState): Payment[] =>
-    state.payments?.filter(p => p.status === PaymentStatus.OVERDUE) ?? [],
+  getOverduePayments: (state: PaymentState): Payment[] => {
+    const payments = Array.isArray(state.payments) ? state.payments : [];
+    return payments.filter(p => p.status === PaymentStatus.OVERDUE);
+  },
 
   /** 
    * Check if a session has been paid
    * Looks for any payment linked to this session with status PAID
    */
-  isSessionPaid: (state: PaymentState, sessionId: string): boolean =>
-    state.payments?.some(
+  isSessionPaid: (state: PaymentState, sessionId: string): boolean => {
+    const payments = Array.isArray(state.payments) ? state.payments : [];
+    return payments.some(
       p => p.sessionId === sessionId && p.status === PaymentStatus.PAID
-    ) ?? false,
+    );
+  },
 
   /**
    * Get payment for a specific session
    */
-  getPaymentBySessionId: (state: PaymentState, sessionId: string): Payment | undefined =>
-    state.payments?.find(p => p.sessionId === sessionId),
+  getPaymentBySessionId: (state: PaymentState, sessionId: string): Payment | undefined => {
+    const payments = Array.isArray(state.payments) ? state.payments : [];
+    return payments.find(p => p.sessionId === sessionId);
+  },
 
   /**
    * Calculate totals from payments array
    * Note: Backend may return amount as string, so we convert to number
    */
   calculateTotals: (state: PaymentState) => {
-    const payments = state.payments ?? [];
+    const payments = Array.isArray(state.payments) ? state.payments : [];
     
     const paidPayments = payments.filter(p => p.status === PaymentStatus.PAID);
     const pendingPayments = payments.filter(p => 

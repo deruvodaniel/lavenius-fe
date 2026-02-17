@@ -12,30 +12,30 @@ import type { Payment } from '../types/api.types';
 export const usePayments = () => {
   const store = usePaymentStore();
   
-  // Extract payments for dependency tracking
-  const paymentsArray = store.payments;
+  // Extract payments for dependency tracking - ensure it's always an array
+  const paymentsArray = Array.isArray(store.payments) ? store.payments : [];
   
   // Memoized derived data - recalculates when payments array changes
   const payments = useMemo(
-    () => paymentsArray ?? [],
+    () => paymentsArray,
     [paymentsArray]
   );
   
   const paidPayments = useMemo(
-    () => paymentsArray?.filter((p: Payment) => p.status === PaymentStatus.PAID) ?? [],
+    () => paymentsArray.filter((p: Payment) => p.status === PaymentStatus.PAID),
     [paymentsArray]
   );
   
   const pendingPayments = useMemo(
-    () => paymentsArray?.filter((p: Payment) => 
+    () => paymentsArray.filter((p: Payment) => 
       p.status === PaymentStatus.PENDING || p.status === PaymentStatus.OVERDUE
-    ) ?? [],
+    ),
     [paymentsArray]
   );
 
   // Calculated totals with safe defaults
   const totals = useMemo(() => {
-    if (!paymentsArray || paymentsArray.length === 0) {
+    if (paymentsArray.length === 0) {
       return {
         totalAmount: 0,
         paidAmount: 0,
@@ -74,9 +74,10 @@ export const usePayments = () => {
   // Note: needs fresh store reference each call
   const isSessionPaid = (sessionId: string): boolean => {
     const currentPayments = usePaymentStore.getState().payments;
-    return currentPayments?.some(
+    const paymentsArr = Array.isArray(currentPayments) ? currentPayments : [];
+    return paymentsArr.some(
       (p: Payment) => p.sessionId === sessionId && p.status === PaymentStatus.PAID
-    ) ?? false;
+    );
   };
 
   return {
