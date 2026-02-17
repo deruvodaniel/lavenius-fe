@@ -1,14 +1,14 @@
 # Implementation Status
 
-> Última actualización: Febrero 14, 2026
+> Última actualización: Febrero 16, 2026
 
 ## ✅ Completado
 
 ### Infraestructura
 - [x] LLM-friendly documentation structure (docs/ai/)
-- [x] Custom hooks (useAuth, usePatients, useSessions, useNotes, usePayments, useErrorToast, useMediaQuery)
+- [x] Custom hooks (useAuth, usePatients, useSessions, useNotes, usePayments, useErrorToast, useMediaQuery, useOnboarding)
 - [x] Error Boundary component
-- [x] Zustand stores (auth, patient, session, note, payment)
+- [x] Zustand stores (auth, patient, session, note, payment, onboarding, calendar)
 - [x] API integration layer (lib/api/)
 
 ### Componentes Migrados
@@ -45,6 +45,15 @@
   - Días Off sincronizados en calendario
   - Overlay "PRÓXIMAMENTE" en features pendientes
 
+- [x] Onboarding & Help System (Febrero 2026)
+  - OnboardingModal: 4-step wizard for first-time users
+  - OnboardingProgress: Step indicator component
+  - OnboardingStep: Individual step component
+  - TipBanner: Dismissible contextual tips
+  - HelpCenter: Searchable help articles by category
+  - Zustand store with localStorage persistence
+  - Calendar connection tip in Agenda view
+
 ### Documentación
 - [x] Documentación consolidada en docs/
 - [x] Guidelines.md (arquitectura y estilo)
@@ -64,10 +73,20 @@
    - Notificaciones push
    - Email reminders
 
-3. **Code Cleanup**
+3. **Backend: Onboarding Persistence** (Cuando se integre)
+   ```typescript
+   // PATCH /users/me/preferences
+   // Body: { hasCompletedOnboarding: boolean, dismissedTips?: string[] }
+   
+   // User entity additions:
+   @Column({ default: false }) hasCompletedOnboarding: boolean;
+   @Column('simple-array', { nullable: true }) dismissedTips: string[];
+   ```
+
+4. **Code Cleanup**
    - Archivar mockData.ts y turnos2026.ts
    - Remover console.logs
-   - Code splitting para optimizar bundle (actualmente ~885KB)
+   - Code splitting para optimizar bundle (actualmente ~937KB)
 
 ## 🎯 Pattern Established
 
@@ -116,7 +135,7 @@ const form = useForm({ resolver: zodResolver(schema) });
 ```
 
 ## 📊 Métricas
-- Bundle size: 885.78 kB (⚠️ considerar code splitting)
+- Bundle size: 937.32 kB (⚠️ considerar code splitting)
 - Build time: ~8s
 - TypeScript strict: ✅
 - ESLint warnings: <10
