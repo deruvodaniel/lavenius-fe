@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { Calendar, Users, DollarSign, LogOut, Settings, ChevronRight, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { ConfirmDialog } from '@/components/shared';
 
 type View = 'agenda' | 'pacientes' | 'cobros' | 'configuracion' | 'perfil' | 'ayuda';
 
@@ -13,9 +15,20 @@ interface SidebarProps {
 
 export function Sidebar({ currentView, onViewChange, onLogout, showHeader = true, onNavigate }: SidebarProps) {
   const { user } = useAuth();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
   const handleNavClick = (view: View) => {
     onViewChange(view);
     onNavigate?.(); // Cerrar drawer en mobile
+  };
+
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    onLogout?.();
+    setShowLogoutConfirm(false);
   };
 
   const menuItems = [
@@ -107,13 +120,26 @@ export function Sidebar({ currentView, onViewChange, onLogout, showHeader = true
           </button>
         )}
         <button
-          onClick={onLogout}
+          onClick={handleLogoutClick}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white transition-colors"
         >
           <LogOut className="w-4 h-4" />
           <span className="text-sm">Cerrar sesión</span>
         </button>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <ConfirmDialog
+        open={showLogoutConfirm}
+        onOpenChange={setShowLogoutConfirm}
+        title="¿Cerrar sesión?"
+        description="Estás a punto de cerrar tu sesión. Tendrás que volver a iniciar sesión para acceder a tu cuenta."
+        confirmLabel="Cerrar sesión"
+        cancelLabel="Cancelar"
+        variant="warning"
+        icon={LogOut}
+        onConfirm={handleLogoutConfirm}
+      />
     </div>
   );
 }

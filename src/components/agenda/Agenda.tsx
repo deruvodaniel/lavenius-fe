@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { TurnoDrawer } from './TurnoDrawer';
 import { TurnoCard } from './TurnoCard';
 import { SessionDetailsModal } from './SessionDetailsModal';
-import { SkeletonList, EmptyState } from '../shared';
+import { SkeletonList, EmptyState, ConfirmDialog } from '../shared';
 import { FullCalendarView } from './FullCalendarView';
 import CalendarSyncButton from '../config/CalendarSyncButton';
 import { FichaClinica } from '../dashboard/FichaClinica';
@@ -101,6 +101,11 @@ export function Agenda() {
   
   // Search state
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Delete confirmation dialog state
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState<{ id: string; patientName: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   // Estado para el mes/año del calendario
   const [calendarDate, setCalendarDate] = useState(new Date());
@@ -428,6 +433,30 @@ export function Agenda() {
     }
   };
 
+  const handleRequestDeleteTurno = (sessionId: string, patientName: string) => {
+    setSessionToDelete({ id: sessionId, patientName });
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteTurno = async () => {
+    if (!sessionToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteSession(sessionToDelete.id);
+      toast.success('Turno eliminado exitosamente');
+      setDeleteConfirmOpen(false);
+      setSessionToDelete(null);
+      // Refresh list
+      await fetchUpcoming();
+    } catch (error) {
+      console.error('Error deleting session:', error);
+      toast.error('Error al eliminar el turno');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   // Send WhatsApp confirmation request for a turno
   const handleSendWhatsAppConfirmation = (paciente: { nombre: string; telefono: string } | undefined, turno: { fecha: string; hora: string }) => {
     if (!paciente?.telefono) {
@@ -632,9 +661,7 @@ export function Agenda() {
                                 setTurnoDrawerOpen(true);
                               }}
                               onDeleteClick={() => {
-                                if (confirm('¿Estás seguro de que deseas eliminar este turno?')) {
-                                  handleDeleteTurno(session.id);
-                                }
+                                handleRequestDeleteTurno(session.id, paciente?.nombre || 'este paciente');
                               }}
                               onWhatsAppClick={() => handleSendWhatsAppConfirmation(paciente, turno)}
                             />
@@ -735,6 +762,23 @@ export function Agenda() {
           setDetailsModalOpen(false);
           setTurnoDrawerOpen(true);
         }}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Eliminar turno"
+        description={`¿Estás seguro de que deseas eliminar el turno de ${sessionToDelete?.patientName}? Esta acción no se puede deshacer.`}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={confirmDeleteTurno}
+        onCancel={() => {
+          setDeleteConfirmOpen(false);
+          setSessionToDelete(null);
+        }}
+        isLoading={isDeleting}
       />
     </div>
   );

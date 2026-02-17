@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, DollarSign, Calendar, FileText } from 'lucide-react';
+import { toast } from 'sonner';
 import { formatISODate } from '@/lib/utils/dateFormatters';
 import type { CreatePaymentDto } from '@/lib/types/api.types';
 import type { SessionUI } from '@/lib/types/session';
@@ -63,12 +64,12 @@ export const PaymentDrawer = ({
     e.preventDefault();
 
     if (!formData.sessionId) {
-      alert('Debe seleccionar una sesión');
+      toast.error('Debe seleccionar una sesión');
       return;
     }
 
     if (formData.amount <= 0) {
-      alert('El monto debe ser mayor a 0');
+      toast.error('El monto debe ser mayor a 0');
       return;
     }
 
@@ -85,11 +86,11 @@ export const PaymentDrawer = ({
       
       await onSave(paymentData);
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error al guardar pago:', error);
       // Show error to user
-      const errorMessage = error?.message || 'Error al guardar el pago';
-      alert(`Error: ${errorMessage}`);
+      const errorMessage = error instanceof Error ? error.message : 'Error al guardar el pago';
+      toast.error(`Error: ${errorMessage}`);
     } finally {
       setIsSaving(false);
     }

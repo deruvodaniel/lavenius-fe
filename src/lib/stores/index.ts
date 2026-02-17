@@ -11,3 +11,19 @@ export { usePatientStore } from './patient.store';
 
 // Appointment Store
 export { useAppointmentStore } from './appointment.store';
+
+// UI Store
+export { 
+  useUIStore,
+  useDrawer,
+  useViewPreferences,
+  useSidebar,
+  useLoading,
+  useIsAnyLoading,
+} from './ui.store';
+export type { 
+  DrawerType,
+  AgendaViewMode,
+  PacientesViewMode,
+  CalendarViewMode,
+} from './ui.store';

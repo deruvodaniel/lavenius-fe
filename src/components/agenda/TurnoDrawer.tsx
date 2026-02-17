@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { X, Calendar, Clock, User, AlertTriangle } from 'lucide-react';
+import { X, Calendar, Clock, User } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAuthStore } from '@/lib/stores';
+import { ConfirmDialog } from '@/components/shared';
 import type { Patient } from '@/lib/types/api.types';
 import { SessionType, SessionStatus } from '@/lib/types/session';
 import type { CreateSessionDto, SessionResponse } from '@/lib/types/session';
@@ -118,11 +120,11 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
   const handleSave = () => {
     // Validate before showing confirmation
     if (!formData.pacienteId) {
-      alert('Por favor seleccione un paciente');
+      toast.error('Por favor seleccione un paciente');
       return;
     }
     if (!formData.fecha) {
-      alert('Por favor seleccione una fecha');
+      toast.error('Por favor seleccione una fecha');
       return;
     }
     
@@ -131,20 +133,20 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     const now = new Date();
     if (selectedDate < now && !session) {
       // Only block past dates for new appointments, allow editing existing ones
-      alert('No se pueden agendar turnos en fechas pasadas. Por favor seleccione una fecha futura.');
+      toast.error('No se pueden agendar turnos en fechas pasadas. Por favor seleccione una fecha futura.');
       return;
     }
     
     if (!formData.horaInicio || !formData.horaFin) {
-      alert('Por favor seleccione hora de inicio y fin');
+      toast.error('Por favor seleccione hora de inicio y fin');
       return;
     }
     if (!formData.sessionType) {
-      alert('Por favor seleccione un tipo de sesión');
+      toast.error('Por favor seleccione un tipo de sesión');
       return;
     }
     if (!formData.estado) {
-      alert('Por favor seleccione un estado');
+      toast.error('Por favor seleccione un estado');
       return;
     }
     
@@ -153,12 +155,12 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
   const confirmSave = async () => {
     if (!user?.id) {
-      alert('Error: No se pudo obtener el ID del usuario. Por favor, inicie sesión nuevamente.');
+      toast.error('Error: No se pudo obtener el ID del usuario. Por favor, inicie sesión nuevamente.');
       return;
     }
 
     if (!formData.pacienteId || !formData.fecha || !formData.horaInicio || !formData.horaFin) {
-      alert('Por favor complete todos los campos requeridos');
+      toast.error('Por favor complete todos los campos requeridos');
       return;
     }
 
@@ -171,7 +173,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     // Get patient email for calendar invite
     const selectedPatient = patients.find(p => p.id === formData.pacienteId);
     if (!selectedPatient?.email) {
-      alert('El paciente seleccionado no tiene email configurado. Por favor, actualice la información del paciente.');
+      toast.error('El paciente seleccionado no tiene email configurado. Por favor, actualice la información del paciente.');
       return;
     }
 
@@ -398,74 +400,35 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       </div>
 
       {/* Save Confirmation Dialog */}
-      {showSaveConfirm && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-indigo-600" />
-              </div>
-              <h3 className="text-gray-900">
-                {isEditing ? '¿Guardar cambios?' : '¿Crear turno?'}
-              </h3>
-            </div>
-            <p className="text-gray-600 text-sm mb-6">
-              {isEditing
-                ? 'Los cambios se aplicarán al turno seleccionado.'
-                : 'Se creará un nuevo turno con la información ingresada.'}
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowSaveConfirm(false)}
-                disabled={isSaving}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmSave}
-                disabled={isSaving}
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSaving ? 'Guardando...' : 'Confirmar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        open={showSaveConfirm}
+        onOpenChange={setShowSaveConfirm}
+        title={isEditing ? '¿Guardar cambios?' : '¿Crear turno?'}
+        description={
+          isEditing
+            ? 'Los cambios se aplicarán al turno seleccionado.'
+            : 'Se creará un nuevo turno con la información ingresada.'
+        }
+        confirmLabel={isSaving ? 'Guardando...' : 'Confirmar'}
+        cancelLabel="Cancelar"
+        variant="default"
+        icon={Calendar}
+        onConfirm={confirmSave}
+        isLoading={isSaving}
+      />
 
       {/* Delete Confirmation Dialog */}
-      {showDeleteConfirm && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-              </div>
-              <h3 className="text-gray-900">¿Eliminar turno?</h3>
-            </div>
-            <p className="text-gray-600 text-sm mb-6">
-              Esta acción no se puede deshacer. El turno será eliminado permanentemente.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={isSaving}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmDelete}
-                disabled={isSaving}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSaving ? 'Eliminando...' : 'Eliminar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title="¿Eliminar turno?"
+        description="Esta acción no se puede deshacer. El turno será eliminado permanentemente."
+        confirmLabel={isSaving ? 'Eliminando...' : 'Eliminar'}
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={confirmDelete}
+        isLoading={isSaving}
+      />
     </div>
   );
 }

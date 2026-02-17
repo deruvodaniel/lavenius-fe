@@ -6,7 +6,7 @@ import { PacienteDrawer } from './PacienteDrawer';
 import { usePatients, useErrorToast, useResponsive } from '@/lib/hooks';
 import { useSessionStore } from '@/lib/stores/sessionStore';
 import { SessionStatus } from '@/lib/types/session';
-import { AnimatedList, SkeletonCard, EmptyState } from '../shared';
+import { AnimatedList, SkeletonCard, EmptyState, ConfirmDialog } from '../shared';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import type { CreatePatientDto } from '@/lib/types/api.types';
@@ -131,6 +131,11 @@ export function Pacientes() {
   // Sort and view mode state
   const [sortBy, setSortBy] = useState<SortOption>('name-asc');
   const [viewMode, setViewMode] = useState<ViewMode>('cards');
+
+  // Delete confirmation dialog state
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Pagination state (desktop)
   const [currentPage, setCurrentPage] = useState(1);
@@ -290,19 +295,27 @@ export function Pacientes() {
     }
   };
 
-  const handleDeletePaciente = async (patientId: string, patientName: string) => {
-    if (!confirm(`¿Estás seguro de que deseas eliminar al paciente ${patientName}? Esta acción no se puede deshacer.`)) {
-      return;
-    }
+  const handleDeletePaciente = (patientId: string, patientName: string) => {
+    setPatientToDelete({ id: patientId, name: patientName });
+    setDeleteConfirmOpen(true);
+  };
 
+  const confirmDeletePaciente = async () => {
+    if (!patientToDelete) return;
+
+    setIsDeleting(true);
     try {
-      await deletePatient(patientId);
+      await deletePatient(patientToDelete.id);
       toast.success('Paciente eliminado exitosamente');
+      setDeleteConfirmOpen(false);
+      setPatientToDelete(null);
       // Refresh list
       await fetchPatients();
     } catch (error) {
       console.error('Error deleting patient:', error);
       toast.error('Error al eliminar el paciente');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -850,6 +863,23 @@ export function Pacientes() {
         }}
         onSave={handleSavePaciente}
         patient={editingPatient}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Eliminar paciente"
+        description={`¿Estás seguro de que deseas eliminar al paciente ${patientToDelete?.name}? Esta acción no se puede deshacer.`}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={confirmDeletePaciente}
+        onCancel={() => {
+          setDeleteConfirmOpen(false);
+          setPatientToDelete(null);
+        }}
+        isLoading={isDeleting}
       />
     </div>
   );

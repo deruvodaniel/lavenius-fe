@@ -8,8 +8,9 @@
 - [x] LLM-friendly documentation structure (docs/ai/)
 - [x] Custom hooks (useAuth, usePatients, useSessions, useNotes, usePayments, useErrorToast, useMediaQuery, useOnboarding)
 - [x] Error Boundary component
-- [x] Zustand stores (auth, patient, session, note, payment, onboarding, calendar)
+- [x] Zustand stores (auth, patient, session, note, payment, onboarding, calendar, ui)
 - [x] API integration layer (lib/api/)
+- [x] UI Store centralizado (drawers, views, sidebar, loading)
 
 ### Componentes Migrados
 - [x] Login/Registro (auth flow completo con JWT)
@@ -54,12 +55,21 @@
   - Zustand store with localStorage persistence
   - Calendar connection tip in Agenda view
 
+- [x] UI Modals & Confirmations (Febrero 2026)
+  - ConfirmDialog: Responsive confirm dialog (AlertDialog desktop, Drawer mobile)
+  - Replaced all native browser alerts/confirms
+  - Variants: danger, warning, info, default
+  - Custom icon support
+  - Logout confirmation in Sidebar
+  - Validation errors via toast (sonner)
+
 ### Documentación
 - [x] Documentación consolidada en docs/
 - [x] Guidelines.md (arquitectura y estilo)
 - [x] A11Y.md (accesibilidad)
 - [x] API_INTEGRATION.md
 - [x] GOOGLE_CALENDAR_SYNC.md
+- [x] UI Store & ConfirmDialog docs en CONTEXT.md
 
 ## 📝 Next Steps (Prioridad)
 
