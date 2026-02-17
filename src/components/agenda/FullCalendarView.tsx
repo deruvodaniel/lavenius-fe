@@ -1,10 +1,10 @@
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
-import type { EventClickArg, DateSelectArg, EventContentArg } from '@fullcalendar/core';
+import type { EventClickArg, DateSelectArg, EventContentArg, EventDropArg } from '@fullcalendar/core';
 import { SessionType, SessionStatus, type SessionUI } from '@/lib/types/session';
 import { SESSION_STATUS_COLORS } from '@/lib/constants/sessionColors';
 import { Card } from '../ui/card';
@@ -12,6 +12,7 @@ import { Button } from '../ui/button';
 import { Calendar, Grid3x3, Clock } from 'lucide-react';
 import { LoadingOverlay } from '../shared/Skeleton';
 import { toast } from 'sonner';
+import { useResponsive } from '@/lib/hooks';
 
 // ============================================================================
 // SETTINGS TYPES & LOADER
@@ -23,19 +24,39 @@ interface DiaOff {
   motivo: string;
 }
 
+interface WorkingHours {
+  startTime: string; // "09:00"
+  endTime: string;   // "18:00"
+  workingDays: number[]; // [1, 2, 3, 4, 5] = Mon-Fri (0 = Sunday)
+}
+
+interface CalendarSettings {
+  diasOff: DiaOff[];
+  workingHours: WorkingHours;
+}
+
 const SETTINGS_KEY = 'lavenius_settings';
 
-const loadDiasOff = (): DiaOff[] => {
+const defaultWorkingHours: WorkingHours = {
+  startTime: '09:00',
+  endTime: '18:00',
+  workingDays: [1, 2, 3, 4, 5], // Monday to Friday
+};
+
+const loadCalendarSettings = (): CalendarSettings => {
   try {
     const stored = localStorage.getItem(SETTINGS_KEY);
     if (stored) {
       const settings = JSON.parse(stored);
-      return settings.diasOff || [];
+      return {
+        diasOff: settings.diasOff || [],
+        workingHours: settings.workingHours || defaultWorkingHours,
+      };
     }
   } catch (error) {
-    console.error('Error loading dias off:', error);
+    console.error('Error loading calendar settings:', error);
   }
-  return [];
+  return { diasOff: [], workingHours: defaultWorkingHours };
 };
 
 // ============================================================================
@@ -63,10 +84,22 @@ export function FullCalendarView({
   getPatientNameFallback
 }: FullCalendarViewProps) {
   const calendarRef = useRef<FullCalendar>(null);
-  const [currentView, setCurrentView] = useState('timeGridWeek');
+  const { isMobile } = useResponsive();
+  
+  // Default to day view on mobile, week view on desktop
+  const defaultView = isMobile ? 'timeGridDay' : 'timeGridWeek';
+  const [currentView, setCurrentView] = useState(defaultView);
 
-  // Load días off from settings
-  const diasOff = useMemo(() => loadDiasOff(), []);
+  // Update view when screen size changes
+  useEffect(() => {
+    if (isMobile && currentView === 'timeGridWeek') {
+      changeView('timeGridDay');
+    }
+  }, [isMobile]);
+
+  // Load calendar settings (días off + working hours)
+  const calendarSettings = useMemo(() => loadCalendarSettings(), []);
+  const { diasOff, workingHours } = calendarSettings;
 
   // Generate a key based on sessions data to force FullCalendar to re-render when sessions change
   const calendarKey = useMemo(() => {
@@ -78,6 +111,20 @@ export function FullCalendarView({
   const isDiaOff = (date: Date): DiaOff | undefined => {
     const dateStr = date.toISOString().split('T')[0];
     return diasOff.find(d => d.fecha === dateStr);
+  };
+
+  // Check if a date is a non-working day
+  const isNonWorkingDay = (date: Date): boolean => {
+    const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    return !workingHours.workingDays.includes(dayOfWeek);
+  };
+
+  // Check if time is outside working hours
+  const isOutsideWorkingHours = (date: Date): boolean => {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    return timeStr < workingHours.startTime || timeStr >= workingHours.endTime;
   };
 
   // Convert sessions to FullCalendar events (filter out cancelled sessions)
@@ -163,15 +210,85 @@ export function FullCalendarView({
       toast.warning(`Este día está marcado como día off${diaOff.motivo ? `: ${diaOff.motivo}` : ''}`);
       return;
     }
+    
+    // Check if it's a non-working day
+    if (isNonWorkingDay(selectInfo.start)) {
+      toast.warning('Este día no está configurado como día laboral');
+      return;
+    }
+    
+    // Check if time is outside working hours (only for time-based selections)
+    if (!selectInfo.allDay && isOutsideWorkingHours(selectInfo.start)) {
+      toast.warning(`El horario seleccionado está fuera de tu horario laboral (${workingHours.startTime} - ${workingHours.endTime})`);
+      return;
+    }
+    
     onDateSelect?.(selectInfo.start, selectInfo.end);
   };
 
-  const handleEventDrop = (dropInfo: any) => {
+  const handleEventDrop = (dropInfo: EventDropArg) => {
     const session = dropInfo.event.extendedProps.session as SessionUI;
-    onEventDrop?.(session.id, dropInfo.event.start, dropInfo.event.end);
+    const newStart = dropInfo.event.start;
+    const newEnd = dropInfo.event.end;
+    
+    if (!newStart || !newEnd) {
+      dropInfo.revert();
+      return;
+    }
+    
+    // Check if dropped on a día off
+    const diaOff = isDiaOff(newStart);
+    if (diaOff) {
+      toast.warning(`No puedes mover el turno a un día off${diaOff.motivo ? `: ${diaOff.motivo}` : ''}`);
+      dropInfo.revert();
+      return;
+    }
+    
+    // Check if dropped on a non-working day
+    if (isNonWorkingDay(newStart)) {
+      toast.warning('No puedes mover el turno a un día no laboral');
+      dropInfo.revert();
+      return;
+    }
+    
+    // Check if dropped outside working hours
+    if (isOutsideWorkingHours(newStart)) {
+      toast.warning(`No puedes mover el turno fuera del horario laboral (${workingHours.startTime} - ${workingHours.endTime})`);
+      dropInfo.revert();
+      return;
+    }
+    
+    onEventDrop?.(session.id, newStart, newEnd);
   };
 
   const renderEventContent = (eventInfo: EventContentArg) => {
+    const { extendedProps } = eventInfo.event;
+    const isTimeGrid = currentView.startsWith('timeGrid');
+    const isDayView = currentView === 'timeGridDay';
+    
+    // For time grid views (day/week), show more detailed content
+    if (isTimeGrid) {
+      return (
+        <div className="fc-event-main-frame h-full flex flex-col overflow-hidden p-1">
+          {/* Time - always visible */}
+          <div className="fc-event-time text-[10px] font-bold opacity-90 shrink-0">
+            {eventInfo.timeText}
+          </div>
+          {/* Patient name - truncate if needed */}
+          <div className={`fc-event-title font-medium leading-tight ${isDayView ? 'text-sm' : 'text-xs'} truncate`}>
+            {extendedProps.patientName || eventInfo.event.title}
+          </div>
+          {/* Show modality icon in day view */}
+          {isDayView && (
+            <div className="text-[10px] opacity-80 mt-0.5">
+              {extendedProps.type === SessionType.REMOTE ? '💻 Remoto' : '📍 Presencial'}
+            </div>
+          )}
+        </div>
+      );
+    }
+    
+    // For month view, keep it compact
     return (
       <div className="fc-event-main-frame px-1 py-0.5 text-xs">
         <div className="fc-event-time font-semibold">
@@ -251,7 +368,7 @@ export function FullCalendarView({
           key={calendarKey}
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
-          initialView="timeGridWeek"
+          initialView={defaultView}
           headerToolbar={{
             left: 'prev,next today',
             center: 'title',
@@ -291,6 +408,16 @@ export function FullCalendarView({
           allDaySlot={true}
           allDayText="Día Off"
           nowIndicator={true}
+          // Business hours - visually highlight working hours
+          businessHours={{
+            daysOfWeek: workingHours.workingDays,
+            startTime: workingHours.startTime,
+            endTime: workingHours.endTime,
+          }}
+          // Constrain selection to business hours
+          selectConstraint="businessHours"
+          // Hide days not in working days
+          hiddenDays={[0, 1, 2, 3, 4, 5, 6].filter(d => !workingHours.workingDays.includes(d))}
         />
       </div>
 
@@ -494,8 +621,23 @@ export function FullCalendarView({
 
         .fullcalendar-wrapper .fc-timegrid-event {
           border-radius: 6px;
-          padding: 4px 8px;
-          border-left-width: 3px;
+          border-left-width: 4px;
+          border-left-style: solid;
+          overflow: hidden;
+        }
+
+        .fullcalendar-wrapper .fc-timegrid-event .fc-event-main {
+          padding: 2px 4px;
+        }
+
+        /* Better event sizing in week view */
+        .fullcalendar-wrapper .fc-timegrid-col-events {
+          margin: 0 2px;
+        }
+
+        /* Ensure events have minimum height for readability */
+        .fullcalendar-wrapper .fc-timegrid-event-harness {
+          min-height: 2.5rem;
         }
 
         .fullcalendar-wrapper .fc-timegrid-now-indicator-line {
@@ -513,6 +655,22 @@ export function FullCalendarView({
         .fullcalendar-wrapper .fc-timegrid-axis {
           font-size: 0.75rem;
           color: #9ca3af;
+        }
+
+        /* Mobile: Wider columns in week view */
+        @media (max-width: 768px) {
+          .fullcalendar-wrapper .fc-timegrid-slot {
+            height: 2.5rem;
+          }
+          
+          .fullcalendar-wrapper .fc-col-header-cell {
+            padding: 0.5rem 0.25rem;
+            font-size: 0.65rem;
+          }
+          
+          .fullcalendar-wrapper .fc-timegrid-slot-label {
+            font-size: 0.65rem;
+          }
         }
 
         /* Scrollbar styling */
