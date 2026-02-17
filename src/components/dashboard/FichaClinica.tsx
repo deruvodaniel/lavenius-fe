@@ -34,7 +34,7 @@ const getFrecuenciaLabel = (frecuencia?: string) => {
 export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   const { updatePatient, fetchPatients } = usePatients();
   const { sessionsUI, isLoading: isLoadingSessions, fetchUpcoming, createSession } = useSessions();
-  const { notes, isLoading: isLoadingNotes, fetchNotesByPatient, createNote, updateNote, deleteNote, clearNotes } = useNotes();
+  const { notes, isLoading: isLoadingNotes, error: notesError, fetchNotesByPatient, createNote, updateNote, deleteNote, clearNotes, clearError: clearNotesError } = useNotes();
   
   // Estado para gestionar flag (basado en riskLevel del paciente)
   const [isFlagged, setIsFlagged] = useState(patient?.riskLevel === 'high');
@@ -65,18 +65,19 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     if (patient) {
       setIsFlagged(patient.riskLevel === 'high');
     }
-  }, [patient]);
+  }, [patient?.riskLevel]);
 
-  // Load notes when patient changes
+  // Load notes when patient ID changes (not the whole patient object)
   useEffect(() => {
-    if (patient) {
+    if (patient?.id) {
       fetchNotesByPatient(patient.id);
       fetchUpcoming(); // Load upcoming sessions
     }
     return () => {
       clearNotes();
+      clearNotesError();
     };
-  }, [patient, fetchNotesByPatient, clearNotes, fetchUpcoming]);
+  }, [patient?.id, fetchNotesByPatient, clearNotes, fetchUpcoming, clearNotesError]);
 
   if (!patient) return null;
 
@@ -526,6 +527,22 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
             
             {isLoadingNotes ? (
               <SkeletonNotes items={3} />
+            ) : notesError ? (
+              <div className="text-center py-8">
+                <FileText className="w-12 h-12 text-amber-400 mx-auto mb-3" />
+                <p className="text-gray-700 text-sm mb-1">No se pudieron cargar las notas existentes</p>
+                <p className="text-gray-500 text-xs mb-3">
+                  {notesError.includes('validación') 
+                    ? 'Puedes crear nuevas notas normalmente.' 
+                    : 'Intenta de nuevo más tarde.'}
+                </p>
+                <button
+                  onClick={() => patient?.id && fetchNotesByPatient(patient.id)}
+                  className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                >
+                  Reintentar
+                </button>
+              </div>
             ) : (
               <NoteList
                 notes={notes}

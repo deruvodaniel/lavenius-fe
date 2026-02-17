@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { usePaymentStore } from '../stores/payment.store';
 import { PaymentStatus } from '../types/api.types';
 import type { Payment } from '../types/api.types';
@@ -8,6 +8,7 @@ import type { Payment } from '../types/api.types';
  * 
  * Simple interface for payment data.
  * Store handles deduplication and caching.
+ * Totals come from the server for accuracy across paginated data.
  */
 export const usePayments = () => {
   const store = usePaymentStore();
@@ -33,52 +34,17 @@ export const usePayments = () => {
     [paymentsArray]
   );
 
-  // Calculated totals with safe defaults
-  const totals = useMemo(() => {
-    if (paymentsArray.length === 0) {
-      return {
-        totalAmount: 0,
-        paidAmount: 0,
-        pendingAmount: 0,
-        overdueAmount: 0,
-        totalCount: 0,
-        paidCount: 0,
-        pendingCount: 0,
-        overdueCount: 0,
-      };
-    }
-    
-    const paid = paymentsArray.filter((p: Payment) => p.status === PaymentStatus.PAID);
-    const pending = paymentsArray.filter((p: Payment) => 
-      p.status === PaymentStatus.PENDING || p.status === PaymentStatus.OVERDUE
-    );
-    const overdue = paymentsArray.filter((p: Payment) => p.status === PaymentStatus.OVERDUE);
-
-    // Helper to safely sum amounts (handles string/number)
-    const sumAmounts = (items: Payment[]) => 
-      items.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
-
-    return {
-      totalAmount: sumAmounts(paymentsArray),
-      paidAmount: sumAmounts(paid),
-      pendingAmount: sumAmounts(pending),
-      overdueAmount: sumAmounts(overdue),
-      totalCount: paymentsArray.length,
-      paidCount: paid.length,
-      pendingCount: pending.length,
-      overdueCount: overdue.length,
-    };
-  }, [paymentsArray]);
-
   // Utility: check if session is paid
-  // Note: needs fresh store reference each call
-  const isSessionPaid = (sessionId: string): boolean => {
-    const currentPayments = usePaymentStore.getState().payments;
-    const paymentsArr = Array.isArray(currentPayments) ? currentPayments : [];
-    return paymentsArr.some(
-      (p: Payment) => p.sessionId === sessionId && p.status === PaymentStatus.PAID
-    );
-  };
+  // Uses useCallback with paymentsArray dependency so the function reference
+  // changes when payments change, triggering re-renders in dependent useMemos
+  const isSessionPaid = useCallback(
+    (sessionId: string): boolean => {
+      return paymentsArray.some(
+        (p: Payment) => p.sessionId === sessionId && p.status === PaymentStatus.PAID
+      );
+    },
+    [paymentsArray]
+  );
 
   return {
     // State
@@ -86,12 +52,15 @@ export const usePayments = () => {
     isLoading: store.fetchStatus === 'loading',
     error: store.error,
     
-    // Derived data
+    // Derived data (from current page)
     paidPayments,
     pendingPayments,
     
-    // Calculated totals (never null)
-    totals,
+    // Server totals (accurate across all pages)
+    totals: store.totals,
+    
+    // Pagination info
+    pagination: store.pagination,
     
     // Utilities
     isSessionPaid,

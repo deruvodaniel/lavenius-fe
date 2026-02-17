@@ -134,7 +134,10 @@ export type Note = {
   id: string;
   text: string; // Decrypted text from backend
   noteDate: string; // Date of the note
-  patientId: string;
+  patient?: {
+    id: string;
+    active?: boolean;
+  };
   createdAt: string;
   updatedAt: string;
 };

@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Bell, Copy, MessageCircle, X, Plus, Video, MapPin, DollarSign, Calendar, History, CheckCircle2, Search, ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
+import { Bell, Copy, MessageCircle, X, Plus, Video, MapPin, DollarSign, Calendar, History, CheckCircle2, Search, ChevronLeft, ChevronRight, ArrowUpDown, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
 import { usePaymentStore } from '@/lib/stores/payment.store';
+import { usePatientStore } from '@/lib/stores/patient.store';
 import { useResponsive, usePatients } from '@/lib/hooks';
 import { PaymentStats } from './PaymentStats';
 import { PaymentDrawer } from './PaymentDrawer';
@@ -595,15 +596,46 @@ const PaymentCard = ({ payment }: PaymentCardProps) => {
 
 interface ReminderModalProps {
   session: SessionUI;
-  patientPhone?: string;
   onClose: () => void;
 }
 
-const ReminderModal = ({ session, patientPhone, onClose }: ReminderModalProps) => {
+const ReminderModal = ({ session, onClose }: ReminderModalProps) => {
+  const fetchPatientById = usePatientStore(state => state.fetchPatientById);
+  const selectedPatient = usePatientStore(state => state.selectedPatient);
+  
+  const [isLoadingPatient, setIsLoadingPatient] = useState(false);
+  const [patientPhone, setPatientPhone] = useState<string | undefined>(undefined);
+  
   const patientName = session.patientName || session.patient?.firstName || 'Paciente';
   const defaultMessage = `Hola ${patientName}! Te escribo para recordarte que tenés pendiente el pago de la sesión del ${formatDate(session.scheduledFrom)} a las ${formatTime(session.scheduledFrom)}. El monto es de ${formatCurrency(session.cost || 0)}. ¡Gracias!`;
   
   const [message, setMessage] = useState(defaultMessage);
+
+  // Load full patient data to get phone
+  useEffect(() => {
+    const loadPatientData = async () => {
+      const patientId = session.patient?.id;
+      if (!patientId) return;
+      
+      setIsLoadingPatient(true);
+      try {
+        await fetchPatientById(patientId);
+      } catch (error) {
+        console.error('Error loading patient data:', error);
+      } finally {
+        setIsLoadingPatient(false);
+      }
+    };
+    
+    loadPatientData();
+  }, [session.patient?.id, fetchPatientById]);
+
+  // Update phone when selectedPatient changes
+  useEffect(() => {
+    if (selectedPatient && selectedPatient.id === session.patient?.id) {
+      setPatientPhone(selectedPatient.phone);
+    }
+  }, [selectedPatient, session.patient?.id]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message);
@@ -621,8 +653,15 @@ const ReminderModal = ({ session, patientPhone, onClose }: ReminderModalProps) =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-0 sm:p-4">
-      <div className="bg-white rounded-t-xl sm:rounded-lg shadow-2xl p-4 sm:p-6 w-full sm:max-w-md">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
+        onClick={onClose}
+      />
+      
+      {/* Modal */}
+      <div className="relative bg-white rounded-t-xl sm:rounded-lg shadow-2xl p-4 sm:p-6 w-full sm:max-w-md">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900">Recordatorio de Pago</h3>
           <button className="text-gray-500 hover:text-gray-700 p-1" onClick={onClose}>
@@ -637,12 +676,33 @@ const ReminderModal = ({ session, patientPhone, onClose }: ReminderModalProps) =
             onChange={(e) => setMessage(e.target.value)}
           />
         </div>
+        
+        {/* Phone status indicator */}
+        {isLoadingPatient ? (
+          <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Cargando datos del paciente...</span>
+          </div>
+        ) : patientPhone ? (
+          <div className="mb-4 text-sm text-green-600">
+            Teléfono: {patientPhone}
+          </div>
+        ) : (
+          <div className="mb-4 text-sm text-yellow-600">
+            El paciente no tiene teléfono registrado
+          </div>
+        )}
+        
         <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
           <Button variant="outline" className="flex-1" onClick={handleCopy}>
             <Copy className="w-4 h-4 mr-2" />
             Copiar
           </Button>
-          <Button className="flex-1 bg-green-600 hover:bg-green-700" onClick={handleWhatsApp}>
+          <Button 
+            className="flex-1 bg-green-600 hover:bg-green-700" 
+            onClick={handleWhatsApp}
+            disabled={isLoadingPatient}
+          >
             <MessageCircle className="w-4 h-4 mr-2" />
             WhatsApp
           </Button>
@@ -663,6 +723,7 @@ export function Cobros() {
     payments,
     paidPayments,
     pendingPayments,
+    totals,
     isLoading: isLoadingPayments, 
     fetchPayments, 
     createPayment,
@@ -857,51 +918,13 @@ export function Cobros() {
     return sessionsPendingPayment.filter(session => isInDateRange(session.scheduledFrom));
   }, [sessionsPendingPayment, isInDateRange]);
 
-  // All payments filtered by global date range (for stats)
-  const paymentsInRange = useMemo(() => {
-    return payments.filter(payment => isInDateRange(payment.paymentDate));
-  }, [payments, isInDateRange]);
-
   // Paid payments filtered by global date range (for historial list)
   const paidPaymentsInRange = useMemo(() => {
     return paidPayments.filter(payment => isInDateRange(payment.paymentDate));
   }, [paidPayments, isInDateRange]);
 
-  // Calculate filtered totals for stats (same logic as usePayments hook)
-  const filteredTotals = useMemo(() => {
-    if (paymentsInRange.length === 0 && sessionsInRange.length === 0) {
-      return {
-        totalAmount: 0,
-        paidAmount: 0,
-        pendingAmount: 0,
-        overdueAmount: 0,
-        totalCount: 0,
-        paidCount: 0,
-        pendingCount: 0,
-        overdueCount: 0,
-      };
-    }
-
-    // Helper to safely sum amounts
-    const sumAmounts = (items: { amount: number }[]) => 
-      items.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
-
-    // Filter payments by status
-    const paidInRange = paymentsInRange.filter(p => p.status === 'paid');
-    const pendingInRange = paymentsInRange.filter(p => p.status === 'pending' || p.status === 'overdue');
-    const overdueInRange = paymentsInRange.filter(p => p.status === 'overdue');
-
-    return {
-      totalAmount: sumAmounts(paymentsInRange),
-      paidAmount: sumAmounts(paidInRange),
-      pendingAmount: sumAmounts(pendingInRange),
-      overdueAmount: sumAmounts(overdueInRange),
-      totalCount: paymentsInRange.length,
-      paidCount: paidInRange.length,
-      pendingCount: pendingInRange.length,
-      overdueCount: overdueInRange.length,
-    };
-  }, [paymentsInRange, sessionsInRange]);
+  // Note: totals now come from server (already filtered by date range)
+  // No need to calculate client-side paymentsInRange or filteredTotals
 
   // Filtered and sorted pending sessions
   const filteredPendingSessions = useMemo(() => {
@@ -999,14 +1022,6 @@ export function Cobros() {
     if (sessionDate.getTime() === today.getTime()) return 'today';
     return 'upcoming';
   }, [today]);
-
-  // Get patient phone by session's patientId
-  const getPatientPhone = useCallback((session: SessionUI): string | undefined => {
-    const patientId = session.patient?.id;
-    if (!patientId) return undefined;
-    const patient = patients.find(p => p.id === patientId);
-    return patient?.phone;
-  }, [patients]);
 
   // Handlers
   const handleCreatePayment = useCallback(() => {
@@ -1128,8 +1143,8 @@ export function Cobros() {
         showSearchAndSort={false}
       />
 
-      {/* Stats Cards */}
-      <PaymentStats totals={filteredTotals} isLoading={isLoading} />
+      {/* Stats Cards - use server totals (already filtered by date range) */}
+      <PaymentStats totals={totals} isLoading={isLoading} />
 
       {/* Tabs */}
       <Tabs defaultValue="pendientes" className="w-full">
@@ -1260,7 +1275,6 @@ export function Cobros() {
       {reminderSession && (
         <ReminderModal 
           session={reminderSession}
-          patientPhone={getPatientPhone(reminderSession)}
           onClose={() => setReminderSession(null)} 
         />
       )}

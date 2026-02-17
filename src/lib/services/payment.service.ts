@@ -11,23 +11,54 @@ export interface PaymentFilters {
   from?: string;  // ISO date string (YYYY-MM-DD)
   to?: string;    // ISO date string (YYYY-MM-DD)
   search?: string; // Search by patient name
+  page?: number;   // Page number (1-indexed)
+  limit?: number;  // Items per page
 }
 
 /**
- * Payment response with totals from backend
+ * Pagination info from backend
  */
-export interface PaymentResponse {
+export interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+/**
+ * Totals calculated from payments
+ */
+export interface PaymentTotals {
+  totalAmount: number;
+  paidAmount: number;
+  pendingAmount: number;
+  overdueAmount: number;
+  totalCount: number;
+  paidCount: number;
+  pendingCount: number;
+  overdueCount: number;
+}
+
+/**
+ * Backend response structure for /payments endpoint
+ * Returns: { data: Payment[], pagination: {...}, total, totalPaid, totalPending, totalOverdue }
+ */
+export interface BackendPaymentResponse {
+  data: Payment[];
+  pagination: PaginationInfo;
+  total: number;
+  totalPaid: number;
+  totalPending: number;
+  totalOverdue: number;
+}
+
+/**
+ * Normalized response from getAll - includes payments, pagination and totals
+ */
+export interface NormalizedPaymentResponse {
   payments: Payment[];
-  totals: {
-    totalAmount: number;
-    paidAmount: number;
-    pendingAmount: number;
-    overdueAmount: number;
-    totalCount: number;
-    paidCount: number;
-    pendingCount: number;
-    overdueCount: number;
-  };
+  pagination: PaginationInfo;
+  totals: PaymentTotals;
 }
 
 /**
@@ -47,8 +78,11 @@ class PaymentService {
    * @param filters.from - Start date (YYYY-MM-DD), defaults to current week start
    * @param filters.to - End date (YYYY-MM-DD), defaults to current week end
    * @param filters.search - Filter by patient name (only affects list)
+   * @param filters.page - Page number (1-indexed)
+   * @param filters.limit - Items per page
+   * @returns Normalized response with payments, pagination and totals
    */
-  async getAll(filters?: PaymentFilters): Promise<Payment[]> {
+  async getAll(filters?: PaymentFilters): Promise<NormalizedPaymentResponse> {
     const params = new URLSearchParams();
     
     if (filters?.from) {
@@ -60,11 +94,34 @@ class PaymentService {
     if (filters?.search) {
       params.append('search', filters.search);
     }
+    if (filters?.page) {
+      params.append('page', filters.page.toString());
+    }
+    if (filters?.limit) {
+      params.append('limit', filters.limit.toString());
+    }
     
     const queryString = params.toString();
     const url = queryString ? `${this.basePath}?${queryString}` : this.basePath;
     
-    return apiClient.get<Payment[]>(url);
+    const response = await apiClient.get<BackendPaymentResponse>(url);
+    
+    // Normalize the response
+    return {
+      payments: response.data || [],
+      pagination: response.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 },
+      totals: {
+        totalAmount: response.total || 0,
+        paidAmount: response.totalPaid || 0,
+        pendingAmount: response.totalPending || 0,
+        overdueAmount: response.totalOverdue || 0,
+        // Calculate counts from pagination
+        totalCount: response.pagination?.total || 0,
+        paidCount: 0, // Backend doesn't provide counts, will calculate from payments if needed
+        pendingCount: 0,
+        overdueCount: 0,
+      },
+    };
   }
 
   /**

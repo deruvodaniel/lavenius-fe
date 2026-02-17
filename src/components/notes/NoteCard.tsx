@@ -81,7 +81,10 @@ export function NoteCard({ note, onEdit, onDelete, readOnly = false }: NoteCardP
         </div>
 
         {/* Footer - Updated timestamp if edited */}
-        {note.updatedAt && note.updatedAt !== note.createdAt && (
+        {note.updatedAt && note.createdAt && 
+         typeof note.updatedAt === 'string' && 
+         typeof note.createdAt === 'string' &&
+         note.updatedAt !== note.createdAt && (
           <div className="flex items-center gap-2 mt-3 pt-3 border-t">
             <FileText className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">

@@ -7,8 +7,28 @@
  * Formatea una fecha completa con día de la semana, fecha y hora
  * @example "miércoles, 15 de enero de 2026, 14:30"
  */
-export function formatDateTime(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
+export function formatDateTime(date: Date | string | unknown): string {
+  if (!date) return '';
+  
+  // Handle case where date might be an object with unexpected structure
+  if (typeof date === 'object' && date !== null && !(date instanceof Date)) {
+    // Try to convert object to string representation
+    const dateStr = String(date);
+    if (dateStr === '[object Object]') {
+      console.warn('formatDateTime received an object:', date);
+      return '';
+    }
+    date = dateStr;
+  }
+  
+  const d = typeof date === 'string' ? new Date(date) : date as Date;
+  
+  // Check if date is valid
+  if (isNaN(d.getTime())) {
+    console.warn('formatDateTime received invalid date:', date);
+    return '';
+  }
+  
   return d.toLocaleString('es-AR', {
     weekday: 'long',
     year: 'numeric',
@@ -35,8 +55,27 @@ export function formatTime(date: Date | string): string {
  * Formatea solo la fecha sin hora
  * @example "miércoles, 15 de enero"
  */
-export function formatDate(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
+export function formatDate(date: Date | string | unknown): string {
+  if (!date) return '';
+  
+  // Handle case where date might be an object with unexpected structure
+  if (typeof date === 'object' && date !== null && !(date instanceof Date)) {
+    const dateStr = String(date);
+    if (dateStr === '[object Object]') {
+      console.warn('formatDate received an object:', date);
+      return '';
+    }
+    date = dateStr;
+  }
+  
+  const d = typeof date === 'string' ? new Date(date) : date as Date;
+  
+  // Check if date is valid
+  if (isNaN(d.getTime())) {
+    console.warn('formatDate received invalid date:', date);
+    return '';
+  }
+  
   return d.toLocaleDateString('es-AR', {
     weekday: 'long',
     day: 'numeric',

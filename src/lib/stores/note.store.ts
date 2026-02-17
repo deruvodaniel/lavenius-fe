@@ -51,6 +51,9 @@ export const useNoteStore = create<NoteStore>((set) => ({
 
   /**
    * Fetch notes for a specific patient
+   * 
+   * Note: Uses GET /notes and filters client-side due to backend ParseIntPipe issue
+   * Silently handles errors to prevent UI breakage
    */
   fetchNotesByPatient: async (patientId: string) => {
     set({ isLoading: true, error: null });
@@ -59,12 +62,15 @@ export const useNoteStore = create<NoteStore>((set) => ({
       const notes = await noteService.getByPatientId(patientId);
       set({ notes, isLoading: false });
     } catch (error) {
+      // Log error but don't throw - gracefully degrade to empty notes list
+      console.warn('Failed to fetch notes for patient:', patientId, error);
+      
       const errorMessage = error instanceof ApiClientError
         ? error.message
         : 'Error al cargar notas';
       
-      set({ isLoading: false, error: errorMessage });
-      throw error;
+      set({ notes: [], isLoading: false, error: errorMessage });
+      // Don't throw - allow UI to continue functioning
     }
   },
 

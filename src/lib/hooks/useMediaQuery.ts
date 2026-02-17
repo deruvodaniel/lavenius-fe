@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 
 /**
  * Hook for responsive breakpoint detection
@@ -16,28 +16,39 @@ const BREAKPOINTS = {
 
 type Breakpoint = keyof typeof BREAKPOINTS;
 
+// Cache for media query lists to avoid recreating them
+const mediaQueryCache = new Map<string, MediaQueryList>();
+
+function getMediaQueryList(query: string): MediaQueryList | null {
+  if (typeof window === 'undefined') return null;
+  
+  if (!mediaQueryCache.has(query)) {
+    mediaQueryCache.set(query, window.matchMedia(query));
+  }
+  return mediaQueryCache.get(query)!;
+}
+
 /**
  * Check if the viewport matches a media query
+ * Uses useSyncExternalStore for safe concurrent rendering
  */
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia(query).matches;
-  });
+  const subscribe = (callback: () => void) => {
+    const mql = getMediaQueryList(query);
+    if (!mql) return () => {};
+    
+    mql.addEventListener('change', callback);
+    return () => mql.removeEventListener('change', callback);
+  };
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(query);
-    setMatches(mediaQuery.matches);
+  const getSnapshot = () => {
+    const mql = getMediaQueryList(query);
+    return mql ? mql.matches : false;
+  };
 
-    const handler = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
+  const getServerSnapshot = () => false;
 
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, [query]);
-
-  return matches;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 /**
@@ -50,16 +61,16 @@ export function useBreakpoint(breakpoint: Breakpoint): boolean {
 
 /**
  * Convenient hook for common responsive checks
+ * All breakpoint checks are made with stable hooks
  */
 export function useResponsive() {
-  const isMobile = !useBreakpoint('md');  // < 768px
-  const isTablet = useBreakpoint('md') && !useBreakpoint('lg');  // 768-1023px
-  const isDesktop = useBreakpoint('lg');  // >= 1024px
+  const isMdUp = useBreakpoint('md');   // >= 768px
+  const isLgUp = useBreakpoint('lg');   // >= 1024px
   
   return {
-    isMobile,
-    isTablet,
-    isDesktop,
-    isMobileOrTablet: isMobile || isTablet,
+    isMobile: !isMdUp,                  // < 768px
+    isTablet: isMdUp && !isLgUp,        // 768-1023px
+    isDesktop: isLgUp,                  // >= 1024px
+    isMobileOrTablet: !isLgUp,          // < 1024px
   };
 }

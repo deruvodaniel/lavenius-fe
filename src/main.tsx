@@ -11,7 +11,7 @@ createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <App />
     </BrowserRouter>
-    <Toaster position="top-right" richColors />
+    <Toaster position="top-right" richColors closeButton />
   </ErrorBoundary>
 );
   

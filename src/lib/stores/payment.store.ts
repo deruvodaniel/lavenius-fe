@@ -4,15 +4,16 @@ import type {
   CreatePaymentDto,
 } from '@/lib/types/api.types';
 import { PaymentStatus } from '@/lib/types/api.types';
-import { paymentService, type PaymentFilters } from '@/lib/services/payment.service';
+import { paymentService, type PaymentFilters, type PaymentTotals, type PaginationInfo } from '@/lib/services/payment.service';
 
 /**
  * Payment Store - Single Source of Truth
  * 
  * Data flow:
  * 1. fetchPayments() loads payments from /payments with optional filters
- * 2. All derived data computed from payments array
- * 3. After mutations, we refresh to stay in sync with backend
+ * 2. Totals come from backend (totalAmount, paidAmount, pendingAmount, overdueAmount)
+ * 3. Pagination info stored for UI controls
+ * 4. After mutations, we refresh to stay in sync with backend
  * 
  * Request deduplication:
  * - Uses fetchStatus to prevent concurrent duplicate requests
@@ -23,6 +24,8 @@ type FetchStatus = 'idle' | 'loading' | 'success' | 'error';
 
 interface PaymentState {
   payments: Payment[];
+  totals: PaymentTotals;
+  pagination: PaginationInfo;
   fetchStatus: FetchStatus;
   error: Error | null;
   lastFetchTime: number | null;
@@ -40,8 +43,28 @@ interface PaymentActions {
 // Cache duration: 30 seconds
 const CACHE_DURATION = 30 * 1000;
 
+const defaultTotals: PaymentTotals = {
+  totalAmount: 0,
+  paidAmount: 0,
+  pendingAmount: 0,
+  overdueAmount: 0,
+  totalCount: 0,
+  paidCount: 0,
+  pendingCount: 0,
+  overdueCount: 0,
+};
+
+const defaultPagination: PaginationInfo = {
+  page: 1,
+  limit: 10,
+  total: 0,
+  totalPages: 0,
+};
+
 const initialState: PaymentState = {
   payments: [],
+  totals: defaultTotals,
+  pagination: defaultPagination,
   fetchStatus: 'idle',
   error: null,
   lastFetchTime: null,
@@ -71,13 +94,11 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
     
     try {
       const response = await paymentService.getAll(filters);
-      // Ensure payments is always an array (API might return object with payments property)
-      const payments = Array.isArray(response) ? response : [];
-      if (!Array.isArray(response)) {
-        console.warn('[PaymentStore] API returned non-array response:', response);
-      }
+      
       set({ 
-        payments, 
+        payments: response.payments,
+        totals: response.totals,
+        pagination: response.pagination,
         fetchStatus: 'success',
         lastFetchTime: Date.now(),
       });
@@ -165,6 +186,12 @@ export const paymentSelectors = {
   getPayments: (state: PaymentState): Payment[] => 
     Array.isArray(state.payments) ? state.payments : [],
   
+  /** Get totals from server (more accurate than client-side calculation) */
+  getTotals: (state: PaymentState): PaymentTotals => state.totals,
+  
+  /** Get pagination info */
+  getPagination: (state: PaymentState): PaginationInfo => state.pagination,
+  
   getPaidPayments: (state: PaymentState): Payment[] => {
     const payments = Array.isArray(state.payments) ? state.payments : [];
     return payments.filter(p => p.status === PaymentStatus.PAID);
@@ -199,34 +226,5 @@ export const paymentSelectors = {
   getPaymentBySessionId: (state: PaymentState, sessionId: string): Payment | undefined => {
     const payments = Array.isArray(state.payments) ? state.payments : [];
     return payments.find(p => p.sessionId === sessionId);
-  },
-
-  /**
-   * Calculate totals from payments array
-   * Note: Backend may return amount as string, so we convert to number
-   */
-  calculateTotals: (state: PaymentState) => {
-    const payments = Array.isArray(state.payments) ? state.payments : [];
-    
-    const paidPayments = payments.filter(p => p.status === PaymentStatus.PAID);
-    const pendingPayments = payments.filter(p => 
-      p.status === PaymentStatus.PENDING || p.status === PaymentStatus.OVERDUE
-    );
-    const overduePayments = payments.filter(p => p.status === PaymentStatus.OVERDUE);
-
-    // Helper to safely sum amounts (handles string/number)
-    const sumAmounts = (items: typeof payments) => 
-      items.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
-
-    return {
-      totalAmount: sumAmounts(payments),
-      paidAmount: sumAmounts(paidPayments),
-      pendingAmount: sumAmounts(pendingPayments),
-      overdueAmount: sumAmounts(overduePayments),
-      totalCount: payments.length,
-      paidCount: paidPayments.length,
-      pendingCount: pendingPayments.length,
-      overdueCount: overduePayments.length,
-    };
   },
 };

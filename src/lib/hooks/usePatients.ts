@@ -25,6 +25,7 @@ export const usePatients = () => {
   const error = usePatientStore(state => state.error);
   
   const fetchPatients = usePatientStore(state => state.fetchPatients);
+  const fetchPatientById = usePatientStore(state => state.fetchPatientById);
   const setSelectedPatient = usePatientStore(state => state.setSelectedPatient);
   const createPatient = usePatientStore(state => state.createPatient);
   const updatePatient = usePatientStore(state => state.updatePatient);
@@ -51,6 +52,7 @@ export const usePatients = () => {
     isLoading,
     error,
     fetchPatients,
+    fetchPatientById,
     setSelectedPatient,
     createPatient,
     updatePatient,

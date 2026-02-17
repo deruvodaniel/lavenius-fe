@@ -1,5 +1,4 @@
 import { AlertTriangle, Info, HelpCircle, Trash2, LucideIcon } from 'lucide-react';
-import { useResponsive } from '@/lib/hooks';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -10,15 +9,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerFooter,
-  DrawerTitle,
-  DrawerDescription,
-} from '@/components/ui/drawer';
-import { Button } from '@/components/ui/button';
 
 export type ConfirmDialogVariant = 'danger' | 'warning' | 'info' | 'default';
 
@@ -72,8 +62,8 @@ const variantConfig: Record<ConfirmDialogVariant, {
 /**
  * ConfirmDialog - Responsive confirmation dialog
  * 
- * Renders as AlertDialog on desktop and bottom Drawer on mobile.
- * Use for confirmations before destructive/important actions.
+ * Uses AlertDialog with CSS-based responsive styling.
+ * On mobile it appears as a bottom sheet style, on desktop as centered modal.
  */
 export function ConfirmDialog({
   open,
@@ -88,7 +78,6 @@ export function ConfirmDialog({
   isLoading = false,
   icon,
 }: ConfirmDialogProps) {
-  const { isMobile } = useResponsive();
   const config = variantConfig[variant];
   const Icon = icon || config.icon;
 
@@ -102,57 +91,19 @@ export function ConfirmDialog({
     onOpenChange(false);
   };
 
-  // Shared content for both desktop and mobile
-  const IconHeader = (
-    <div className={`w-12 h-12 rounded-full ${config.iconBg} flex items-center justify-center shrink-0`}>
-      <Icon className={`w-6 h-6 ${config.iconColor}`} />
-    </div>
-  );
-
-  // Mobile: Bottom Drawer
-  if (isMobile) {
-    return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent>
-          <DrawerHeader className="text-left">
-            <div className="flex items-start gap-4">
-              {IconHeader}
-              <div className="flex-1 min-w-0">
-                <DrawerTitle className="text-gray-900">{title}</DrawerTitle>
-                <DrawerDescription className="mt-1 text-gray-600">
-                  {description}
-                </DrawerDescription>
-              </div>
-            </div>
-          </DrawerHeader>
-          <DrawerFooter className="pt-2">
-            <Button
-              onClick={handleConfirm}
-              disabled={isLoading}
-              className={config.confirmButton}
-            >
-              {isLoading ? 'Procesando...' : confirmLabel}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleCancel}
-              disabled={isLoading}
-            >
-              {cancelLabel}
-            </Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-    );
-  }
-
-  // Desktop: AlertDialog (centered modal)
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="bg-white">
+      <AlertDialogContent className="bg-white max-w-[calc(100%-2rem)] sm:max-w-lg fixed bottom-0 sm:bottom-auto sm:top-[50%] left-[50%] translate-x-[-50%] translate-y-0 sm:translate-y-[-50%] rounded-t-xl sm:rounded-lg rounded-b-none sm:rounded-b-lg">
+        {/* Mobile handle bar - only visible on mobile */}
+        <div className="flex justify-center pt-1 pb-2 sm:hidden">
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
+        </div>
+        
         <AlertDialogHeader>
           <div className="flex items-start gap-4">
-            {IconHeader}
+            <div className={`w-12 h-12 rounded-full ${config.iconBg} flex items-center justify-center shrink-0`}>
+              <Icon className={`w-6 h-6 ${config.iconColor}`} />
+            </div>
             <div className="flex-1 min-w-0">
               <AlertDialogTitle className="text-gray-900">{title}</AlertDialogTitle>
               <AlertDialogDescription className="mt-1 text-gray-600">
@@ -161,18 +112,18 @@ export function ConfirmDialog({
             </div>
           </div>
         </AlertDialogHeader>
-        <AlertDialogFooter>
+        <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-2">
           <AlertDialogCancel 
             onClick={handleCancel}
             disabled={isLoading}
-            className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            className="border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto"
           >
             {cancelLabel}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isLoading}
-            className={config.confirmButton}
+            className={`${config.confirmButton} w-full sm:w-auto`}
           >
             {isLoading ? 'Procesando...' : confirmLabel}
           </AlertDialogAction>

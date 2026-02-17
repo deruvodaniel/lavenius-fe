@@ -14,35 +14,34 @@ export class NoteService {
   private readonly basePath = '/notes';
 
   /**
-   * Get all notes with optional filters
+   * Get all notes (without filters)
    */
-  async getAll(params?: {
-    patientId?: string;
-    sessionId?: string;
-    noteType?: NoteType;
-  }): Promise<Note[]> {
-    return apiClient.get<Note[]>(this.basePath, { params });
+  async getAll(): Promise<Note[]> {
+    return apiClient.get<Note[]>(this.basePath);
   }
 
   /**
    * Get notes by patient ID
+   * Fetches all notes and filters client-side by patient.id
+   * (Backend ParseIntPipe bug prevents using query param with UUID)
    */
   async getByPatientId(patientId: string): Promise<Note[]> {
-    return this.getAll({ patientId });
+    const allNotes = await apiClient.get<Note[]>(this.basePath);
+    return allNotes.filter(note => note.patient?.id === patientId);
   }
 
   /**
    * Get notes by session ID
    */
   async getBySessionId(sessionId: string): Promise<Note[]> {
-    return this.getAll({ sessionId });
+    return apiClient.get<Note[]>(`${this.basePath}/session/${sessionId}`);
   }
 
   /**
    * Get notes by type
    */
   async getByType(noteType: NoteType): Promise<Note[]> {
-    return this.getAll({ noteType });
+    return apiClient.get<Note[]>(`${this.basePath}?noteType=${noteType}`);
   }
 
   /**

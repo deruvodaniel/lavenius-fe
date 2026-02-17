@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { X, Calendar, Clock, User } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { X, Calendar, Clock, User, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuthStore } from '@/lib/stores';
+import { useAuthStore, usePatientStore } from '@/lib/stores';
 import { ConfirmDialog } from '@/components/shared';
 import type { Patient } from '@/lib/types/api.types';
 import { SessionType, SessionStatus } from '@/lib/types/session';
@@ -38,6 +38,12 @@ interface TurnoDrawerProps {
 
 export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, initialDate, onSave, onDelete }: TurnoDrawerProps) {
   const user = useAuthStore(state => state.user);
+  const fetchPatientById = usePatientStore(state => state.fetchPatientById);
+  const selectedPatientFromStore = usePatientStore(state => state.selectedPatient);
+  
+  // Store the full patient data (with email) when a patient is selected
+  const [fullPatientData, setFullPatientData] = useState<Patient | null>(null);
+  const [isLoadingPatient, setIsLoadingPatient] = useState(false);
   
   const [formData, setFormData] = useState({
     pacienteId: '',
@@ -110,12 +116,46 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     }
   }, [session, pacienteId, initialDate]);
 
+  // Fetch full patient data when patient is selected (to get email)
+  const loadFullPatientData = useCallback(async (patientId: string) => {
+    if (!patientId) {
+      setFullPatientData(null);
+      return;
+    }
+    
+    setIsLoadingPatient(true);
+    try {
+      await fetchPatientById(patientId);
+    } catch (error) {
+      console.error('Error loading patient data:', error);
+      toast.error('Error al cargar datos del paciente');
+    } finally {
+      setIsLoadingPatient(false);
+    }
+  }, [fetchPatientById]);
+
+  // Update fullPatientData when selectedPatientFromStore changes
+  useEffect(() => {
+    if (selectedPatientFromStore && selectedPatientFromStore.id === formData.pacienteId) {
+      setFullPatientData(selectedPatientFromStore);
+    }
+  }, [selectedPatientFromStore, formData.pacienteId]);
+
+  // Load patient data when pacienteId changes in form
+  useEffect(() => {
+    if (formData.pacienteId) {
+      loadFullPatientData(formData.pacienteId);
+    } else {
+      setFullPatientData(null);
+    }
+  }, [formData.pacienteId, loadFullPatientData]);
+
   if (!isOpen) return null;
 
   const isEditing = !!session;
   
-  // Validate form
-  const isFormValid = formData.pacienteId && formData.fecha && formData.horaInicio && formData.horaFin && formData.sessionType && formData.estado;
+  // Validate form - also require full patient data to be loaded (with email)
+  const isFormValid = formData.pacienteId && formData.fecha && formData.horaInicio && formData.horaFin && formData.sessionType && formData.estado && fullPatientData?.email && !isLoadingPatient;
 
   const handleSave = () => {
     // Validate before showing confirmation
@@ -170,9 +210,8 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     const scheduledFrom = new Date(scheduledFromStr);
     const scheduledTo = new Date(scheduledToStr);
     
-    // Get patient email for calendar invite
-    const selectedPatient = patients.find(p => p.id === formData.pacienteId);
-    if (!selectedPatient?.email) {
+    // Use full patient data (fetched via fetchPatientById) to get email
+    if (!fullPatientData?.email) {
       toast.error('El paciente seleccionado no tiene email configurado. Por favor, actualice la información del paciente.');
       return;
     }
@@ -181,7 +220,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       patientId: formData.pacienteId,
       scheduledFrom: formatLocalDateTime(scheduledFrom),
       scheduledTo: formatLocalDateTime(scheduledTo),
-      attendeeEmail: selectedPatient.email,
+      attendeeEmail: fullPatientData.email,
       sessionSummary: formData.motivo || undefined,
       type: formData.sessionType,
       status: formData.estado,
@@ -266,6 +305,23 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
                 </option>
               ))}
             </select>
+            {/* Loading indicator or email status */}
+            {formData.pacienteId && isLoadingPatient && (
+              <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Cargando datos del paciente...</span>
+              </div>
+            )}
+            {formData.pacienteId && !isLoadingPatient && fullPatientData && !fullPatientData.email && (
+              <div className="mt-1 text-sm text-red-500">
+                Este paciente no tiene email configurado. Por favor, actualice su información.
+              </div>
+            )}
+            {formData.pacienteId && !isLoadingPatient && fullPatientData?.email && (
+              <div className="mt-1 text-sm text-green-600">
+                Email: {fullPatientData.email}
+              </div>
+            )}
           </div>
 
           {/* Fecha */}

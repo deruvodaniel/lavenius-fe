@@ -23,6 +23,10 @@ const ERROR_TRANSLATIONS: Record<string, string> = {
   'Validation failed (uuid is expected)': 'Error de validación: se esperaba un identificador válido',
   'Bad Request': 'Solicitud inválida',
   'Invalid credentials': 'Credenciales inválidas',
+  'Invalid email or password': 'Credenciales inválidas',
+  'Wrong password': 'Credenciales inválidas',
+  'User not found': 'Credenciales inválidas',
+  'Authentication failed': 'Credenciales inválidas',
   'Invalid passphrase': 'Frase de seguridad incorrecta',
   
   // Auth errors

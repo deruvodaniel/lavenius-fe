@@ -73,7 +73,7 @@ const ViewModeToggle = ({ value, onChange, isMobile }: ViewModeToggleProps) => {
 
 export function Agenda() {
   const { sessionsUI, isLoading, error, fetchUpcoming, createSession, updateSession, deleteSession, clearError } = useSessions();
-  const { patients, fetchPatients } = usePatients();
+  const { patients, selectedPatient, fetchPatients, fetchPatientById, setSelectedPatient } = usePatients();
   const { isSessionPaid, fetchPayments } = usePayments();
   const { isMobile, isDesktop } = useResponsive();
   const { isConnected: isCalendarConnected, connectCalendar, syncCalendar, isSyncing, lastSyncAt, checkConnection } = useCalendarStore();
@@ -87,6 +87,7 @@ export function Agenda() {
   }, [error, clearError]);
   
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [isLoadingPatientDetails, setIsLoadingPatientDetails] = useState(false);
   const [turnoDrawerOpen, setTurnoDrawerOpen] = useState(false);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<SessionResponse | null>(null);
@@ -471,13 +472,48 @@ export function Agenda() {
     window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
   };
 
+  // Function to select a patient and fetch full details
+  const handleSelectPatient = async (patientId: string) => {
+    setSelectedPatientId(patientId);
+    setIsLoadingPatientDetails(true);
+    try {
+      await fetchPatientById(patientId);
+    } catch (err) {
+      console.error('Error fetching patient details:', err);
+      toast.error('Error al cargar los detalles del paciente');
+    } finally {
+      setIsLoadingPatientDetails(false);
+    }
+  };
+
+  // Function to go back from FichaClinica
+  const handleBackFromFicha = () => {
+    setSelectedPatientId(null);
+    setSelectedPatient(null);
+  };
+
   // If a patient is selected, show their FichaClinica
   if (selectedPatientId !== null) {
-    const selectedPatient = patients.find(p => p.id === selectedPatientId);
+    // Show loading state while fetching patient details
+    if (isLoadingPatientDetails || !selectedPatient) {
+      return (
+        <div className="p-4 md:p-6 lg:p-8 flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-3">
+            <div className="inline-flex items-center gap-2">
+              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+            <p className="text-gray-500">Cargando ficha del paciente...</p>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <FichaClinica
-        patient={selectedPatient || null}
-        onBack={() => setSelectedPatientId(null)}
+        patient={selectedPatient}
+        onBack={handleBackFromFicha}
       />
     );
   }
@@ -655,7 +691,7 @@ export function Agenda() {
                               hora={turno.hora}
                               isPaid={isPaid}
                               isCompactView={viewMode === 'both'}
-                              onPatientClick={(patientId) => setSelectedPatientId(patientId)}
+                              onPatientClick={(patientId) => handleSelectPatient(patientId)}
                               onEditClick={() => {
                                 setSelectedSession(session);
                                 setTurnoDrawerOpen(true);

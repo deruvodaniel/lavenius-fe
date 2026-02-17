@@ -111,7 +111,7 @@ const InfiniteScrollLoader = ({ isLoading, hasMore, loadMoreRef }: InfiniteScrol
 };
 
 export function Pacientes() {
-  const { patients, isLoading, error, fetchPatients, createPatient, updatePatient, deletePatient, clearError } = usePatients();
+  const { patients, selectedPatient, isLoading, error, fetchPatients, fetchPatientById, createPatient, updatePatient, deletePatient, clearError, setSelectedPatient } = usePatients();
   const { sessions, fetchUpcoming } = useSessionStore();
   const { isMobile } = useResponsive();
   
@@ -119,6 +119,7 @@ export function Pacientes() {
   useErrorToast(error, clearError);
   
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [isLoadingPatientDetails, setIsLoadingPatientDetails] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [modalidadFilter, setModalidadFilter] = useState<'todas' | 'presencial' | 'remoto' | 'mixto'>('todas');
@@ -269,6 +270,26 @@ export function Pacientes() {
     
     return { dias: Math.max(0, diffDays) };
   }, [nextSessionByPatient]);
+
+  // Function to select a patient and fetch full details
+  const handleSelectPatient = useCallback(async (patientId: string) => {
+    setSelectedPatientId(patientId);
+    setIsLoadingPatientDetails(true);
+    try {
+      await fetchPatientById(patientId);
+    } catch (err) {
+      console.error('Error fetching patient details:', err);
+      toast.error('Error al cargar los detalles del paciente');
+    } finally {
+      setIsLoadingPatientDetails(false);
+    }
+  }, [fetchPatientById]);
+
+  // Function to go back from FichaClinica
+  const handleBackFromFicha = useCallback(() => {
+    setSelectedPatientId(null);
+    setSelectedPatient(null);
+  }, [setSelectedPatient]);
 
   const handleNuevoPaciente = () => {
     setPacienteDrawerOpen(true);
@@ -431,11 +452,26 @@ export function Pacientes() {
 
   // If a patient is selected, show their clinical record
   if (selectedPatientId) {
-    const selectedPatient = patients.find(p => p.id === selectedPatientId) || null;
+    // Show loading state while fetching patient details
+    if (isLoadingPatientDetails || !selectedPatient) {
+      return (
+        <div className="p-4 md:p-6 lg:p-8 flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-3">
+            <div className="inline-flex items-center gap-2">
+              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+            <p className="text-gray-500">Cargando ficha del paciente...</p>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <FichaClinica
         patient={selectedPatient}
-        onBack={() => setSelectedPatientId(null)}
+        onBack={handleBackFromFicha}
       />
     );
   }
@@ -642,7 +678,7 @@ export function Pacientes() {
                     <tr 
                       key={paciente.rawId} 
                       className="hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => setSelectedPatientId(paciente.rawId)}
+                      onClick={() => handleSelectPatient(paciente.rawId)}
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
@@ -738,7 +774,7 @@ export function Pacientes() {
               <div className="flex items-start justify-between mb-4">
                 <div 
                   className="flex items-center gap-3 cursor-pointer flex-1"
-                  onClick={() => setSelectedPatientId(paciente.rawId)}
+                  onClick={() => handleSelectPatient(paciente.rawId)}
                 >
                   <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
                     <span className="text-indigo-600">
