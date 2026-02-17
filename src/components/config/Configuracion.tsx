@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, DollarSign, Calendar, X, Plus, Save } from 'lucide-react';
+import { Bell, DollarSign, Calendar, X, Plus, Save, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -11,6 +11,23 @@ import CalendarSync from './CalendarSync';
 
 const SETTINGS_KEY = 'lavenius_settings';
 
+// Days of the week (0 = Sunday, 1 = Monday, etc.)
+const WEEKDAYS = [
+  { id: 1, name: 'Lunes', short: 'L' },
+  { id: 2, name: 'Martes', short: 'M' },
+  { id: 3, name: 'Miércoles', short: 'X' },
+  { id: 4, name: 'Jueves', short: 'J' },
+  { id: 5, name: 'Viernes', short: 'V' },
+  { id: 6, name: 'Sábado', short: 'S' },
+  { id: 0, name: 'Domingo', short: 'D' },
+];
+
+interface WorkingHours {
+  startTime: string; // "09:00"
+  endTime: string;   // "18:00"
+  workingDays: number[]; // [1, 2, 3, 4, 5] = Mon-Fri
+}
+
 interface AppSettings {
   recordatoriosCobros: boolean;
   frecuenciaRecordatorio: string;
@@ -18,6 +35,7 @@ interface AppSettings {
   recordatoriosPacientes: boolean;
   horasAnticipacion: number;
   diasOff: { id: number; fecha: string; motivo: string }[];
+  workingHours: WorkingHours;
 }
 
 const defaultSettings: AppSettings = {
@@ -30,6 +48,11 @@ const defaultSettings: AppSettings = {
     { id: 1, fecha: '2025-12-25', motivo: 'Navidad' },
     { id: 2, fecha: '2026-01-01', motivo: 'Año Nuevo' },
   ],
+  workingHours: {
+    startTime: '09:00',
+    endTime: '18:00',
+    workingDays: [1, 2, 3, 4, 5], // Monday to Friday
+  },
 };
 
 const loadSettings = (): AppSettings => {
@@ -253,13 +276,6 @@ export function Configuracion() {
               </div>
             )}
 
-            {/* Coming soon: Time slots feature */}
-            <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
-              <p className="text-xs sm:text-sm text-indigo-700">
-                <span className="font-medium">Próximamente:</span> Podrás configurar franjas horarias específicas para cada día (ej: no atender de 12:00 a 14:00).
-              </p>
-            </div>
-
             {/* Formulario para agregar */}
             {showAddDiaOff ? (
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
@@ -316,6 +332,107 @@ export function Configuracion() {
                 Agregar Día Off
               </Button>
             )}
+          </div>
+        </ConfigSection>
+
+        {/* Horario Laboral */}
+        <ConfigSection
+          icon={Clock}
+          iconColor="text-indigo-600"
+          iconBg="bg-indigo-100"
+          title="Horario Laboral"
+          description="Define tu horario de atención y días de trabajo"
+        >
+          <div className="space-y-6">
+            {/* Horario de atención */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Horario de atención
+              </label>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">Desde</span>
+                  <input
+                    type="time"
+                    value={settings.workingHours.startTime}
+                    onChange={(e) => updateSetting('workingHours', {
+                      ...settings.workingHours,
+                      startTime: e.target.value,
+                    })}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">hasta</span>
+                  <input
+                    type="time"
+                    value={settings.workingHours.endTime}
+                    onChange={(e) => updateSetting('workingHours', {
+                      ...settings.workingHours,
+                      endTime: e.target.value,
+                    })}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Días de trabajo */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Días de trabajo
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {WEEKDAYS.map((day) => {
+                  const isSelected = settings.workingHours.workingDays.includes(day.id);
+                  return (
+                    <button
+                      key={day.id}
+                      type="button"
+                      onClick={() => {
+                        const newDays = isSelected
+                          ? settings.workingHours.workingDays.filter(d => d !== day.id)
+                          : [...settings.workingHours.workingDays, day.id];
+                        updateSetting('workingHours', {
+                          ...settings.workingHours,
+                          workingDays: newDays,
+                        });
+                      }}
+                      className={`
+                        w-10 h-10 rounded-full text-sm font-medium transition-all
+                        ${isSelected 
+                          ? 'bg-indigo-600 text-white shadow-sm' 
+                          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }
+                      `}
+                      title={day.name}
+                    >
+                      {day.short}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-gray-500">
+                Los días no seleccionados aparecerán bloqueados en tu calendario
+              </p>
+            </div>
+
+            {/* Preview */}
+            <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+              <p className="text-xs sm:text-sm text-indigo-800">
+                <span className="font-medium">Tu horario:</span>{' '}
+                {settings.workingHours.workingDays.length > 0 ? (
+                  <>
+                    {WEEKDAYS.filter(d => settings.workingHours.workingDays.includes(d.id))
+                      .map(d => d.name)
+                      .join(', ')}{' '}
+                    de {settings.workingHours.startTime} a {settings.workingHours.endTime}
+                  </>
+                ) : (
+                  'No hay días de trabajo seleccionados'
+                )}
+              </p>
+            </div>
           </div>
         </ConfigSection>
 
