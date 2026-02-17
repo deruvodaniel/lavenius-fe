@@ -7,9 +7,11 @@ import { SkeletonList, EmptyState } from '../shared';
 import { FullCalendarView } from './FullCalendarView';
 import CalendarSyncButton from '../config/CalendarSyncButton';
 import { FichaClinica } from '../dashboard/FichaClinica';
+import { TipBanner } from '../onboarding';
 import { usePatients, useResponsive } from '@/lib/hooks';
 import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
+import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { Input } from '@/components/ui/input';
 import type { CreateSessionDto, SessionResponse, UpdateSessionDto } from '@/lib/types/session';
 import { SESSION_STATUS_BADGE_CLASSES, SESSION_STATUS_LABELS } from '@/lib/constants/sessionColors';
@@ -74,6 +76,7 @@ export function Agenda() {
   const { patients, fetchPatients } = usePatients();
   const { isSessionPaid, fetchPayments } = usePayments();
   const { isMobile, isDesktop } = useResponsive();
+  const { isConnected: isCalendarConnected, connectCalendar, checkConnection } = useCalendarStore();
   
   // Auto-display error toasts
   useEffect(() => {
@@ -116,6 +119,7 @@ export function Agenda() {
       fetchUpcoming();
       fetchPatients();
       fetchPayments();
+      checkConnection(); // Check calendar connection status
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -508,6 +512,20 @@ export function Agenda() {
             {futurosTurnos.length} turno{futurosTurnos.length !== 1 ? 's' : ''} encontrado{futurosTurnos.length !== 1 ? 's' : ''}
             {searchTerm && ` para "${searchTerm}"`}
           </p>
+        )}
+
+        {/* Tip: Connect calendar */}
+        {!isCalendarConnected && (
+          <TipBanner
+            tipId="agenda-connect-calendar"
+            title="Conecta tu Google Calendar"
+            description="Sincroniza tus turnos con Google Calendar para recibir recordatorios y que tus pacientes reciban invitaciones automáticas."
+            variant="info"
+            action={{
+              label: "Conectar ahora",
+              onClick: connectCalendar
+            }}
+          />
         )}
       </div>
 

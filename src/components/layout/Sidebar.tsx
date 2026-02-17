@@ -1,7 +1,7 @@
-import { Calendar, Users, DollarSign, LogOut, Settings, ChevronRight } from 'lucide-react';
+import { Calendar, Users, DollarSign, LogOut, Settings, ChevronRight, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
 
-type View = 'agenda' | 'pacientes' | 'cobros' | 'configuracion' | 'perfil';
+type View = 'agenda' | 'pacientes' | 'cobros' | 'configuracion' | 'perfil' | 'ayuda';
 
 interface SidebarProps {
   currentView: View;
@@ -65,6 +65,19 @@ export function Sidebar({ currentView, onViewChange, onLogout, showHeader = true
         >
           <Settings className="w-5 h-5" />
           <span>Configuración</span>
+        </button>
+
+        {/* Ayuda */}
+        <button
+          onClick={() => handleNavClick('ayuda')}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+            currentView === 'ayuda'
+              ? 'bg-indigo-700 text-white'
+              : 'text-indigo-200 hover:bg-indigo-800 hover:text-white'
+          }`}
+        >
+          <HelpCircle className="w-5 h-5" />
+          <span>Ayuda</span>
         </button>
       </nav>
       

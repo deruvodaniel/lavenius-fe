@@ -222,6 +222,16 @@ export function Pacientes() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Listen for openPatientDrawer event from onboarding
+  React.useEffect(() => {
+    const handleOpenDrawer = () => {
+      setPacienteDrawerOpen(true);
+    };
+    
+    window.addEventListener('openPatientDrawer', handleOpenDrawer);
+    return () => window.removeEventListener('openPatientDrawer', handleOpenDrawer);
+  }, []);
+
   // Build a map of patient ID -> next session date for quick lookup
   const nextSessionByPatient = useMemo(() => {
     const map = new Map<string, Date>();
