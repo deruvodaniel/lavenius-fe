@@ -10,7 +10,7 @@ interface NoteDrawerProps {
   onClose: () => void;
   onSave: (data: CreateNoteDto | UpdateNoteDto, noteId?: string) => Promise<void>;
   note?: Note | null;
-  patientId: number;
+  patientId: string;
 }
 
 /**

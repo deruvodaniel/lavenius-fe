@@ -134,7 +134,7 @@ export type Note = {
   id: string;
   text: string; // Decrypted text from backend
   noteDate: string; // Date of the note
-  patientId: number;
+  patientId: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -236,7 +236,7 @@ export type UpdateAppointmentDto = Partial<CreateAppointmentDto>;
 export type CreateNoteDto = {
   text: string;
   noteDate: string; // ISO 8601 date string
-  patientId: number; // Backend expects integer
+  patientId: string;
 };
 
 export type UpdateNoteDto = {

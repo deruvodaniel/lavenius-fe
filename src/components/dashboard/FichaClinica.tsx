@@ -556,7 +556,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
         }}
         onSave={handleSaveNote}
         note={selectedNote}
-        patientId={parseInt(patient.id, 10)}
+        patientId={patient.id}
       />
 
       {/* Paciente Drawer - para edición completa */}
