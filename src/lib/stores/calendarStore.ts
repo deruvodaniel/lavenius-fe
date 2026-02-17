@@ -68,10 +68,13 @@ export const useCalendarStore = create<CalendarState>((set) => ({
         description: 'Por favor autoriza la aplicación en la ventana que se abrió'
       });
 
+      let messageReceived = false;
+
       // Listen for message from popup
       const handleMessage = (event: MessageEvent) => {
         // Verify message origin if needed
         if (event.data.type === 'GOOGLE_CALENDAR_SUCCESS') {
+          messageReceived = true;
           window.removeEventListener('message', handleMessage);
           
           toast.success('¡Conectado exitosamente!', {
@@ -84,6 +87,7 @@ export const useCalendarStore = create<CalendarState>((set) => ({
           // Refresh calendar list
           useCalendarStore.getState().checkConnection();
         } else if (event.data.type === 'GOOGLE_CALENDAR_ERROR') {
+          messageReceived = true;
           window.removeEventListener('message', handleMessage);
           
           toast.error('Error al conectar', {
@@ -94,8 +98,26 @@ export const useCalendarStore = create<CalendarState>((set) => ({
 
       window.addEventListener('message', handleMessage);
 
-      // Cleanup listener after 5 minutes (in case popup is closed without completing)
+      // Poll to check if popup was closed (fallback when postMessage doesn't work)
+      const checkPopupClosed = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(checkPopupClosed);
+          window.removeEventListener('message', handleMessage);
+          
+          // If we didn't receive a message, check connection status
+          // (user may have completed auth but popup didn't send message)
+          if (!messageReceived) {
+            // Small delay to allow backend to process the OAuth callback
+            setTimeout(() => {
+              useCalendarStore.getState().checkConnection();
+            }, 1000);
+          }
+        }
+      }, 500);
+
+      // Cleanup after 5 minutes (in case popup is closed without completing)
       setTimeout(() => {
+        clearInterval(checkPopupClosed);
         window.removeEventListener('message', handleMessage);
       }, 5 * 60 * 1000);
     } catch (error: any) {
