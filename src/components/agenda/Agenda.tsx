@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Clock, Video, MapPin, Plus, Calendar, X, Edit2, CalendarX, MessageCircle, DollarSign, Search, List, LayoutGrid } from 'lucide-react';
+import { Plus, Calendar, X, CalendarX, Search, List, LayoutGrid, CheckCircle2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { TurnoDrawer } from './TurnoDrawer';
+import { TurnoCard } from './TurnoCard';
 import { SessionDetailsModal } from './SessionDetailsModal';
 import { SkeletonList, EmptyState } from '../shared';
 import { FullCalendarView } from './FullCalendarView';
@@ -14,7 +15,6 @@ import { usePayments } from '@/lib/hooks/usePayments';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { Input } from '@/components/ui/input';
 import type { CreateSessionDto, SessionResponse, UpdateSessionDto } from '@/lib/types/session';
-import { SESSION_STATUS_BADGE_CLASSES, SESSION_STATUS_LABELS } from '@/lib/constants/sessionColors';
 
 // ============================================================================
 // TYPES
@@ -76,7 +76,7 @@ export function Agenda() {
   const { patients, fetchPatients } = usePatients();
   const { isSessionPaid, fetchPayments } = usePayments();
   const { isMobile, isDesktop } = useResponsive();
-  const { isConnected: isCalendarConnected, connectCalendar, checkConnection } = useCalendarStore();
+  const { isConnected: isCalendarConnected, connectCalendar, syncCalendar, isSyncing, lastSyncAt, checkConnection } = useCalendarStore();
   
   // Auto-display error toasts
   useEffect(() => {
@@ -512,8 +512,8 @@ export function Agenda() {
           </p>
         )}
 
-        {/* Tip: Connect calendar */}
-        {!isCalendarConnected && (
+        {/* Calendar connection status */}
+        {!isCalendarConnected ? (
           <TipBanner
             tipId="agenda-connect-calendar"
             title="Conecta tu Google Calendar"
@@ -524,6 +524,31 @@ export function Agenda() {
               onClick: connectCalendar
             }}
           />
+        ) : (
+          <div className="flex items-center justify-between gap-3 px-4 py-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center gap-2 text-green-700">
+              <CheckCircle2 className="w-4 h-4 text-green-500" />
+              <span className="text-sm font-medium">Google Calendar conectado</span>
+              {lastSyncAt && (
+                <span className="text-xs text-green-600">
+                  · Última sincronización: {new Date(lastSyncAt).toLocaleString('es-AR', { 
+                    day: 'numeric', 
+                    month: 'short', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </span>
+              )}
+            </div>
+            <button
+              onClick={() => syncCalendar()}
+              disabled={isSyncing}
+              className="flex items-center gap-1.5 text-sm font-medium text-green-700 hover:text-green-900 px-3 py-1.5 rounded-md hover:bg-green-100 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+              {isSyncing ? 'Sincronizando...' : 'Sincronizar'}
+            </button>
+          </div>
         )}
       </div>
 
@@ -584,93 +609,35 @@ export function Agenda() {
                           const paciente = getPaciente(turno.pacienteRawId ?? turno.pacienteId ?? null);
                           const session = sessionsUI.find(s => s.id === turno.rawId);
                           const isPaid = session && isSessionPaid(session.id);
+                          const originalPatient = patients.find(p => p.id === paciente?.rawId);
+
+                          if (!session) return null;
 
                           return (
-                            <div
+                            <TurnoCard
                               key={turno.rawId ?? turno.id}
-                              className="p-4 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors group"
-                            >
-                              {/* Fluid Layout - wraps to multiple lines when needed */}
-                              <div className="flex flex-wrap items-center gap-3">
-                                {/* Time */}
-                                <div className="flex items-center gap-1.5 text-gray-600">
-                                  <Clock className="w-4 h-4 flex-shrink-0" />
-                                  <span className="text-sm font-medium">{turno.hora}</span>
-                                </div>
-
-                                {/* Avatar + Name */}
-                                <div className="flex items-center gap-2 min-w-0 flex-1 basis-40">
-                                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <span className="text-indigo-600 text-xs font-semibold">
-                                      {paciente ? paciente.nombre.split(' ').map((n) => n[0]).join('').slice(0, 2) : '?'}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm font-medium text-gray-900 truncate">{paciente?.nombre || 'Sin nombre'}</p>
-                                </div>
-
-                                {/* Badges - wrap when needed, icon-only in 'both' view for space */}
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span
-                                    className={`px-2 py-1 rounded text-xs whitespace-nowrap ${
-                                      session ? SESSION_STATUS_BADGE_CLASSES[session.status] : ''
-                                    }`}
-                                    title={session ? SESSION_STATUS_LABELS[session.status] : ''}
-                                  >
-                                    {viewMode === 'both' 
-                                      ? (session?.status === 'pending' ? '⏳' : session?.status === 'confirmed' ? '✓' : session?.status === 'completed' ? '✔' : '✗')
-                                      : (session ? SESSION_STATUS_LABELS[session.status] : '')
-                                    }
-                                  </span>
-                                  {isPaid && (
-                                    <span 
-                                      className="flex items-center gap-1 px-2 py-1 rounded text-xs whitespace-nowrap bg-green-100 text-green-700"
-                                      title="Pagado"
-                                    >
-                                      <DollarSign className="w-3 h-3" />
-                                      {viewMode !== 'both' && 'Pagado'}
-                                    </span>
-                                  )}
-                                  <span
-                                    className={`flex items-center gap-1 px-2 py-1 rounded text-xs whitespace-nowrap ${
-                                      turno.modalidad === 'remoto' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
-                                    }`}
-                                    title={turno.modalidad === 'remoto' ? 'Remoto' : 'Presencial'}
-                                  >
-                                    {turno.modalidad === 'remoto' ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-                                    {viewMode !== 'both' && (turno.modalidad === 'remoto' ? 'Remoto' : 'Presencial')}
-                                  </span>
-                                </div>
-
-                                {/* Actions - always at end */}
-                                <div className="flex items-center gap-1 ml-auto">
-                                  <button
-                                    onClick={() => handleSendWhatsAppConfirmation(paciente, turno)}
-                                    className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                    title="Confirmar por WhatsApp"
-                                  >
-                                    <MessageCircle className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      if (session) {
-                                        setSelectedSession(session);
-                                        setTurnoDrawerOpen(true);
-                                      }
-                                    }}
-                                    className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                                    title="Editar"
-                                  >
-                                    <Edit2 className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    onClick={() => setSelectedPatientId(paciente?.rawId || null)}
-                                    className="text-indigo-600 text-xs font-medium hover:text-indigo-700 transition-colors whitespace-nowrap px-2"
-                                  >
-                                    Ver ficha
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
+                              session={session}
+                              patient={paciente ? {
+                                id: paciente.rawId,
+                                nombre: paciente.nombre,
+                                telefono: paciente.telefono,
+                                riskLevel: originalPatient?.riskLevel,
+                              } : undefined}
+                              hora={turno.hora}
+                              isPaid={isPaid}
+                              isCompactView={viewMode === 'both'}
+                              onPatientClick={(patientId) => setSelectedPatientId(patientId)}
+                              onEditClick={() => {
+                                setSelectedSession(session);
+                                setTurnoDrawerOpen(true);
+                              }}
+                              onDeleteClick={() => {
+                                if (confirm('¿Estás seguro de que deseas eliminar este turno?')) {
+                                  handleDeleteTurno(session.id);
+                                }
+                              }}
+                              onWhatsAppClick={() => handleSendWhatsAppConfirmation(paciente, turno)}
+                            />
                           );
                       })}
                     </div>

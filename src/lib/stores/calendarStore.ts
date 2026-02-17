@@ -1,12 +1,20 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { calendarService } from '../services/calendarService';
 import { toast } from 'sonner';
+
+interface CalendarInfo {
+  id: string;
+  summary: string;
+  primary?: boolean;
+}
 
 interface CalendarState {
   isConnected: boolean;
   isSyncing: boolean;
   isCheckingConnection: boolean;
-  calendars: any[];
+  calendars: CalendarInfo[];
+  lastSyncAt: string | null;
   
   // Actions
   checkConnection: () => Promise<void>;
@@ -15,11 +23,16 @@ interface CalendarState {
   disconnectCalendar: () => Promise<void>;
 }
 
-export const useCalendarStore = create<CalendarState>((set) => ({
-  isConnected: false,
-  isSyncing: false,
-  isCheckingConnection: false,
-  calendars: [],
+const STORAGE_KEY = 'lavenius-calendar';
+
+export const useCalendarStore = create<CalendarState>()(
+  persist(
+    (set) => ({
+      isConnected: false,
+      isSyncing: false,
+      isCheckingConnection: false,
+      calendars: [],
+      lastSyncAt: null,
 
   checkConnection: async () => {
     set({ isCheckingConnection: true });
@@ -136,7 +149,7 @@ export const useCalendarStore = create<CalendarState>((set) => ({
         description: `${response.sessionsSynced} sesiones sincronizadas con Google Calendar`
       });
       
-      set({ isSyncing: false, isConnected: true });
+      set({ isSyncing: false, isConnected: true, lastSyncAt: new Date().toISOString() });
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al sincronizar calendario';
       toast.error(errorMessage);
@@ -151,11 +164,20 @@ export const useCalendarStore = create<CalendarState>((set) => ({
       
       toast.success('Google Calendar desconectado');
       
-      set({ isConnected: false, calendars: [] });
+      set({ isConnected: false, calendars: [], lastSyncAt: null });
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al desconectar Google Calendar';
       toast.error(errorMessage);
       throw error;
     }
   },
-}));
+}),
+    {
+      name: STORAGE_KEY,
+      partialize: (state) => ({
+        isConnected: state.isConnected,
+        lastSyncAt: state.lastSyncAt,
+      }),
+    }
+  )
+);
