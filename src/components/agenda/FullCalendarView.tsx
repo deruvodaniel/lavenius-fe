@@ -18,10 +18,15 @@ import { useResponsive } from '@/lib/hooks';
 // SETTINGS TYPES & LOADER
 // ============================================================================
 
+type DiaOffTipo = 'full' | 'morning' | 'afternoon' | 'custom';
+
 interface DiaOff {
   id: number;
   fecha: string;
   motivo: string;
+  tipo?: DiaOffTipo; // Optional for backwards compatibility
+  startTime?: string; // Solo para tipo 'custom'
+  endTime?: string;   // Solo para tipo 'custom'
 }
 
 interface WorkingHours {
@@ -41,6 +46,23 @@ const defaultWorkingHours: WorkingHours = {
   startTime: '09:00',
   endTime: '18:00',
   workingDays: [1, 2, 3, 4, 5], // Monday to Friday
+};
+
+// Get time range for a día off based on its tipo
+const getDiaOffTimeRange = (dia: DiaOff): { start: string; end: string } => {
+  const tipo = dia.tipo || 'full'; // Default to 'full' for backwards compatibility
+  switch (tipo) {
+    case 'full':
+      return { start: '00:00', end: '23:59' };
+    case 'morning':
+      return { start: '00:00', end: '12:00' };
+    case 'afternoon':
+      return { start: '12:00', end: '23:59' };
+    case 'custom':
+      return { start: dia.startTime || '00:00', end: dia.endTime || '23:59' };
+    default:
+      return { start: '00:00', end: '23:59' };
+  }
 };
 
 const loadCalendarSettings = (): CalendarSettings => {
@@ -107,8 +129,30 @@ export function FullCalendarView({
     return sessions.map(s => `${s.id}-${s.status}-${s.scheduledFrom}`).join('|');
   }, [sessions]);
 
-  // Check if a date is a día off
+  // Check if a date is a día off (returns the día off if it matches date AND time)
   const isDiaOff = (date: Date): DiaOff | undefined => {
+    const dateStr = date.toISOString().split('T')[0];
+    const diaOff = diasOff.find(d => d.fecha === dateStr);
+    
+    if (!diaOff) return undefined;
+    
+    // Check if the time is within the día off range
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    
+    const { start, end } = getDiaOffTimeRange(diaOff);
+    
+    // Check if time is within the día off range
+    if (timeStr >= start && timeStr < end) {
+      return diaOff;
+    }
+    
+    return undefined;
+  };
+  
+  // Check if a date has any día off configured (for all-day events display)
+  const getDiaOffForDate = (date: Date): DiaOff | undefined => {
     const dateStr = date.toISOString().split('T')[0];
     return diasOff.find(d => d.fecha === dateStr);
   };
@@ -167,28 +211,79 @@ export function FullCalendarView({
   // Create background events for días off
   const diaOffEvents = useMemo(() => {
     if (!diasOff || !Array.isArray(diasOff)) return [];
-    return diasOff.flatMap(dia => [
-      // Background event for the striped pattern
-      {
-        id: `dia-off-bg-${dia.id}`,
-        start: dia.fecha,
-        allDay: true,
-        display: 'background' as const,
-        classNames: ['dia-off-event'],
-      },
-      // Regular all-day event for the label
-      {
-        id: `dia-off-label-${dia.id}`,
-        title: dia.motivo || 'Día Off',
-        start: dia.fecha,
-        allDay: true,
-        classNames: ['dia-off-label'],
-        extendedProps: {
-          isDiaOff: true,
-          motivo: dia.motivo,
-        },
-      },
-    ]);
+    
+    const events: Array<{
+      id: string;
+      start: string;
+      end?: string;
+      allDay?: boolean;
+      display?: 'background';
+      title?: string;
+      classNames: string[];
+      extendedProps?: {
+        isDiaOff: boolean;
+        motivo: string;
+        tipo?: string;
+      };
+    }> = [];
+    
+    diasOff.forEach(dia => {
+      const tipo = dia.tipo || 'full';
+      const { start: startTime, end: endTime } = getDiaOffTimeRange(dia);
+      const isFullDay = tipo === 'full';
+      
+      // Build label with time info for partial days
+      let label = dia.motivo || 'Día Off';
+      if (!isFullDay) {
+        const timeLabel = tipo === 'morning' ? 'Mañana' : tipo === 'afternoon' ? 'Tarde' : `${startTime}-${endTime}`;
+        label = `${label} (${timeLabel})`;
+      }
+      
+      if (isFullDay) {
+        // Full day: use allDay events
+        events.push({
+          id: `dia-off-bg-${dia.id}`,
+          start: dia.fecha,
+          allDay: true,
+          display: 'background',
+          classNames: ['dia-off-event'],
+        });
+        events.push({
+          id: `dia-off-label-${dia.id}`,
+          title: label,
+          start: dia.fecha,
+          allDay: true,
+          classNames: ['dia-off-label'],
+          extendedProps: {
+            isDiaOff: true,
+            motivo: dia.motivo,
+          },
+        });
+      } else {
+        // Partial day: use timed events
+        events.push({
+          id: `dia-off-bg-${dia.id}`,
+          start: `${dia.fecha}T${startTime}:00`,
+          end: `${dia.fecha}T${endTime}:00`,
+          display: 'background',
+          classNames: ['dia-off-event', 'dia-off-partial'],
+        });
+        events.push({
+          id: `dia-off-label-${dia.id}`,
+          title: label,
+          start: `${dia.fecha}T${startTime}:00`,
+          end: `${dia.fecha}T${endTime}:00`,
+          classNames: ['dia-off-label', 'dia-off-timed'],
+          extendedProps: {
+            isDiaOff: true,
+            motivo: dia.motivo,
+            tipo: dia.tipo,
+          },
+        });
+      }
+    });
+    
+    return events;
   }, [diasOff]);
 
   // Combine all events
@@ -207,7 +302,10 @@ export function FullCalendarView({
     // Check if the selected date is a día off
     const diaOff = isDiaOff(selectInfo.start);
     if (diaOff) {
-      toast.warning(`Este día está marcado como día off${diaOff.motivo ? `: ${diaOff.motivo}` : ''}`);
+      const { start, end } = getDiaOffTimeRange(diaOff);
+      const tipo = diaOff.tipo || 'full';
+      const timeInfo = tipo === 'full' ? '' : ` (${start} - ${end})`;
+      toast.warning(`Este horario está marcado como día off${timeInfo}${diaOff.motivo ? `: ${diaOff.motivo}` : ''}`);
       return;
     }
     
@@ -239,7 +337,10 @@ export function FullCalendarView({
     // Check if dropped on a día off
     const diaOff = isDiaOff(newStart);
     if (diaOff) {
-      toast.warning(`No puedes mover el turno a un día off${diaOff.motivo ? `: ${diaOff.motivo}` : ''}`);
+      const { start, end } = getDiaOffTimeRange(diaOff);
+      const tipo = diaOff.tipo || 'full';
+      const timeInfo = tipo === 'full' ? '' : ` (${start} - ${end})`;
+      toast.warning(`No puedes mover el turno a un día off${timeInfo}${diaOff.motivo ? `: ${diaOff.motivo}` : ''}`);
       dropInfo.revert();
       return;
     }
