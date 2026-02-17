@@ -22,6 +22,25 @@ const WEEKDAYS = [
   { id: 0, name: 'Domingo', short: 'D' },
 ];
 
+// Día Off types
+type DiaOffTipo = 'full' | 'morning' | 'afternoon' | 'custom';
+
+const DIA_OFF_TIPOS: { value: DiaOffTipo; label: string; description: string }[] = [
+  { value: 'full', label: 'Todo el día', description: 'Sin atención' },
+  { value: 'morning', label: 'Mañana', description: '00:00 - 12:00' },
+  { value: 'afternoon', label: 'Tarde', description: '12:00 - 23:59' },
+  { value: 'custom', label: 'Rango horario', description: 'Personalizado' },
+];
+
+interface DiaOff {
+  id: number;
+  fecha: string;
+  motivo: string;
+  tipo: DiaOffTipo;
+  startTime?: string; // Solo para tipo 'custom'
+  endTime?: string;   // Solo para tipo 'custom'
+}
+
 interface WorkingHours {
   startTime: string; // "09:00"
   endTime: string;   // "18:00"
@@ -34,7 +53,7 @@ interface AppSettings {
   minimoTurnos: number;
   recordatoriosPacientes: boolean;
   horasAnticipacion: number;
-  diasOff: { id: number; fecha: string; motivo: string }[];
+  diasOff: DiaOff[];
   workingHours: WorkingHours;
 }
 
@@ -45,8 +64,8 @@ const defaultSettings: AppSettings = {
   recordatoriosPacientes: true,
   horasAnticipacion: 24,
   diasOff: [
-    { id: 1, fecha: '2025-12-25', motivo: 'Navidad' },
-    { id: 2, fecha: '2026-01-01', motivo: 'Año Nuevo' },
+    { id: 1, fecha: '2025-12-25', motivo: 'Navidad', tipo: 'full' },
+    { id: 2, fecha: '2026-01-01', motivo: 'Año Nuevo', tipo: 'full' },
   ],
   workingHours: {
     startTime: '09:00',
@@ -160,7 +179,13 @@ export function Configuracion() {
   
   // UI state
   const [showAddDiaOff, setShowAddDiaOff] = useState(false);
-  const [newDiaOff, setNewDiaOff] = useState({ fecha: '', motivo: '' });
+  const [newDiaOff, setNewDiaOff] = useState<Omit<DiaOff, 'id'>>({ 
+    fecha: '', 
+    motivo: '', 
+    tipo: 'full',
+    startTime: '12:00',
+    endTime: '18:00',
+  });
 
   // Update a setting and mark as changed
   const updateSetting = useCallback(<K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
@@ -198,8 +223,30 @@ export function Configuracion() {
       toast.error('Selecciona una fecha');
       return;
     }
-    updateSetting('diasOff', [...settings.diasOff, { id: Date.now(), ...newDiaOff }]);
-    setNewDiaOff({ fecha: '', motivo: '' });
+    if (newDiaOff.tipo === 'custom') {
+      if (!newDiaOff.startTime || !newDiaOff.endTime) {
+        toast.error('Selecciona el rango horario');
+        return;
+      }
+      if (newDiaOff.startTime >= newDiaOff.endTime) {
+        toast.error('La hora de inicio debe ser menor a la hora de fin');
+        return;
+      }
+    }
+    
+    const diaOffToAdd: DiaOff = {
+      id: Date.now(),
+      fecha: newDiaOff.fecha,
+      motivo: newDiaOff.motivo,
+      tipo: newDiaOff.tipo,
+      ...(newDiaOff.tipo === 'custom' && {
+        startTime: newDiaOff.startTime,
+        endTime: newDiaOff.endTime,
+      }),
+    };
+    
+    updateSetting('diasOff', [...settings.diasOff, diaOffToAdd]);
+    setNewDiaOff({ fecha: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
     setShowAddDiaOff(false);
     toast.success('Día off agregado');
   };
@@ -216,6 +263,21 @@ export function Configuracion() {
       month: 'short',
       year: 'numeric',
     });
+  };
+
+  const formatDiaOffTime = (dia: DiaOff): string => {
+    switch (dia.tipo) {
+      case 'full':
+        return 'Todo el día';
+      case 'morning':
+        return 'Mañana (00:00 - 12:00)';
+      case 'afternoon':
+        return 'Tarde (12:00 - 23:59)';
+      case 'custom':
+        return `${dia.startTime} - ${dia.endTime}`;
+      default:
+        return 'Todo el día';
+    }
   };
 
   return (
@@ -253,9 +315,15 @@ export function Configuracion() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-gray-900">{formatDateDisplay(dia.fecha)}</p>
-                        {dia.motivo && (
-                          <p className="text-xs text-gray-500 truncate">{dia.motivo}</p>
-                        )}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs text-rose-600 font-medium">{formatDiaOffTime(dia)}</span>
+                          {dia.motivo && (
+                            <>
+                              <span className="text-gray-300">•</span>
+                              <span className="text-xs text-gray-500 truncate">{dia.motivo}</span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <button
@@ -278,7 +346,8 @@ export function Configuracion() {
 
             {/* Formulario para agregar */}
             {showAddDiaOff ? (
-              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-4">
+                {/* Fecha y Motivo */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">Fecha</label>
@@ -300,13 +369,64 @@ export function Configuracion() {
                     />
                   </div>
                 </div>
-                <div className="flex items-center gap-2 justify-end">
+
+                {/* Tipo de día off */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-2">Tipo de bloqueo</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {DIA_OFF_TIPOS.map((tipo) => (
+                      <button
+                        key={tipo.value}
+                        type="button"
+                        onClick={() => setNewDiaOff({ ...newDiaOff, tipo: tipo.value })}
+                        className={`
+                          p-2 rounded-lg border text-left transition-all
+                          ${newDiaOff.tipo === tipo.value
+                            ? 'border-rose-500 bg-rose-50 ring-1 ring-rose-500'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-100'
+                          }
+                        `}
+                      >
+                        <p className={`text-sm font-medium ${newDiaOff.tipo === tipo.value ? 'text-rose-700' : 'text-gray-900'}`}>
+                          {tipo.label}
+                        </p>
+                        <p className="text-xs text-gray-500">{tipo.description}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Rango horario personalizado */}
+                {newDiaOff.tipo === 'custom' && (
+                  <div className="flex flex-wrap items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-gray-500">Desde</label>
+                      <input
+                        type="time"
+                        value={newDiaOff.startTime}
+                        onChange={(e) => setNewDiaOff({ ...newDiaOff, startTime: e.target.value })}
+                        className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-gray-500">hasta</label>
+                      <input
+                        type="time"
+                        value={newDiaOff.endTime}
+                        onChange={(e) => setNewDiaOff({ ...newDiaOff, endTime: e.target.value })}
+                        className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2 justify-end pt-2">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => {
                       setShowAddDiaOff(false);
-                      setNewDiaOff({ fecha: '', motivo: '' });
+                      setNewDiaOff({ fecha: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
                     }}
                   >
                     Cancelar
