@@ -102,8 +102,6 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           const endHours = Math.min(hours + 1, 23);
           newFormData.horaFin = `${endHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
         }
-        
-        console.log('📅 TurnoDrawer - initialDate received:', initialDate, 'hours:', hours, 'minutes:', minutes);
       }
       
       setFormData(newFormData);

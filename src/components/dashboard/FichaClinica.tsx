@@ -166,20 +166,18 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   };
 
   const handleSaveNote = async (data: CreateNoteDto | UpdateNoteDto, noteId?: string) => {
-    console.log('🎯 FichaClinica.handleSaveNote - Received data:', JSON.stringify(data, null, 2));
     try {
       if (noteId) {
         await updateNote(noteId, data as UpdateNoteDto);
         toast.success('Nota actualizada exitosamente');
       } else {
-        console.log('🎯 About to call createNote with:', data);
         await createNote(data as CreateNoteDto);
         toast.success('Nota creada exitosamente');
       }
       setIsNoteDrawerOpen(false);
       setSelectedNote(null);
     } catch (error) {
-      console.error('❌ Error saving note:', error);
+      console.error('Error saving note:', error);
       toast.error('Error al guardar la nota');
     }
   };

@@ -383,8 +383,6 @@ export function Agenda() {
         if (sessionData.cost !== undefined) updateData.cost = sessionData.cost;
         if (sessionData.type) updateData.type = sessionData.type;
         
-        console.log('📝 Update session data:', { datesChanged, updateData });
-        
         await updateSession(selectedSession.id, updateData);
         toast.success('Turno actualizado exitosamente');
         // Refresh to ensure UI is in sync

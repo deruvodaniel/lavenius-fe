@@ -16,10 +16,7 @@ export class AppointmentService {
    * Get all appointments for the authenticated therapist
    */
   async getAll(): Promise<Appointment[]> {
-    console.log('[AppointmentService] Calling GET /appointments');
-    const result = await apiClient.get<Appointment[]>(this.basePath);
-    console.log('[AppointmentService] GET /appointments returned:', result);
-    return result;
+    return apiClient.get<Appointment[]>(this.basePath);
   }
 
   /**
@@ -78,24 +75,16 @@ export class AppointmentService {
   async getUpcoming(limit?: number): Promise<Appointment[]> {
     const appointments = await this.getAll();
     const now = new Date();
-    console.log('[AppointmentService] getUpcoming - now:', now);
-    console.log('[AppointmentService] getUpcoming - total appointments:', appointments.length);
-    if (appointments.length > 0) {
-      console.log('[AppointmentService] First appointment raw data:', appointments[0]);
-      console.log('[AppointmentService] First appointment dateTime:', appointments[0].dateTime, typeof appointments[0].dateTime);
-    }
     
     const upcoming = appointments
       .filter((apt) => {
         const aptDate = new Date(apt.dateTime);
-        console.log('[AppointmentService] apt.dateTime:', apt.dateTime, '-> parsed:', aptDate, 'valid:', !isNaN(aptDate.getTime()));
         return aptDate > now;
       })
       .sort((a, b) => 
         new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
       );
 
-    console.log('[AppointmentService] getUpcoming - filtered upcoming:', upcoming.length);
     return limit ? upcoming.slice(0, limit) : upcoming;
   }
 }

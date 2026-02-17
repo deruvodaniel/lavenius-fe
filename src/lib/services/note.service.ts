@@ -56,7 +56,6 @@ export class NoteService {
    * Create a new note
    */
   async create(data: CreateNoteDto): Promise<Note> {
-    console.log('🔵 noteService.create - Sending data:', JSON.stringify(data, null, 2));
     return apiClient.post<Note, CreateNoteDto>(this.basePath, data);
   }
 

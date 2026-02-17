@@ -1,6 +1,6 @@
 # System Context
 
-> **Actualizado**: Febrero 14, 2026
+> **Actualizado**: Febrero 16, 2026
 
 ## Tech Stack
 - React 18.3.1 + TypeScript 5.9.3
@@ -61,16 +61,21 @@ src/
 │   │   ├── patient.store.ts
 │   │   ├── sessionStore.ts
 │   │   ├── note.store.ts
-│   │   └── payment.store.ts
+│   │   ├── payment.store.ts
+│   │   ├── onboarding.store.ts      # Onboarding state (localStorage)
+│   │   └── calendar.store.ts
 │   ├── hooks/
 │   │   ├── useAuth.ts
 │   │   ├── usePatients.ts
 │   │   ├── useSessions.ts
 │   │   ├── useNotes.ts
 │   │   ├── usePayments.ts
+│   │   ├── useOnboarding.ts         # Onboarding hook
+│   │   ├── useAppointments.ts
 │   │   └── useMediaQuery.ts
 │   └── types/
-│       └── api.types.ts           # Central type definitions
+│       ├── api.types.ts             # Central type definitions
+│       └── onboarding.types.ts      # Onboarding types
 ├── components/
 │   ├── ui/                        # shadcn components (DO NOT EDIT)
 │   ├── shared/                    # Reusable components
@@ -85,6 +90,8 @@ src/
 │   ├── config/                    # Configuracion, CalendarSync
 │   ├── perfil/                    # Perfil (user profile editing)
 │   ├── dashboard/                 # FichaClinica, Dashboard
+│   ├── onboarding/                # OnboardingModal, TipBanner, Progress
+│   ├── help/                      # HelpCenter
 │   └── layout/                    # Sidebar, Header
 ├── utils/                         # Helpers
 │   ├── dateFormatters.ts

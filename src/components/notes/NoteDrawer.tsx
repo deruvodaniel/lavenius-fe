@@ -69,7 +69,6 @@ export function NoteDrawer({
           noteDate: formData.noteDate,
           patientId,
         };
-        console.log('📝 Creating note with data:', createData);
         await onSave(createData);
       }
 

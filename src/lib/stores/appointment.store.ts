@@ -57,9 +57,7 @@ export const useAppointmentStore = create<AppointmentStore>((set, _get) => ({
     set({ isLoading: true, error: null });
     
     try {
-      console.log('[AppointmentStore] Fetching appointments...');
       const appointments = await appointmentService.getAll();
-      console.log('[AppointmentStore] Received appointments:', appointments);
       set({ appointments, isLoading: false });
     } catch (error) {
       const errorMessage = error instanceof ApiClientError
@@ -117,9 +115,7 @@ export const useAppointmentStore = create<AppointmentStore>((set, _get) => ({
     set({ isLoading: true, error: null });
     
     try {
-      console.log('[AppointmentStore] Fetching upcoming appointments with limit:', limit);
       const appointments = await appointmentService.getUpcoming(limit);
-      console.log('[AppointmentStore] Received upcoming appointments:', appointments);
       set({ appointments, isLoading: false });
     } catch (error) {
       const errorMessage = error instanceof ApiClientError

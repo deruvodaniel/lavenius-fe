@@ -83,10 +83,15 @@
    @Column('simple-array', { nullable: true }) dismissedTips: string[];
    ```
 
-4. **Code Cleanup**
-   - Archivar mockData.ts y turnos2026.ts
-   - Remover console.logs
-   - Code splitting para optimizar bundle (actualmente ~937KB)
+4. **Code Cleanup** (Completado)
+   - ✅ mockData.ts y turnos2026.ts eliminados (839 líneas de código muerto)
+   - ✅ Console.logs de debug removidos (mantenidos solo console.error)
+   - ✅ Carpeta src/data/ eliminada
+
+5. **Performance Optimization** (Completado)
+   - ✅ Code splitting implementado via rollupOptions.manualChunks
+   - ✅ Lazy loading para Agenda, Cobros y HelpCenter
+   - ✅ FullCalendar solo se carga al navegar a Agenda
 
 ## 🎯 Pattern Established
 
@@ -135,7 +140,16 @@ const form = useForm({ resolver: zodResolver(schema) });
 ```
 
 ## 📊 Métricas
-- Bundle size: 937.32 kB (⚠️ considerar code splitting)
+- **Carga inicial**: ~593 kB (gzip: ~176 kB)
+  - index (app): 243.13 kB
+  - vendor-react: 180.01 kB
+  - vendor-radix: 43.81 kB
+  - vendor-forms: 87.24 kB
+  - vendor-state: 39.33 kB
+- **Lazy loaded** (solo cuando se navega):
+  - Agenda + vendor-calendar: 299.07 kB
+  - Cobros: 31.51 kB
+  - HelpCenter: 11.53 kB
 - Build time: ~8s
 - TypeScript strict: ✅
 - ESLint warnings: <10

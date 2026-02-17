@@ -56,7 +56,6 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
     
     // Prevent duplicate concurrent requests
     if (fetchStatus === 'loading') {
-      console.log('[PaymentStore] Skipping fetch - already loading');
       return;
     }
     
@@ -65,7 +64,6 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
     
     // Use cache if valid, not forced, and filters haven't changed
     if (!force && !filtersChanged && lastFetchTime && Date.now() - lastFetchTime < CACHE_DURATION) {
-      console.log('[PaymentStore] Using cached data');
       return;
     }
 
@@ -73,7 +71,6 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
     
     try {
       const payments = await paymentService.getAll(filters);
-      console.log('[PaymentStore] Fetched payments:', payments);
       set({ 
         payments, 
         fetchStatus: 'success',
