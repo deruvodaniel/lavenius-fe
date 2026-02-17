@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import type { CreatePaymentDto, Payment } from '@/lib/types/api.types';
 import type { SessionUI } from '@/lib/types/session';
 import { SessionStatus } from '@/lib/types/session';
+import type { PaymentFilters } from '@/lib/services/payment.service';
 
 // ============================================================================
 // CONSTANTS
@@ -766,14 +767,44 @@ export function Cobros() {
     };
   }, [isMobile, isLoadingMoreHistory]);
 
-  // Single fetch on mount
+  // Debounced search for server-side filtering
+  const [debouncedHistorySearch, setDebouncedHistorySearch] = useState('');
+  
+  // Debounce history search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedHistorySearch(historySearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [historySearch]);
+
+  // Build server-side filters for payments
+  const serverFilters = useMemo((): PaymentFilters | undefined => {
+    const filters: PaymentFilters = {};
+    
+    if (globalDateFrom) {
+      filters.from = globalDateFrom;
+    }
+    if (globalDateTo) {
+      filters.to = globalDateTo;
+    }
+    if (debouncedHistorySearch.trim()) {
+      filters.search = debouncedHistorySearch.trim();
+    }
+    
+    return Object.keys(filters).length > 0 ? filters : undefined;
+  }, [globalDateFrom, globalDateTo, debouncedHistorySearch]);
+
+  // Fetch payments when filters change (server-side filtering)
+  useEffect(() => {
+    fetchPayments(true, serverFilters).catch(() => {});
+  }, [serverFilters, fetchPayments]);
+
+  // Single fetch on mount for sessions
   useEffect(() => {
     const loadData = async () => {
       try {
-        await Promise.all([
-          fetchUpcoming(),
-          fetchPayments(),
-        ]);
+        await fetchUpcoming();
       } catch (error) {
         console.error('Error fetching initial data:', error);
       } finally {
@@ -919,21 +950,11 @@ export function Cobros() {
     }
   }, [filteredPendingSessions, pendingPage, pendingVisibleCount, isMobile]);
 
-  // Filtered and sorted history
+  // Filtered and sorted history (payments are now filtered by server)
   const filteredPaidPayments = useMemo(() => {
-    // Start with payments in the global date range
-    let filtered = [...paidPaymentsInRange];
-
-    // Filter by patient name (tab-specific search)
-    if (historySearch.trim()) {
-      const search = historySearch.toLowerCase();
-      filtered = filtered.filter(payment => {
-        const name = payment.patient 
-          ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.toLowerCase()
-          : '';
-        return name.includes(search);
-      });
-    }
+    // Payments are already filtered by server (date range and search)
+    // Only apply client-side sorting
+    let filtered = [...paidPayments];
 
     // Sort by selected option
     filtered.sort((a, b) => {
@@ -952,7 +973,7 @@ export function Cobros() {
     });
 
     return filtered;
-  }, [paidPaymentsInRange, historySearch, historySortBy]);
+  }, [paidPayments, historySortBy]);
 
   // Pagination for desktop, infinite scroll for mobile
   const historyTotalPages = Math.ceil(filteredPaidPayments.length / ITEMS_PER_PAGE);
@@ -1011,7 +1032,7 @@ export function Cobros() {
           // Backend may return error but still process the payment
           // Refresh data to verify actual state
           console.warn('markAsPaid returned error, verifying payment state...', markError);
-          await fetchPayments(true);
+          await fetchPayments(true, serverFilters);
           
           // Check if payment was actually processed
           const updatedPayment = usePaymentStore.getState().payments.find(
@@ -1038,7 +1059,7 @@ export function Cobros() {
       // Refresh all data to update lists and stats
       await Promise.all([
         fetchUpcoming(),
-        fetchPayments(true),
+        fetchPayments(true, serverFilters),
       ]);
     } catch (error) {
       console.error('Error saving payment:', error);
@@ -1046,7 +1067,7 @@ export function Cobros() {
     } finally {
       setIsRefreshing(false);
     }
-  }, [createPayment, markAsPaid, getExistingPayment, fetchUpcoming, fetchPayments]);
+  }, [createPayment, markAsPaid, getExistingPayment, fetchUpcoming, fetchPayments, serverFilters]);
 
   const handleCloseDrawer = useCallback(() => {
     setIsPaymentDrawerOpen(false);

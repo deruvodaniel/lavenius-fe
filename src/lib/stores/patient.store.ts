@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { patientService } from '../services/patient.service';
+import { patientService, type PatientFilters } from '../services/patient.service';
 import type { Patient, CreatePatientDto, UpdatePatientDto } from '../types/api.types';
 import { ApiClientError } from '../api/client';
 
@@ -11,13 +11,14 @@ interface PatientState {
   selectedPatient: Patient | null;
   isLoading: boolean;
   error: string | null;
+  currentFilters: PatientFilters | null;
 }
 
 /**
  * Patient Store Actions
  */
 interface PatientActions {
-  fetchPatients: () => Promise<void>;
+  fetchPatients: (filters?: PatientFilters) => Promise<void>;
   fetchPatientById: (id: string) => Promise<void>;
   createPatient: (data: CreatePatientDto) => Promise<Patient>;
   updatePatient: (id: string, data: UpdatePatientDto) => Promise<Patient>;
@@ -40,6 +41,7 @@ const initialState: PatientState = {
   selectedPatient: null,
   isLoading: false,
   error: null,
+  currentFilters: null,
 };
 
 /**
@@ -50,13 +52,13 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
   ...initialState,
 
   /**
-   * Fetch all patients
+   * Fetch all patients with optional server-side filters
    */
-  fetchPatients: async () => {
-    set({ isLoading: true, error: null });
+  fetchPatients: async (filters?: PatientFilters) => {
+    set({ isLoading: true, error: null, currentFilters: filters || null });
     
     try {
-      const patients = await patientService.getAll();
+      const patients = await patientService.getAll(filters);
       set({ patients, isLoading: false });
     } catch (error) {
       const errorMessage = error instanceof ApiClientError

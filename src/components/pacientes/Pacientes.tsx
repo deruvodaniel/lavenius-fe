@@ -10,6 +10,7 @@ import { AnimatedList, SkeletonCard, EmptyState } from '../shared';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import type { CreatePatientDto } from '@/lib/types/api.types';
+import type { PatientFilters } from '@/lib/services/patient.service';
 
 // ============================================================================
 // CONSTANTS & TYPES
@@ -119,6 +120,7 @@ export function Pacientes() {
   
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [modalidadFilter, setModalidadFilter] = useState<'todas' | 'presencial' | 'remoto' | 'mixto'>('todas');
   const [frecuenciaFilter, setFrecuenciaFilter] = useState<'todas' | 'semanal' | 'quincenal' | 'mensual'>('todas');
   const [soloTurnosEstaSemana, setSoloTurnosEstaSemana] = useState(false);
@@ -138,11 +140,49 @@ export function Pacientes() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
+  // Debounce search term for server-side filtering
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Build server-side filters
+  const serverFilters = useMemo((): PatientFilters | undefined => {
+    const filters: PatientFilters = {};
+    
+    if (debouncedSearchTerm.trim()) {
+      filters.name = debouncedSearchTerm.trim();
+    }
+    
+    if (modalidadFilter !== 'todas') {
+      // Map frontend values to backend values
+      filters.sessionType = modalidadFilter === 'remoto' ? 'remote' : 'presential';
+    }
+    
+    if (frecuenciaFilter !== 'todas') {
+      filters.frequency = frecuenciaFilter;
+    }
+    
+    if (soloTurnosEstaSemana) {
+      filters.hasSessionThisWeek = true;
+    }
+    
+    // Return undefined if no filters to avoid unnecessary query params
+    return Object.keys(filters).length > 0 ? filters : undefined;
+  }, [debouncedSearchTerm, modalidadFilter, frecuenciaFilter, soloTurnosEstaSemana]);
+
+  // Fetch patients when filters change (server-side filtering)
+  useEffect(() => {
+    fetchPatients(serverFilters).catch(() => {});
+  }, [serverFilters, fetchPatients]);
+
   // Reset pagination/scroll when filters change
   useEffect(() => {
     setCurrentPage(1);
     setVisibleCount(INFINITE_SCROLL_BATCH);
-  }, [searchTerm, modalidadFilter, frecuenciaFilter, soloTurnosEstaSemana, sortBy]);
+  }, [debouncedSearchTerm, modalidadFilter, frecuenciaFilter, soloTurnosEstaSemana, sortBy]);
 
   // Infinite scroll effect (mobile only)
   useEffect(() => {
@@ -173,11 +213,10 @@ export function Pacientes() {
     };
   }, [isMobile, isLoadingMore]);
 
-  // Fetch data on mount (only once)
+  // Fetch sessions on mount (patients are fetched via filter effect)
   React.useEffect(() => {
     if (!hasFetchedRef.current) {
       hasFetchedRef.current = true;
-      fetchPatients().catch(() => {});
       fetchUpcoming().catch(() => {});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -300,40 +339,12 @@ export function Pacientes() {
     };
   });
 
-  // Filter and sort patients
+  // Filter and sort patients (filtering is now server-side, only sorting is client-side)
   const filteredPacientes = useMemo(() => {
-    let filtered = pacientes.filter((paciente) => {
-      // Search by name
-      if (searchTerm.trim()) {
-        const search = searchTerm.toLowerCase().trim();
-        const name = paciente.nombre.toLowerCase();
-        if (!name.includes(search)) {
-          return false;
-        }
-      }
+    // Create a copy for sorting (patients are already filtered by server)
+    let filtered = [...pacientes];
 
-      // Modalidad filter
-      if (modalidadFilter !== 'todas' && paciente.modalidad !== modalidadFilter) {
-        return false;
-      }
-
-      // Frecuencia filter
-      if (frecuenciaFilter !== 'todas' && paciente.frecuencia !== frecuenciaFilter) {
-        return false;
-      }
-
-      // Filter for patients with appointments this week
-      if (soloTurnosEstaSemana) {
-        const turno = getProximoTurno(paciente.rawId);
-        if (!turno || turno.dias > 7) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    // Sort
+    // Sort (client-side)
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'name-asc':
@@ -352,7 +363,7 @@ export function Pacientes() {
     });
 
     return filtered;
-  }, [pacientes, searchTerm, modalidadFilter, frecuenciaFilter, soloTurnosEstaSemana, getProximoTurno, sortBy]);
+  }, [pacientes, sortBy]);
 
   // Pagination for desktop, infinite scroll for mobile
   const totalPages = Math.ceil(filteredPacientes.length / ITEMS_PER_PAGE);

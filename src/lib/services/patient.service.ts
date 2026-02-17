@@ -7,6 +7,16 @@ import type {
 } from '../types/api.types';
 
 /**
+ * Patient filter options for server-side filtering
+ */
+export interface PatientFilters {
+  name?: string;
+  sessionType?: 'remote' | 'presential';
+  frequency?: 'semanal' | 'quincenal' | 'mensual';
+  hasSessionThisWeek?: boolean;
+}
+
+/**
  * Patient Service
  * Maneja todas las operaciones CRUD de pacientes
  */
@@ -15,9 +25,28 @@ export class PatientService {
 
   /**
    * Get all patients for the authenticated therapist
+   * Supports optional server-side filters
    */
-  async getAll(): Promise<Patient[]> {
-    return apiClient.get<Patient[]>(this.basePath);
+  async getAll(filters?: PatientFilters): Promise<Patient[]> {
+    const params = new URLSearchParams();
+    
+    if (filters?.name) {
+      params.append('name', filters.name);
+    }
+    if (filters?.sessionType) {
+      params.append('sessionType', filters.sessionType);
+    }
+    if (filters?.frequency) {
+      params.append('frequency', filters.frequency);
+    }
+    if (filters?.hasSessionThisWeek !== undefined) {
+      params.append('hasSessionThisWeek', String(filters.hasSessionThisWeek));
+    }
+    
+    const queryString = params.toString();
+    const url = queryString ? `${this.basePath}?${queryString}` : this.basePath;
+    
+    return apiClient.get<Patient[]>(url);
   }
 
   /**

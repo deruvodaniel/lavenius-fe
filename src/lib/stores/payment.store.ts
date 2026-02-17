@@ -4,13 +4,13 @@ import type {
   CreatePaymentDto,
 } from '@/lib/types/api.types';
 import { PaymentStatus } from '@/lib/types/api.types';
-import { paymentService } from '@/lib/services/payment.service';
+import { paymentService, type PaymentFilters } from '@/lib/services/payment.service';
 
 /**
  * Payment Store - Single Source of Truth
  * 
  * Data flow:
- * 1. fetchPayments() loads all payments from /payments
+ * 1. fetchPayments() loads payments from /payments with optional filters
  * 2. All derived data computed from payments array
  * 3. After mutations, we refresh to stay in sync with backend
  * 
@@ -26,10 +26,11 @@ interface PaymentState {
   fetchStatus: FetchStatus;
   error: Error | null;
   lastFetchTime: number | null;
+  currentFilters: PaymentFilters | null;
 }
 
 interface PaymentActions {
-  fetchPayments: (force?: boolean) => Promise<void>;
+  fetchPayments: (force?: boolean, filters?: PaymentFilters) => Promise<void>;
   createPayment: (data: CreatePaymentDto) => Promise<Payment>;
   markAsPaid: (id: string) => Promise<Payment>;
   deletePayment: (id: string) => Promise<void>;
@@ -44,13 +45,14 @@ const initialState: PaymentState = {
   fetchStatus: 'idle',
   error: null,
   lastFetchTime: null,
+  currentFilters: null,
 };
 
 export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) => ({
   ...initialState,
 
-  fetchPayments: async (force = false) => {
-    const { fetchStatus, lastFetchTime } = get();
+  fetchPayments: async (force = false, filters?: PaymentFilters) => {
+    const { fetchStatus, lastFetchTime, currentFilters } = get();
     
     // Prevent duplicate concurrent requests
     if (fetchStatus === 'loading') {
@@ -58,16 +60,19 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
       return;
     }
     
-    // Use cache if valid and not forced
-    if (!force && lastFetchTime && Date.now() - lastFetchTime < CACHE_DURATION) {
+    // Check if filters changed
+    const filtersChanged = JSON.stringify(filters) !== JSON.stringify(currentFilters);
+    
+    // Use cache if valid, not forced, and filters haven't changed
+    if (!force && !filtersChanged && lastFetchTime && Date.now() - lastFetchTime < CACHE_DURATION) {
       console.log('[PaymentStore] Using cached data');
       return;
     }
 
-    set({ fetchStatus: 'loading', error: null });
+    set({ fetchStatus: 'loading', error: null, currentFilters: filters || null });
     
     try {
-      const payments = await paymentService.getAll();
+      const payments = await paymentService.getAll(filters);
       console.log('[PaymentStore] Fetched payments:', payments);
       set({ 
         payments, 
