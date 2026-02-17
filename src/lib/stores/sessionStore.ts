@@ -68,7 +68,16 @@ export const useSessionStore = create<SessionState>((set, _get) => ({
       
       return newSession;
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Error al crear sesión';
+      const backendMessage = error?.response?.data?.message || error?.message || '';
+      
+      // Provide user-friendly error messages
+      let errorMessage = 'Error al crear sesión';
+      if (backendMessage.includes('calendar event') || backendMessage.includes('calendar')) {
+        errorMessage = 'Para agendar turnos, primero debes conectar tu Google Calendar en Configuración';
+      } else if (backendMessage) {
+        errorMessage = backendMessage;
+      }
+      
       set({ error: errorMessage, isLoading: false });
       throw error;
     }
