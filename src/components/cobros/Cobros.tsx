@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
 import { usePaymentStore } from '@/lib/stores/payment.store';
-import { useResponsive } from '@/lib/hooks';
+import { useResponsive, usePatients } from '@/lib/hooks';
 import { PaymentStats } from './PaymentStats';
 import { PaymentDrawer } from './PaymentDrawer';
 import { Button } from '@/components/ui/button';
@@ -595,10 +595,11 @@ const PaymentCard = ({ payment }: PaymentCardProps) => {
 
 interface ReminderModalProps {
   session: SessionUI;
+  patientPhone?: string;
   onClose: () => void;
 }
 
-const ReminderModal = ({ session, onClose }: ReminderModalProps) => {
+const ReminderModal = ({ session, patientPhone, onClose }: ReminderModalProps) => {
   const patientName = session.patientName || session.patient?.firstName || 'Paciente';
   const defaultMessage = `Hola ${patientName}! Te escribo para recordarte que tenés pendiente el pago de la sesión del ${formatDate(session.scheduledFrom)} a las ${formatTime(session.scheduledFrom)}. El monto es de ${formatCurrency(session.cost || 0)}. ¡Gracias!`;
   
@@ -610,9 +611,8 @@ const ReminderModal = ({ session, onClose }: ReminderModalProps) => {
   };
 
   const handleWhatsApp = () => {
-    const phone = session.patient?.phone;
-    if (phone) {
-      const cleanPhone = phone.replace(/\D/g, '');
+    if (patientPhone) {
+      const cleanPhone = patientPhone.replace(/\D/g, '');
       window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
     } else {
       toast.info('El paciente no tiene número de teléfono registrado');
@@ -658,6 +658,7 @@ const ReminderModal = ({ session, onClose }: ReminderModalProps) => {
 
 export function Cobros() {
   const { sessionsUI, fetchUpcoming } = useSessions();
+  const { patients, fetchPatients } = usePatients();
   const { 
     payments,
     paidPayments,
@@ -800,11 +801,11 @@ export function Cobros() {
     fetchPayments(true, serverFilters).catch(() => {});
   }, [serverFilters, fetchPayments]);
 
-  // Single fetch on mount for sessions
+  // Single fetch on mount for sessions and patients
   useEffect(() => {
     const loadData = async () => {
       try {
-        await fetchUpcoming();
+        await Promise.all([fetchUpcoming(), fetchPatients()]);
       } catch (error) {
         console.error('Error fetching initial data:', error);
       } finally {
@@ -998,6 +999,14 @@ export function Cobros() {
     if (sessionDate.getTime() === today.getTime()) return 'today';
     return 'upcoming';
   }, [today]);
+
+  // Get patient phone by session's patientId
+  const getPatientPhone = useCallback((session: SessionUI): string | undefined => {
+    const patientId = session.patient?.id;
+    if (!patientId) return undefined;
+    const patient = patients.find(p => p.id === patientId);
+    return patient?.phone;
+  }, [patients]);
 
   // Handlers
   const handleCreatePayment = useCallback(() => {
@@ -1250,7 +1259,8 @@ export function Cobros() {
       {/* Reminder Modal */}
       {reminderSession && (
         <ReminderModal 
-          session={reminderSession} 
+          session={reminderSession}
+          patientPhone={getPatientPhone(reminderSession)}
           onClose={() => setReminderSession(null)} 
         />
       )}
