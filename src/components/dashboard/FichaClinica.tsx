@@ -248,6 +248,11 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     .filter((a) => new Date(a.scheduledFrom) >= today)
     .sort((a, b) => new Date(a.scheduledFrom).getTime() - new Date(b.scheduledFrom).getTime());
 
+  // Get last completed session (past sessions, sorted descending)
+  const ultimaConsulta = turnosPaciente
+    .filter((s) => new Date(s.scheduledFrom) < today && s.status === 'completed')
+    .sort((a, b) => new Date(b.scheduledFrom).getTime() - new Date(a.scheduledFrom).getTime())[0];
+
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
       {/* Header with Back Button */}
@@ -383,13 +388,15 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
                   </div>
                 )}
               </div>
-              <div>
-                <label className="text-gray-500 text-sm block mb-1">Última Consulta</label>
-                <div className="flex items-center gap-2 text-gray-900">
-                  <Calendar className="w-4 h-4 text-gray-400" />
-                  <span>{patient.updatedAt ? formatFecha(patient.updatedAt) : 'Sin consultas'}</span>
+              {ultimaConsulta && (
+                <div>
+                  <label className="text-gray-500 text-sm block mb-1">Última Consulta</label>
+                  <div className="flex items-center gap-2 text-gray-900">
+                    <Calendar className="w-4 h-4 text-gray-400" />
+                    <span>{formatFecha(ultimaConsulta.scheduledFrom)}</span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             
             {isEditing && (
@@ -503,17 +510,8 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
             )}
           </div>
 
-          {/* Notas de Sesión - con overlay Próximamente */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 relative overflow-hidden">
-            {/* Coming Soon Overlay */}
-            <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-[1px] z-10 flex items-center justify-center">
-              <div className="bg-white/90 border border-gray-200 shadow-lg rounded-lg px-4 py-2 transform -rotate-3">
-                <span className="text-sm font-bold text-gray-500 tracking-wider uppercase">
-                  Próximamente
-                </span>
-              </div>
-            </div>
-            
+          {/* Notas de Sesión */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-gray-900 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-indigo-600" />
