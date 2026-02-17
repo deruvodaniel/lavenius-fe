@@ -28,6 +28,17 @@ export const SESSION_STATUS_BADGE_CLASSES: Record<SessionStatus, string> = {
 } as const;
 
 /**
+ * Clases CSS de Tailwind para borde izquierdo de cards
+ * Usados en TurnoCard y otros componentes de lista
+ */
+export const SESSION_STATUS_BORDER_CLASSES: Record<SessionStatus, string> = {
+  [SessionStatus.PENDING]: 'border-l-orange-500',
+  [SessionStatus.CONFIRMED]: 'border-l-blue-500',
+  [SessionStatus.COMPLETED]: 'border-l-green-500',
+  [SessionStatus.CANCELLED]: 'border-l-red-500',
+} as const;
+
+/**
  * Textos legibles para los estados de sesión
  */
 export const SESSION_STATUS_LABELS: Record<SessionStatus, string> = {
