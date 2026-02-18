@@ -187,7 +187,7 @@ export function TurnoCard({
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={onWhatsAppClick} 
-              disabled={!patient?.telefono}
+              disabled={!patient}
               className="cursor-pointer"
             >
               <MessageCircle className="w-4 h-4 mr-2" />

@@ -436,7 +436,134 @@ const InfiniteScrollLoader = ({ isLoading, hasMore, loadMoreRef }: InfiniteScrol
 };
 
 // ============================================================================
-// UNIFIED PAYMENT CARD
+// UNIFIED COBRO ITEM TYPE
+// ============================================================================
+
+/**
+ * Unified item that can represent either:
+ * - A Payment from the database (isVirtual = false)
+ * - A Session without payment shown as pending (isVirtual = true)
+ */
+interface CobroItem {
+  id: string;
+  isVirtual: boolean; // true = session without payment, false = real payment
+  status: PaymentStatus;
+  amount: number;
+  date: string;
+  patientName: string;
+  patientId?: string;
+  sessionId?: string;
+  description?: string;
+  // Original payment data (only for real payments)
+  payment?: Payment;
+}
+
+// ============================================================================
+// UNIFIED COBRO CARD
+// ============================================================================
+
+interface CobroCardProps {
+  item: CobroItem;
+  onMarkAsPaid?: () => void;
+  onReminder?: () => void;
+  onDelete?: () => void;
+  onViewDetail?: () => void;
+  onRegisterPayment?: () => void;
+  isMarkingAsPaid?: boolean;
+}
+
+const CobroCard = ({ item, onMarkAsPaid, onReminder, onDelete, onViewDetail, onRegisterPayment, isMarkingAsPaid }: CobroCardProps) => {
+  const initials = getInitials(item.patientName || 'SP');
+  const config = STATUS_CONFIG[item.status];
+  const Icon = config.Icon;
+  const isPaid = item.status === PaymentStatus.PAID;
+  const isPending = item.status === PaymentStatus.PENDING;
+
+  return (
+    <Card className={`p-3 transition-all hover:shadow-md border-l-4 bg-white ${config.borderColor}`}>
+      {/* Clickeable area for detail */}
+      <div 
+        className={!item.isVirtual ? 'cursor-pointer' : ''}
+        onClick={!item.isVirtual ? onViewDetail : undefined}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${config.iconBgColor}`}>
+              {isPaid ? (
+                <Icon className={`h-4 w-4 ${config.iconColor}`} />
+              ) : (
+                <span className={`text-xs font-semibold ${config.iconColor}`}>{initials}</span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="font-medium text-gray-900 text-sm truncate">{item.patientName || 'Sin paciente'}</p>
+              <p className="text-xs text-gray-500">{formatDate(item.date)}</p>
+            </div>
+          </div>
+          <PaymentStatusBadge status={item.status} />
+        </div>
+        
+        <div className="flex items-center justify-between mt-3">
+          {item.description && (
+            <p className="text-xs text-gray-500 truncate flex-1 mr-2">{item.description}</p>
+          )}
+          <p className="font-semibold text-gray-900">{formatCurrency(item.amount)}</p>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-2 pt-2 mt-3 border-t border-gray-100">
+        {/* Virtual items (sessions without payment) - show Register Payment button */}
+        {item.isVirtual && isPending && onRegisterPayment && (
+          <Button 
+            size="sm" 
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white" 
+            onClick={onRegisterPayment}
+          >
+            <DollarSign className="h-4 w-4 mr-1.5" />
+            Registrar Pago
+          </Button>
+        )}
+        {/* Real payments - show Reminder and Mark as Paid buttons */}
+        {!item.isVirtual && !isPaid && onReminder && (
+          <Button size="sm" variant="outline" className="flex-1" onClick={onReminder}>
+            <Bell className="h-4 w-4 mr-1.5" />
+            Recordatorio
+          </Button>
+        )}
+        {!item.isVirtual && !isPaid && onMarkAsPaid && (
+          <Button 
+            size="sm" 
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white" 
+            onClick={onMarkAsPaid}
+            disabled={isMarkingAsPaid}
+          >
+            {isMarkingAsPaid ? (
+              <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+            ) : (
+              <DollarSign className="h-4 w-4 mr-1.5" />
+            )}
+            Cobrar
+          </Button>
+        )}
+        {!item.isVirtual && onDelete && (
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className={`text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 ${isPaid ? 'flex-1' : ''}`}
+            onClick={onDelete}
+          >
+            <Trash2 className="h-4 w-4" />
+            {isPaid && <span className="ml-1.5">Eliminar</span>}
+          </Button>
+        )}
+      </div>
+    </Card>
+  );
+};
+
+// ============================================================================
+// LEGACY PAYMENT CARD (kept for table view compatibility)
 // ============================================================================
 
 interface PaymentCardProps {
@@ -626,7 +753,7 @@ const ReminderModal = ({ payment, onClose }: ReminderModalProps) => {
     ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
     : 'Paciente';
   
-  const defaultMessage = `Hola ${patientName}! Te escribo para recordarte que tenés pendiente el pago del ${formatDate(payment.paymentDate)}. El monto es de ${formatCurrency(payment.amount)}. ¡Gracias!`;
+  const defaultMessage = `Hola ${patientName}! Te escribo para recordarte que tenes un pago pendiente del *${formatDate(payment.paymentDate)}* por *${formatCurrency(payment.amount)}*. Podes abonar por transferencia o en efectivo en tu proxima sesion. Gracias!`;
   
   const [message, setMessage] = useState(defaultMessage);
 
@@ -860,23 +987,90 @@ export function Cobros() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Get session IDs that already have a payment
+  const sessionIdsWithPayment = useMemo(() => {
+    return new Set(payments.map(p => p.sessionId).filter(Boolean));
+  }, [payments]);
+
+  // Create virtual pending items from sessions without payment (only past/completed sessions)
+  const virtualPendingItems = useMemo((): CobroItem[] => {
+    const now = new Date();
+    
+    return sessionsUI
+      .filter(session => {
+        // Only include past sessions (completed or past date)
+        const sessionDate = new Date(session.scheduledFrom);
+        const isPast = sessionDate < now || session.status === 'completed';
+        // Exclude sessions that already have a payment
+        const hasPayment = sessionIdsWithPayment.has(session.id);
+        // Only include if session has a cost
+        const hasCost = session.cost && session.cost > 0;
+        
+        return isPast && !hasPayment && hasCost;
+      })
+      .map(session => ({
+        id: `virtual-${session.id}`,
+        isVirtual: true,
+        status: PaymentStatus.PENDING,
+        amount: session.cost || 0,
+        date: session.scheduledFrom,
+        patientName: session.patientName || 'Sin paciente',
+        patientId: session.patient?.id,
+        sessionId: session.id,
+        description: session.sessionSummary || 'Sesión sin cobrar',
+      }));
+  }, [sessionsUI, sessionIdsWithPayment]);
+
+  // Convert real payments to CobroItems
+  const realPaymentItems = useMemo((): CobroItem[] => {
+    return payments.map(payment => ({
+      id: payment.id,
+      isVirtual: false,
+      status: payment.status,
+      amount: payment.amount,
+      date: payment.paymentDate,
+      patientName: payment.patient 
+        ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
+        : 'Sin paciente',
+      patientId: payment.patient?.id,
+      sessionId: payment.sessionId,
+      description: payment.description,
+      payment,
+    }));
+  }, [payments]);
+
+  // Unified list of all cobro items (real payments + virtual pending)
+  const allCobroItems = useMemo((): CobroItem[] => {
+    return [...realPaymentItems, ...virtualPendingItems];
+  }, [realPaymentItems, virtualPendingItems]);
+
   // Client-side filtering (status and patient search)
-  const filteredPayments = useMemo(() => {
-    let filtered = [...payments];
+  const filteredCobroItems = useMemo(() => {
+    let filtered = [...allCobroItems];
+
+    // Filter by date range (for virtual items - real payments are already filtered by server)
+    if (dateFrom || dateTo) {
+      filtered = filtered.filter(item => {
+        // Real payments are already filtered by server, only filter virtual items
+        if (!item.isVirtual) return true;
+        
+        const itemDate = new Date(item.date);
+        if (dateFrom && itemDate < new Date(dateFrom)) return false;
+        if (dateTo && itemDate > new Date(dateTo + 'T23:59:59')) return false;
+        return true;
+      });
+    }
 
     // Filter by status (client-side)
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(p => p.status === statusFilter);
+      filtered = filtered.filter(item => item.status === statusFilter);
     }
 
     // Filter by patient name (client-side - data is encrypted on server)
     if (debouncedSearch.trim()) {
       const search = debouncedSearch.toLowerCase();
-      filtered = filtered.filter(payment => {
-        const name = payment.patient 
-          ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.toLowerCase()
-          : '';
-        return name.includes(search);
+      filtered = filtered.filter(item => {
+        return item.patientName.toLowerCase().includes(search);
       });
     }
 
@@ -884,9 +1078,9 @@ export function Cobros() {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'date-desc':
-          return new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime();
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
         case 'date-asc':
-          return new Date(a.paymentDate).getTime() - new Date(b.paymentDate).getTime();
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
         case 'price-desc':
           return (b.amount || 0) - (a.amount || 0);
         case 'price-asc':
@@ -897,20 +1091,20 @@ export function Cobros() {
     });
 
     return filtered;
-  }, [payments, statusFilter, debouncedSearch, sortBy]);
+  }, [allCobroItems, statusFilter, debouncedSearch, sortBy, dateFrom, dateTo]);
 
   // Pagination/infinite scroll
-  const totalPages = Math.ceil(filteredPayments.length / ITEMS_PER_PAGE);
-  const hasMore = visibleCount < filteredPayments.length;
+  const totalPages = Math.ceil(filteredCobroItems.length / ITEMS_PER_PAGE);
+  const hasMore = visibleCount < filteredCobroItems.length;
   
-  const displayedPayments = useMemo(() => {
+  const displayedCobroItems = useMemo(() => {
     if (isMobile) {
-      return filteredPayments.slice(0, visibleCount);
+      return filteredCobroItems.slice(0, visibleCount);
     } else {
       const start = (currentPage - 1) * ITEMS_PER_PAGE;
-      return filteredPayments.slice(start, start + ITEMS_PER_PAGE);
+      return filteredCobroItems.slice(start, start + ITEMS_PER_PAGE);
     }
-  }, [filteredPayments, currentPage, visibleCount, isMobile]);
+  }, [filteredCobroItems, currentPage, visibleCount, isMobile]);
 
   // Handlers
   const handleCreatePayment = useCallback(() => {
@@ -1010,6 +1204,15 @@ export function Cobros() {
     setQuickFilter('all');
   }, []);
 
+  // Handler to register payment for a specific session (from virtual pending item)
+  const handleRegisterPaymentForSession = useCallback((sessionId: string) => {
+    const session = sessionsUI.find(s => s.id === sessionId);
+    if (session) {
+      setPreselectedSession(session);
+      setIsPaymentDrawerOpen(true);
+    }
+  }, [sessionsUI]);
+
   const hasDateFilters = dateFrom || dateTo;
   const hasAnyFilters = hasDateFilters || statusFilter !== 'all' || searchTerm;
 
@@ -1059,31 +1262,41 @@ export function Cobros() {
       {/* Payments List */}
       {isLoading ? (
         <SkeletonList items={3} />
-      ) : filteredPayments.length === 0 ? (
+      ) : filteredCobroItems.length === 0 ? (
         <EmptyState 
           icon={DollarSign} 
-          title={hasAnyFilters ? "Sin resultados" : "Sin pagos"}
-          subtitle={hasAnyFilters ? "No hay pagos que coincidan con los filtros" : "Aún no hay pagos registrados"}
+          title={hasAnyFilters ? "Sin resultados" : "Sin cobros"}
+          subtitle={hasAnyFilters ? "No hay cobros que coincidan con los filtros" : "Aún no hay cobros pendientes ni pagos registrados"}
         />
       ) : isMobile ? (
         /* Mobile: Cards with infinite scroll */
         <>
           <div className="space-y-3">
-            {displayedPayments.map((payment) => (
-              <PaymentCard
-                key={payment.id}
-                payment={payment}
-                onMarkAsPaid={payment.status !== PaymentStatus.PAID 
-                  ? () => handleMarkAsPaid(payment.id) 
+            {displayedCobroItems.map((item) => (
+              <CobroCard
+                key={item.id}
+                item={item}
+                onMarkAsPaid={!item.isVirtual && item.status !== PaymentStatus.PAID && item.payment
+                  ? () => handleMarkAsPaid(item.payment!.id) 
                   : undefined
                 }
-                onReminder={payment.status !== PaymentStatus.PAID 
-                  ? () => setReminderPayment(payment) 
+                onReminder={!item.isVirtual && item.status !== PaymentStatus.PAID && item.payment
+                  ? () => setReminderPayment(item.payment!) 
                   : undefined
                 }
-                onDelete={() => setDeletePaymentData(payment)}
-                onViewDetail={() => handleViewDetail(payment)}
-                isMarkingAsPaid={markingAsPaidId === payment.id}
+                onDelete={!item.isVirtual && item.payment
+                  ? () => setDeletePaymentData(item.payment!)
+                  : undefined
+                }
+                onViewDetail={!item.isVirtual && item.payment
+                  ? () => handleViewDetail(item.payment!)
+                  : undefined
+                }
+                onRegisterPayment={item.isVirtual && item.sessionId
+                  ? () => handleRegisterPaymentForSession(item.sessionId!)
+                  : undefined
+                }
+                isMarkingAsPaid={!item.isVirtual && markingAsPaidId === item.id}
               />
             ))}
           </div>
@@ -1109,19 +1322,17 @@ export function Cobros() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {displayedPayments.map((payment) => {
-                    const patientName = payment.patient 
-                      ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
-                      : 'Sin paciente';
-                    const initials = getInitials(patientName);
-                    const config = STATUS_CONFIG[payment.status];
-                    const isPaid = payment.status === PaymentStatus.PAID;
+                  {displayedCobroItems.map((item) => {
+                    const initials = getInitials(item.patientName || 'SP');
+                    const config = STATUS_CONFIG[item.status];
+                    const isPaid = item.status === PaymentStatus.PAID;
+                    const isPending = item.status === PaymentStatus.PENDING;
 
                     return (
                       <tr 
-                        key={payment.id} 
-                        className="hover:bg-gray-50 transition-colors cursor-pointer"
-                        onClick={() => handleViewDetail(payment)}
+                        key={item.id} 
+                        className={`hover:bg-gray-50 transition-colors ${!item.isVirtual ? 'cursor-pointer' : ''}`}
+                        onClick={!item.isVirtual && item.payment ? () => handleViewDetail(item.payment!) : undefined}
                       >
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
@@ -1129,40 +1340,62 @@ export function Cobros() {
                               <span className={`text-xs font-semibold ${config.iconColor}`}>{initials}</span>
                             </div>
                             <div className="min-w-0">
-                              <p className="font-medium text-gray-900 truncate">{patientName}</p>
-                              {payment.description && (
-                                <p className="text-xs text-gray-500 truncate max-w-[200px]">{payment.description}</p>
+                              <p className="font-medium text-gray-900 truncate">{item.patientName}</p>
+                              {item.description && (
+                                <p className="text-xs text-gray-500 truncate max-w-[200px]">{item.description}</p>
+                              )}
+                              {item.isVirtual && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-600 mt-0.5">
+                                  Sesión sin cobrar
+                                </span>
                               )}
                             </div>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600">
-                          {formatDate(payment.paymentDate)}
+                          {formatDate(item.date)}
                         </td>
                         <td className="px-4 py-3">
-                          <PaymentStatusBadge status={payment.status} />
+                          <PaymentStatusBadge status={item.status} />
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="font-semibold text-gray-900">{formatCurrency(payment.amount)}</span>
+                          <span className="font-semibold text-gray-900">{formatCurrency(item.amount)}</span>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-end gap-1">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleViewDetail(payment);
-                              }}
-                              className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                              title="Ver detalle"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                            {!isPaid && (
+                            {/* Virtual items: Register Payment button */}
+                            {item.isVirtual && isPending && item.sessionId && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRegisterPaymentForSession(item.sessionId!);
+                                }}
+                                className="p-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors"
+                                title="Registrar pago"
+                              >
+                                <DollarSign className="w-4 h-4" />
+                              </button>
+                            )}
+                            {/* Real payments: View detail button */}
+                            {!item.isVirtual && item.payment && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleViewDetail(item.payment!);
+                                }}
+                                className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                title="Ver detalle"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+                            )}
+                            {/* Real payments not paid: Reminder and Mark as paid */}
+                            {!item.isVirtual && !isPaid && item.payment && (
                               <>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    setReminderPayment(payment);
+                                    setReminderPayment(item.payment!);
                                   }}
                                   className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                                   title="Enviar recordatorio"
@@ -1172,30 +1405,33 @@ export function Cobros() {
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleMarkAsPaid(payment.id);
+                                    handleMarkAsPaid(item.payment!.id);
                                   }}
                                   className="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors"
                                   title="Marcar como cobrado"
-                                  disabled={markingAsPaidId === payment.id}
+                                  disabled={markingAsPaidId === item.payment!.id}
                                 >
-                                  {markingAsPaidId === payment.id ? (
+                                  {markingAsPaidId === item.payment!.id ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
                                   ) : (
-                                    <DollarSign className="w-4 h-4" />
+                                    <CheckCircle2 className="w-4 h-4" />
                                   )}
                                 </button>
                               </>
                             )}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDeletePaymentData(payment);
-                              }}
-                              className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                              title="Eliminar pago"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            {/* Real payments: Delete button */}
+                            {!item.isVirtual && item.payment && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeletePaymentData(item.payment!);
+                                }}
+                                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Eliminar pago"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -1208,7 +1444,7 @@ export function Cobros() {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            totalItems={filteredPayments.length}
+            totalItems={filteredCobroItems.length}
             onPageChange={setCurrentPage}
           />
         </>

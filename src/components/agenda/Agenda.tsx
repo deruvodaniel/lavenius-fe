@@ -13,6 +13,7 @@ import { usePatients, useResponsive } from '@/lib/hooks';
 import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
+import { patientService } from '@/lib/services/patient.service';
 import { Input } from '@/components/ui/input';
 import type { CreateSessionDto, SessionResponse, UpdateSessionDto } from '@/lib/types/session';
 
@@ -194,6 +195,12 @@ export function Agenda() {
     };
   });
 
+  // Helper to sanitize string fields that may come as "undefined" from backend
+  const sanitizeString = (value: string | undefined): string => {
+    if (!value || value === 'undefined' || value === 'null') return '';
+    return value;
+  };
+
   const pacientes = patients.map((p, index) => {
     const numericId = Number.parseInt(p.id, 10);
     const safeId = Number.isNaN(numericId) ? index : numericId;
@@ -202,13 +209,13 @@ export function Agenda() {
       id: safeId,
       rawId: p.id,
       nombre: `${p.firstName} ${p.lastName}`,
-      telefono: p.phone || '',
-      email: p.email || '',
+      telefono: sanitizeString(p.phone),
+      email: sanitizeString(p.email),
       edad: 0,
-      obraSocial: p.healthInsurance || '',
+      obraSocial: sanitizeString(p.healthInsurance),
       modalidad: 'presencial' as const,
       frecuencia: 'semanal' as const,
-      historiaClinica: p.notes || '',
+      historiaClinica: sanitizeString(p.notes),
     };
   });
 
@@ -391,14 +398,14 @@ export function Agenda() {
         
         await updateSession(selectedSession.id, updateData);
         toast.success('Turno actualizado exitosamente');
-        // Refresh to ensure UI is in sync
-        await fetchUpcoming();
+        // Refresh sessions and payments to ensure UI is in sync
+        await Promise.all([fetchUpcoming(), fetchPayments(true)]);
       } else {
         // Create new session
         await createSession(sessionData);
         toast.success('Turno creado exitosamente');
-        // Refresh to ensure UI is in sync
-        await fetchUpcoming();
+        // Refresh sessions and payments to ensure UI is in sync
+        await Promise.all([fetchUpcoming(), fetchPayments(true)]);
       }
       setTurnoDrawerOpen(false);
       setSelectedSession(null);
@@ -425,8 +432,8 @@ export function Agenda() {
       await deleteSession(sessionId);
       toast.success('Turno eliminado exitosamente');
       setTurnoDrawerOpen(false);
-      // Refresh list
-      await fetchUpcoming();
+      // Refresh sessions and payments
+      await Promise.all([fetchUpcoming(), fetchPayments(true)]);
     } catch (error) {
       console.error('Error deleting session:', error);
       toast.error('Error al eliminar el turno');
@@ -448,8 +455,8 @@ export function Agenda() {
       toast.success('Turno eliminado exitosamente');
       setDeleteConfirmOpen(false);
       setSessionToDelete(null);
-      // Refresh list
-      await fetchUpcoming();
+      // Refresh sessions and payments
+      await Promise.all([fetchUpcoming(), fetchPayments(true)]);
     } catch (error) {
       console.error('Error deleting session:', error);
       toast.error('Error al eliminar el turno');
@@ -459,15 +466,41 @@ export function Agenda() {
   };
 
   // Send WhatsApp confirmation request for a turno
-  const handleSendWhatsAppConfirmation = (paciente: { nombre: string; telefono: string } | undefined, turno: { fecha: string; hora: string }) => {
-    if (!paciente?.telefono) {
+  // Fetches patient details if phone is not available in the list
+  const handleSendWhatsAppConfirmation = async (
+    paciente: { rawId?: string; nombre: string; telefono: string } | undefined, 
+    turno: { fecha: string; hora: string }
+  ) => {
+    if (!paciente) {
+      toast.info('No se encontró el paciente');
+      return;
+    }
+
+    let phoneNumber = paciente.telefono;
+
+    // If phone is not available, fetch patient details
+    if (!phoneNumber && paciente.rawId) {
+      try {
+        toast.loading('Obteniendo datos del paciente...', { id: 'whatsapp-fetch' });
+        const patientDetails = await patientService.getById(paciente.rawId);
+        phoneNumber = sanitizeString(patientDetails.phone);
+        toast.dismiss('whatsapp-fetch');
+      } catch (error) {
+        toast.dismiss('whatsapp-fetch');
+        console.error('Error fetching patient for WhatsApp:', error);
+        toast.error('Error al obtener datos del paciente');
+        return;
+      }
+    }
+
+    if (!phoneNumber) {
       toast.info('El paciente no tiene número de teléfono registrado');
       return;
     }
 
     const fechaFormateada = formatFecha(turno.fecha);
-    const message = `Hola ${paciente.nombre}! Tenés un turno agendado para el ${fechaFormateada} a las ${turno.hora}. ¿Confirmás tu asistencia? Respondé "Sí" para confirmar o "No" si necesitás cancelar. ¡Gracias!`;
-    const phone = paciente.telefono.replace(/\D/g, '');
+    const message = `Hola ${paciente.nombre}! Te recuerdo que tenes un turno agendado para el *${fechaFormateada}* a las *${turno.hora}*. Podes confirmar tu asistencia? Responde *Si* para confirmar o *No* si necesitas cancelar. Gracias!`;
+    const phone = phoneNumber.replace(/\D/g, '');
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
   };
@@ -673,7 +706,7 @@ export function Agenda() {
                         {turnosDelDia.map((turno) => {
                           const paciente = getPaciente(turno.pacienteRawId ?? turno.pacienteId ?? null);
                           const session = sessionsUI.find(s => s.id === turno.rawId);
-                          const isPaid = session && isSessionPaid(session.id);
+                          const isPaid = session ? isSessionPaid(session.id) : false;
                           const originalPatient = patients.find(p => p.id === paciente?.rawId);
 
                           if (!session) return null;

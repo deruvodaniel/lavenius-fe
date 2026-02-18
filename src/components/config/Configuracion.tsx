@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, DollarSign, Calendar, X, Plus, Save, Clock } from 'lucide-react';
+import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, MessageCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -47,6 +47,11 @@ interface WorkingHours {
   workingDays: number[]; // [1, 2, 3, 4, 5] = Mon-Fri
 }
 
+interface WhatsAppTemplates {
+  turnoReminder: string;
+  paymentReminder: string;
+}
+
 interface AppSettings {
   recordatoriosCobros: boolean;
   frecuenciaRecordatorio: string;
@@ -55,7 +60,12 @@ interface AppSettings {
   horasAnticipacion: number;
   diasOff: DiaOff[];
   workingHours: WorkingHours;
+  whatsappTemplates: WhatsAppTemplates;
 }
+
+// Default WhatsApp templates with placeholders
+const DEFAULT_TURNO_TEMPLATE = 'Hola {nombre}! Te recuerdo que tenes un turno agendado para el *{fecha}* a las *{hora}*. Podes confirmar tu asistencia? Responde *Si* para confirmar o *No* si necesitas cancelar. Gracias!';
+const DEFAULT_PAYMENT_TEMPLATE = 'Hola {nombre}! Te escribo para recordarte que tenes un pago pendiente del *{fecha}* por *{monto}*. Podes abonar por transferencia o en efectivo en tu proxima sesion. Gracias!';
 
 const defaultSettings: AppSettings = {
   recordatoriosCobros: true,
@@ -71,6 +81,10 @@ const defaultSettings: AppSettings = {
     startTime: '09:00',
     endTime: '18:00',
     workingDays: [1, 2, 3, 4, 5], // Monday to Friday
+  },
+  whatsappTemplates: {
+    turnoReminder: DEFAULT_TURNO_TEMPLATE,
+    paymentReminder: DEFAULT_PAYMENT_TEMPLATE,
   },
 };
 
@@ -136,6 +150,27 @@ const ConfigSection = ({ icon: Icon, iconColor, iconBg, title, description, chil
       {children}
     </div>
   </Card>
+);
+
+// ============================================================================
+// COMING SOON WRAPPER (for partial overlay within a section)
+// ============================================================================
+
+interface ComingSoonWrapperProps {
+  children: React.ReactNode;
+}
+
+const ComingSoonWrapper = ({ children }: ComingSoonWrapperProps) => (
+  <div className="relative select-none">
+    <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
+      <div className="bg-white/90 border border-gray-200 shadow-lg rounded-lg px-3 py-1.5 transform -rotate-2">
+        <span className="text-xs font-bold text-gray-500 tracking-wider uppercase">
+          Proximamente
+        </span>
+      </div>
+    </div>
+    {children}
+  </div>
 );
 
 // ============================================================================
@@ -562,111 +597,193 @@ export function Configuracion() {
           iconColor="text-orange-600"
           iconBg="bg-orange-100"
           title="Recordatorios de Cobros"
-          description="Recibe notificaciones de turnos sin cobrar"
-          comingSoon
+          description="Configura notificaciones y mensajes para cobros pendientes"
         >
-          <div className="space-y-4">
-            <ToggleRow
-              checked={settings.recordatoriosCobros}
-              onChange={(v) => updateSetting('recordatoriosCobros', v)}
-              label="Activar recordatorios de cobros pendientes"
-              description="Te notificaremos cuando tengas turnos realizados sin marcar como cobrados"
-            />
+          <div className="space-y-6">
+            {/* Automatización - Coming Soon */}
+            <ComingSoonWrapper>
+              <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Automatización de recordatorios</h3>
+                <ToggleRow
+                  checked={settings.recordatoriosCobros}
+                  onChange={(v) => updateSetting('recordatoriosCobros', v)}
+                  label="Activar recordatorios automáticos de cobros pendientes"
+                  description="Te notificaremos cuando tengas turnos realizados sin marcar como cobrados"
+                />
 
-            {settings.recordatoriosCobros && (
-              <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-100">
-                {/* Frecuencia */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Frecuencia de recordatorio
-                  </label>
-                  <select
-                    value={settings.frecuenciaRecordatorio}
-                    onChange={(e) => updateSetting('frecuenciaRecordatorio', e.target.value)}
-                    className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
-                  >
-                    <option value="diario">Diariamente</option>
-                    <option value="semanal">Semanalmente (lunes)</option>
-                    <option value="quincenal">Cada 15 días</option>
-                  </select>
-                </div>
+                {settings.recordatoriosCobros && (
+                  <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
+                    {/* Frecuencia */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Frecuencia de recordatorio
+                      </label>
+                      <select
+                        value={settings.frecuenciaRecordatorio}
+                        onChange={(e) => updateSetting('frecuenciaRecordatorio', e.target.value)}
+                        className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                      >
+                        <option value="diario">Diariamente</option>
+                        <option value="semanal">Semanalmente (lunes)</option>
+                        <option value="quincenal">Cada 15 días</option>
+                      </select>
+                    </div>
 
-                {/* Mínimo de turnos */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Recordar cuando haya al menos
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      min="1"
-                      max="20"
-                      value={settings.minimoTurnos}
-                      onChange={(e) => updateSetting('minimoTurnos', Number(e.target.value))}
-                      className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
-                    />
-                    <span className="text-sm text-gray-600">
-                      {settings.minimoTurnos === 1 ? 'turno sin cobrar' : 'turnos sin cobrar'}
-                    </span>
+                    {/* Mínimo de turnos */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Recordar cuando haya al menos
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min="1"
+                          max="20"
+                          value={settings.minimoTurnos}
+                          onChange={(e) => updateSetting('minimoTurnos', Number(e.target.value))}
+                          className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                        />
+                        <span className="text-sm text-gray-600">
+                          {settings.minimoTurnos === 1 ? 'turno sin cobrar' : 'turnos sin cobrar'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Preview */}
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                      <p className="text-xs sm:text-sm text-orange-800">
+                        <span className="font-medium">Ejemplo:</span> Tienes {settings.minimoTurnos} {settings.minimoTurnos === 1 ? 'turno' : 'turnos'} de la semana pasada sin marcar como {settings.minimoTurnos === 1 ? 'cobrado' : 'cobrados'}.
+                      </p>
+                    </div>
                   </div>
-                </div>
-
-                {/* Preview */}
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                  <p className="text-xs sm:text-sm text-orange-800">
-                    <span className="font-medium">Ejemplo:</span> Tienes {settings.minimoTurnos} {settings.minimoTurnos === 1 ? 'turno' : 'turnos'} de la semana pasada sin marcar como {settings.minimoTurnos === 1 ? 'cobrado' : 'cobrados'}.
-                  </p>
-                </div>
+                )}
               </div>
-            )}
+            </ComingSoonWrapper>
+
+            {/* Payment Reminder Template - ENABLED */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-2">
+                <MessageCircle className="w-4 h-4 text-green-600" />
+                <label className="block text-sm font-medium text-gray-700">
+                  Mensaje de WhatsApp para recordatorio de pago
+                </label>
+              </div>
+              <p className="text-xs text-gray-500">
+                Este mensaje se usará cuando envíes recordatorios de pago a tus pacientes.
+                Variables disponibles: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{monto}'}</code>
+              </p>
+              <textarea
+                value={settings.whatsappTemplates.paymentReminder}
+                onChange={(e) => updateSetting('whatsappTemplates', {
+                  ...settings.whatsappTemplates,
+                  paymentReminder: e.target.value
+                })}
+                rows={3}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                placeholder="Escribe tu mensaje de recordatorio de pago..."
+              />
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => updateSetting('whatsappTemplates', {
+                    ...settings.whatsappTemplates,
+                    paymentReminder: DEFAULT_PAYMENT_TEMPLATE
+                  })}
+                  className="text-xs text-indigo-600 hover:text-indigo-800"
+                >
+                  Restaurar mensaje por defecto
+                </button>
+              </div>
+            </div>
           </div>
         </ConfigSection>
 
-        {/* Recordatorios para Pacientes */}
+        {/* Recordatorios de Turnos */}
         <ConfigSection
           icon={Bell}
           iconColor="text-blue-600"
           iconBg="bg-blue-100"
-          title="Recordatorios para Pacientes"
-          description="Notificaciones de turnos próximos"
-          comingSoon
+          title="Recordatorios de Turnos"
+          description="Configura notificaciones y mensajes para turnos de pacientes"
         >
-          <div className="space-y-4">
-            <ToggleRow
-              checked={settings.recordatoriosPacientes}
-              onChange={(v) => updateSetting('recordatoriosPacientes', v)}
-              label="Activar recordatorios para pacientes"
-              description="Te avisaremos cuando sea momento de recordar a tus pacientes sus turnos"
-            />
+          <div className="space-y-6">
+            {/* Automatización - Coming Soon */}
+            <ComingSoonWrapper>
+              <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Automatización de recordatorios</h3>
+                <ToggleRow
+                  checked={settings.recordatoriosPacientes}
+                  onChange={(v) => updateSetting('recordatoriosPacientes', v)}
+                  label="Activar recordatorios automáticos para pacientes"
+                  description="Te avisaremos cuando sea momento de recordar a tus pacientes sus turnos"
+                />
 
-            {settings.recordatoriosPacientes && (
-              <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-100">
-                {/* Horas de anticipación */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Horas de anticipación
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      min="1"
-                      max="72"
-                      value={settings.horasAnticipacion}
-                      onChange={(e) => updateSetting('horasAnticipacion', Number(e.target.value))}
-                      className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
-                    />
-                    <span className="text-sm text-gray-600">horas antes del turno</span>
+                {settings.recordatoriosPacientes && (
+                  <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
+                    {/* Horas de anticipación */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Horas de anticipación
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min="1"
+                          max="72"
+                          value={settings.horasAnticipacion}
+                          onChange={(e) => updateSetting('horasAnticipacion', Number(e.target.value))}
+                          className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                        />
+                        <span className="text-sm text-gray-600">horas antes del turno</span>
+                      </div>
+                    </div>
+
+                    {/* Preview */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-xs sm:text-sm text-blue-800">
+                        <span className="font-medium">Ejemplo:</span> Recordatorio para paciente con turno en {settings.horasAnticipacion} {settings.horasAnticipacion === 1 ? 'hora' : 'horas'}.
+                      </p>
+                    </div>
                   </div>
-                </div>
-
-                {/* Preview */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-xs sm:text-sm text-blue-800">
-                    <span className="font-medium">Ejemplo:</span> Recordatorio para paciente con turno en {settings.horasAnticipacion} {settings.horasAnticipacion === 1 ? 'hora' : 'horas'}.
-                  </p>
-                </div>
+                )}
               </div>
-            )}
+            </ComingSoonWrapper>
+
+            {/* Turno Reminder Template - ENABLED */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-2">
+                <MessageCircle className="w-4 h-4 text-green-600" />
+                <label className="block text-sm font-medium text-gray-700">
+                  Mensaje de WhatsApp para recordatorio de turno
+                </label>
+              </div>
+              <p className="text-xs text-gray-500">
+                Este mensaje se usará cuando envíes recordatorios de turno a tus pacientes.
+                Variables disponibles: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{hora}'}</code>
+              </p>
+              <textarea
+                value={settings.whatsappTemplates.turnoReminder}
+                onChange={(e) => updateSetting('whatsappTemplates', {
+                  ...settings.whatsappTemplates,
+                  turnoReminder: e.target.value
+                })}
+                rows={3}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                placeholder="Escribe tu mensaje de recordatorio de turno..."
+              />
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => updateSetting('whatsappTemplates', {
+                    ...settings.whatsappTemplates,
+                    turnoReminder: DEFAULT_TURNO_TEMPLATE
+                  })}
+                  className="text-xs text-indigo-600 hover:text-indigo-800"
+                >
+                  Restaurar mensaje por defecto
+                </button>
+              </div>
+            </div>
           </div>
         </ConfigSection>
 

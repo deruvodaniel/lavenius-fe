@@ -234,7 +234,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     }
 
     const phone = editableData.telefono.replace(/\D/g, '');
-    const defaultMessage = `Hola ${patient.firstName}!`;
+    const defaultMessage = `Hola ${patient.firstName}! Te escribo desde el consultorio. Como estas?`;
     const encodedMessage = encodeURIComponent(message || defaultMessage);
     window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
   };
