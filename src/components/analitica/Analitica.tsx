@@ -25,11 +25,12 @@ import {
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SkeletonList } from '@/components/shared/Skeleton';
-import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
 import { usePatients, useResponsive } from '@/lib/hooks';
 import { SessionStatus } from '@/lib/types/session';
 import { PaymentStatus } from '@/lib/types/api.types';
+import { sessionService } from '@/lib/api/sessions';
+import type { SessionResponse } from '@/lib/types/session';
 
 // ============================================================================
 // CONSTANTS & TYPES
@@ -190,14 +191,14 @@ const CustomTooltip = ({ active, payload, label, formatter }: TooltipProps) => {
 // ============================================================================
 
 export function Analitica() {
-  const { sessionsUI, fetchUpcoming, fetchMonthly } = useSessions();
-  const { payments, totals, fetchPayments } = usePayments();
+  const { payments, fetchPayments } = usePayments();
   const { patients, fetchPatients } = usePatients();
   const { isMobile } = useResponsive();
   
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>('month');
   const [showRangeDropdown, setShowRangeDropdown] = useState(false);
+  const [allSessions, setAllSessions] = useState<SessionResponse[]>([]);
 
   // Fetch all data on mount and when time range changes
   useEffect(() => {
@@ -215,12 +216,25 @@ export function Analitica() {
           current.setMonth(current.getMonth() + 1);
         }
         
-        // Fetch sessions for all months in parallel
-        await Promise.all([
-          ...monthsToFetch.map(({ year, month }) => fetchMonthly(year, month)),
+        // Fetch sessions for all months in parallel and aggregate results
+        const sessionPromises = monthsToFetch.map(({ year, month }) => 
+          sessionService.getMonthly(year, month)
+        );
+        
+        const [sessionsResults] = await Promise.all([
+          Promise.all(sessionPromises),
           fetchPayments(true),
           fetchPatients(),
         ]);
+        
+        // Flatten and deduplicate sessions by id
+        const sessionsMap = new Map<string, SessionResponse>();
+        sessionsResults.flat().forEach(session => {
+          if (session?.id) {
+            sessionsMap.set(session.id, session);
+          }
+        });
+        setAllSessions(Array.from(sessionsMap.values()));
       } catch (error) {
         console.error('Error loading analytics data:', error);
       } finally {
@@ -230,6 +244,36 @@ export function Analitica() {
     loadData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeRange]);
+
+  // Transform sessions to UI-friendly format
+  const sessionsUI = useMemo(() => {
+    return allSessions
+      .filter(session => session && session.scheduledFrom && session.scheduledTo)
+      .map((session) => {
+        const scheduledFrom = new Date(session.scheduledFrom);
+        const scheduledTo = new Date(session.scheduledTo);
+        const now = new Date();
+        
+        return {
+          ...session,
+          patientName: session.patient 
+            ? `${session.patient.firstName} ${session.patient.lastName || ''}`.trim()
+            : undefined,
+          duration: session.actualDuration || 
+            Math.round((scheduledTo.getTime() - scheduledFrom.getTime()) / (1000 * 60)),
+          isPast: scheduledTo < now,
+          isToday: scheduledFrom.toDateString() === now.toDateString(),
+          formattedDate: scheduledFrom.toLocaleDateString('es-AR'),
+          formattedTime: `${scheduledFrom.toLocaleTimeString('es-AR', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          })} - ${scheduledTo.toLocaleTimeString('es-AR', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          })}`
+        };
+      });
+  }, [allSessions]);
 
   // Filter data by time range
   const { start, end } = useMemo(() => getDateRange(timeRange), [timeRange]);
