@@ -259,13 +259,13 @@ export function Analitica() {
       s.status === SessionStatus.PENDING || s.status === SessionStatus.CONFIRMED
     ).length;
 
-    // Payment stats
+    // Payment stats - ensure amount is a valid number
     const totalIncome = filteredPayments
       .filter(p => p.status === PaymentStatus.PAID)
-      .reduce((sum, p) => sum + p.amount, 0);
+      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
     const pendingIncome = filteredPayments
       .filter(p => p.status === PaymentStatus.PENDING || p.status === PaymentStatus.OVERDUE)
-      .reduce((sum, p) => sum + p.amount, 0);
+      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
 
     // Patient stats
     const activePatients = patients.filter(p => p.status === 'ACTIVE').length;
@@ -359,10 +359,11 @@ export function Analitica() {
         grouped[key] = { paid: 0, pending: 0 };
       }
       
+      const amount = Number(payment.amount) || 0;
       if (payment.status === PaymentStatus.PAID) {
-        grouped[key].paid += payment.amount;
+        grouped[key].paid += amount;
       } else {
-        grouped[key].pending += payment.amount;
+        grouped[key].pending += amount;
       }
     });
 
