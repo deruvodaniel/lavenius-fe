@@ -11,6 +11,7 @@ import { useAuthStore } from './lib/stores';
 const Agenda = lazy(() => import('./components/agenda/Agenda').then(m => ({ default: m.Agenda })));
 const Pacientes = lazy(() => import('./components/pacientes/Pacientes').then(m => ({ default: m.Pacientes })));
 const Cobros = lazy(() => import('./components/cobros/Cobros').then(m => ({ default: m.Cobros })));
+const Analitica = lazy(() => import('./components/analitica/Analitica').then(m => ({ default: m.Analitica })));
 const Configuracion = lazy(() => import('./components/config/Configuracion').then(m => ({ default: m.Configuracion })));
 const Perfil = lazy(() => import('./components/perfil/Perfil').then(m => ({ default: m.Perfil })));
 const HelpCenter = lazy(() => import('./components/help/HelpCenter').then(m => ({ default: m.HelpCenter })));
@@ -67,6 +68,11 @@ export default function App() {
         <Route path="cobros" element={
           <Suspense fallback={<LoadingOverlay message="Cargando cobros..." />}>
             <Cobros />
+          </Suspense>
+        } />
+        <Route path="analitica" element={
+          <Suspense fallback={<LoadingOverlay message="Cargando analítica..." />}>
+            <Analitica />
           </Suspense>
         } />
         <Route path="configuracion" element={

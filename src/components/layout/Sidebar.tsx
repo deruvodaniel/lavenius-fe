@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Calendar, Users, DollarSign, LogOut, Settings, ChevronRight, HelpCircle } from 'lucide-react';
+import { Calendar, Users, DollarSign, LogOut, Settings, ChevronRight, HelpCircle, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { ConfirmDialog } from '@/components/shared';
 
@@ -32,6 +32,7 @@ export function Sidebar({ currentPath, onLogout, showHeader = true, onNavigate }
     { path: '/dashboard/agenda', label: 'Agenda', icon: Calendar },
     { path: '/dashboard/pacientes', label: 'Pacientes', icon: Users },
     { path: '/dashboard/cobros', label: 'Cobros', icon: DollarSign },
+    { path: '/dashboard/analitica', label: 'Analítica', icon: BarChart3 },
   ];
 
   const getLinkClassName = ({ isActive }: { isActive: boolean }) => 
