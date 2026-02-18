@@ -28,6 +28,19 @@ const ERROR_TRANSLATIONS: Record<string, string> = {
   'User not found': 'Credenciales inválidas',
   'Authentication failed': 'Credenciales inválidas',
   'Invalid passphrase': 'Frase de seguridad incorrecta',
+  'Authentication required': 'Debes iniciar sesión para continuar',
+  
+  // Registration errors
+  'User account already exists': 'Este email ya está registrado',
+  'Resource already exists': 'Este email ya está registrado',
+  'User account with identifier': 'Este email ya está registrado',
+  'email already exists': 'Este email ya está registrado',
+  'Email already in use': 'Este email ya está registrado',
+  'email must be an email': 'Ingresa un email válido',
+  'password must be longer than or equal to 6 characters': 'La contraseña debe tener al menos 6 caracteres',
+  'passphrase must be longer than or equal to 8 characters': 'La passphrase debe tener al menos 8 caracteres',
+  'firstName must be a string': 'El nombre es requerido',
+  'lastName must be a string': 'El apellido es requerido',
   
   // Auth errors
   'Unauthorized': 'No autorizado',
@@ -50,10 +63,11 @@ const ERROR_TRANSLATIONS: Record<string, string> = {
   'Duplicate entry': 'Ya existe un registro con estos datos',
   
   // Server errors
-  'Internal server error': 'Error interno del servidor',
-  'Service unavailable': 'Servicio no disponible',
-  'Gateway timeout': 'Tiempo de espera agotado',
+  'Internal server error': 'Error interno del servidor. Por favor intenta nuevamente.',
+  'Service unavailable': 'Servicio no disponible. Por favor intenta más tarde.',
+  'Gateway timeout': 'Tiempo de espera agotado. Por favor intenta nuevamente.',
   'An error occurred while processing your request': 'Ocurrió un error al procesar tu solicitud',
+  'Something went wrong': 'Algo salió mal. Por favor intenta nuevamente.',
   
   // Calendar errors
   'Calendar not connected': 'Calendario no conectado',

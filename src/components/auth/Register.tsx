@@ -2,31 +2,96 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useAuth, useErrorToast } from '@/lib/hooks';
+import { useAuth } from '@/lib/hooks';
+import { toast } from 'sonner';
+import { useState } from 'react';
+
+// Password validation rules
+const passwordRules = {
+  minLength: 8,
+  hasUppercase: /[A-Z]/,
+  hasLowercase: /[a-z]/,
+  hasNumber: /[0-9]/,
+  hasSpecial: /[!@#$%^&*(),.?":{}|<>]/,
+};
 
 const registerSchema = z.object({
-  email: z.string().email('Email inválido'),
-  password: z.string().min(8, 'Contraseña debe tener al menos 8 caracteres'),
-  passphrase: z.string().min(6, 'Passphrase debe tener al menos 6 caracteres'),
-  firstName: z.string().min(2, 'Nombre debe tener al menos 2 caracteres'),
-  lastName: z.string().min(2, 'Apellido debe tener al menos 2 caracteres'),
+  email: z.string()
+    .min(1, 'El email es requerido')
+    .email('Ingresa un email válido (ej: usuario@dominio.com)'),
+  password: z.string()
+    .min(passwordRules.minLength, `La contraseña debe tener al menos ${passwordRules.minLength} caracteres`)
+    .regex(passwordRules.hasUppercase, 'Debe incluir al menos una letra mayúscula')
+    .regex(passwordRules.hasLowercase, 'Debe incluir al menos una letra minúscula')
+    .regex(passwordRules.hasNumber, 'Debe incluir al menos un número')
+    .regex(passwordRules.hasSpecial, 'Debe incluir al menos un carácter especial (!@#$%^&*...)'),
+  passphrase: z.string()
+    .min(6, 'La passphrase debe tener al menos 6 caracteres'),
+  firstName: z.string()
+    .min(1, 'El nombre es requerido')
+    .min(2, 'El nombre debe tener al menos 2 caracteres'),
+  lastName: z.string()
+    .min(1, 'El apellido es requerido')
+    .min(2, 'El apellido debe tener al menos 2 caracteres'),
   phone: z.string().optional(),
   licenseNumber: z.string().optional(),
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
+// Password strength indicator component
+function PasswordStrengthIndicator({ password }: { password: string }) {
+  const checks = [
+    { label: `Mínimo ${passwordRules.minLength} caracteres`, valid: password.length >= passwordRules.minLength },
+    { label: 'Una letra mayúscula (A-Z)', valid: passwordRules.hasUppercase.test(password) },
+    { label: 'Una letra minúscula (a-z)', valid: passwordRules.hasLowercase.test(password) },
+    { label: 'Un número (0-9)', valid: passwordRules.hasNumber.test(password) },
+    { label: 'Un carácter especial (!@#$%...)', valid: passwordRules.hasSpecial.test(password) },
+  ];
+
+  const validCount = checks.filter(c => c.valid).length;
+  const allValid = validCount === checks.length;
+
+  if (!password) return null;
+
+  return (
+    <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+      <p className="text-xs font-medium text-gray-700 mb-2">
+        Requisitos de contraseña:
+      </p>
+      <ul className="space-y-1">
+        {checks.map((check, index) => (
+          <li key={index} className="flex items-center gap-2 text-xs">
+            {check.valid ? (
+              <Check className="w-3.5 h-3.5 text-green-500" />
+            ) : (
+              <X className="w-3.5 h-3.5 text-gray-400" />
+            )}
+            <span className={check.valid ? 'text-green-700' : 'text-gray-500'}>
+              {check.label}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {allValid && (
+        <p className="mt-2 text-xs text-green-600 font-medium">
+          ¡Contraseña segura!
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function Register() {
   const navigate = useNavigate();
-  const { register, isLoading, error, clearError } = useAuth();
-
-  useErrorToast(error, clearError);
+  const { register, isLoading, clearError } = useAuth();
+  const [watchPassword, setWatchPassword] = useState('');
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -42,12 +107,35 @@ export function Register() {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
+    clearError();
     try {
       await register(data);
-      // Redirect to login instead of auto-authenticating
+      toast.success('¡Cuenta creada exitosamente!', {
+        description: 'Ahora puedes iniciar sesión con tus credenciales'
+      });
       navigate('/login?registered=true');
-    } catch (err) {
-      // Error is handled by store and displayed via useErrorToast
+    } catch (err: any) {
+      const errorMsg = err?.message || 'Error al registrar usuario';
+      const errorMsgLower = errorMsg.toLowerCase();
+      
+      // Provide specific user-friendly messages
+      if (errorMsgLower.includes('email') && (errorMsgLower.includes('exist') || errorMsgLower.includes('registrado') || errorMsgLower.includes('duplicate'))) {
+        toast.error('Este email ya está registrado', {
+          description: '¿Ya tienes cuenta? Intenta iniciar sesión.'
+        });
+      } else if (errorMsgLower.includes('password') || errorMsgLower.includes('contraseña')) {
+        toast.error('Error en la contraseña', {
+          description: errorMsg
+        });
+      } else if (errorMsgLower.includes('validation') || errorMsgLower.includes('validación')) {
+        toast.error('Error de validación', {
+          description: 'Por favor revisa que todos los campos estén correctos'
+        });
+      } else {
+        toast.error('Error al crear cuenta', {
+          description: 'Hubo un problema. Por favor intenta nuevamente.'
+        });
+      }
       console.error('Registration failed:', err);
     }
   };
@@ -187,9 +275,14 @@ export function Register() {
                         placeholder="••••••••"
                         disabled={isLoading}
                         className="h-11"
+                        onChange={(e) => {
+                          field.onChange(e);
+                          setWatchPassword(e.target.value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
+                    <PasswordStrengthIndicator password={watchPassword} />
                   </FormItem>
                 )}
               />
