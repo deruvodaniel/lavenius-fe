@@ -160,9 +160,10 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
       toast.success('Turno creado exitosamente');
       await fetchUpcoming();
       setIsTurnoDrawerOpen(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating session:', error);
-      toast.error('Error al crear el turno');
+      const errorMessage = error?.message || 'Error al crear el turno';
+      toast.error(errorMessage);
     }
   };
 

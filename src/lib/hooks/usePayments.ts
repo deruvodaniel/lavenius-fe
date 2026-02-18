@@ -68,6 +68,7 @@ export const usePayments = () => {
     // Actions (direct from store - already stable)
     fetchPayments: store.fetchPayments,
     createPayment: store.createPayment,
+    updatePayment: store.updatePayment,
     markAsPaid: store.markAsPaid,
     deletePayment: store.deletePayment,
     reset: store.reset,

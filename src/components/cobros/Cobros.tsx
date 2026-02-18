@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Bell, Copy, MessageCircle, X, Plus, Video, MapPin, DollarSign, Calendar, History, CheckCircle2, Search, ChevronLeft, ChevronRight, ArrowUpDown, Loader2 } from 'lucide-react';
+import { Bell, Copy, MessageCircle, X, Plus, DollarSign, Calendar, CheckCircle2, Clock, AlertCircle, Search, ChevronLeft, ChevronRight, ArrowUpDown, Loader2, Filter, Trash2, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
@@ -8,14 +8,14 @@ import { usePatientStore } from '@/lib/stores/patient.store';
 import { useResponsive, usePatients } from '@/lib/hooks';
 import { PaymentStats } from './PaymentStats';
 import { PaymentDrawer } from './PaymentDrawer';
+import { PaymentDetailModal } from './PaymentDetailModal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SkeletonList } from '@/components/shared/Skeleton';
 import { Input } from '@/components/ui/input';
-import type { CreatePaymentDto, Payment } from '@/lib/types/api.types';
+import type { CreatePaymentDto, Payment, UpdatePaymentDto } from '@/lib/types/api.types';
+import { PaymentStatus } from '@/lib/types/api.types';
 import type { SessionUI } from '@/lib/types/session';
-import { SessionStatus } from '@/lib/types/session';
 import type { PaymentFilters } from '@/lib/services/payment.service';
 
 // ============================================================================
@@ -37,13 +37,6 @@ const formatDate = (dateStr: string) => {
   });
 };
 
-const formatTime = (dateStr: string) => {
-  return new Date(dateStr).toLocaleTimeString('es-AR', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  });
-};
-
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('es-AR', {
     style: 'currency',
@@ -55,21 +48,54 @@ const getInitials = (name: string) =>
   name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
 // ============================================================================
+// STATUS CONFIGURATION
+// ============================================================================
+
+type StatusFilterOption = 'all' | PaymentStatus;
+
+const STATUS_CONFIG = {
+  [PaymentStatus.PAID]: { 
+    label: 'Pagado', 
+    className: 'bg-green-100 text-green-800',
+    borderColor: 'border-l-green-500',
+    iconBgColor: 'bg-green-100',
+    iconColor: 'text-green-600',
+    Icon: CheckCircle2,
+  },
+  [PaymentStatus.PENDING]: { 
+    label: 'Pendiente', 
+    className: 'bg-yellow-100 text-yellow-800',
+    borderColor: 'border-l-yellow-500',
+    iconBgColor: 'bg-yellow-100',
+    iconColor: 'text-yellow-600',
+    Icon: Clock,
+  },
+  [PaymentStatus.OVERDUE]: { 
+    label: 'Vencido', 
+    className: 'bg-red-100 text-red-800',
+    borderColor: 'border-l-red-500',
+    iconBgColor: 'bg-red-100',
+    iconColor: 'text-red-600',
+    Icon: AlertCircle,
+  },
+};
+
+const STATUS_FILTER_OPTIONS: { value: StatusFilterOption; label: string }[] = [
+  { value: 'all', label: 'Todos los estados' },
+  { value: PaymentStatus.PENDING, label: 'Pendiente' },
+  { value: PaymentStatus.OVERDUE, label: 'Vencido' },
+  { value: PaymentStatus.PAID, label: 'Pagado' },
+];
+
+// ============================================================================
 // SUB-COMPONENTS
 // ============================================================================
 
-type PaymentStatusType = 'overdue' | 'today' | 'upcoming';
-
-const StatusBadge = ({ status }: { status: PaymentStatusType }) => {
-  const config = {
-    overdue: { label: 'Vencido', className: 'bg-red-100 text-red-800' },
-    today: { label: 'Hoy', className: 'bg-orange-100 text-orange-800' },
-    upcoming: { label: 'Pendiente', className: 'bg-yellow-100 text-yellow-800' },
-  };
-  const { label, className } = config[status];
+const PaymentStatusBadge = ({ status }: { status: PaymentStatus }) => {
+  const config = STATUS_CONFIG[status];
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${className}`}>
-      {label}
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${config.className}`}>
+      {config.label}
     </span>
   );
 };
@@ -142,35 +168,25 @@ const getMonthRange = () => {
 };
 
 interface FiltersProps {
-  searchTerm: string;
-  onSearchChange: (value: string) => void;
   dateFrom: string;
   dateTo: string;
   onDateFromChange: (value: string) => void;
   onDateToChange: (value: string) => void;
   onClearFilters: () => void;
   hasActiveFilters: boolean;
-  sortBy: SortOption;
-  onSortChange: (sort: SortOption) => void;
   quickFilter: QuickFilter;
   onQuickFilterChange: (filter: QuickFilter) => void;
-  showSearchAndSort?: boolean;
 }
 
-const Filters = ({ 
-  searchTerm, 
-  onSearchChange, 
+const DateFilters = ({ 
   dateFrom, 
   dateTo, 
   onDateFromChange, 
   onDateToChange,
   onClearFilters,
   hasActiveFilters,
-  sortBy,
-  onSortChange,
   quickFilter,
   onQuickFilterChange,
-  showSearchAndSort = true,
 }: FiltersProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -235,35 +251,6 @@ const Filters = ({
         </Button>
       </div>
 
-      {/* Search bar and sort - only shown when showSearchAndSort is true */}
-      {showSearchAndSort && (
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="Buscar por paciente..."
-              value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          {/* Sort dropdown */}
-          <div className="relative">
-            <select
-              value={sortBy}
-              onChange={(e) => onSortChange(e.target.value as SortOption)}
-              className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
-            >
-              {SORT_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-          </div>
-        </div>
-      )}
-
       {/* Custom date range (expanded when "Rango" is selected) */}
       {(isExpanded || quickFilter === 'custom') && (
         <Card className="p-3 space-y-3 bg-white">
@@ -303,18 +290,28 @@ const Filters = ({
 };
 
 // ============================================================================
-// SEARCH AND SORT COMPONENT (for tabs)
+// SEARCH, STATUS FILTER AND SORT COMPONENT
 // ============================================================================
 
-interface SearchAndSortProps {
+interface SearchAndFiltersProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
+  statusFilter: StatusFilterOption;
+  onStatusFilterChange: (status: StatusFilterOption) => void;
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
 }
 
-const SearchAndSort = ({ searchTerm, onSearchChange, sortBy, onSortChange }: SearchAndSortProps) => (
-  <div className="flex gap-2">
+const SearchAndFilters = ({ 
+  searchTerm, 
+  onSearchChange, 
+  statusFilter,
+  onStatusFilterChange,
+  sortBy, 
+  onSortChange 
+}: SearchAndFiltersProps) => (
+  <div className="flex flex-col sm:flex-row gap-2">
+    {/* Search */}
     <div className="relative flex-1">
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
       <Input
@@ -325,17 +322,35 @@ const SearchAndSort = ({ searchTerm, onSearchChange, sortBy, onSortChange }: Sea
         className="pl-9"
       />
     </div>
-    <div className="relative">
-      <select
-        value={sortBy}
-        onChange={(e) => onSortChange(e.target.value as SortOption)}
-        className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
-      >
-        {SORT_OPTIONS.map(option => (
-          <option key={option.value} value={option.value}>{option.label}</option>
-        ))}
-      </select>
-      <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+    
+    <div className="flex gap-2">
+      {/* Status filter dropdown */}
+      <div className="relative">
+        <select
+          value={statusFilter}
+          onChange={(e) => onStatusFilterChange(e.target.value as StatusFilterOption)}
+          className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
+        >
+          {STATUS_FILTER_OPTIONS.map(option => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+        <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+      </div>
+      
+      {/* Sort dropdown */}
+      <div className="relative">
+        <select
+          value={sortBy}
+          onChange={(e) => onSortChange(e.target.value as SortOption)}
+          className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
+        >
+          {SORT_OPTIONS.map(option => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+        <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+      </div>
     </div>
   </div>
 );
@@ -421,172 +436,173 @@ const InfiniteScrollLoader = ({ isLoading, hasMore, loadMoreRef }: InfiniteScrol
 };
 
 // ============================================================================
-// SESSION CARD (Pendientes Tab)
-// ============================================================================
-
-interface SessionCardProps {
-  session: SessionUI;
-  status: PaymentStatusType;
-  onReminder: () => void;
-  onCollect: () => void;
-}
-
-const SessionCard = ({ session, status, onReminder, onCollect }: SessionCardProps) => {
-  const patientName = session.patientName || session.patient?.firstName || 'Sin paciente';
-  const initials = getInitials(patientName);
-  const borderColor = {
-    overdue: 'border-l-red-500',
-    today: 'border-l-orange-500',
-    upcoming: 'border-l-yellow-500',
-  }[status];
-
-  return (
-    <Card className={`p-3 sm:p-4 transition-all hover:shadow-md border-l-4 bg-white ${borderColor}`}>
-      {/* Mobile Layout */}
-      <div className="sm:hidden space-y-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-9 h-9 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-indigo-600 text-xs font-semibold">{initials}</span>
-            </div>
-            <div className="min-w-0">
-              <p className="font-medium text-gray-900 text-sm truncate">{patientName}</p>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span className="capitalize">{formatDate(session.scheduledFrom)}</span>
-                <span>{formatTime(session.scheduledFrom)}</span>
-              </div>
-            </div>
-          </div>
-          <StatusBadge status={status} />
-        </div>
-        
-        <div className="flex items-center justify-between text-sm">
-          <span className="flex items-center gap-1 text-gray-500">
-            {session.sessionType === 'remote' ? (
-              <><Video className="w-3 h-3" /><span>Remoto</span></>
-            ) : (
-              <><MapPin className="w-3 h-3" /><span>Presencial</span></>
-            )}
-          </span>
-          <p className="font-semibold text-gray-900">{formatCurrency(session.cost || 0)}</p>
-        </div>
-        
-        <div className="flex gap-2 pt-2 border-t border-gray-100">
-          <Button size="sm" variant="outline" className="flex-1" onClick={onReminder}>
-            <Bell className="h-4 w-4 mr-1.5" />
-            Recordatorio
-          </Button>
-          <Button size="sm" className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={onCollect}>
-            <DollarSign className="h-4 w-4 mr-1.5" />
-            Cobrar
-          </Button>
-        </div>
-      </div>
-
-      {/* Desktop Layout */}
-      <div className="hidden sm:flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-            <span className="text-indigo-600 text-sm font-semibold">{initials}</span>
-          </div>
-          <div className="min-w-0">
-            <p className="font-medium text-gray-900 truncate">{patientName}</p>
-            <div className="flex items-center gap-3 text-sm text-gray-500">
-              <span className="capitalize">{formatDate(session.scheduledFrom)}</span>
-              <span>{formatTime(session.scheduledFrom)}</span>
-              <span className="flex items-center gap-1">
-                {session.sessionType === 'remote' ? (
-                  <><Video className="w-3 h-3" /><span>Remoto</span></>
-                ) : (
-                  <><MapPin className="w-3 h-3" /><span>Presencial</span></>
-                )}
-              </span>
-            </div>
-          </div>
-        </div>
-        <StatusBadge status={status} />
-        <div className="flex items-center gap-4">
-          <p className="font-semibold text-gray-900 min-w-[100px] text-right">
-            {formatCurrency(session.cost || 0)}
-          </p>
-          <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={onReminder} title="Enviar recordatorio">
-              <Bell className="h-4 w-4" />
-            </Button>
-            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white" onClick={onCollect}>
-              <DollarSign className="h-4 w-4 mr-1" />
-              Cobrar
-            </Button>
-          </div>
-        </div>
-      </div>
-    </Card>
-  );
-};
-
-// ============================================================================
-// PAYMENT CARD (Historial Tab)
+// UNIFIED PAYMENT CARD
 // ============================================================================
 
 interface PaymentCardProps {
   payment: Payment;
+  onMarkAsPaid?: () => void;
+  onReminder?: () => void;
+  onDelete?: () => void;
+  onViewDetail?: () => void;
+  isMarkingAsPaid?: boolean;
 }
 
-const PaymentCard = ({ payment }: PaymentCardProps) => {
+const PaymentCard = ({ payment, onMarkAsPaid, onReminder, onDelete, onViewDetail, isMarkingAsPaid }: PaymentCardProps) => {
   const patientName = payment.patient 
     ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
     : 'Sin paciente';
+  
+  const initials = getInitials(patientName);
+  const config = STATUS_CONFIG[payment.status];
+  const Icon = config.Icon;
+  const isPaid = payment.status === PaymentStatus.PAID;
 
   return (
-    <Card className="p-3 sm:p-4 border-l-4 border-l-green-500 bg-white">
-      {/* Mobile Layout */}
-      <div className="sm:hidden space-y-2">
+    <Card className={`p-3 transition-all hover:shadow-md border-l-4 bg-white ${config.borderColor}`}>
+      {/* Clickeable area for detail */}
+      <div 
+        className="cursor-pointer"
+        onClick={onViewDetail}
+      >
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${config.iconBgColor}`}>
+              {isPaid ? (
+                <Icon className={`h-4 w-4 ${config.iconColor}`} />
+              ) : (
+                <span className={`text-xs font-semibold ${config.iconColor}`}>{initials}</span>
+              )}
             </div>
             <div className="min-w-0">
               <p className="font-medium text-gray-900 text-sm truncate">{patientName}</p>
               <p className="text-xs text-gray-500">{formatDate(payment.paymentDate)}</p>
             </div>
           </div>
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            Pagado
-          </span>
+          <PaymentStatusBadge status={payment.status} />
         </div>
-        <div className="flex items-center justify-between">
+        
+        <div className="flex items-center justify-between mt-3">
           {payment.description && (
-            <p className="text-xs text-gray-500 truncate flex-1">{payment.description}</p>
+            <p className="text-xs text-gray-500 truncate flex-1 mr-2">{payment.description}</p>
           )}
           <p className="font-semibold text-gray-900">{formatCurrency(payment.amount)}</p>
         </div>
       </div>
 
-      {/* Desktop Layout */}
-      <div className="hidden sm:flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
-          </div>
-          <div className="min-w-0">
-            <p className="font-medium text-gray-900 truncate">{patientName}</p>
-            <div className="flex items-center gap-3 text-sm text-gray-500">
-              <span>{formatDate(payment.paymentDate)}</span>
-              {payment.description && (
-                <span className="truncate max-w-[200px]">{payment.description}</span>
-              )}
-            </div>
-          </div>
-        </div>
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-          Pagado
-        </span>
-        <p className="font-semibold text-gray-900 min-w-[100px] text-right">
-          {formatCurrency(payment.amount)}
-        </p>
+      {/* Actions */}
+      <div className="flex gap-2 pt-2 mt-3 border-t border-gray-100">
+        {!isPaid && onReminder && (
+          <Button size="sm" variant="outline" className="flex-1" onClick={onReminder}>
+            <Bell className="h-4 w-4 mr-1.5" />
+            Recordatorio
+          </Button>
+        )}
+        {!isPaid && onMarkAsPaid && (
+          <Button 
+            size="sm" 
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white" 
+            onClick={onMarkAsPaid}
+            disabled={isMarkingAsPaid}
+          >
+            {isMarkingAsPaid ? (
+              <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+            ) : (
+              <DollarSign className="h-4 w-4 mr-1.5" />
+            )}
+            Cobrar
+          </Button>
+        )}
+        {onDelete && (
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className={`text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 ${isPaid ? 'flex-1' : ''}`}
+            onClick={onDelete}
+          >
+            <Trash2 className="h-4 w-4" />
+            {isPaid && <span className="ml-1.5">Eliminar</span>}
+          </Button>
+        )}
       </div>
     </Card>
+  );
+};
+
+// ============================================================================
+// DELETE CONFIRMATION MODAL
+// ============================================================================
+
+interface DeleteConfirmModalProps {
+  payment: Payment;
+  onClose: () => void;
+  onConfirm: () => void;
+  isDeleting: boolean;
+}
+
+const DeleteConfirmModal = ({ payment, onClose, onConfirm, isDeleting }: DeleteConfirmModalProps) => {
+  const patientName = payment.patient 
+    ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
+    : 'Sin paciente';
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
+        onClick={onClose}
+      />
+      
+      {/* Modal */}
+      <div className="relative bg-white rounded-t-xl sm:rounded-lg shadow-2xl p-4 sm:p-6 w-full sm:max-w-md">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">Eliminar Pago</h3>
+          <button className="text-gray-500 hover:text-gray-700 p-1" onClick={onClose}>
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div className="mb-6">
+          <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Trash2 className="w-6 h-6 text-red-600" />
+          </div>
+          <p className="text-center text-gray-600">
+            ¿Estás seguro que deseas eliminar el pago de <span className="font-medium text-gray-900">{patientName}</span> por <span className="font-medium text-gray-900">{formatCurrency(payment.amount)}</span>?
+          </p>
+          <p className="text-center text-sm text-gray-500 mt-2">
+            Esta acción no se puede deshacer.
+          </p>
+        </div>
+        
+        <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
+          <Button 
+            variant="outline" 
+            className="flex-1" 
+            onClick={onClose}
+            disabled={isDeleting}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white" 
+            onClick={onConfirm}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Eliminando...
+              </>
+            ) : (
+              <>
+                <Trash2 className="w-4 h-4 mr-2" />
+                Eliminar
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -595,26 +611,29 @@ const PaymentCard = ({ payment }: PaymentCardProps) => {
 // ============================================================================
 
 interface ReminderModalProps {
-  session: SessionUI;
+  payment: Payment;
   onClose: () => void;
 }
 
-const ReminderModal = ({ session, onClose }: ReminderModalProps) => {
+const ReminderModal = ({ payment, onClose }: ReminderModalProps) => {
   const fetchPatientById = usePatientStore(state => state.fetchPatientById);
   const selectedPatient = usePatientStore(state => state.selectedPatient);
   
   const [isLoadingPatient, setIsLoadingPatient] = useState(false);
   const [patientPhone, setPatientPhone] = useState<string | undefined>(undefined);
   
-  const patientName = session.patientName || session.patient?.firstName || 'Paciente';
-  const defaultMessage = `Hola ${patientName}! Te escribo para recordarte que tenés pendiente el pago de la sesión del ${formatDate(session.scheduledFrom)} a las ${formatTime(session.scheduledFrom)}. El monto es de ${formatCurrency(session.cost || 0)}. ¡Gracias!`;
+  const patientName = payment.patient 
+    ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
+    : 'Paciente';
+  
+  const defaultMessage = `Hola ${patientName}! Te escribo para recordarte que tenés pendiente el pago del ${formatDate(payment.paymentDate)}. El monto es de ${formatCurrency(payment.amount)}. ¡Gracias!`;
   
   const [message, setMessage] = useState(defaultMessage);
 
   // Load full patient data to get phone
   useEffect(() => {
     const loadPatientData = async () => {
-      const patientId = session.patient?.id;
+      const patientId = payment.patient?.id;
       if (!patientId) return;
       
       setIsLoadingPatient(true);
@@ -628,14 +647,14 @@ const ReminderModal = ({ session, onClose }: ReminderModalProps) => {
     };
     
     loadPatientData();
-  }, [session.patient?.id, fetchPatientById]);
+  }, [payment.patient?.id, fetchPatientById]);
 
   // Update phone when selectedPatient changes
   useEffect(() => {
-    if (selectedPatient && selectedPatient.id === session.patient?.id) {
+    if (selectedPatient && selectedPatient.id === payment.patient?.id) {
       setPatientPhone(selectedPatient.phone);
     }
-  }, [selectedPatient, session.patient?.id]);
+  }, [selectedPatient, payment.patient?.id]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message);
@@ -718,17 +737,16 @@ const ReminderModal = ({ session, onClose }: ReminderModalProps) => {
 
 export function Cobros() {
   const { sessionsUI, fetchUpcoming } = useSessions();
-  const { patients, fetchPatients } = usePatients();
+  const { fetchPatients } = usePatients();
   const { 
     payments,
-    paidPayments,
-    pendingPayments,
     totals,
+    pagination,
     isLoading: isLoadingPayments, 
     fetchPayments, 
     createPayment,
     markAsPaid,
-    isSessionPaid,
+    deletePayment,
   } = usePayments();
   const { isMobile } = useResponsive();
   
@@ -736,59 +754,50 @@ export function Cobros() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isPaymentDrawerOpen, setIsPaymentDrawerOpen] = useState(false);
   const [preselectedSession, setPreselectedSession] = useState<SessionUI | null>(null);
-  const [reminderSession, setReminderSession] = useState<SessionUI | null>(null);
+  const [reminderPayment, setReminderPayment] = useState<Payment | null>(null);
+  const [markingAsPaidId, setMarkingAsPaidId] = useState<string | null>(null);
+  const [deletePaymentData, setDeletePaymentData] = useState<Payment | null>(null);
+  const [isDeletingPayment, setIsDeletingPayment] = useState(false);
+  const [detailPayment, setDetailPayment] = useState<Payment | null>(null);
 
-  // Global filter state (affects stats and lists)
-  const [globalDateFrom, setGlobalDateFrom] = useState('');
-  const [globalDateTo, setGlobalDateTo] = useState('');
-  const [globalQuickFilter, setGlobalQuickFilter] = useState<QuickFilter>('all');
-
-  // Tab-specific filter state (search and sort only)
-  const [pendingSearch, setPendingSearch] = useState('');
-  const [pendingPage, setPendingPage] = useState(1);
-  const [pendingSortBy, setPendingSortBy] = useState<SortOption>('date-desc');
-
-  const [historySearch, setHistorySearch] = useState('');
-  const [historyPage, setHistoryPage] = useState(1);
-  const [historySortBy, setHistorySortBy] = useState<SortOption>('date-desc');
+  // Filter state
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [quickFilter, setQuickFilter] = useState<QuickFilter>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilterOption>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('date-desc');
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Infinite scroll state (for mobile)
-  const [pendingVisibleCount, setPendingVisibleCount] = useState(INFINITE_SCROLL_BATCH);
-  const [historyVisibleCount, setHistoryVisibleCount] = useState(INFINITE_SCROLL_BATCH);
-  const [isLoadingMorePending, setIsLoadingMorePending] = useState(false);
-  const [isLoadingMoreHistory, setIsLoadingMoreHistory] = useState(false);
-  const pendingLoadMoreRef = useRef<HTMLDivElement>(null);
-  const historyLoadMoreRef = useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = useState(INFINITE_SCROLL_BATCH);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Reset page/visible count when filters change
+  // Reset page when filters change
   useEffect(() => { 
-    setPendingPage(1); 
-    setPendingVisibleCount(INFINITE_SCROLL_BATCH);
-  }, [pendingSearch, globalDateFrom, globalDateTo, pendingSortBy]);
-  
-  useEffect(() => { 
-    setHistoryPage(1); 
-    setHistoryVisibleCount(INFINITE_SCROLL_BATCH);
-  }, [historySearch, globalDateFrom, globalDateTo, historySortBy]);
+    setCurrentPage(1); 
+    setVisibleCount(INFINITE_SCROLL_BATCH);
+  }, [searchTerm, dateFrom, dateTo, statusFilter, sortBy]);
 
-  // Infinite scroll effect for pending sessions (mobile only)
+  // Infinite scroll effect (mobile only)
   useEffect(() => {
     if (!isMobile) return;
     
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isLoadingMorePending) {
-          setIsLoadingMorePending(true);
+        if (entries[0].isIntersecting && !isLoadingMore) {
+          setIsLoadingMore(true);
           setTimeout(() => {
-            setPendingVisibleCount((prev) => prev + INFINITE_SCROLL_BATCH);
-            setIsLoadingMorePending(false);
+            setVisibleCount((prev) => prev + INFINITE_SCROLL_BATCH);
+            setIsLoadingMore(false);
           }, 500);
         }
       },
       { threshold: 0.1 }
     );
 
-    const currentRef = pendingLoadMoreRef.current;
+    const currentRef = loadMoreRef.current;
     if (currentRef) {
       observer.observe(currentRef);
     }
@@ -798,66 +807,40 @@ export function Cobros() {
         observer.unobserve(currentRef);
       }
     };
-  }, [isMobile, isLoadingMorePending]);
+  }, [isMobile, isLoadingMore]);
 
-  // Infinite scroll effect for history (mobile only)
-  useEffect(() => {
-    if (!isMobile) return;
-    
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !isLoadingMoreHistory) {
-          setIsLoadingMoreHistory(true);
-          setTimeout(() => {
-            setHistoryVisibleCount((prev) => prev + INFINITE_SCROLL_BATCH);
-            setIsLoadingMoreHistory(false);
-          }, 500);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const currentRef = historyLoadMoreRef.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
-  }, [isMobile, isLoadingMoreHistory]);
-
-  // Debounced search for server-side filtering
-  const [debouncedHistorySearch, setDebouncedHistorySearch] = useState('');
+  // Debounced search - not used for server since patient data is encrypted
+  // We filter client-side after receiving the payments
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   
-  // Debounce history search
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedHistorySearch(historySearch);
+      setDebouncedSearch(searchTerm);
     }, 300);
     return () => clearTimeout(timer);
-  }, [historySearch]);
+  }, [searchTerm]);
 
-  // Build server-side filters for payments
-  const serverFilters = useMemo((): PaymentFilters | undefined => {
-    const filters: PaymentFilters = {};
+  // Build server-side filters for payments (date range and pagination only)
+  // Patient search is done client-side since data is encrypted
+  const serverFilters = useMemo((): PaymentFilters => {
+    const filters: PaymentFilters = {
+      page: currentPage,
+      limit: ITEMS_PER_PAGE,
+    };
     
-    if (globalDateFrom) {
-      filters.from = globalDateFrom;
+    if (dateFrom) {
+      filters.from = dateFrom;
     }
-    if (globalDateTo) {
-      filters.to = globalDateTo;
+    if (dateTo) {
+      filters.to = dateTo;
     }
-    if (debouncedHistorySearch.trim()) {
-      filters.search = debouncedHistorySearch.trim();
-    }
+    // Status filter could be server-side if backend supports it
+    // For now we do it client-side
     
-    return Object.keys(filters).length > 0 ? filters : undefined;
-  }, [globalDateFrom, globalDateTo, debouncedHistorySearch]);
+    return filters;
+  }, [dateFrom, dateTo, currentPage]);
 
-  // Fetch payments when filters change (server-side filtering)
+  // Fetch payments when server filters change
   useEffect(() => {
     fetchPayments(true, serverFilters).catch(() => {});
   }, [serverFilters, fetchPayments]);
@@ -877,112 +860,29 @@ export function Cobros() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Today for status calculation
-  const today = useMemo(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }, []);
+  // Client-side filtering (status and patient search)
+  const filteredPayments = useMemo(() => {
+    let filtered = [...payments];
 
-  // Sessions pending payment: not cancelled, not paid
-  const sessionsPendingPayment = useMemo(() => {
-    return sessionsUI.filter((session) => {
-      const isNotCancelled = session.status !== SessionStatus.CANCELLED;
-      const notPaid = !isSessionPaid(session.id);
-      return isNotCancelled && notPaid;
-    });
-  }, [sessionsUI, isSessionPaid]);
-
-  // Helper to check if a date is within the global filter range
-  const isInDateRange = useCallback((dateStr: string) => {
-    if (!globalDateFrom && !globalDateTo) return true;
-    
-    const date = new Date(dateStr);
-    date.setHours(0, 0, 0, 0);
-    
-    if (globalDateFrom) {
-      const from = new Date(globalDateFrom);
-      from.setHours(0, 0, 0, 0);
-      if (date < from) return false;
+    // Filter by status (client-side)
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(p => p.status === statusFilter);
     }
-    if (globalDateTo) {
-      const to = new Date(globalDateTo);
-      to.setHours(23, 59, 59, 999);
-      if (date > to) return false;
-    }
-    return true;
-  }, [globalDateFrom, globalDateTo]);
 
-  // Sessions filtered by global date range (for stats and list)
-  const sessionsInRange = useMemo(() => {
-    return sessionsPendingPayment.filter(session => isInDateRange(session.scheduledFrom));
-  }, [sessionsPendingPayment, isInDateRange]);
-
-  // Paid payments filtered by global date range (for historial list)
-  const paidPaymentsInRange = useMemo(() => {
-    return paidPayments.filter(payment => isInDateRange(payment.paymentDate));
-  }, [paidPayments, isInDateRange]);
-
-  // Note: totals now come from server (already filtered by date range)
-  // No need to calculate client-side paymentsInRange or filteredTotals
-
-  // Filtered and sorted pending sessions
-  const filteredPendingSessions = useMemo(() => {
-    // Start with sessions in the global date range
-    let filtered = [...sessionsInRange];
-
-    // Filter by patient name (tab-specific search)
-    if (pendingSearch.trim()) {
-      const search = pendingSearch.toLowerCase();
-      filtered = filtered.filter(session => {
-        const name = (session.patientName || session.patient?.firstName || '').toLowerCase();
+    // Filter by patient name (client-side - data is encrypted on server)
+    if (debouncedSearch.trim()) {
+      const search = debouncedSearch.toLowerCase();
+      filtered = filtered.filter(payment => {
+        const name = payment.patient 
+          ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.toLowerCase()
+          : '';
         return name.includes(search);
       });
     }
 
-    // Sort by selected option
+    // Sort
     filtered.sort((a, b) => {
-      switch (pendingSortBy) {
-        case 'date-desc':
-          return new Date(b.scheduledFrom).getTime() - new Date(a.scheduledFrom).getTime();
-        case 'date-asc':
-          return new Date(a.scheduledFrom).getTime() - new Date(b.scheduledFrom).getTime();
-        case 'price-desc':
-          return (b.cost || 0) - (a.cost || 0);
-        case 'price-asc':
-          return (a.cost || 0) - (b.cost || 0);
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [sessionsInRange, pendingSearch, pendingSortBy]);
-
-  // Pagination for desktop, infinite scroll for mobile
-  const pendingTotalPages = Math.ceil(filteredPendingSessions.length / ITEMS_PER_PAGE);
-  const hasMorePending = pendingVisibleCount < filteredPendingSessions.length;
-  
-  const displayedPendingSessions = useMemo(() => {
-    if (isMobile) {
-      // Infinite scroll: show items up to visibleCount
-      return filteredPendingSessions.slice(0, pendingVisibleCount);
-    } else {
-      // Pagination: show items for current page
-      const start = (pendingPage - 1) * ITEMS_PER_PAGE;
-      return filteredPendingSessions.slice(start, start + ITEMS_PER_PAGE);
-    }
-  }, [filteredPendingSessions, pendingPage, pendingVisibleCount, isMobile]);
-
-  // Filtered and sorted history (payments are now filtered by server)
-  const filteredPaidPayments = useMemo(() => {
-    // Payments are already filtered by server (date range and search)
-    // Only apply client-side sorting
-    let filtered = [...paidPayments];
-
-    // Sort by selected option
-    filtered.sort((a, b) => {
-      switch (historySortBy) {
+      switch (sortBy) {
         case 'date-desc':
           return new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime();
         case 'date-asc':
@@ -997,31 +897,20 @@ export function Cobros() {
     });
 
     return filtered;
-  }, [paidPayments, historySortBy]);
+  }, [payments, statusFilter, debouncedSearch, sortBy]);
 
-  // Pagination for desktop, infinite scroll for mobile
-  const historyTotalPages = Math.ceil(filteredPaidPayments.length / ITEMS_PER_PAGE);
-  const hasMoreHistory = historyVisibleCount < filteredPaidPayments.length;
+  // Pagination/infinite scroll
+  const totalPages = Math.ceil(filteredPayments.length / ITEMS_PER_PAGE);
+  const hasMore = visibleCount < filteredPayments.length;
   
-  const displayedPaidPayments = useMemo(() => {
+  const displayedPayments = useMemo(() => {
     if (isMobile) {
-      // Infinite scroll: show items up to visibleCount
-      return filteredPaidPayments.slice(0, historyVisibleCount);
+      return filteredPayments.slice(0, visibleCount);
     } else {
-      // Pagination: show items for current page
-      const start = (historyPage - 1) * ITEMS_PER_PAGE;
-      return filteredPaidPayments.slice(start, start + ITEMS_PER_PAGE);
+      const start = (currentPage - 1) * ITEMS_PER_PAGE;
+      return filteredPayments.slice(start, start + ITEMS_PER_PAGE);
     }
-  }, [filteredPaidPayments, historyPage, historyVisibleCount, isMobile]);
-
-  // Get session payment status for display
-  const getSessionStatus = useCallback((session: SessionUI): PaymentStatusType => {
-    const sessionDate = new Date(session.scheduledFrom);
-    sessionDate.setHours(0, 0, 0, 0);
-    if (sessionDate < today) return 'overdue';
-    if (sessionDate.getTime() === today.getTime()) return 'today';
-    return 'upcoming';
-  }, [today]);
+  }, [filteredPayments, currentPage, visibleCount, isMobile]);
 
   // Handlers
   const handleCreatePayment = useCallback(() => {
@@ -1029,58 +918,47 @@ export function Cobros() {
     setIsPaymentDrawerOpen(true);
   }, []);
 
-  const handleCollectPayment = useCallback((session: SessionUI) => {
-    setPreselectedSession(session);
-    setIsPaymentDrawerOpen(true);
-  }, []);
+  const handleMarkAsPaid = useCallback(async (paymentId: string) => {
+    try {
+      setMarkingAsPaidId(paymentId);
+      await markAsPaid(paymentId);
+      toast.success('Pago marcado como cobrado');
+      // Refresh data
+      await fetchPayments(true, serverFilters);
+    } catch (error) {
+      console.error('Error marking payment as paid:', error);
+      toast.error('No se pudo marcar el pago como cobrado');
+    } finally {
+      setMarkingAsPaidId(null);
+    }
+  }, [markAsPaid, fetchPayments, serverFilters]);
 
-  // Get existing payment for a session (to update instead of create)
-  const getExistingPayment = useCallback((sessionId: string) => {
-    return paidPayments.find(p => p.sessionId === sessionId) 
-      || pendingPayments.find(p => p.sessionId === sessionId);
-  }, [paidPayments, pendingPayments]);
+  const handleDeletePayment = useCallback(async () => {
+    if (!deletePaymentData) return;
+    
+    try {
+      setIsDeletingPayment(true);
+      await deletePayment(deletePaymentData.id);
+      toast.success('Pago eliminado correctamente');
+      setDeletePaymentData(null);
+      // Refresh data
+      await fetchPayments(true, serverFilters);
+    } catch (error) {
+      console.error('Error deleting payment:', error);
+      toast.error('No se pudo eliminar el pago');
+    } finally {
+      setIsDeletingPayment(false);
+    }
+  }, [deletePaymentData, deletePayment, fetchPayments, serverFilters]);
 
   const handleSavePayment = useCallback(async (data: CreatePaymentDto) => {
     try {
       setIsRefreshing(true);
-      
-      // Check if there's an existing payment for this session
-      const existingPayment = getExistingPayment(data.sessionId);
-      
-      if (existingPayment && existingPayment.status !== 'paid') {
-        // Update existing payment to paid
-        try {
-          await markAsPaid(existingPayment.id);
-          toast.success('Pago marcado como cobrado');
-        } catch (markError) {
-          // Backend may return error but still process the payment
-          // Refresh data to verify actual state
-          console.warn('markAsPaid returned error, verifying payment state...', markError);
-          await fetchPayments(true, serverFilters);
-          
-          // Check if payment was actually processed
-          const updatedPayment = usePaymentStore.getState().payments.find(
-            p => p.id === existingPayment.id
-          );
-          
-          if (updatedPayment?.status === 'paid') {
-            toast.success('Pago marcado como cobrado');
-          } else {
-            throw markError; // Re-throw if payment wasn't actually processed
-          }
-        }
-      } else if (!existingPayment) {
-        // Create new payment
-        await createPayment(data);
-        toast.success('Pago registrado correctamente');
-      } else {
-        // Already paid
-        toast.info('Esta sesión ya está marcada como pagada');
-      }
-      
+      await createPayment(data);
+      toast.success('Pago registrado correctamente');
       setIsPaymentDrawerOpen(false);
       setPreselectedSession(null);
-      // Refresh all data to update lists and stats
+      // Refresh data
       await Promise.all([
         fetchUpcoming(),
         fetchPayments(true, serverFilters),
@@ -1091,22 +969,49 @@ export function Cobros() {
     } finally {
       setIsRefreshing(false);
     }
-  }, [createPayment, markAsPaid, getExistingPayment, fetchUpcoming, fetchPayments, serverFilters]);
+  }, [createPayment, fetchUpcoming, fetchPayments, serverFilters]);
 
   const handleCloseDrawer = useCallback(() => {
     setIsPaymentDrawerOpen(false);
     setPreselectedSession(null);
   }, []);
 
-  const clearGlobalFilters = useCallback(() => {
-    setGlobalDateFrom('');
-    setGlobalDateTo('');
-    setGlobalQuickFilter('all');
+  const handleViewDetail = useCallback((payment: Payment) => {
+    setDetailPayment(payment);
   }, []);
 
-  const hasGlobalFilters = globalDateFrom || globalDateTo;
-  const hasPendingFilters = pendingSearch;
-  const hasHistoryFilters = historySearch;
+  const handleCloseDetail = useCallback(() => {
+    setDetailPayment(null);
+  }, []);
+
+  const handleEditFromDetail = useCallback(() => {
+    // Close detail modal - edit functionality coming soon
+    // When backend supports PATCH /payments/:id, we can enable edit mode
+    setDetailPayment(null);
+    toast.info('La edición de pagos estará disponible próximamente');
+  }, []);
+
+  const handleDeleteFromDetail = useCallback(() => {
+    if (detailPayment) {
+      setDeletePaymentData(detailPayment);
+      setDetailPayment(null);
+    }
+  }, [detailPayment]);
+
+  const handleMarkAsPaidFromDetail = useCallback(async () => {
+    if (!detailPayment) return;
+    await handleMarkAsPaid(detailPayment.id);
+    setDetailPayment(null);
+  }, [detailPayment, handleMarkAsPaid]);
+
+  const clearDateFilters = useCallback(() => {
+    setDateFrom('');
+    setDateTo('');
+    setQuickFilter('all');
+  }, []);
+
+  const hasDateFilters = dateFrom || dateTo;
+  const hasAnyFilters = hasDateFilters || statusFilter !== 'all' || searchTerm;
 
   const isLoading = isInitialLoading || isRefreshing;
 
@@ -1126,140 +1031,188 @@ export function Cobros() {
         </Button>
       </div>
 
-      {/* Global Filters (affects stats and both tabs) */}
-      <Filters
-        searchTerm=""
-        onSearchChange={() => {}}
-        dateFrom={globalDateFrom}
-        dateTo={globalDateTo}
-        onDateFromChange={setGlobalDateFrom}
-        onDateToChange={setGlobalDateTo}
-        onClearFilters={clearGlobalFilters}
-        hasActiveFilters={!!hasGlobalFilters}
-        sortBy="date-desc"
-        onSortChange={() => {}}
-        quickFilter={globalQuickFilter}
-        onQuickFilterChange={setGlobalQuickFilter}
-        showSearchAndSort={false}
+      {/* Date Filters */}
+      <DateFilters
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+        onDateFromChange={setDateFrom}
+        onDateToChange={setDateTo}
+        onClearFilters={clearDateFilters}
+        hasActiveFilters={!!hasDateFilters}
+        quickFilter={quickFilter}
+        onQuickFilterChange={setQuickFilter}
       />
 
-      {/* Stats Cards - use server totals (already filtered by date range) */}
+      {/* Stats Cards */}
       <PaymentStats totals={totals} isLoading={isLoading} />
 
-      {/* Tabs */}
-      <Tabs defaultValue="pendientes" className="w-full">
-        <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="pendientes" className="flex-1 sm:flex-none gap-2">
-            <Calendar className="h-4 w-4" />
-            Pendientes
-            <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-1.5 py-0.5 rounded-full">
-              {sessionsInRange.length}
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="historial" className="flex-1 sm:flex-none gap-2">
-            <History className="h-4 w-4" />
-            Historial
-            <span className="bg-green-100 text-green-800 text-xs font-medium px-1.5 py-0.5 rounded-full">
-              {paidPaymentsInRange.length}
-            </span>
-          </TabsTrigger>
-        </TabsList>
+      {/* Search, Status Filter and Sort */}
+      <SearchAndFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+      />
 
-        {/* Pendientes Tab */}
-        <TabsContent value="pendientes" className="mt-4 space-y-4">
-          <SearchAndSort
-            searchTerm={pendingSearch}
-            onSearchChange={setPendingSearch}
-            sortBy={pendingSortBy}
-            onSortChange={setPendingSortBy}
+      {/* Payments List */}
+      {isLoading ? (
+        <SkeletonList items={3} />
+      ) : filteredPayments.length === 0 ? (
+        <EmptyState 
+          icon={DollarSign} 
+          title={hasAnyFilters ? "Sin resultados" : "Sin pagos"}
+          subtitle={hasAnyFilters ? "No hay pagos que coincidan con los filtros" : "Aún no hay pagos registrados"}
+        />
+      ) : isMobile ? (
+        /* Mobile: Cards with infinite scroll */
+        <>
+          <div className="space-y-3">
+            {displayedPayments.map((payment) => (
+              <PaymentCard
+                key={payment.id}
+                payment={payment}
+                onMarkAsPaid={payment.status !== PaymentStatus.PAID 
+                  ? () => handleMarkAsPaid(payment.id) 
+                  : undefined
+                }
+                onReminder={payment.status !== PaymentStatus.PAID 
+                  ? () => setReminderPayment(payment) 
+                  : undefined
+                }
+                onDelete={() => setDeletePaymentData(payment)}
+                onViewDetail={() => handleViewDetail(payment)}
+                isMarkingAsPaid={markingAsPaidId === payment.id}
+              />
+            ))}
+          </div>
+          <InfiniteScrollLoader
+            isLoading={isLoadingMore}
+            hasMore={hasMore}
+            loadMoreRef={loadMoreRef}
           />
+        </>
+      ) : (
+        /* Desktop: Table with pagination */
+        <>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {displayedPayments.map((payment) => {
+                    const patientName = payment.patient 
+                      ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
+                      : 'Sin paciente';
+                    const initials = getInitials(patientName);
+                    const config = STATUS_CONFIG[payment.status];
+                    const isPaid = payment.status === PaymentStatus.PAID;
 
-          {isLoading ? (
-            <SkeletonList items={3} />
-          ) : filteredPendingSessions.length === 0 ? (
-            <EmptyState 
-              icon={DollarSign} 
-              title={(hasPendingFilters || hasGlobalFilters) ? "Sin resultados" : "¡Todo al día!"}
-              subtitle={(hasPendingFilters || hasGlobalFilters) ? "No hay sesiones que coincidan con los filtros" : "No hay sesiones pendientes de cobro"}
-              variant={(hasPendingFilters || hasGlobalFilters) ? 'default' : 'success'}
-            />
-          ) : (
-            <>
-              <div className="space-y-3">
-                {displayedPendingSessions.map((session) => (
-                  <SessionCard
-                    key={session.id}
-                    session={session}
-                    status={getSessionStatus(session)}
-                    onReminder={() => setReminderSession(session)}
-                    onCollect={() => handleCollectPayment(session)}
-                  />
-                ))}
-              </div>
-              
-              {/* Desktop: Pagination | Mobile: Infinite Scroll */}
-              {isMobile ? (
-                <InfiniteScrollLoader
-                  isLoading={isLoadingMorePending}
-                  hasMore={hasMorePending}
-                  loadMoreRef={pendingLoadMoreRef}
-                />
-              ) : (
-                <Pagination
-                  currentPage={pendingPage}
-                  totalPages={pendingTotalPages}
-                  totalItems={filteredPendingSessions.length}
-                  onPageChange={setPendingPage}
-                />
-              )}
-            </>
-          )}
-        </TabsContent>
-
-        {/* Historial Tab */}
-        <TabsContent value="historial" className="mt-4 space-y-4">
-          <SearchAndSort
-            searchTerm={historySearch}
-            onSearchChange={setHistorySearch}
-            sortBy={historySortBy}
-            onSortChange={setHistorySortBy}
+                    return (
+                      <tr 
+                        key={payment.id} 
+                        className="hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => handleViewDetail(payment)}
+                      >
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${config.iconBgColor}`}>
+                              <span className={`text-xs font-semibold ${config.iconColor}`}>{initials}</span>
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-medium text-gray-900 truncate">{patientName}</p>
+                              {payment.description && (
+                                <p className="text-xs text-gray-500 truncate max-w-[200px]">{payment.description}</p>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          {formatDate(payment.paymentDate)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <PaymentStatusBadge status={payment.status} />
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <span className="font-semibold text-gray-900">{formatCurrency(payment.amount)}</span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewDetail(payment);
+                              }}
+                              className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                              title="Ver detalle"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            {!isPaid && (
+                              <>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setReminderPayment(payment);
+                                  }}
+                                  className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                  title="Enviar recordatorio"
+                                >
+                                  <Bell className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleMarkAsPaid(payment.id);
+                                  }}
+                                  className="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors"
+                                  title="Marcar como cobrado"
+                                  disabled={markingAsPaidId === payment.id}
+                                >
+                                  {markingAsPaidId === payment.id ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <DollarSign className="w-4 h-4" />
+                                  )}
+                                </button>
+                              </>
+                            )}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeletePaymentData(payment);
+                              }}
+                              className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Eliminar pago"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={filteredPayments.length}
+            onPageChange={setCurrentPage}
           />
-
-          {isLoading ? (
-            <SkeletonList items={3} />
-          ) : filteredPaidPayments.length === 0 ? (
-            <EmptyState 
-              icon={History} 
-              title={(hasHistoryFilters || hasGlobalFilters) ? "Sin resultados" : "Sin historial"}
-              subtitle={(hasHistoryFilters || hasGlobalFilters) ? "No hay pagos que coincidan con los filtros" : "Aún no hay pagos registrados"}
-            />
-          ) : (
-            <>
-              <div className="space-y-3">
-                {displayedPaidPayments.map((payment) => (
-                  <PaymentCard key={payment.id} payment={payment} />
-                ))}
-              </div>
-              
-              {/* Desktop: Pagination | Mobile: Infinite Scroll */}
-              {isMobile ? (
-                <InfiniteScrollLoader
-                  isLoading={isLoadingMoreHistory}
-                  hasMore={hasMoreHistory}
-                  loadMoreRef={historyLoadMoreRef}
-                />
-              ) : (
-                <Pagination
-                  currentPage={historyPage}
-                  totalPages={historyTotalPages}
-                  totalItems={filteredPaidPayments.length}
-                  onPageChange={setHistoryPage}
-                />
-              )}
-            </>
-          )}
-        </TabsContent>
-      </Tabs>
+        </>
+      )}
 
       {/* Payment Drawer */}
       <PaymentDrawer
@@ -1272,10 +1225,35 @@ export function Cobros() {
       />
 
       {/* Reminder Modal */}
-      {reminderSession && (
+      {reminderPayment && (
         <ReminderModal 
-          session={reminderSession}
-          onClose={() => setReminderSession(null)} 
+          payment={reminderPayment}
+          onClose={() => setReminderPayment(null)} 
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletePaymentData && (
+        <DeleteConfirmModal
+          payment={deletePaymentData}
+          onClose={() => setDeletePaymentData(null)}
+          onConfirm={handleDeletePayment}
+          isDeleting={isDeletingPayment}
+        />
+      )}
+
+      {/* Payment Detail Modal */}
+      {detailPayment && (
+        <PaymentDetailModal
+          payment={detailPayment}
+          onClose={handleCloseDetail}
+          onEdit={handleEditFromDetail}
+          onDelete={handleDeleteFromDetail}
+          onMarkAsPaid={detailPayment.status !== PaymentStatus.PAID 
+            ? handleMarkAsPaidFromDetail 
+            : undefined
+          }
+          isMarkingAsPaid={markingAsPaidId === detailPayment.id}
         />
       )}
     </div>

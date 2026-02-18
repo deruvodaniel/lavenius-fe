@@ -108,16 +108,16 @@ export function FullCalendarView({
   const calendarRef = useRef<FullCalendar>(null);
   const { isMobile } = useResponsive();
   
-  // Default to day view on mobile, week view on desktop
-  const defaultView = isMobile ? 'timeGridDay' : 'timeGridWeek';
+  // Default to day view on both mobile and desktop
+  const defaultView = 'timeGridDay';
   const [currentView, setCurrentView] = useState(defaultView);
 
-  // Update view when screen size changes
+  // Keep day view on mobile (week view not ideal for small screens)
   useEffect(() => {
     if (isMobile && currentView === 'timeGridWeek') {
       changeView('timeGridDay');
     }
-  }, [isMobile]);
+  }, [isMobile, currentView]);
 
   // Load calendar settings (días off + working hours)
   const calendarSettings = useMemo(() => loadCalendarSettings(), []);

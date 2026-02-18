@@ -2,6 +2,7 @@ import { apiClient } from '../api/client';
 import type {
   Payment,
   CreatePaymentDto,
+  UpdatePaymentDto,
 } from '../types/api.types';
 
 /**
@@ -41,11 +42,13 @@ export interface PaymentTotals {
 
 /**
  * Backend response structure for /payments endpoint
- * Returns: { data: Payment[], pagination: {...}, total, totalPaid, totalPending, totalOverdue }
+ * Returns: { payments: { data: Payment[], pagination: {...} }, total, totalPaid, totalPending, totalOverdue }
  */
 export interface BackendPaymentResponse {
-  data: Payment[];
-  pagination: PaginationInfo;
+  payments: {
+    data: Payment[];
+    pagination: PaginationInfo;
+  };
   total: number;
   totalPaid: number;
   totalPending: number;
@@ -106,17 +109,20 @@ class PaymentService {
     
     const response = await apiClient.get<BackendPaymentResponse>(url);
     
-    // Normalize the response
+    // Normalize the response - backend returns { payments: { data, pagination }, total, ... }
+    const paymentsData = response.payments?.data || [];
+    const paginationData = response.payments?.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 };
+    
     return {
-      payments: response.data || [],
-      pagination: response.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 },
+      payments: paymentsData,
+      pagination: paginationData,
       totals: {
         totalAmount: response.total || 0,
         paidAmount: response.totalPaid || 0,
         pendingAmount: response.totalPending || 0,
         overdueAmount: response.totalOverdue || 0,
         // Calculate counts from pagination
-        totalCount: response.pagination?.total || 0,
+        totalCount: paginationData.total || 0,
         paidCount: 0, // Backend doesn't provide counts, will calculate from payments if needed
         pendingCount: 0,
         overdueCount: 0,
@@ -160,6 +166,20 @@ class PaymentService {
       `${this.basePath}/${id}/pay`,
       {}
     );
+  }
+
+  /**
+   * Update an existing payment
+   * NOTE: Backend endpoint not yet implemented - will throw error
+   * TODO: Remove this error once backend implements PATCH /payments/:id
+   */
+  async update(id: string, data: UpdatePaymentDto): Promise<Payment> {
+    // Backend doesn't have this endpoint yet
+    // When implemented, uncomment the following:
+    // return apiClient.patch<Payment, UpdatePaymentDto>(`${this.basePath}/${id}`, data);
+    
+    console.warn('[PaymentService] Update endpoint not yet implemented in backend', { id, data });
+    throw new Error('La edición de pagos estará disponible próximamente');
   }
 
   /**

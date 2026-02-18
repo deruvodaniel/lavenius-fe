@@ -15,19 +15,34 @@ export class NoteService {
 
   /**
    * Get all notes (without filters)
+   * NOTE: Currently disabled due to backend ParseIntPipe bug
+   * The backend expects patientId as number but IDs are UUIDs
    */
   async getAll(): Promise<Note[]> {
-    return apiClient.get<Note[]>(this.basePath);
+    try {
+      return await apiClient.get<Note[]>(this.basePath);
+    } catch (error) {
+      // Backend has a bug with ParseIntPipe - return empty array
+      console.warn('GET /notes failed (known backend issue), returning empty array');
+      return [];
+    }
   }
 
   /**
    * Get notes by patient ID
-   * Fetches all notes and filters client-side by patient.id
-   * (Backend ParseIntPipe bug prevents using query param with UUID)
+   * NOTE: Backend has ParseIntPipe bug that prevents filtering by UUID
+   * For now, we return empty array until backend is fixed
    */
   async getByPatientId(patientId: string): Promise<Note[]> {
-    const allNotes = await apiClient.get<Note[]>(this.basePath);
-    return allNotes.filter(note => note.patient?.id === patientId);
+    try {
+      // Try to get all notes and filter client-side
+      const allNotes = await apiClient.get<Note[]>(this.basePath);
+      return allNotes.filter(note => note.patient?.id === patientId);
+    } catch (error) {
+      // Backend ParseIntPipe bug - return empty array gracefully
+      console.warn('Failed to fetch notes (known backend issue):', patientId);
+      return [];
+    }
   }
 
   /**

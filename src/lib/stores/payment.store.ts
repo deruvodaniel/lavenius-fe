@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type {
   Payment,
   CreatePaymentDto,
+  UpdatePaymentDto,
 } from '@/lib/types/api.types';
 import { PaymentStatus } from '@/lib/types/api.types';
 import { paymentService, type PaymentFilters, type PaymentTotals, type PaginationInfo } from '@/lib/services/payment.service';
@@ -35,6 +36,7 @@ interface PaymentState {
 interface PaymentActions {
   fetchPayments: (force?: boolean, filters?: PaymentFilters) => Promise<void>;
   createPayment: (data: CreatePaymentDto) => Promise<Payment>;
+  updatePayment: (id: string, data: UpdatePaymentDto) => Promise<Payment>;
   markAsPaid: (id: string) => Promise<Payment>;
   deletePayment: (id: string) => Promise<void>;
   reset: () => void;
@@ -127,6 +129,28 @@ export const usePaymentStore = create<PaymentState & PaymentActions>((set, get) 
     } catch (error) {
       set({
         error: error instanceof Error ? error : new Error('Failed to create payment'),
+        fetchStatus: 'error',
+      });
+      throw error;
+    }
+  },
+
+  updatePayment: async (id: string, data: UpdatePaymentDto) => {
+    set({ fetchStatus: 'loading', error: null });
+    try {
+      const updatedPayment = await paymentService.update(id, data);
+      
+      // Update local state immediately
+      const currentPayments = get().payments;
+      set({ 
+        payments: currentPayments.map(p => p.id === id ? updatedPayment : p),
+        fetchStatus: 'success',
+      });
+      
+      return updatedPayment;
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error : new Error('Failed to update payment'),
         fetchStatus: 'error',
       });
       throw error;

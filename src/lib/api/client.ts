@@ -53,11 +53,20 @@ const ERROR_TRANSLATIONS: Record<string, string> = {
   'Internal server error': 'Error interno del servidor',
   'Service unavailable': 'Servicio no disponible',
   'Gateway timeout': 'Tiempo de espera agotado',
+  'An error occurred while processing your request': 'Ocurrió un error al procesar tu solicitud',
   
   // Calendar errors
   'Calendar not connected': 'Calendario no conectado',
   'Failed to sync calendar': 'Error al sincronizar el calendario',
   'Google Calendar authentication failed': 'Error de autenticación con Google Calendar',
+  'Google Calendar not connected': 'Para agendar turnos, primero conecta tu Google Calendar en Configuración',
+  'Google Calendar not connected. Please sync your calendar first.': 'Para agendar turnos, primero conecta tu Google Calendar en Configuración',
+  'Sessions calendar not found. Please sync your calendar first.': 'Calendario de sesiones no encontrado. Por favor sincroniza tu calendario en Configuración',
+  'Failed to create calendar event for the session': 'Error al crear el evento en Google Calendar. Verifica que el email del paciente sea válido',
+  'Failed to create calendar event': 'Error al crear el evento en Google Calendar. Verifica que el email del paciente sea válido',
+  'Google Calendar token is invalid or expired': 'Tu conexión con Google Calendar expiró. Por favor reconecta en Configuración',
+  'Google Calendar token is invalid. Please reconnect your calendar.': 'Tu conexión con Google Calendar expiró. Por favor reconecta en Configuración',
+  'Unable to create event in Google Calendar': 'No se pudo crear el evento en Google Calendar. Verifica que el email del paciente sea válido',
 };
 
 /**

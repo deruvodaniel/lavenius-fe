@@ -69,11 +69,16 @@ export const useSessionStore = create<SessionState>((set, _get) => ({
       return newSession;
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || error?.message || '';
+      const statusCode = error?.statusCode || error?.response?.status;
       
       // Provide user-friendly error messages
       let errorMessage = 'Error al crear sesión';
+      
       if (backendMessage.includes('calendar event') || backendMessage.includes('calendar')) {
         errorMessage = 'Para agendar turnos, primero debes conectar tu Google Calendar en Configuración';
+      } else if (statusCode === 500) {
+        // Error 500 al crear sesión generalmente es problema con Google Calendar o email inválido
+        errorMessage = 'Error al crear el turno. Verifica que el email del paciente sea válido y que tu Google Calendar esté conectado en Configuración';
       } else if (backendMessage) {
         errorMessage = backendMessage;
       }

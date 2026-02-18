@@ -1,24 +1,21 @@
 import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { Calendar, Users, DollarSign, LogOut, Settings, ChevronRight, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { ConfirmDialog } from '@/components/shared';
 
-type View = 'agenda' | 'pacientes' | 'cobros' | 'configuracion' | 'perfil' | 'ayuda';
-
 interface SidebarProps {
-  currentView: View;
-  onViewChange: (view: View) => void;
+  currentPath: string;
   onLogout?: () => void;
   showHeader?: boolean;
   onNavigate?: () => void; // Callback para cerrar drawer en mobile
 }
 
-export function Sidebar({ currentView, onViewChange, onLogout, showHeader = true, onNavigate }: SidebarProps) {
+export function Sidebar({ currentPath, onLogout, showHeader = true, onNavigate }: SidebarProps) {
   const { user } = useAuth();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  const handleNavClick = (view: View) => {
-    onViewChange(view);
+  const handleNavClick = () => {
     onNavigate?.(); // Cerrar drawer en mobile
   };
 
@@ -32,10 +29,17 @@ export function Sidebar({ currentView, onViewChange, onLogout, showHeader = true
   };
 
   const menuItems = [
-    { id: 'agenda' as View, label: 'Agenda', icon: Calendar },
-    { id: 'pacientes' as View, label: 'Pacientes', icon: Users },
-    { id: 'cobros' as View, label: 'Cobros', icon: DollarSign },
+    { path: '/dashboard/agenda', label: 'Agenda', icon: Calendar },
+    { path: '/dashboard/pacientes', label: 'Pacientes', icon: Users },
+    { path: '/dashboard/cobros', label: 'Cobros', icon: DollarSign },
   ];
+
+  const getLinkClassName = ({ isActive }: { isActive: boolean }) => 
+    `w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+      isActive
+        ? 'bg-indigo-700 text-white'
+        : 'text-indigo-200 hover:bg-indigo-800 hover:text-white'
+    }`;
 
   return (
     <div className="h-full flex flex-col">
@@ -52,58 +56,50 @@ export function Sidebar({ currentView, onViewChange, onLogout, showHeader = true
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
-            <button
-              key={item.id}
-              onClick={() => handleNavClick(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                currentView === item.id
-                  ? 'bg-indigo-700 text-white'
-                  : 'text-indigo-200 hover:bg-indigo-800 hover:text-white'
-              }`}
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={handleNavClick}
+              className={getLinkClassName}
             >
               <Icon className="w-5 h-5" />
               <span>{item.label}</span>
-            </button>
+            </NavLink>
           );
         })}
         
         {/* Configuración */}
-        <button
-          onClick={() => handleNavClick('configuracion')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-            currentView === 'configuracion'
-              ? 'bg-indigo-700 text-white'
-              : 'text-indigo-200 hover:bg-indigo-800 hover:text-white'
-          }`}
+        <NavLink
+          to="/dashboard/configuracion"
+          onClick={handleNavClick}
+          className={getLinkClassName}
         >
           <Settings className="w-5 h-5" />
           <span>Configuración</span>
-        </button>
+        </NavLink>
 
         {/* Ayuda */}
-        <button
-          onClick={() => handleNavClick('ayuda')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-            currentView === 'ayuda'
-              ? 'bg-indigo-700 text-white'
-              : 'text-indigo-200 hover:bg-indigo-800 hover:text-white'
-          }`}
+        <NavLink
+          to="/dashboard/ayuda"
+          onClick={handleNavClick}
+          className={getLinkClassName}
         >
           <HelpCircle className="w-5 h-5" />
           <span>Ayuda</span>
-        </button>
+        </NavLink>
       </nav>
       
       {/* User Profile & Logout */}
       <div className="p-6 border-t border-indigo-800">
         {user && (
-          <button
-            onClick={() => handleNavClick('perfil')}
-            className={`w-full flex items-center gap-3 mb-4 p-2 -m-2 rounded-lg transition-colors group ${
-              currentView === 'perfil'
-                ? 'bg-indigo-700'
-                : 'hover:bg-indigo-800'
-            }`}
+          <NavLink
+            to="/dashboard/perfil"
+            onClick={handleNavClick}
+            className={({ isActive }) => 
+              `w-full flex items-center gap-3 mb-4 p-2 -m-2 rounded-lg transition-colors group ${
+                isActive ? 'bg-indigo-700' : 'hover:bg-indigo-800'
+              }`
+            }
           >
             <div className="w-10 h-10 bg-indigo-600 ring-2 ring-indigo-400 rounded-full flex items-center justify-center flex-shrink-0 group-hover:ring-indigo-300 transition-colors">
               <span className="text-white text-sm font-semibold">
@@ -117,7 +113,7 @@ export function Sidebar({ currentView, onViewChange, onLogout, showHeader = true
               <p className="text-indigo-300 text-xs truncate">{user.email}</p>
             </div>
             <ChevronRight className="w-4 h-4 text-indigo-400 group-hover:text-indigo-300 transition-colors flex-shrink-0" />
-          </button>
+          </NavLink>
         )}
         <button
           onClick={handleLogoutClick}

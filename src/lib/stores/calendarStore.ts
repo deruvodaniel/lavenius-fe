@@ -143,10 +143,10 @@ export const useCalendarStore = create<CalendarState>()(
   syncCalendar: async () => {
     set({ isSyncing: true });
     try {
-      const response = await calendarService.syncCalendar();
+      await calendarService.syncCalendar();
       
       toast.success('Calendario sincronizado', {
-        description: `${response.sessionsSynced} sesiones sincronizadas con Google Calendar`
+        description: 'Tu calendario de sesiones está listo para usar'
       });
       
       set({ isSyncing: false, isConnected: true, lastSyncAt: new Date().toISOString() });

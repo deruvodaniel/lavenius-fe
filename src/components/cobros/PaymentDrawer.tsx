@@ -1,27 +1,133 @@
 import { useState, useEffect } from 'react';
-import { X, DollarSign, Calendar, FileText } from 'lucide-react';
+import { X, DollarSign, Calendar, FileText, Sparkles, CalendarRange, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatISODate } from '@/lib/utils/dateFormatters';
-import type { CreatePaymentDto } from '@/lib/types/api.types';
+import type { CreatePaymentDto, Payment, UpdatePaymentDto } from '@/lib/types/api.types';
 import type { SessionUI } from '@/lib/types/session';
+
+// ============================================================================
+// PAYMENT TYPE SELECTOR
+// ============================================================================
+
+type PaymentType = 'single' | 'monthly';
+
+interface PaymentTypeSelectorProps {
+  selected: PaymentType;
+  onChange: (type: PaymentType) => void;
+  disabled?: boolean;
+}
+
+const PaymentTypeSelector = ({ selected, onChange, disabled }: PaymentTypeSelectorProps) => (
+  <div className="flex gap-2">
+    <button
+      type="button"
+      onClick={() => onChange('single')}
+      disabled={disabled}
+      className={`flex-1 p-3 rounded-lg border-2 transition-all ${
+        selected === 'single'
+          ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+          : 'border-gray-200 hover:border-gray-300 text-gray-600'
+      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+    >
+      <DollarSign className="w-5 h-5 mx-auto mb-1" />
+      <span className="text-sm font-medium block">Pago único</span>
+    </button>
+    <button
+      type="button"
+      onClick={() => onChange('monthly')}
+      disabled={disabled}
+      className={`flex-1 p-3 rounded-lg border-2 transition-all ${
+        selected === 'monthly'
+          ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+          : 'border-gray-200 hover:border-gray-300 text-gray-600'
+      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+    >
+      <CalendarRange className="w-5 h-5 mx-auto mb-1" />
+      <span className="text-sm font-medium block">Plan mensual</span>
+    </button>
+  </div>
+);
+
+// ============================================================================
+// COMING SOON OVERLAY
+// ============================================================================
+
+const ComingSoonOverlay = () => (
+  <div className="absolute inset-0 bg-white/90 backdrop-blur-[1px] rounded-lg flex flex-col items-center justify-center z-10">
+    <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+      <Sparkles className="w-8 h-8 text-indigo-600" />
+    </div>
+    <h3 className="text-lg font-semibold text-gray-900 mb-2">Próximamente</h3>
+    <p className="text-sm text-gray-500 text-center max-w-xs px-4">
+      Los planes mensuales y pagos adelantados estarán disponibles pronto
+    </p>
+  </div>
+);
+
+// ============================================================================
+// MONTHLY PAYMENT FORM (placeholder)
+// ============================================================================
+
+const MonthlyPaymentForm = () => (
+  <div className="relative">
+    <ComingSoonOverlay />
+    <div className="space-y-4 opacity-50 pointer-events-none select-none p-4 border border-gray-200 rounded-lg">
+      <div>
+        <label className="text-gray-700 text-sm mb-2 block">Paciente</label>
+        <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
+          Seleccionar paciente...
+        </div>
+      </div>
+      <div>
+        <label className="text-gray-700 text-sm mb-2 block">Cantidad de sesiones</label>
+        <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
+          4 sesiones / mes
+        </div>
+      </div>
+      <div>
+        <label className="text-gray-700 text-sm mb-2 block">Precio por sesión</label>
+        <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
+          $15,000
+        </div>
+      </div>
+      <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+        <div className="flex justify-between items-center">
+          <span className="text-green-700 text-sm">Descuento plan mensual (10%)</span>
+          <span className="text-green-700 font-medium">-$6,000</span>
+        </div>
+        <div className="flex justify-between items-center mt-2 pt-2 border-t border-green-200">
+          <span className="text-green-800 font-medium">Total plan mensual</span>
+          <span className="text-green-800 font-bold text-lg">$54,000</span>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 interface PaymentDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: CreatePaymentDto) => Promise<void>;
+  onUpdate?: (id: string, data: UpdatePaymentDto) => Promise<void>;
   sessions?: SessionUI[];
   preselectedSessionId?: string;
   isLoading?: boolean;
+  // Edit mode props
+  editPayment?: Payment | null;
 }
 
 export const PaymentDrawer = ({
   isOpen,
   onClose,
   onSave,
+  onUpdate,
   sessions = [],
   preselectedSessionId,
   isLoading = false,
+  editPayment = null,
 }: PaymentDrawerProps) => {
+  const isEditMode = !!editPayment;
+  const [paymentType, setPaymentType] = useState<PaymentType>('single');
   const [formData, setFormData] = useState<CreatePaymentDto>({
     sessionId: '',
     amount: 0,
@@ -30,24 +136,37 @@ export const PaymentDrawer = ({
   });
   const [isSaving, setIsSaving] = useState(false);
 
-  // Reset form when drawer opens, apply preselected session if provided
+  // Reset form when drawer opens, apply preselected session or edit data
   useEffect(() => {
     if (isOpen) {
-      const sessionId = preselectedSessionId || '';
-      const preselectedSession = sessionId ? sessions.find((s) => s.id === sessionId) : null;
-      
-      setFormData({
-        sessionId,
-        amount: preselectedSession?.cost ? Number(preselectedSession.cost) : 0,
-        paymentDate: formatISODate(new Date()),
-        description: '',
-      });
+      if (editPayment) {
+        // Edit mode - populate with existing payment data
+        setPaymentType('single');
+        setFormData({
+          sessionId: editPayment.sessionId,
+          amount: editPayment.amount,
+          paymentDate: editPayment.paymentDate.split('T')[0], // Extract date part
+          description: editPayment.description || '',
+        });
+      } else {
+        // Create mode
+        const sessionId = preselectedSessionId || '';
+        const preselectedSession = sessionId ? sessions.find((s) => s.id === sessionId) : null;
+        
+        setPaymentType('single');
+        setFormData({
+          sessionId,
+          amount: preselectedSession?.cost ? Number(preselectedSession.cost) : 0,
+          paymentDate: formatISODate(new Date()),
+          description: '',
+        });
+      }
     }
-  }, [isOpen, preselectedSessionId, sessions]);
+  }, [isOpen, preselectedSessionId, sessions, editPayment]);
 
-  // Auto-fill amount when session is selected (for manual selection changes)
+  // Auto-fill amount when session is selected (for manual selection changes, only in create mode)
   useEffect(() => {
-    if (formData.sessionId && !preselectedSessionId) {
+    if (!isEditMode && formData.sessionId && !preselectedSessionId) {
       const selectedSession = sessions.find((s) => s.id === formData.sessionId);
       if (selectedSession?.cost) {
         setFormData((prev) => ({
@@ -56,7 +175,7 @@ export const PaymentDrawer = ({
         }));
       }
     }
-  }, [formData.sessionId, sessions, preselectedSessionId]);
+  }, [formData.sessionId, sessions, preselectedSessionId, isEditMode]);
 
   if (!isOpen) return null;
 
@@ -76,21 +195,31 @@ export const PaymentDrawer = ({
     try {
       setIsSaving(true);
       
-      // Ensure amount is a valid number (not NaN)
-      const paymentData: CreatePaymentDto = {
-        sessionId: formData.sessionId,
-        amount: Math.round(formData.amount * 100) / 100, // Round to 2 decimals
-        paymentDate: formData.paymentDate,
-        description: formData.description?.trim() || undefined,
-      };
-      
-      await onSave(paymentData);
+      if (isEditMode && editPayment && onUpdate) {
+        // Edit mode - update existing payment
+        const updateData: UpdatePaymentDto = {
+          amount: Math.round(formData.amount * 100) / 100,
+          paymentDate: formData.paymentDate,
+          description: formData.description?.trim() || undefined,
+        };
+        
+        await onUpdate(editPayment.id, updateData);
+      } else {
+        // Create mode - create new payment
+        const paymentData: CreatePaymentDto = {
+          sessionId: formData.sessionId,
+          amount: Math.round(formData.amount * 100) / 100,
+          paymentDate: formData.paymentDate,
+          description: formData.description?.trim() || undefined,
+        };
+        
+        await onSave(paymentData);
+      }
       onClose();
     } catch (error: unknown) {
       console.error('Error al guardar pago:', error);
-      // Show error to user
       const errorMessage = error instanceof Error ? error.message : 'Error al guardar el pago';
-      toast.error(`Error: ${errorMessage}`);
+      toast.error(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -116,6 +245,11 @@ export const PaymentDrawer = ({
     ? sessions.find((s) => s.id === formData.sessionId) 
     : null;
 
+  // Get patient name for edit mode header
+  const editPatientName = editPayment?.patient 
+    ? `${editPayment.patient.firstName} ${editPayment.patient.lastName || ''}`.trim()
+    : null;
+
   const isFormValid = formData.sessionId && formData.amount > 0;
 
   return (
@@ -133,9 +267,11 @@ export const PaymentDrawer = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <DollarSign className="w-5 h-5" />
+                {isEditMode ? <Pencil className="w-5 h-5" /> : <DollarSign className="w-5 h-5" />}
               </div>
-              <h2 className="text-white text-xl">Registrar Pago</h2>
+              <h2 className="text-white text-xl">
+                {isEditMode ? 'Editar Pago' : 'Registrar Pago'}
+              </h2>
             </div>
             <button
               onClick={onClose}
@@ -144,7 +280,12 @@ export const PaymentDrawer = ({
               <X className="w-6 h-6" />
             </button>
           </div>
-          {preselectedSessionId && selectedSession && (
+          {isEditMode && editPatientName && (
+            <p className="text-indigo-200 text-sm mt-2">
+              Pago de {editPatientName}
+            </p>
+          )}
+          {!isEditMode && preselectedSessionId && selectedSession && (
             <p className="text-indigo-200 text-sm mt-2">
               Pago para sesión de {selectedSession.patientName || selectedSession.patient?.firstName}
             </p>
@@ -153,100 +294,127 @@ export const PaymentDrawer = ({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4 md:space-y-6">
-          {/* Session Selector */}
-          <div>
-            <label className="flex items-center gap-2 text-gray-700 mb-2">
-              <Calendar className="w-4 h-4" />
-              Sesión <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={formData.sessionId}
-              onChange={(e) => setFormData({ ...formData, sessionId: e.target.value })}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                !formData.sessionId ? 'border-red-300 bg-red-50' : 'border-gray-300'
-              }`}
-              disabled={isLoading || isSaving || !!preselectedSessionId}
-              required
-            >
-              <option value="">Seleccionar sesión...</option>
-              {sessions.map((session) => (
-                <option key={session.id} value={session.id}>
-                  {formatSessionOption(session)}
-                </option>
-              ))}
-            </select>
+          {/* Payment Type Selector - only show in create mode */}
+          {!isEditMode && (
+            <div>
+              <label className="text-gray-700 mb-2 block text-sm font-medium">Tipo de pago</label>
+              <PaymentTypeSelector
+                selected={paymentType}
+                onChange={setPaymentType}
+                disabled={isLoading || isSaving || !!preselectedSessionId}
+              />
+            </div>
+          )}
 
-            {/* Selected session preview */}
-            {selectedSession && (
-              <div className="mt-3 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
-                <p className="font-medium text-indigo-900">
-                  {selectedSession.patientName || selectedSession.patient?.firstName}
-                </p>
-                <p className="text-indigo-700 text-sm mt-0.5">
-                  {new Date(selectedSession.scheduledFrom).toLocaleDateString('es-AR', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                  })} - {selectedSession.formattedTime || new Date(selectedSession.scheduledFrom).toLocaleTimeString('es-AR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
+          {/* Monthly Payment Form (with Coming Soon overlay) */}
+          {!isEditMode && paymentType === 'monthly' && (
+            <MonthlyPaymentForm />
+          )}
+
+          {/* Single Payment Form */}
+          {(isEditMode || paymentType === 'single') && (
+            <>
+              {/* Session Selector - disabled in edit mode */}
+              <div>
+                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                  <Calendar className="w-4 h-4" />
+                  Sesión <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.sessionId}
+                  onChange={(e) => setFormData({ ...formData, sessionId: e.target.value })}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                    !formData.sessionId ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  } ${isEditMode ? 'bg-gray-50 text-gray-500' : ''}`}
+                  disabled={isLoading || isSaving || !!preselectedSessionId || isEditMode}
+                  required
+                >
+                  <option value="">Seleccionar sesión...</option>
+                  {sessions.map((session) => (
+                    <option key={session.id} value={session.id}>
+                      {formatSessionOption(session)}
+                    </option>
+                  ))}
+                </select>
+                {isEditMode && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    La sesión no puede modificarse
+                  </p>
+                )}
+
+                {/* Selected session preview */}
+                {!isEditMode && selectedSession && (
+                  <div className="mt-3 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
+                    <p className="font-medium text-indigo-900">
+                      {selectedSession.patientName || selectedSession.patient?.firstName}
+                    </p>
+                    <p className="text-indigo-700 text-sm mt-0.5">
+                      {new Date(selectedSession.scheduledFrom).toLocaleDateString('es-AR', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                      })} - {selectedSession.formattedTime || new Date(selectedSession.scheduledFrom).toLocaleTimeString('es-AR', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* Amount */}
-          <div>
-            <label className="flex items-center gap-2 text-gray-700 mb-2">
-              <DollarSign className="w-4 h-4" />
-              Monto (ARS) <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                formData.amount <= 0 ? 'border-red-300 bg-red-50' : 'border-gray-300'
-              }`}
-              required
-              disabled={isLoading || isSaving}
-            />
-          </div>
+              {/* Amount */}
+              <div>
+                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                  <DollarSign className="w-4 h-4" />
+                  Monto (ARS) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                    formData.amount <= 0 ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
+                  required
+                  disabled={isLoading || isSaving}
+                />
+              </div>
 
-          {/* Payment Date */}
-          <div>
-            <label className="flex items-center gap-2 text-gray-700 mb-2">
-              <Calendar className="w-4 h-4" />
-              Fecha de Pago <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="date"
-              value={formData.paymentDate}
-              onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-              disabled={isLoading || isSaving}
-            />
-          </div>
+              {/* Payment Date */}
+              <div>
+                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                  <Calendar className="w-4 h-4" />
+                  Fecha de Pago <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={formData.paymentDate}
+                  onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                  disabled={isLoading || isSaving}
+                />
+              </div>
 
-          {/* Description */}
-          <div>
-            <label className="flex items-center gap-2 text-gray-700 mb-2">
-              <FileText className="w-4 h-4" />
-              Descripción <span className="text-gray-400 text-sm">(opcional)</span>
-            </label>
-            <textarea
-              value={formData.description || ''}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Notas adicionales sobre el pago..."
-              rows={3}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-              disabled={isLoading || isSaving}
-            />
-          </div>
+              {/* Description */}
+              <div>
+                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                  <FileText className="w-4 h-4" />
+                  Descripción <span className="text-gray-400 text-sm">(opcional)</span>
+                </label>
+                <textarea
+                  value={formData.description || ''}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Notas adicionales sobre el pago..."
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                  disabled={isLoading || isSaving}
+                />
+              </div>
+            </>
+          )}
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
@@ -258,17 +426,24 @@ export const PaymentDrawer = ({
             >
               Cancelar
             </button>
-            <button
-              type="submit"
-              disabled={!isFormValid || isLoading || isSaving}
-              className={`flex-1 py-3 rounded-lg transition-colors ${
-                isFormValid && !isLoading && !isSaving
-                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              {isSaving ? 'Guardando...' : 'Registrar Pago'}
-            </button>
+            {(isEditMode || paymentType === 'single') && (
+              <button
+                type="submit"
+                disabled={!isFormValid || isLoading || isSaving}
+                className={`flex-1 py-3 rounded-lg transition-colors ${
+                  isFormValid && !isLoading && !isSaving
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {isSaving 
+                  ? 'Guardando...' 
+                  : isEditMode 
+                    ? 'Guardar Cambios' 
+                    : 'Registrar Pago'
+                }
+              </button>
+            )}
           </div>
         </form>
       </div>
