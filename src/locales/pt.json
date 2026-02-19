@@ -723,26 +723,247 @@
     }
   },
   "profile": {
-    "title": "Perfil",
-    "subtitle": "Gerencie suas informações pessoais",
+    "title": "Meu Perfil",
+    "subtitle": "Gerencie suas informações profissionais",
     "personalInfo": "Informações Pessoais",
     "changePassword": "Alterar Senha",
     "currentPassword": "Senha atual",
     "newPassword": "Nova senha",
     "confirmNewPassword": "Confirmar nova senha",
+    "avatar": {
+      "removePhoto": "Remover foto"
+    },
+    "professional": {
+      "title": "Informações Profissionais",
+      "description": "Dados da sua prática profissional",
+      "specialty": "Especialidade",
+      "specialtyPlaceholder": "Ex: Psicólogo Clínico, Terapeuta Cognitivo-Comportamental...",
+      "bio": "Descrição / Bio",
+      "bioPlaceholder": "Conte aos seus pacientes sobre você, sua abordagem terapêutica e experiência...",
+      "characters": "caracteres"
+    },
+    "contact": {
+      "title": "Informações de Contato",
+      "description": "Como seus pacientes podem entrar em contato",
+      "primaryPhone": "Telefone Principal",
+      "alternativePhone": "Telefone Alternativo",
+      "email": "Email",
+      "website": "Site"
+    },
+    "location": {
+      "title": "Endereço do Consultório",
+      "description": "Local onde você atende seus pacientes",
+      "address": "Endereço",
+      "tip": "Dica: Este endereço pode ser compartilhado com pacientes para sessões presenciais."
+    },
+    "social": {
+      "title": "Redes Sociais",
+      "description": "Seus perfis profissionais nas redes",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn"
+    },
+    "save": {
+      "unsavedChanges": "Há alterações não salvas",
+      "saving": "Salvando...",
+      "saveChanges": "Salvar Alterações"
+    },
     "messages": {
       "updateSuccess": "Perfil atualizado com sucesso",
-      "passwordChanged": "Senha alterada com sucesso"
+      "passwordChanged": "Senha alterada com sucesso",
+      "saveSuccess": "Perfil salvo com sucesso",
+      "saveError": "Erro ao salvar o perfil"
+    }
+  },
+  "analytics": {
+    "title": "Análises",
+    "subtitle": "Visualize o desempenho do seu consultório",
+    "loading": "Carregando dados...",
+    "refresh": "Atualizar dados",
+    "noData": "Sem dados para exibir",
+    "timeRange": {
+      "week": "Esta semana",
+      "month": "Este mês",
+      "quarter": "Último trimestre",
+      "year": "Este ano"
+    },
+    "weekdays": {
+      "sun": "Dom",
+      "mon": "Seg",
+      "tue": "Ter",
+      "wed": "Qua",
+      "thu": "Qui",
+      "fri": "Sex",
+      "sat": "Sáb"
+    },
+    "months": {
+      "jan": "Jan",
+      "feb": "Fev",
+      "mar": "Mar",
+      "apr": "Abr",
+      "may": "Mai",
+      "jun": "Jun",
+      "jul": "Jul",
+      "aug": "Ago",
+      "sep": "Set",
+      "oct": "Out",
+      "nov": "Nov",
+      "dec": "Dez"
+    },
+    "stats": {
+      "sessions": "Sessões",
+      "completed": "concluídas",
+      "income": "Receita",
+      "pending": "pendente",
+      "patientsAttended": "Pacientes Atendidos",
+      "newInPeriod": "novos no período",
+      "attendanceRate": "Taxa de Comparecimento",
+      "cancellations": "cancelamentos",
+      "vsPrevious": "vs anterior"
+    },
+    "charts": {
+      "sessionsOverTime": {
+        "title": "Sessões ao Longo do Tempo",
+        "subtitle": "Evolução de sessões por período"
+      },
+      "sessionStatus": {
+        "title": "Status das Sessões",
+        "subtitle": "Distribuição por status"
+      },
+      "incomeOverTime": {
+        "title": "Receita ao Longo do Tempo",
+        "subtitle": "Recebimentos vs pendentes"
+      },
+      "paymentStatus": {
+        "title": "Status de Pagamentos",
+        "subtitle": "Distribuição de pagamentos"
+      },
+      "hourlyOccupancy": {
+        "title": "Ocupação por Hora",
+        "subtitle": "Horários mais demandados"
+      },
+      "dailyOccupancy": {
+        "title": "Ocupação por Dia",
+        "subtitle": "Dias mais ativos da semana"
+      },
+      "topPatients": {
+        "title": "Pacientes Frequentes",
+        "subtitle": "Top 5 pacientes com mais sessões"
+      }
+    },
+    "labels": {
+      "completed": "Concluídas",
+      "confirmed": "Confirmadas",
+      "pendingStatus": "Pendentes",
+      "cancelled": "Canceladas",
+      "paid": "Pagos",
+      "overdue": "Atrasados",
+      "total": "Total",
+      "collected": "Recebido",
+      "pendingAmount": "Pendente",
+      "sessions": "Sessões",
+      "sessionsLower": "sessões",
+      "weekNumber": "Semana {{number}}"
     }
   },
   "help": {
     "title": "Central de Ajuda",
-    "subtitle": "Como podemos ajudar você?",
+    "subtitle": "Encontre respostas para suas perguntas sobre o Lavenius",
     "searchPlaceholder": "Pesquisar na ajuda...",
     "faq": "Perguntas Frequentes",
     "contact": "Contato",
     "tutorials": "Tutoriais",
-    "documentation": "Documentação"
+    "documentation": "Documentação",
+    "backToCategories": "Voltar às categorias",
+    "backTo": "Voltar a {{category}}",
+    "article": "artigo",
+    "articles": "artigos",
+    "articleCount": "{{count}} artigo",
+    "articleCount_plural": "{{count}} artigos",
+    "relatedTopics": "Tópicos relacionados:",
+    "noResults": "Nenhum resultado encontrado para \"{{search}}\"",
+    "notFound": "Não encontrou o que procurava?",
+    "contactUs": "Entre em contato conosco em",
+    "categories": {
+      "agenda": {
+        "title": "Agenda",
+        "description": "Aprenda a gerenciar suas consultas",
+        "articles": {
+          "createSession": {
+            "title": "Criar uma nova consulta",
+            "content": "Para criar uma nova consulta:\n\n1. Vá para a seção **Agenda** no menu lateral\n2. Clique no botão **\"Nova Consulta\"**\n3. Selecione o paciente da lista\n4. Escolha a data e hora\n5. Selecione a modalidade (presencial ou remoto)\n6. Clique em **\"Salvar\"**\n\n**Dica:** Você também pode criar consultas clicando diretamente no calendário.",
+            "tags": ["consulta", "criar", "agendar", "sessão"]
+          },
+          "editSession": {
+            "title": "Editar ou cancelar uma consulta",
+            "content": "Para editar uma consulta existente:\n\n1. Encontre a consulta na lista ou calendário\n2. Clique no ícone de **editar** (lápis)\n3. Modifique os dados necessários\n4. Salve as alterações\n\nPara cancelar uma consulta, altere o status para \"Cancelada\" no drawer de edição.",
+            "tags": ["consulta", "editar", "cancelar", "modificar"]
+          },
+          "googleCalendar": {
+            "title": "Conectar Google Calendar",
+            "content": "Para sincronizar com o Google Calendar:\n\n1. Vá para **Configurações** no menu lateral\n2. Na seção \"Calendário\", clique em **\"Conectar Google Calendar\"**\n3. Autorize o aplicativo na janela popup\n4. Uma vez conectado, suas consultas serão sincronizadas automaticamente\n\n**Benefícios:**\n- Receba lembretes no seu celular\n- Seus pacientes recebem convites de calendário\n- Veja todos os seus eventos em um só lugar",
+            "tags": ["google", "calendar", "calendário", "sincronizar", "conectar"]
+          }
+        }
+      },
+      "pacientes": {
+        "title": "Pacientes",
+        "description": "Gestão de pacientes e fichas clínicas",
+        "articles": {
+          "createPatient": {
+            "title": "Registrar um novo paciente",
+            "content": "Para registrar um novo paciente:\n\n1. Vá para a seção **Pacientes** no menu lateral\n2. Clique em **\"Novo Paciente\"**\n3. Preencha os dados pessoais (nome, email, telefone)\n4. Adicione informações adicionais (plano de saúde, frequência de sessões)\n5. Clique em **\"Salvar\"**\n\n**Dica:** Você pode adicionar anotações iniciais no campo de observações.",
+            "tags": ["paciente", "criar", "registrar", "novo"]
+          },
+          "clinicalFile": {
+            "title": "Usar a ficha clínica",
+            "content": "A ficha clínica permite:\n\n- Ver o histórico completo do paciente\n- Registrar anotações de cada sessão\n- Consultar sessões passadas e futuras\n- Ver o status de pagamentos\n\nPara acessar, clique em **\"Ver ficha\"** no card do paciente ou em uma consulta na agenda.",
+            "tags": ["ficha", "clínica", "histórico", "anotações"]
+          },
+          "searchPatients": {
+            "title": "Pesquisar e filtrar pacientes",
+            "content": "Você pode pesquisar pacientes de várias formas:\n\n1. **Pesquisa por nome:** Use a barra de pesquisa\n2. **Filtro por modalidade:** Presencial, remoto ou misto\n3. **Filtro por frequência:** Semanal, quinzenal ou mensal\n4. **Sessões esta semana:** Mostra apenas pacientes com consultas próximas\n\nOs filtros podem ser combinados para resultados mais específicos.",
+            "tags": ["pesquisar", "filtrar", "pacientes", "modalidade"]
+          }
+        }
+      },
+      "cobros": {
+        "title": "Cobranças",
+        "description": "Controle de pagamentos e faturamento",
+        "articles": {
+          "registerPayment": {
+            "title": "Registrar um pagamento",
+            "content": "Para registrar um pagamento:\n\n1. Vá para a seção **Cobranças** no menu lateral\n2. Encontre a sessão pendente na aba \"Pendentes\"\n3. Clique em **\"Receber\"**\n4. Confirme o valor e método de pagamento\n5. Salve o pagamento\n\n**Dica:** Você também pode registrar pagamentos diretamente na ficha do paciente.",
+            "tags": ["pagamento", "receber", "registrar", "dinheiro"]
+          },
+          "paymentHistory": {
+            "title": "Ver histórico de pagamentos",
+            "content": "O histórico de pagamentos mostra:\n\n- Todos os pagamentos realizados\n- Data e valor de cada pagamento\n- Paciente associado\n- Descrição do pagamento\n\nVocê pode filtrar por intervalo de datas usando os filtros rápidos (semana, mês) ou selecionando datas personalizadas.",
+            "tags": ["histórico", "pagamentos", "ver", "filtrar"]
+          },
+          "sendReminder": {
+            "title": "Enviar lembrete de pagamento",
+            "content": "Para enviar um lembrete:\n\n1. Na aba \"Pendentes\", encontre a sessão\n2. Clique em **\"Lembrete\"**\n3. Revise a mensagem predefinida (você pode editá-la)\n4. Escolha enviar por WhatsApp ou copiar a mensagem\n\nA mensagem inclui automaticamente os dados da sessão e o valor.",
+            "tags": ["lembrete", "whatsapp", "mensagem", "receber"]
+          }
+        }
+      },
+      "configuracion": {
+        "title": "Configurações",
+        "description": "Personalize sua experiência",
+        "articles": {
+          "profile": {
+            "title": "Editar seu perfil",
+            "content": "Para editar seu perfil:\n\n1. Clique no seu nome no menu lateral\n2. Ou vá para a seção **Perfil**\n3. Modifique seus dados pessoais\n4. Salve as alterações\n\nVocê pode atualizar: nome, email e senha.",
+            "tags": ["perfil", "editar", "dados", "conta"]
+          },
+          "calendarConfig": {
+            "title": "Configurar calendário",
+            "content": "Na seção de Configurações você pode:\n\n- Conectar ou desconectar o Google Calendar\n- Ver o status da sincronização\n- Forçar uma sincronização manual\n\nA sincronização é bidirecional: as alterações no Lavenius aparecem no seu Google Calendar e vice-versa.",
+            "tags": ["calendário", "configurar", "google", "sincronizar"]
+          }
+        }
+      }
+    }
   },
   "landing": {
     "brand": "Lavenius",
@@ -884,12 +1105,42 @@
   },
   "onboarding": {
     "welcome": "Bem-vindo ao Lavenius!",
+    "welcomeDescription": "Sua nova ferramenta para gerenciar pacientes, agendar sessões e acompanhar sua prática terapêutica de forma simples e organizada.",
     "welcomeSubtitle": "Vamos guiá-lo pelos primeiros passos",
     "steps": {
       "profile": "Complete seu perfil",
       "firstPatient": "Adicione seu primeiro paciente",
       "firstSession": "Agende sua primeira sessão",
       "calendarSync": "Sincronize seu calendário"
+    },
+    "calendar": {
+      "title": "Conecte seu calendário",
+      "description": "Sincronize com o Google Calendar para agendar consultas automaticamente e receber lembretes. Seus pacientes também receberão convites.",
+      "connect": "Conectar Google Calendar",
+      "later": "Farei isso depois"
+    },
+    "patient": {
+      "title": "Registre seu primeiro paciente",
+      "description": "Comece adicionando seus pacientes para poder agendar sessões, fazer anotações clínicas e gerenciar seus pagamentos.",
+      "create": "Criar paciente",
+      "later": "Farei isso depois"
+    },
+    "complete": {
+      "title": "Tudo pronto!",
+      "description": "Agora você pode começar a usar o Lavenius. Lembre-se de que sempre pode acessar a ajuda no menu lateral se tiver dúvidas.",
+      "tip": "Dica:",
+      "tipText": "Use a seção",
+      "helpSection": "Ajuda",
+      "tipSuffix": "para ver tutoriais e resolver dúvidas frequentes."
+    },
+    "navigation": {
+      "close": "Fechar",
+      "back": "Voltar",
+      "next": "Próximo",
+      "start": "Começar"
+    },
+    "tip": {
+      "dismiss": "Descartar dica"
     },
     "skip": "Pular tutorial",
     "finish": "Finalizar"
@@ -927,5 +1178,71 @@
   "logout": {
     "confirmTitle": "Sair?",
     "confirmDescription": "Você está prestes a sair. Precisará entrar novamente para acessar sua conta."
+  },
+  "clinicalFile": {
+    "backToPatients": "Voltar aos Pacientes",
+    "highRisk": "ALTO RISCO",
+    "noHealthInsurance": "Sem plano de saúde",
+    "notRegistered": "Não cadastrado",
+    "noUpcomingAppointments": "Não há consultas próximas",
+    "defaultSession": "Sessão",
+    "scheduleAppointment": "Agendar Consulta",
+    "newNote": "Nova Anotação",
+    "noDiagnosis": "Sem diagnóstico registrado",
+    "noTreatment": "Sem tratamento registrado",
+    "noObservations": "Sem observações registradas",
+    "frequency": {
+      "weekly": "Semanal",
+      "biweekly": "Quinzenal",
+      "monthly": "Mensal",
+      "notSpecified": "Não especificada"
+    },
+    "fields": {
+      "phone": "Telefone",
+      "email": "Email",
+      "lastAppointment": "Última Consulta"
+    },
+    "sections": {
+      "contactInfo": "Informações de Contato",
+      "upcomingAppointments": "Próximas Consultas",
+      "diagnosis": "Diagnóstico",
+      "currentTreatment": "Tratamento Atual",
+      "observations": "Observações Clínicas",
+      "sessionNotes": "Anotações de Sessão"
+    },
+    "actions": {
+      "editPatient": "Editar informações do paciente",
+      "editInfo": "Editar informações",
+      "removeRisk": "Remover marcador de risco",
+      "markHighRisk": "Marcar como alto risco",
+      "sendWhatsApp": "Enviar WhatsApp"
+    },
+    "messages": {
+      "riskMarked": "Paciente marcado como alto risco",
+      "riskRemoved": "Marcador de risco removido",
+      "riskUpdateError": "Erro ao atualizar marcador",
+      "infoUpdateSuccess": "Informações atualizadas com sucesso",
+      "infoUpdateError": "Erro ao atualizar informações",
+      "appointmentCreateSuccess": "Consulta criada com sucesso",
+      "appointmentCreateError": "Erro ao criar consulta",
+      "noteUpdateSuccess": "Anotação atualizada com sucesso",
+      "noteCreateSuccess": "Anotação criada com sucesso",
+      "noteSaveError": "Erro ao salvar anotação",
+      "noteDeleteSuccess": "Anotação excluída com sucesso",
+      "noteDeleteError": "Erro ao excluir anotação",
+      "patientUpdateSuccess": "Paciente atualizado com sucesso",
+      "patientUpdateError": "Erro ao atualizar paciente",
+      "noPhone": "O paciente não tem número de telefone registrado"
+    },
+    "whatsapp": {
+      "defaultMessage": "Olá {{name}}! Estou entrando em contato do consultório. Como você está?"
+    },
+    "notes": {
+      "loadError": "Não foi possível carregar as anotações existentes",
+      "canCreateNew": "Você pode criar novas anotações normalmente.",
+      "tryAgainLater": "Tente novamente mais tarde.",
+      "retry": "Tentar novamente",
+      "noNotes": "Nenhuma anotação registrada para este paciente"
+    }
   }
 }

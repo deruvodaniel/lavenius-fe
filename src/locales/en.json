@@ -723,26 +723,247 @@
     }
   },
   "profile": {
-    "title": "Profile",
-    "subtitle": "Manage your personal information",
+    "title": "My Profile",
+    "subtitle": "Manage your professional information",
     "personalInfo": "Personal Information",
     "changePassword": "Change Password",
     "currentPassword": "Current password",
     "newPassword": "New password",
     "confirmNewPassword": "Confirm new password",
+    "avatar": {
+      "removePhoto": "Remove photo"
+    },
+    "professional": {
+      "title": "Professional Information",
+      "description": "Your professional practice data",
+      "specialty": "Specialty",
+      "specialtyPlaceholder": "E.g.: Clinical Psychologist, Cognitive-Behavioral Therapist...",
+      "bio": "Description / Bio",
+      "bioPlaceholder": "Tell your patients about yourself, your therapeutic approach and experience...",
+      "characters": "characters"
+    },
+    "contact": {
+      "title": "Contact Information",
+      "description": "How your patients can contact you",
+      "primaryPhone": "Primary Phone",
+      "alternativePhone": "Alternative Phone",
+      "email": "Email",
+      "website": "Website"
+    },
+    "location": {
+      "title": "Office Address",
+      "description": "Location where you see your patients",
+      "address": "Address",
+      "tip": "Tip: This address can be shared with patients for in-person sessions."
+    },
+    "social": {
+      "title": "Social Media",
+      "description": "Your professional social media profiles",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn"
+    },
+    "save": {
+      "unsavedChanges": "There are unsaved changes",
+      "saving": "Saving...",
+      "saveChanges": "Save Changes"
+    },
     "messages": {
       "updateSuccess": "Profile updated successfully",
-      "passwordChanged": "Password changed successfully"
+      "passwordChanged": "Password changed successfully",
+      "saveSuccess": "Profile saved successfully",
+      "saveError": "Error saving profile"
+    }
+  },
+  "analytics": {
+    "title": "Analytics",
+    "subtitle": "View your practice performance",
+    "loading": "Loading data...",
+    "refresh": "Refresh data",
+    "noData": "No data to display",
+    "timeRange": {
+      "week": "This week",
+      "month": "This month",
+      "quarter": "Last quarter",
+      "year": "This year"
+    },
+    "weekdays": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    },
+    "months": {
+      "jan": "Jan",
+      "feb": "Feb",
+      "mar": "Mar",
+      "apr": "Apr",
+      "may": "May",
+      "jun": "Jun",
+      "jul": "Jul",
+      "aug": "Aug",
+      "sep": "Sep",
+      "oct": "Oct",
+      "nov": "Nov",
+      "dec": "Dec"
+    },
+    "stats": {
+      "sessions": "Sessions",
+      "completed": "completed",
+      "income": "Income",
+      "pending": "pending",
+      "patientsAttended": "Patients Attended",
+      "newInPeriod": "new in period",
+      "attendanceRate": "Attendance Rate",
+      "cancellations": "cancellations",
+      "vsPrevious": "vs previous"
+    },
+    "charts": {
+      "sessionsOverTime": {
+        "title": "Sessions Over Time",
+        "subtitle": "Session evolution by period"
+      },
+      "sessionStatus": {
+        "title": "Session Status",
+        "subtitle": "Distribution by status"
+      },
+      "incomeOverTime": {
+        "title": "Income Over Time",
+        "subtitle": "Collected vs pending payments"
+      },
+      "paymentStatus": {
+        "title": "Payment Status",
+        "subtitle": "Payment distribution"
+      },
+      "hourlyOccupancy": {
+        "title": "Hourly Occupancy",
+        "subtitle": "Most demanded hours"
+      },
+      "dailyOccupancy": {
+        "title": "Daily Occupancy",
+        "subtitle": "Most active days of the week"
+      },
+      "topPatients": {
+        "title": "Frequent Patients",
+        "subtitle": "Top 5 patients with most sessions"
+      }
+    },
+    "labels": {
+      "completed": "Completed",
+      "confirmed": "Confirmed",
+      "pendingStatus": "Pending",
+      "cancelled": "Cancelled",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "total": "Total",
+      "collected": "Collected",
+      "pendingAmount": "Pending",
+      "sessions": "Sessions",
+      "sessionsLower": "sessions",
+      "weekNumber": "Week {{number}}"
     }
   },
   "help": {
     "title": "Help Center",
-    "subtitle": "How can we help you?",
+    "subtitle": "Find answers to your questions about Lavenius",
     "searchPlaceholder": "Search help...",
     "faq": "Frequently Asked Questions",
     "contact": "Contact",
     "tutorials": "Tutorials",
-    "documentation": "Documentation"
+    "documentation": "Documentation",
+    "backToCategories": "Back to categories",
+    "backTo": "Back to {{category}}",
+    "article": "article",
+    "articles": "articles",
+    "articleCount": "{{count}} article",
+    "articleCount_plural": "{{count}} articles",
+    "relatedTopics": "Related topics:",
+    "noResults": "No results found for \"{{search}}\"",
+    "notFound": "Didn't find what you were looking for?",
+    "contactUs": "Contact us at",
+    "categories": {
+      "agenda": {
+        "title": "Schedule",
+        "description": "Learn how to manage your appointments",
+        "articles": {
+          "createSession": {
+            "title": "Create a new appointment",
+            "content": "To create a new appointment:\n\n1. Go to the **Schedule** section from the sidebar\n2. Click the **\"New Appointment\"** button\n3. Select the patient from the list\n4. Choose the date and time\n5. Select the modality (in-person or remote)\n6. Click **\"Save\"**\n\n**Tip:** You can also create appointments by clicking directly on the calendar.",
+            "tags": ["appointment", "create", "schedule", "session"]
+          },
+          "editSession": {
+            "title": "Edit or cancel an appointment",
+            "content": "To edit an existing appointment:\n\n1. Find the appointment in the list or calendar\n2. Click the **edit** icon (pencil)\n3. Modify the necessary data\n4. Save the changes\n\nTo cancel an appointment, change the status to \"Cancelled\" from the edit drawer.",
+            "tags": ["appointment", "edit", "cancel", "modify"]
+          },
+          "googleCalendar": {
+            "title": "Connect Google Calendar",
+            "content": "To sync with Google Calendar:\n\n1. Go to **Settings** from the sidebar\n2. In the \"Calendar\" section, click **\"Connect Google Calendar\"**\n3. Authorize the application in the popup window\n4. Once connected, your appointments will sync automatically\n\n**Benefits:**\n- Receive reminders on your phone\n- Your patients receive calendar invitations\n- See all your events in one place",
+            "tags": ["google", "calendar", "sync", "connect"]
+          }
+        }
+      },
+      "pacientes": {
+        "title": "Patients",
+        "description": "Patient management and clinical files",
+        "articles": {
+          "createPatient": {
+            "title": "Register a new patient",
+            "content": "To register a new patient:\n\n1. Go to the **Patients** section from the sidebar\n2. Click **\"New Patient\"**\n3. Fill in the personal data (name, email, phone)\n4. Add additional information (health insurance, session frequency)\n5. Click **\"Save\"**\n\n**Tip:** You can add initial notes in the observations field.",
+            "tags": ["patient", "create", "register", "new"]
+          },
+          "clinicalFile": {
+            "title": "Using the clinical file",
+            "content": "The clinical file allows you to:\n\n- View the complete patient history\n- Record notes for each session\n- View past and future sessions\n- See payment status\n\nTo access it, click **\"View file\"** from the patient card or from an appointment in the schedule.",
+            "tags": ["file", "clinical", "history", "notes"]
+          },
+          "searchPatients": {
+            "title": "Search and filter patients",
+            "content": "You can search for patients in several ways:\n\n1. **Search by name:** Use the search bar\n2. **Filter by modality:** In-person, remote, or mixed\n3. **Filter by frequency:** Weekly, biweekly, or monthly\n4. **Sessions this week:** Show only patients with upcoming appointments\n\nFilters can be combined for more specific results.",
+            "tags": ["search", "filter", "patients", "modality"]
+          }
+        }
+      },
+      "cobros": {
+        "title": "Billing",
+        "description": "Payment and invoicing control",
+        "articles": {
+          "registerPayment": {
+            "title": "Register a payment",
+            "content": "To register a payment:\n\n1. Go to the **Billing** section from the sidebar\n2. Find the pending session in the \"Pending\" tab\n3. Click **\"Collect\"**\n4. Confirm the amount and payment method\n5. Save the payment\n\n**Tip:** You can also register payments directly from the patient file.",
+            "tags": ["payment", "collect", "register", "money"]
+          },
+          "paymentHistory": {
+            "title": "View payment history",
+            "content": "The payment history shows:\n\n- All payments made\n- Date and amount of each payment\n- Associated patient\n- Payment description\n\nYou can filter by date range using quick filters (week, month) or by selecting custom dates.",
+            "tags": ["history", "payments", "view", "filter"]
+          },
+          "sendReminder": {
+            "title": "Send payment reminder",
+            "content": "To send a reminder:\n\n1. In the \"Pending\" tab, find the session\n2. Click **\"Reminder\"**\n3. Review the predefined message (you can edit it)\n4. Choose to send via WhatsApp or copy the message\n\nThe message automatically includes the session data and amount.",
+            "tags": ["reminder", "whatsapp", "message", "collect"]
+          }
+        }
+      },
+      "configuracion": {
+        "title": "Settings",
+        "description": "Customize your experience",
+        "articles": {
+          "profile": {
+            "title": "Edit your profile",
+            "content": "To edit your profile:\n\n1. Click your name in the sidebar\n2. Or go to the **Profile** section\n3. Modify your personal data\n4. Save the changes\n\nYou can update: name, email, and password.",
+            "tags": ["profile", "edit", "data", "account"]
+          },
+          "calendarConfig": {
+            "title": "Configure calendar",
+            "content": "In the Settings section you can:\n\n- Connect or disconnect Google Calendar\n- View sync status\n- Force a manual sync\n\nSync is bidirectional: changes in Lavenius appear in your Google Calendar and vice versa.",
+            "tags": ["calendar", "configure", "google", "sync"]
+          }
+        }
+      }
+    }
   },
   "landing": {
     "brand": "Lavenius",
@@ -884,12 +1105,42 @@
   },
   "onboarding": {
     "welcome": "Welcome to Lavenius!",
+    "welcomeDescription": "Your new tool to manage patients, schedule sessions, and keep track of your therapeutic practice in a simple and organized way.",
     "welcomeSubtitle": "We'll guide you through the first steps",
     "steps": {
       "profile": "Complete your profile",
       "firstPatient": "Add your first patient",
       "firstSession": "Schedule your first session",
       "calendarSync": "Sync your calendar"
+    },
+    "calendar": {
+      "title": "Connect your calendar",
+      "description": "Sync with Google Calendar to automatically schedule appointments and receive reminders. Your patients will also receive invitations.",
+      "connect": "Connect Google Calendar",
+      "later": "I'll do it later"
+    },
+    "patient": {
+      "title": "Register your first patient",
+      "description": "Start by adding your patients so you can schedule sessions, keep clinical notes, and manage their payments.",
+      "create": "Create patient",
+      "later": "I'll do it later"
+    },
+    "complete": {
+      "title": "All set!",
+      "description": "You can now start using Lavenius. Remember that you can always access help from the sidebar if you have questions.",
+      "tip": "Tip:",
+      "tipText": "Use the",
+      "helpSection": "Help",
+      "tipSuffix": "section to see tutorials and answer common questions."
+    },
+    "navigation": {
+      "close": "Close",
+      "back": "Back",
+      "next": "Next",
+      "start": "Start"
+    },
+    "tip": {
+      "dismiss": "Dismiss tip"
     },
     "skip": "Skip tutorial",
     "finish": "Finish"
@@ -927,5 +1178,71 @@
   "logout": {
     "confirmTitle": "Log out?",
     "confirmDescription": "You are about to log out. You will need to log in again to access your account."
+  },
+  "clinicalFile": {
+    "backToPatients": "Back to Patients",
+    "highRisk": "HIGH RISK",
+    "noHealthInsurance": "No health insurance",
+    "notRegistered": "Not registered",
+    "noUpcomingAppointments": "No upcoming appointments",
+    "defaultSession": "Session",
+    "scheduleAppointment": "Schedule Appointment",
+    "newNote": "New Note",
+    "noDiagnosis": "No diagnosis recorded",
+    "noTreatment": "No treatment recorded",
+    "noObservations": "No observations recorded",
+    "frequency": {
+      "weekly": "Weekly",
+      "biweekly": "Biweekly",
+      "monthly": "Monthly",
+      "notSpecified": "Not specified"
+    },
+    "fields": {
+      "phone": "Phone",
+      "email": "Email",
+      "lastAppointment": "Last Appointment"
+    },
+    "sections": {
+      "contactInfo": "Contact Information",
+      "upcomingAppointments": "Upcoming Appointments",
+      "diagnosis": "Diagnosis",
+      "currentTreatment": "Current Treatment",
+      "observations": "Clinical Observations",
+      "sessionNotes": "Session Notes"
+    },
+    "actions": {
+      "editPatient": "Edit patient information",
+      "editInfo": "Edit information",
+      "removeRisk": "Remove risk marker",
+      "markHighRisk": "Mark as high risk",
+      "sendWhatsApp": "Send WhatsApp"
+    },
+    "messages": {
+      "riskMarked": "Patient marked as high risk",
+      "riskRemoved": "Risk marker removed",
+      "riskUpdateError": "Error updating marker",
+      "infoUpdateSuccess": "Information updated successfully",
+      "infoUpdateError": "Error updating information",
+      "appointmentCreateSuccess": "Appointment created successfully",
+      "appointmentCreateError": "Error creating appointment",
+      "noteUpdateSuccess": "Note updated successfully",
+      "noteCreateSuccess": "Note created successfully",
+      "noteSaveError": "Error saving note",
+      "noteDeleteSuccess": "Note deleted successfully",
+      "noteDeleteError": "Error deleting note",
+      "patientUpdateSuccess": "Patient updated successfully",
+      "patientUpdateError": "Error updating patient",
+      "noPhone": "Patient does not have a registered phone number"
+    },
+    "whatsapp": {
+      "defaultMessage": "Hi {{name}}! I'm writing from the office. How are you?"
+    },
+    "notes": {
+      "loadError": "Could not load existing notes",
+      "canCreateNew": "You can create new notes normally.",
+      "tryAgainLater": "Try again later.",
+      "retry": "Retry",
+      "noNotes": "No notes recorded for this patient"
+    }
   }
 }
