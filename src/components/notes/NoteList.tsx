@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { FileText } from 'lucide-react';
 import { NoteCard } from './NoteCard';
 import { EmptyState } from '../shared/EmptyState';
@@ -25,8 +26,10 @@ export function NoteList({
   onDelete, 
   onCreateNew,
   readOnly = false,
-  emptyMessage = 'No hay notas registradas'
+  emptyMessage
 }: NoteListProps) {
+  const { t } = useTranslation();
+  
   if (isLoading) {
     return <SkeletonNotes items={3} />;
   }
@@ -35,11 +38,11 @@ export function NoteList({
     return (
       <EmptyState
         icon={FileText}
-        title={emptyMessage}
-        description="Las notas se muestran ordenadas por fecha de creación"
+        title={emptyMessage || t('notes.emptyState.title')}
+        description={t('notes.emptyState.description')}
         variant="subtle"
         action={onCreateNew ? {
-          label: 'Crear primera nota',
+          label: t('notes.emptyState.createFirst'),
           onClick: onCreateNew
         } : undefined}
       />

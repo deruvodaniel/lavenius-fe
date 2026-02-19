@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FileText, Calendar, Trash2, Edit } from 'lucide-react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
@@ -18,6 +19,7 @@ interface NoteCardProps {
  * Displays a single note with edit/delete actions
  */
 export function NoteCard({ note, onEdit, onDelete, readOnly = false }: NoteCardProps) {
+  const { t } = useTranslation();
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const handleEdit = () => {
@@ -55,7 +57,7 @@ export function NoteCard({ note, onEdit, onDelete, readOnly = false }: NoteCardP
                   size="sm"
                   onClick={handleEdit}
                   className="h-7 w-7 p-0"
-                  aria-label="Editar nota"
+                  aria-label={t('notes.card.editNote')}
                 >
                   <Edit className="w-3.5 h-3.5" />
                 </Button>
@@ -66,7 +68,7 @@ export function NoteCard({ note, onEdit, onDelete, readOnly = false }: NoteCardP
                   size="sm"
                   onClick={handleDelete}
                   className="h-7 w-7 p-0 text-destructive hover:text-destructive"
-                  aria-label="Eliminar nota"
+                  aria-label={t('notes.card.deleteNote')}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>
@@ -88,7 +90,7 @@ export function NoteCard({ note, onEdit, onDelete, readOnly = false }: NoteCardP
           <div className="flex items-center gap-2 mt-3 pt-3 border-t">
             <FileText className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">
-              Editado: {formatDateTime(note.updatedAt)}
+              {t('notes.card.edited')} {formatDateTime(note.updatedAt)}
             </span>
           </div>
         )}
@@ -97,10 +99,10 @@ export function NoteCard({ note, onEdit, onDelete, readOnly = false }: NoteCardP
       <ConfirmDialog
         open={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}
-        title="Eliminar nota"
-        description="¿Estás seguro de eliminar esta nota? Esta acción no se puede deshacer."
-        confirmLabel="Eliminar"
-        cancelLabel="Cancelar"
+        title={t('notes.deleteConfirm.title')}
+        description={t('notes.deleteConfirm.description')}
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
         variant="danger"
         onConfirm={confirmDelete}
         onCancel={() => setDeleteConfirmOpen(false)}

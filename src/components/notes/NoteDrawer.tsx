@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, FileText, Calendar as CalendarIcon, Save } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
@@ -24,6 +25,7 @@ export function NoteDrawer({
   note, 
   patientId
 }: NoteDrawerProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     text: '',
     noteDate: new Date().toISOString(),
@@ -111,14 +113,14 @@ export function NoteDrawer({
             <div className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
               <h2 className="text-white text-xl">
-                {note ? 'Editar Nota' : 'Nueva Nota'}
+                {note ? t('notes.editNote') : t('notes.newNote')}
               </h2>
             </div>
             <button
               onClick={handleClose}
               className="text-indigo-200 hover:text-white transition-colors"
               disabled={isSaving}
-              aria-label="Cerrar"
+              aria-label={t('notes.drawer.closePanel')}
             >
               <X className="w-6 h-6" />
             </button>
@@ -131,7 +133,7 @@ export function NoteDrawer({
           <div>
             <label htmlFor="note-date" className="block text-gray-700 mb-2">
               <CalendarIcon className="w-4 h-4 inline mr-1" />
-              Fecha de la nota
+              {t('notes.drawer.noteDate')}
             </label>
             <input
               id="note-date"
@@ -152,18 +154,18 @@ export function NoteDrawer({
           {/* Note Content */}
           <div>
             <label htmlFor="note-content" className="block text-gray-700 mb-2">
-              Contenido de la nota
+              {t('notes.drawer.noteContent')}
             </label>
             <Textarea
               id="note-content"
               value={formData.text}
               onChange={(e) => setFormData({ ...formData, text: e.target.value })}
-              placeholder="Escribe aquí las observaciones de la sesión..."
+              placeholder={t('notes.drawer.placeholder')}
               className="min-h-[300px] resize-none"
               disabled={isSaving}
             />
             <p className="text-xs text-muted-foreground mt-2">
-              Esta nota se encriptará automáticamente para proteger la privacidad del paciente
+              {t('notes.drawer.encryptionNote')}
             </p>
           </div>
         </div>
@@ -175,7 +177,7 @@ export function NoteDrawer({
             onClick={handleClose}
             disabled={isSaving}
           >
-            Cancelar
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSave}
@@ -183,11 +185,11 @@ export function NoteDrawer({
             className="bg-indigo-600 hover:bg-indigo-700 text-white"
           >
             {isSaving ? (
-              'Guardando...'
+              t('notes.drawer.saving')
             ) : (
               <>
                 <Save className="w-4 h-4 mr-2" />
-                {note ? 'Actualizar' : 'Guardar'}
+                {note ? t('notes.drawer.update') : t('notes.drawer.save')}
               </>
             )}
           </Button>
