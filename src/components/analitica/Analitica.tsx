@@ -206,6 +206,8 @@ export function Analitica() {
 
   // Fetch all data on mount and when time range changes
   useEffect(() => {
+    let isMounted = true;
+    
     const loadData = async () => {
       setIsLoading(true);
       try {
@@ -223,17 +225,19 @@ export function Analitica() {
           current.setMonth(current.getMonth() + 1);
         }
         
-        // Fetch sessions for all months in parallel and aggregate results
+        // Fetch sessions for all months in parallel
         const sessionPromises = monthsToFetch.map(({ year, month }) => 
           sessionService.getMonthly(year, month)
         );
         
-        // Force refresh all data with date filters
+        // Fetch all data in parallel
         const [sessionsResults] = await Promise.all([
           Promise.all(sessionPromises),
           fetchPayments(true, { from: fromDate, to: toDate, limit: 1000 }),
           fetchPatients(),
         ]);
+        
+        if (!isMounted) return;
         
         // Flatten and deduplicate sessions by id
         const sessionsMap = new Map<string, SessionResponse>();
@@ -242,14 +246,22 @@ export function Analitica() {
             sessionsMap.set(session.id, session);
           }
         });
+        
         setAllSessions(Array.from(sessionsMap.values()));
       } catch (error) {
-        console.error('Error loading analytics data:', error);
+        console.error('[Analitica] Error loading data:', error);
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
+    
     loadData();
+    
+    return () => {
+      isMounted = false;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeRange, refreshKey]);
 

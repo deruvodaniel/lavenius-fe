@@ -4,6 +4,7 @@ import type {
   CreatePaymentDto,
   UpdatePaymentDto,
 } from '../types/api.types';
+import { PaymentStatus } from '../types/api.types';
 
 /**
  * Payment filter options for server-side filtering
@@ -86,46 +87,46 @@ class PaymentService {
    * @returns Normalized response with payments, pagination and totals
    */
   async getAll(filters?: PaymentFilters): Promise<NormalizedPaymentResponse> {
-    const params = new URLSearchParams();
+    // Backend doesn't support filters yet, just fetch all
+    const url = this.basePath;
     
-    if (filters?.from) {
-      params.append('from', filters.from);
-    }
-    if (filters?.to) {
-      params.append('to', filters.to);
-    }
-    if (filters?.search) {
-      params.append('search', filters.search);
-    }
-    if (filters?.page) {
-      params.append('page', filters.page.toString());
-    }
-    if (filters?.limit) {
-      params.append('limit', filters.limit.toString());
+    const response = await apiClient.get<Payment[] | BackendPaymentResponse>(url);
+    
+    // Handle both array response (current backend) and object response (future)
+    let paymentsData: Payment[];
+    
+    if (Array.isArray(response)) {
+      // Backend returns array directly
+      paymentsData = response;
+    } else if (response.payments?.data) {
+      // Backend returns paginated object
+      paymentsData = response.payments.data;
+    } else {
+      paymentsData = [];
     }
     
-    const queryString = params.toString();
-    const url = queryString ? `${this.basePath}?${queryString}` : this.basePath;
-    
-    const response = await apiClient.get<BackendPaymentResponse>(url);
-    
-    // Normalize the response - backend returns { payments: { data, pagination }, total, ... }
-    const paymentsData = response.payments?.data || [];
-    const paginationData = response.payments?.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 };
+    // Calculate totals from the data using PaymentStatus enum
+    const paidPayments = paymentsData.filter(p => p.status === PaymentStatus.PAID);
+    const pendingPayments = paymentsData.filter(p => p.status === PaymentStatus.PENDING);
+    const overduePayments = paymentsData.filter(p => p.status === PaymentStatus.OVERDUE);
     
     return {
       payments: paymentsData,
-      pagination: paginationData,
+      pagination: {
+        page: 1,
+        limit: paymentsData.length,
+        total: paymentsData.length,
+        totalPages: 1,
+      },
       totals: {
-        totalAmount: response.total || 0,
-        paidAmount: response.totalPaid || 0,
-        pendingAmount: response.totalPending || 0,
-        overdueAmount: response.totalOverdue || 0,
-        // Calculate counts from pagination
-        totalCount: paginationData.total || 0,
-        paidCount: 0, // Backend doesn't provide counts, will calculate from payments if needed
-        pendingCount: 0,
-        overdueCount: 0,
+        totalAmount: paymentsData.reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
+        paidAmount: paidPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
+        pendingAmount: pendingPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
+        overdueAmount: overduePayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
+        totalCount: paymentsData.length,
+        paidCount: paidPayments.length,
+        pendingCount: pendingPayments.length,
+        overdueCount: overduePayments.length,
       },
     };
   }
