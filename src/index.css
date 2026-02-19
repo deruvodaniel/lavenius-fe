@@ -62,29 +62,68 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Sonner toast close button - position inside toast on the right */
+/* ==========================================================================
+   Sonner Toast Overrides
+   ========================================================================== */
+
+/* Sonner toast - flex layout to position close button inside */
+/* padding-right: 12px (right margin) + 28px (button) + 8px (gap) = 48px */
+[data-sonner-toast] {
+  display: flex !important;
+  align-items: center !important;
+  padding-right: 48px !important;
+}
+
+/* Sonner toast close button - inside toast on the right, larger and visible */
 [data-sonner-toast] [data-close-button] {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  left: auto;
-  background: transparent;
-  border: none;
-  color: currentColor;
-  opacity: 0.5;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: opacity 0.2s, background-color 0.2s;
+  position: absolute !important;
+  right: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  left: auto !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: 6px !important;
+  color: currentColor !important;
+  opacity: 0.7 !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  transition: opacity 0.2s, background-color 0.2s, transform 0.15s !important;
 }
 
 [data-sonner-toast] [data-close-button]:hover {
-  opacity: 1;
-  background-color: rgba(0, 0, 0, 0.1);
+  opacity: 1 !important;
+  background: rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-50%) scale(1.05) !important;
+}
+
+[data-sonner-toast] [data-close-button]:active {
+  transform: translateY(-50%) scale(0.95) !important;
+}
+
+[data-sonner-toast] [data-close-button]:focus-visible {
+  opacity: 1 !important;
+  outline: 2px solid hsl(var(--ring)) !important;
+  outline-offset: 2px !important;
 }
 
 [data-sonner-toast] [data-close-button] svg {
-  width: 16px;
-  height: 16px;
+  width: 16px !important;
+  height: 16px !important;
+  stroke-width: 2.5px !important;
+}
+
+/* Dark mode adjustments for close button */
+.dark [data-sonner-toast] [data-close-button] {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.dark [data-sonner-toast] [data-close-button]:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
 }
