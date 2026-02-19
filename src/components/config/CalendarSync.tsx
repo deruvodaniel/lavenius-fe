@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { Button } from '../ui/button';
 import { Calendar as CalendarIcon, RefreshCw, Link2Off, CheckCircle2, Circle, ExternalLink, AlertTriangle, Loader2 } from 'lucide-react';
@@ -35,6 +36,7 @@ const ChecklistItem = ({ label, checked, isLoading, description }: ChecklistItem
 );
 
 export default function CalendarSync() {
+  const { t, i18n } = useTranslation();
   const {
     isConnected,
     isSyncing,
@@ -56,7 +58,8 @@ export default function CalendarSync() {
     if (!isoDate) return null;
     try {
       const date = new Date(isoDate);
-      return date.toLocaleDateString('es-AR', {
+      const locale = i18n.language === 'en' ? 'en-US' : i18n.language === 'pt' ? 'pt-BR' : 'es-AR';
+      return date.toLocaleDateString(locale, {
         day: 'numeric',
         month: 'short',
         hour: '2-digit',
@@ -83,28 +86,28 @@ export default function CalendarSync() {
               {syncStatus.hasToken && syncStatus.hasSessionsCalendar && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
                   <CheckCircle2 className="w-3 h-3" />
-                  Listo
+                  {t('settings.calendarSync.ready')}
                 </span>
               )}
               {syncStatus.hasToken && !syncStatus.hasSessionsCalendar && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
                   <AlertTriangle className="w-3 h-3" />
-                  Pendiente
+                  {t('settings.calendarSync.pending')}
                 </span>
               )}
               {!syncStatus.hasToken && !isCheckingConnection && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                   <Circle className="w-3 h-3" />
-                  Desconectado
+                  {t('settings.calendarSync.disconnected')}
                 </span>
               )}
             </div>
             <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
               {syncStatus.hasToken && syncStatus.hasSessionsCalendar
-                ? 'Tu calendario está completamente configurado'
+                ? t('settings.calendarSync.fullyConfigured')
                 : syncStatus.hasToken
-                ? 'Conectado - Sincroniza para crear el calendario de sesiones'
-                : 'Conecta tu cuenta de Google para sincronizar tus sesiones'}
+                ? t('settings.calendarSync.connectedSyncNeeded')
+                : t('settings.calendarSync.connectToSync')}
             </p>
           </div>
         </div>
@@ -115,30 +118,30 @@ export default function CalendarSync() {
         
         {/* Status Checklist */}
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-          <p className="text-sm font-medium text-gray-700 mb-2">Estado de configuración</p>
+          <p className="text-sm font-medium text-gray-700 mb-2">{t('settings.calendarSync.configurationStatus')}</p>
           <div className="divide-y divide-gray-100">
             <ChecklistItem
-              label="Cuenta de Google conectada"
+              label={t('settings.calendarSync.googleAccountConnected')}
               checked={syncStatus.hasToken}
               isLoading={isCheckingConnection}
-              description={syncStatus.hasToken ? 'Autorización completada' : 'Conecta tu cuenta de Google'}
+              description={syncStatus.hasToken ? t('settings.calendarSync.authCompleted') : t('settings.calendarSync.connectGoogle')}
             />
             <ChecklistItem
-              label="Calendario 'Sesiones' creado"
+              label={t('settings.calendarSync.sessionsCalendarCreated')}
               checked={syncStatus.hasSessionsCalendar}
               isLoading={isCheckingConnection}
               description={
                 syncStatus.hasSessionsCalendar 
-                  ? 'Calendario listo en tu Google Calendar' 
+                  ? t('settings.calendarSync.calendarReady')
                   : syncStatus.hasToken 
-                    ? 'Presiona "Sincronizar" para crearlo' 
-                    : 'Se creará al sincronizar'
+                    ? t('settings.calendarSync.pressSyncToCreate')
+                    : t('settings.calendarSync.willBeCreatedOnSync')
               }
             />
           </div>
           {lastSyncFormatted && (
             <p className="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-200">
-              Última sincronización: {lastSyncFormatted}
+              {t('settings.calendarSync.lastSync')}: {lastSyncFormatted}
             </p>
           )}
         </div>
@@ -151,7 +154,7 @@ export default function CalendarSync() {
             className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
           >
             <ExternalLink className="mr-2 h-4 w-4" />
-            Conectar Google Calendar
+            {t('settings.calendarSync.connect')}
           </Button>
         )}
 
@@ -163,7 +166,7 @@ export default function CalendarSync() {
               className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white"
             >
               <RefreshCw className={`mr-2 h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
-              {isSyncing ? 'Sincronizando...' : 'Sincronizar Ahora'}
+              {isSyncing ? t('settings.calendarSync.syncing') : t('settings.calendarSync.syncNow')}
             </Button>
 
             <Button
@@ -172,26 +175,26 @@ export default function CalendarSync() {
               className="flex-1 sm:flex-none text-gray-600 hover:text-red-600 hover:border-red-200 hover:bg-red-50"
             >
               <Link2Off className="mr-2 h-4 w-4" />
-              Desconectar
+              {t('settings.calendarSync.disconnect')}
             </Button>
           </div>
         )}
 
         {/* Info section */}
         <div className="bg-blue-50/50 border border-blue-100 rounded-lg p-4">
-          <p className="text-sm font-medium text-gray-700 mb-2">¿Qué se sincroniza?</p>
+          <p className="text-sm font-medium text-gray-700 mb-2">{t('settings.calendarSync.whatSyncs')}</p>
           <ul className="space-y-1.5">
             <li className="flex items-center gap-2 text-sm text-gray-600">
               <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
-              Todas tus sesiones agendadas
+              {t('settings.calendarSync.syncScheduledSessions')}
             </li>
             <li className="flex items-center gap-2 text-sm text-gray-600">
               <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
-              Cambios en horarios de sesiones
+              {t('settings.calendarSync.syncTimeChanges')}
             </li>
             <li className="flex items-center gap-2 text-sm text-gray-600">
               <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
-              Cancelación de sesiones
+              {t('settings.calendarSync.syncCancellations')}
             </li>
           </ul>
         </div>
@@ -201,11 +204,11 @@ export default function CalendarSync() {
           <div className="flex gap-3">
             <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-red-800">Sincronización unidireccional</p>
-              <p className="text-sm text-red-600 mt-1">
-                La sincronización funciona solo desde Lavenius hacia Google Calendar. 
-                Los cambios que realices directamente en Google Calendar <strong>no se reflejarán</strong> en la aplicación.
-              </p>
+              <p className="text-sm font-medium text-red-800">{t('settings.calendarSync.oneWaySync')}</p>
+              <p 
+                className="text-sm text-red-600 mt-1"
+                dangerouslySetInnerHTML={{ __html: t('settings.calendarSync.oneWaySyncWarning') }}
+              />
             </div>
           </div>
         </div>

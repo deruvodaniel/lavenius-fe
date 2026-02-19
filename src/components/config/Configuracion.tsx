@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, MessageCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, MessageCircle, Globe } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
+import { LanguageSwitcher } from '@/components/shared';
 
 // ============================================================================
 // SETTINGS STORAGE
@@ -12,24 +14,25 @@ import CalendarSync from './CalendarSync';
 const SETTINGS_KEY = 'lavenius_settings';
 
 // Days of the week (0 = Sunday, 1 = Monday, etc.)
-const WEEKDAYS = [
-  { id: 1, name: 'Lunes', short: 'L' },
-  { id: 2, name: 'Martes', short: 'M' },
-  { id: 3, name: 'Miércoles', short: 'X' },
-  { id: 4, name: 'Jueves', short: 'J' },
-  { id: 5, name: 'Viernes', short: 'V' },
-  { id: 6, name: 'Sábado', short: 'S' },
-  { id: 0, name: 'Domingo', short: 'D' },
+// Translations are handled via t() function
+const WEEKDAY_KEYS = [
+  { id: 1, nameKey: 'settings.weekdays.monday', shortKey: 'settings.weekdays.mon' },
+  { id: 2, nameKey: 'settings.weekdays.tuesday', shortKey: 'settings.weekdays.tue' },
+  { id: 3, nameKey: 'settings.weekdays.wednesday', shortKey: 'settings.weekdays.wed' },
+  { id: 4, nameKey: 'settings.weekdays.thursday', shortKey: 'settings.weekdays.thu' },
+  { id: 5, nameKey: 'settings.weekdays.friday', shortKey: 'settings.weekdays.fri' },
+  { id: 6, nameKey: 'settings.weekdays.saturday', shortKey: 'settings.weekdays.sat' },
+  { id: 0, nameKey: 'settings.weekdays.sunday', shortKey: 'settings.weekdays.sun' },
 ];
 
 // Día Off types
 type DiaOffTipo = 'full' | 'morning' | 'afternoon' | 'custom';
 
-const DIA_OFF_TIPOS: { value: DiaOffTipo; label: string; description: string }[] = [
-  { value: 'full', label: 'Todo el día', description: 'Sin atención' },
-  { value: 'morning', label: 'Mañana', description: '00:00 - 12:00' },
-  { value: 'afternoon', label: 'Tarde', description: '12:00 - 23:59' },
-  { value: 'custom', label: 'Rango horario', description: 'Personalizado' },
+const DIA_OFF_TIPO_KEYS: { value: DiaOffTipo; labelKey: string; descriptionKey: string }[] = [
+  { value: 'full', labelKey: 'settings.daysOff.fullDay', descriptionKey: 'settings.daysOff.noService' },
+  { value: 'morning', labelKey: 'settings.daysOff.morning', descriptionKey: '00:00 - 12:00' },
+  { value: 'afternoon', labelKey: 'settings.daysOff.afternoon', descriptionKey: '12:00 - 23:59' },
+  { value: 'custom', labelKey: 'settings.daysOff.customRange', descriptionKey: 'settings.daysOff.custom' },
 ];
 
 interface DiaOff {
@@ -121,16 +124,17 @@ interface ConfigSectionProps {
   description: string;
   children: React.ReactNode;
   comingSoon?: boolean;
+  comingSoonText?: string;
 }
 
-const ConfigSection = ({ icon: Icon, iconColor, iconBg, title, description, children, comingSoon }: ConfigSectionProps) => (
+const ConfigSection = ({ icon: Icon, iconColor, iconBg, title, description, children, comingSoon, comingSoonText = 'Coming soon' }: ConfigSectionProps) => (
   <Card className={`overflow-hidden relative bg-white ${comingSoon ? 'select-none' : ''}`}>
     {/* Coming Soon Overlay */}
     {comingSoon && (
       <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-[1px] z-10 flex items-center justify-center">
         <div className="bg-white/90 border border-gray-200 shadow-lg rounded-lg px-4 py-2 transform -rotate-3">
           <span className="text-sm font-bold text-gray-500 tracking-wider uppercase">
-            Proximamente
+            {comingSoonText}
           </span>
         </div>
       </div>
@@ -158,14 +162,15 @@ const ConfigSection = ({ icon: Icon, iconColor, iconBg, title, description, chil
 
 interface ComingSoonWrapperProps {
   children: React.ReactNode;
+  text?: string;
 }
 
-const ComingSoonWrapper = ({ children }: ComingSoonWrapperProps) => (
+const ComingSoonWrapper = ({ children, text = 'Coming soon' }: ComingSoonWrapperProps) => (
   <div className="relative select-none">
     <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
       <div className="bg-white/90 border border-gray-200 shadow-lg rounded-lg px-3 py-1.5 transform -rotate-2">
         <span className="text-xs font-bold text-gray-500 tracking-wider uppercase">
-          Proximamente
+          {text}
         </span>
       </div>
     </div>
@@ -207,6 +212,8 @@ const ToggleRow = ({ checked, onChange, label, description }: ToggleRowProps) =>
 // ============================================================================
 
 export function Configuracion() {
+  const { t, i18n } = useTranslation();
+  
   // Load settings from localStorage on mount
   const [settings, setSettings] = useState<AppSettings>(loadSettings);
   const [hasChanges, setHasChanges] = useState(false);
@@ -245,9 +252,9 @@ export function Configuracion() {
     try {
       saveSettings(settings);
       setHasChanges(false);
-      toast.success('Configuración guardada correctamente');
+      toast.success(t('settings.messages.saved'));
     } catch {
-      toast.error('Error al guardar la configuración');
+      toast.error(t('settings.messages.saveError'));
     } finally {
       setIsSaving(false);
     }
@@ -255,16 +262,16 @@ export function Configuracion() {
 
   const handleAddDiaOff = () => {
     if (!newDiaOff.fecha) {
-      toast.error('Selecciona una fecha');
+      toast.error(t('settings.messages.selectDate'));
       return;
     }
     if (newDiaOff.tipo === 'custom') {
       if (!newDiaOff.startTime || !newDiaOff.endTime) {
-        toast.error('Selecciona el rango horario');
+        toast.error(t('settings.messages.selectTimeRange'));
         return;
       }
       if (newDiaOff.startTime >= newDiaOff.endTime) {
-        toast.error('La hora de inicio debe ser menor a la hora de fin');
+        toast.error(t('settings.messages.startBeforeEnd'));
         return;
       }
     }
@@ -283,16 +290,17 @@ export function Configuracion() {
     updateSetting('diasOff', [...settings.diasOff, diaOffToAdd]);
     setNewDiaOff({ fecha: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
     setShowAddDiaOff(false);
-    toast.success('Día off agregado');
+    toast.success(t('settings.daysOff.added'));
   };
 
   const handleRemoveDiaOff = (id: number) => {
     updateSetting('diasOff', settings.diasOff.filter(d => d.id !== id));
-    toast.success('Día off eliminado');
+    toast.success(t('settings.daysOff.removed'));
   };
 
   const formatDateDisplay = (fecha: string) => {
-    return new Date(fecha + 'T00:00:00').toLocaleDateString('es-AR', {
+    const locale = i18n.language === 'en' ? 'en-US' : i18n.language === 'pt' ? 'pt-BR' : 'es-AR';
+    return new Date(fecha + 'T00:00:00').toLocaleDateString(locale, {
       weekday: 'short',
       day: 'numeric',
       month: 'short',
@@ -303,15 +311,15 @@ export function Configuracion() {
   const formatDiaOffTime = (dia: DiaOff): string => {
     switch (dia.tipo) {
       case 'full':
-        return 'Todo el día';
+        return t('settings.daysOff.fullDay');
       case 'morning':
-        return 'Mañana (00:00 - 12:00)';
+        return `${t('settings.daysOff.morning')} (00:00 - 12:00)`;
       case 'afternoon':
-        return 'Tarde (12:00 - 23:59)';
+        return `${t('settings.daysOff.afternoon')} (12:00 - 23:59)`;
       case 'custom':
         return `${dia.startTime} - ${dia.endTime}`;
       default:
-        return 'Todo el día';
+        return t('settings.daysOff.fullDay');
     }
   };
 
@@ -319,11 +327,22 @@ export function Configuracion() {
     <div className="p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Configuración</h1>
-        <p className="text-sm text-gray-500">Personaliza tu experiencia en Lavenius</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{t('settings.title')}</h1>
+        <p className="text-sm text-gray-500">{t('settings.subtitle')}</p>
       </div>
 
       <div className="space-y-4 sm:space-y-6">
+        {/* Language Section */}
+        <ConfigSection
+          icon={Globe}
+          iconColor="text-purple-600"
+          iconBg="bg-purple-100"
+          title={t('settings.language')}
+          description={t('settings.selectLanguage')}
+        >
+          <LanguageSwitcher showLabel={false} variant="dropdown" className="max-w-xs" />
+        </ConfigSection>
+
         {/* Google Calendar Sync */}
         <CalendarSync />
 
@@ -332,8 +351,8 @@ export function Configuracion() {
           icon={Calendar}
           iconColor="text-rose-600"
           iconBg="bg-rose-100"
-          title="Días Off"
-          description="Configura los días en los que no atenderás"
+          title={t('settings.daysOff.title')}
+          description={t('settings.daysOff.description')}
         >
           <div className="space-y-4">
             {/* Lista de días off */}
@@ -364,8 +383,8 @@ export function Configuracion() {
                     <button
                       onClick={() => handleRemoveDiaOff(dia.id)}
                       className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                      title="Eliminar"
-                      aria-label="Eliminar día off"
+                      title={t('common.delete')}
+                      aria-label={t('common.delete')}
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -375,8 +394,8 @@ export function Configuracion() {
             ) : (
               <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-200">
                 <Calendar className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">No hay días off configurados</p>
-                <p className="text-xs text-gray-400 mt-1">Agrega días para bloquearlos en tu agenda</p>
+                <p className="text-sm text-gray-500">{t('settings.daysOff.noDaysOff')}</p>
+                <p className="text-xs text-gray-400 mt-1">{t('settings.daysOff.noDaysOffHint')}</p>
               </div>
             )}
 
@@ -386,7 +405,7 @@ export function Configuracion() {
                 {/* Fecha y Motivo */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="diaoff-fecha" className="block text-xs font-medium text-gray-700 mb-1">Fecha</label>
+                    <label htmlFor="diaoff-fecha" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.date')}</label>
                     <input
                       id="diaoff-fecha"
                       type="date"
@@ -396,13 +415,13 @@ export function Configuracion() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="diaoff-motivo" className="block text-xs font-medium text-gray-700 mb-1">Motivo (opcional)</label>
+                    <label htmlFor="diaoff-motivo" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.reason')} ({t('common.optional')})</label>
                     <input
                       id="diaoff-motivo"
                       type="text"
                       value={newDiaOff.motivo}
                       onChange={(e) => setNewDiaOff({ ...newDiaOff, motivo: e.target.value })}
-                      placeholder="Ej: Feriado, Vacaciones..."
+                      placeholder={t('settings.daysOff.reasonPlaceholder')}
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
                     />
                   </div>
@@ -410,9 +429,9 @@ export function Configuracion() {
 
                 {/* Tipo de día off */}
                 <fieldset>
-                  <legend className="block text-xs font-medium text-gray-700 mb-2">Tipo de bloqueo</legend>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="radiogroup" aria-label="Tipo de bloqueo">
-                    {DIA_OFF_TIPOS.map((tipo) => (
+                  <legend className="block text-xs font-medium text-gray-700 mb-2">{t('settings.daysOff.blockType')}</legend>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="radiogroup" aria-label={t('settings.daysOff.blockType')}>
+                    {DIA_OFF_TIPO_KEYS.map((tipo) => (
                       <button
                         key={tipo.value}
                         type="button"
@@ -426,9 +445,9 @@ export function Configuracion() {
                         `}
                       >
                         <p className={`text-sm font-medium ${newDiaOff.tipo === tipo.value ? 'text-rose-700' : 'text-gray-900'}`}>
-                          {tipo.label}
+                          {t(tipo.labelKey)}
                         </p>
-                        <p className="text-xs text-gray-500">{tipo.description}</p>
+                        <p className="text-xs text-gray-500">{tipo.descriptionKey.startsWith('settings.') ? t(tipo.descriptionKey) : tipo.descriptionKey}</p>
                       </button>
                     ))}
                   </div>
@@ -438,7 +457,7 @@ export function Configuracion() {
                 {newDiaOff.tipo === 'custom' && (
                   <div className="flex flex-wrap items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
                     <div className="flex items-center gap-2">
-                      <label htmlFor="diaoff-start-time" className="text-sm text-gray-500">Desde</label>
+                      <label htmlFor="diaoff-start-time" className="text-sm text-gray-500">{t('common.from')}</label>
                       <input
                         id="diaoff-start-time"
                         type="time"
@@ -448,7 +467,7 @@ export function Configuracion() {
                       />
                     </div>
                     <div className="flex items-center gap-2">
-                      <label htmlFor="diaoff-end-time" className="text-sm text-gray-500">hasta</label>
+                      <label htmlFor="diaoff-end-time" className="text-sm text-gray-500">{t('common.to').toLowerCase()}</label>
                       <input
                         id="diaoff-end-time"
                         type="time"
@@ -469,7 +488,7 @@ export function Configuracion() {
                       setNewDiaOff({ fecha: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
                     }}
                   >
-                    Cancelar
+                    {t('common.cancel')}
                   </Button>
                   <Button
                     size="sm"
@@ -477,7 +496,7 @@ export function Configuracion() {
                     className="bg-indigo-600 hover:bg-indigo-700 text-white"
                   >
                     <Plus className="w-4 h-4 mr-1" />
-                    Agregar
+                    {t('common.add')}
                   </Button>
                 </div>
               </div>
@@ -489,7 +508,7 @@ export function Configuracion() {
                 className="w-full sm:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2 text-rose-600" />
-                Agregar Día Off
+                {t('settings.daysOff.addDayOff')}
               </Button>
             )}
           </div>
@@ -500,18 +519,18 @@ export function Configuracion() {
           icon={Clock}
           iconColor="text-indigo-600"
           iconBg="bg-indigo-100"
-          title="Horario Laboral"
-          description="Define tu horario de atención y días de trabajo"
+          title={t('settings.workingHours.title')}
+          description={t('settings.workingHours.description')}
         >
           <div className="space-y-6">
             {/* Horario de atención */}
             <fieldset className="space-y-3">
               <legend className="block text-sm font-medium text-gray-700">
-                Horario de atención
+                {t('settings.workingHours.schedule')}
               </legend>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <label htmlFor="working-hours-start" className="text-sm text-gray-500">Desde</label>
+                  <label htmlFor="working-hours-start" className="text-sm text-gray-500">{t('common.from')}</label>
                   <input
                     id="working-hours-start"
                     type="time"
@@ -524,7 +543,7 @@ export function Configuracion() {
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <label htmlFor="working-hours-end" className="text-sm text-gray-500">hasta</label>
+                  <label htmlFor="working-hours-end" className="text-sm text-gray-500">{t('common.to').toLowerCase()}</label>
                   <input
                     id="working-hours-end"
                     type="time"
@@ -542,10 +561,10 @@ export function Configuracion() {
             {/* Días de trabajo */}
             <fieldset className="space-y-3">
               <legend className="block text-sm font-medium text-gray-700">
-                Días de trabajo
+                {t('settings.workingHours.workingDays')}
               </legend>
-              <div className="flex flex-wrap gap-2" role="group" aria-label="Seleccionar días de trabajo">
-                {WEEKDAYS.map((day) => {
+              <div className="flex flex-wrap gap-2" role="group" aria-label={t('settings.workingHours.workingDays')}>
+                {WEEKDAY_KEYS.map((day) => {
                   const isSelected = settings.workingHours.workingDays.includes(day.id);
                   return (
                     <button
@@ -567,33 +586,33 @@ export function Configuracion() {
                           : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                         }
                       `}
-                      title={day.name}
-                      aria-label={day.name}
+                      title={t(day.nameKey)}
+                      aria-label={t(day.nameKey)}
                       aria-pressed={isSelected}
                     >
-                      {day.short}
+                      {t(day.shortKey)}
                     </button>
                   );
                 })}
               </div>
               <p className="text-xs text-gray-500">
-                Los días no seleccionados aparecerán bloqueados en tu calendario
+                {t('settings.workingHours.nonWorkingDaysHint')}
               </p>
             </fieldset>
 
             {/* Preview */}
             <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
               <p className="text-xs sm:text-sm text-indigo-800">
-                <span className="font-medium">Tu horario:</span>{' '}
+                <span className="font-medium">{t('settings.workingHours.yourSchedule')}:</span>{' '}
                 {settings.workingHours.workingDays.length > 0 ? (
                   <>
-                    {WEEKDAYS.filter(d => settings.workingHours.workingDays.includes(d.id))
-                      .map(d => d.name)
+                    {WEEKDAY_KEYS.filter(d => settings.workingHours.workingDays.includes(d.id))
+                      .map(d => t(d.nameKey))
                       .join(', ')}{' '}
-                    de {settings.workingHours.startTime} a {settings.workingHours.endTime}
+                    {t('common.from').toLowerCase()} {settings.workingHours.startTime} {t('common.to').toLowerCase()} {settings.workingHours.endTime}
                   </>
                 ) : (
-                  'No hay días de trabajo seleccionados'
+                  t('settings.workingHours.noWorkingDays')
                 )}
               </p>
             </div>
@@ -605,19 +624,19 @@ export function Configuracion() {
           icon={DollarSign}
           iconColor="text-orange-600"
           iconBg="bg-orange-100"
-          title="Recordatorios de Cobros"
-          description="Configura notificaciones y mensajes para cobros pendientes"
+          title={t('settings.paymentReminders.title')}
+          description={t('settings.paymentReminders.description')}
         >
           <div className="space-y-6">
             {/* Automatización - Coming Soon */}
-            <ComingSoonWrapper>
+            <ComingSoonWrapper text={t('common.comingSoon')}>
               <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700">Automatización de recordatorios</h3>
+                <h3 className="text-sm font-medium text-gray-700">{t('settings.paymentReminders.automation')}</h3>
                 <ToggleRow
                   checked={settings.recordatoriosCobros}
                   onChange={(v) => updateSetting('recordatoriosCobros', v)}
-                  label="Activar recordatorios automáticos de cobros pendientes"
-                  description="Te notificaremos cuando tengas turnos realizados sin marcar como cobrados"
+                  label={t('settings.paymentReminders.enableAuto')}
+                  description={t('settings.paymentReminders.enableAutoHint')}
                 />
 
                 {settings.recordatoriosCobros && (
@@ -625,7 +644,7 @@ export function Configuracion() {
                     {/* Frecuencia */}
                     <div className="space-y-2">
                       <label htmlFor="frecuencia-recordatorio" className="block text-sm font-medium text-gray-700">
-                        Frecuencia de recordatorio
+                        {t('settings.paymentReminders.frequency')}
                       </label>
                       <select
                         id="frecuencia-recordatorio"
@@ -633,16 +652,16 @@ export function Configuracion() {
                         onChange={(e) => updateSetting('frecuenciaRecordatorio', e.target.value)}
                         className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
                       >
-                        <option value="diario">Diariamente</option>
-                        <option value="semanal">Semanalmente (lunes)</option>
-                        <option value="quincenal">Cada 15 días</option>
+                        <option value="diario">{t('settings.paymentReminders.daily')}</option>
+                        <option value="semanal">{t('settings.paymentReminders.weekly')}</option>
+                        <option value="quincenal">{t('settings.paymentReminders.biweekly')}</option>
                       </select>
                     </div>
 
                     {/* Mínimo de turnos */}
                     <div className="space-y-2">
                       <label htmlFor="minimo-turnos" className="block text-sm font-medium text-gray-700">
-                        Recordar cuando haya al menos
+                        {t('settings.paymentReminders.minimumSessions')}
                       </label>
                       <div className="flex items-center gap-2">
                         <input
@@ -655,7 +674,7 @@ export function Configuracion() {
                           className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
                         />
                         <span className="text-sm text-gray-600">
-                          {settings.minimoTurnos === 1 ? 'turno sin cobrar' : 'turnos sin cobrar'}
+                          {settings.minimoTurnos === 1 ? t('settings.paymentReminders.sessionsUnpaid') : t('settings.paymentReminders.sessionsUnpaidPlural')}
                         </span>
                       </div>
                     </div>
@@ -663,7 +682,7 @@ export function Configuracion() {
                     {/* Preview */}
                     <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
                       <p className="text-xs sm:text-sm text-orange-800">
-                        <span className="font-medium">Ejemplo:</span> Tienes {settings.minimoTurnos} {settings.minimoTurnos === 1 ? 'turno' : 'turnos'} de la semana pasada sin marcar como {settings.minimoTurnos === 1 ? 'cobrado' : 'cobrados'}.
+                        <span className="font-medium">{t('settings.paymentReminders.example')}:</span> {t('settings.paymentReminders.exampleText', { count: settings.minimoTurnos })}
                       </p>
                     </div>
                   </div>
@@ -676,12 +695,12 @@ export function Configuracion() {
               <div className="flex items-center gap-2">
                 <MessageCircle className="w-4 h-4 text-green-600" />
                 <label htmlFor="whatsapp-payment-template" className="block text-sm font-medium text-gray-700">
-                  Mensaje de WhatsApp para recordatorio de pago
+                  {t('settings.paymentReminders.whatsappTemplate')}
                 </label>
               </div>
               <p className="text-xs text-gray-500">
-                Este mensaje se usará cuando envíes recordatorios de pago a tus pacientes.
-                Variables disponibles: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{monto}'}</code>
+                {t('settings.paymentReminders.whatsappTemplateHint')}{' '}
+                {t('settings.paymentReminders.variablesAvailable')}: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{monto}'}</code>
               </p>
               <textarea
                 id="whatsapp-payment-template"
@@ -692,7 +711,6 @@ export function Configuracion() {
                 })}
                 rows={3}
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                placeholder="Escribe tu mensaje de recordatorio de pago..."
               />
               <div className="flex justify-end">
                 <button
@@ -703,7 +721,7 @@ export function Configuracion() {
                   })}
                   className="text-xs text-indigo-600 hover:text-indigo-800"
                 >
-                  Restaurar mensaje por defecto
+                  {t('settings.paymentReminders.restoreDefault')}
                 </button>
               </div>
             </div>
@@ -715,19 +733,19 @@ export function Configuracion() {
           icon={Bell}
           iconColor="text-blue-600"
           iconBg="bg-blue-100"
-          title="Recordatorios de Turnos"
-          description="Configura notificaciones y mensajes para turnos de pacientes"
+          title={t('settings.appointmentReminders.title')}
+          description={t('settings.appointmentReminders.description')}
         >
           <div className="space-y-6">
             {/* Automatización - Coming Soon */}
-            <ComingSoonWrapper>
+            <ComingSoonWrapper text={t('common.comingSoon')}>
               <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700">Automatización de recordatorios</h3>
+                <h3 className="text-sm font-medium text-gray-700">{t('settings.appointmentReminders.automation')}</h3>
                 <ToggleRow
                   checked={settings.recordatoriosPacientes}
                   onChange={(v) => updateSetting('recordatoriosPacientes', v)}
-                  label="Activar recordatorios automáticos para pacientes"
-                  description="Te avisaremos cuando sea momento de recordar a tus pacientes sus turnos"
+                  label={t('settings.appointmentReminders.enableAuto')}
+                  description={t('settings.appointmentReminders.enableAutoHint')}
                 />
 
                 {settings.recordatoriosPacientes && (
@@ -735,7 +753,7 @@ export function Configuracion() {
                     {/* Horas de anticipación */}
                     <div className="space-y-2">
                       <label htmlFor="horas-anticipacion" className="block text-sm font-medium text-gray-700">
-                        Horas de anticipación
+                        {t('settings.appointmentReminders.hoursBeforeLabel')}
                       </label>
                       <div className="flex items-center gap-2">
                         <input
@@ -747,14 +765,14 @@ export function Configuracion() {
                           onChange={(e) => updateSetting('horasAnticipacion', Number(e.target.value))}
                           className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
                         />
-                        <span className="text-sm text-gray-600">horas antes del turno</span>
+                        <span className="text-sm text-gray-600">{t('settings.appointmentReminders.hoursBeforeAppointment')}</span>
                       </div>
                     </div>
 
                     {/* Preview */}
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <p className="text-xs sm:text-sm text-blue-800">
-                        <span className="font-medium">Ejemplo:</span> Recordatorio para paciente con turno en {settings.horasAnticipacion} {settings.horasAnticipacion === 1 ? 'hora' : 'horas'}.
+                        <span className="font-medium">{t('settings.appointmentReminders.example')}:</span> {t('settings.appointmentReminders.exampleText', { hours: settings.horasAnticipacion })}
                       </p>
                     </div>
                   </div>
@@ -767,12 +785,12 @@ export function Configuracion() {
               <div className="flex items-center gap-2">
                 <MessageCircle className="w-4 h-4 text-green-600" />
                 <label htmlFor="whatsapp-turno-template" className="block text-sm font-medium text-gray-700">
-                  Mensaje de WhatsApp para recordatorio de turno
+                  {t('settings.appointmentReminders.whatsappTemplate')}
                 </label>
               </div>
               <p className="text-xs text-gray-500">
-                Este mensaje se usará cuando envíes recordatorios de turno a tus pacientes.
-                Variables disponibles: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{hora}'}</code>
+                {t('settings.appointmentReminders.whatsappTemplateHint')}{' '}
+                {t('settings.paymentReminders.variablesAvailable')}: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{hora}'}</code>
               </p>
               <textarea
                 id="whatsapp-turno-template"
@@ -783,7 +801,6 @@ export function Configuracion() {
                 })}
                 rows={3}
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                placeholder="Escribe tu mensaje de recordatorio de turno..."
               />
               <div className="flex justify-end">
                 <button
@@ -794,7 +811,7 @@ export function Configuracion() {
                   })}
                   className="text-xs text-indigo-600 hover:text-indigo-800"
                 >
-                  Restaurar mensaje por defecto
+                  {t('settings.paymentReminders.restoreDefault')}
                 </button>
               </div>
             </div>
@@ -804,7 +821,7 @@ export function Configuracion() {
         {/* Botón Guardar */}
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
           {hasChanges && (
-            <span className="text-sm text-amber-600">Hay cambios sin guardar</span>
+            <span className="text-sm text-amber-600">{t('common.unsavedChanges')}</span>
           )}
           <Button 
             onClick={handleSave}
@@ -812,7 +829,7 @@ export function Configuracion() {
             className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save className="w-4 h-4 mr-2" />
-            {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+            {isSaving ? t('common.saving') : t('common.save')}
           </Button>
         </div>
       </div>
