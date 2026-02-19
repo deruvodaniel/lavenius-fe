@@ -209,13 +209,16 @@ export function Analitica() {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const { start } = getDateRange(timeRange);
-        const now = new Date();
+        const { start, end } = getDateRange(timeRange);
+        
+        // Format dates for API (YYYY-MM-DD)
+        const fromDate = start.toISOString().split('T')[0];
+        const toDate = end.toISOString().split('T')[0];
         
         // Fetch monthly sessions for each month in the range
         const monthsToFetch: { year: number; month: number }[] = [];
         const current = new Date(start);
-        while (current <= now) {
+        while (current <= end) {
           monthsToFetch.push({ year: current.getFullYear(), month: current.getMonth() + 1 });
           current.setMonth(current.getMonth() + 1);
         }
@@ -225,11 +228,11 @@ export function Analitica() {
           sessionService.getMonthly(year, month)
         );
         
-        // Force refresh all data - don't use cached data
+        // Force refresh all data with date filters
         const [sessionsResults] = await Promise.all([
           Promise.all(sessionPromises),
-          fetchPayments(true),  // true = forceRefresh
-          fetchPatients(),      // Always fetches fresh from server
+          fetchPayments(true, { from: fromDate, to: toDate, limit: 1000 }),
+          fetchPatients(),
         ]);
         
         // Flatten and deduplicate sessions by id
