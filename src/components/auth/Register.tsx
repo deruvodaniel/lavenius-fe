@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import { UserPlus, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/lib/hooks';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import type { TFunction } from 'i18next';
 
 // Password validation rules
 const passwordRules = {
@@ -21,38 +23,43 @@ const passwordRules = {
   hasSpecial: /[!@#$%^&*(),.?":{}|<>]/,
 };
 
-const registerSchema = z.object({
-  email: z.string()
-    .min(1, 'El email es requerido')
-    .email('Ingresa un email válido (ej: usuario@dominio.com)'),
-  password: z.string()
-    .min(passwordRules.minLength, `La contraseña debe tener al menos ${passwordRules.minLength} caracteres`)
-    .regex(passwordRules.hasUppercase, 'Debe incluir al menos una letra mayúscula')
-    .regex(passwordRules.hasLowercase, 'Debe incluir al menos una letra minúscula')
-    .regex(passwordRules.hasNumber, 'Debe incluir al menos un número')
-    .regex(passwordRules.hasSpecial, 'Debe incluir al menos un carácter especial (!@#$%^&*...)'),
-  passphrase: z.string()
-    .min(6, 'La passphrase debe tener al menos 6 caracteres'),
-  firstName: z.string()
-    .min(1, 'El nombre es requerido')
-    .min(2, 'El nombre debe tener al menos 2 caracteres'),
-  lastName: z.string()
-    .min(1, 'El apellido es requerido')
-    .min(2, 'El apellido debe tener al menos 2 caracteres'),
-  phone: z.string().optional(),
-  licenseNumber: z.string().optional(),
-});
+// Create schema with translations
+function createRegisterSchema(t: TFunction) {
+  return z.object({
+    email: z.string()
+      .min(1, t('auth.validation.emailRequired'))
+      .email(t('auth.validation.emailInvalid')),
+    password: z.string()
+      .min(passwordRules.minLength, t('auth.validation.passwordMinLength', { count: passwordRules.minLength }))
+      .regex(passwordRules.hasUppercase, t('auth.validation.passwordUppercase'))
+      .regex(passwordRules.hasLowercase, t('auth.validation.passwordLowercase'))
+      .regex(passwordRules.hasNumber, t('auth.validation.passwordNumber'))
+      .regex(passwordRules.hasSpecial, t('auth.validation.passwordSpecial')),
+    passphrase: z.string()
+      .min(6, t('auth.validation.passphraseMinLength', { count: 6 })),
+    firstName: z.string()
+      .min(1, t('auth.validation.firstNameRequired'))
+      .min(2, t('auth.validation.firstNameMinLength', { count: 2 })),
+    lastName: z.string()
+      .min(1, t('auth.validation.lastNameRequired'))
+      .min(2, t('auth.validation.lastNameMinLength', { count: 2 })),
+    phone: z.string().optional(),
+    licenseNumber: z.string().optional(),
+  });
+}
 
-type RegisterFormData = z.infer<typeof registerSchema>;
+type RegisterFormData = z.infer<ReturnType<typeof createRegisterSchema>>;
 
 // Password strength indicator component
 function PasswordStrengthIndicator({ password }: { password: string }) {
+  const { t } = useTranslation();
+  
   const checks = [
-    { label: `Mínimo ${passwordRules.minLength} caracteres`, valid: password.length >= passwordRules.minLength },
-    { label: 'Una letra mayúscula (A-Z)', valid: passwordRules.hasUppercase.test(password) },
-    { label: 'Una letra minúscula (a-z)', valid: passwordRules.hasLowercase.test(password) },
-    { label: 'Un número (0-9)', valid: passwordRules.hasNumber.test(password) },
-    { label: 'Un carácter especial (!@#$%...)', valid: passwordRules.hasSpecial.test(password) },
+    { label: t('auth.passwordRequirements.minLength', { count: passwordRules.minLength }), valid: password.length >= passwordRules.minLength },
+    { label: t('auth.passwordRequirements.uppercase'), valid: passwordRules.hasUppercase.test(password) },
+    { label: t('auth.passwordRequirements.lowercase'), valid: passwordRules.hasLowercase.test(password) },
+    { label: t('auth.passwordRequirements.number'), valid: passwordRules.hasNumber.test(password) },
+    { label: t('auth.passwordRequirements.special'), valid: passwordRules.hasSpecial.test(password) },
   ];
 
   const validCount = checks.filter(c => c.valid).length;
@@ -63,7 +70,7 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
   return (
     <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
       <p className="text-xs font-medium text-gray-700 mb-2">
-        Requisitos de contraseña:
+        {t('auth.passwordRequirements.title')}
       </p>
       <ul className="space-y-1">
         {checks.map((check, index) => (
@@ -81,7 +88,7 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
       </ul>
       {allValid && (
         <p className="mt-2 text-xs text-green-600 font-medium">
-          ¡Contraseña segura!
+          {t('auth.passwordRequirements.secure')}
         </p>
       )}
     </div>
@@ -89,9 +96,13 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
 }
 
 export function Register() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { register, isLoading, clearError } = useAuth();
   const [watchPassword, setWatchPassword] = useState('');
+
+  // Memoize schema to recreate only when language changes
+  const registerSchema = useMemo(() => createRegisterSchema(t), [t]);
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -110,30 +121,30 @@ export function Register() {
     clearError();
     try {
       await register(data);
-      toast.success('¡Cuenta creada exitosamente!', {
-        description: 'Ahora puedes iniciar sesión con tus credenciales'
+      toast.success(t('auth.accountCreated'), {
+        description: t('auth.loginToContinue')
       });
       navigate('/login?registered=true');
     } catch (err: any) {
-      const errorMsg = err?.message || 'Error al registrar usuario';
+      const errorMsg = err?.message || '';
       const errorMsgLower = errorMsg.toLowerCase();
       
       // Provide specific user-friendly messages
       if (errorMsgLower.includes('email') && (errorMsgLower.includes('exist') || errorMsgLower.includes('registrado') || errorMsgLower.includes('duplicate'))) {
-        toast.error('Este email ya está registrado', {
-          description: '¿Ya tienes cuenta? Intenta iniciar sesión.'
+        toast.error(t('auth.errors.emailExists'), {
+          description: t('auth.errors.emailExistsHint')
         });
-      } else if (errorMsgLower.includes('password') || errorMsgLower.includes('contraseña')) {
-        toast.error('Error en la contraseña', {
+      } else if (errorMsgLower.includes('password') || errorMsgLower.includes('contraseña') || errorMsgLower.includes('senha')) {
+        toast.error(t('auth.errors.passwordError'), {
           description: errorMsg
         });
-      } else if (errorMsgLower.includes('validation') || errorMsgLower.includes('validación')) {
-        toast.error('Error de validación', {
-          description: 'Por favor revisa que todos los campos estén correctos'
+      } else if (errorMsgLower.includes('validation') || errorMsgLower.includes('validación') || errorMsgLower.includes('validação')) {
+        toast.error(t('auth.errors.validationError'), {
+          description: t('auth.errors.validationErrorHint')
         });
       } else {
-        toast.error('Error al crear cuenta', {
-          description: 'Hubo un problema. Por favor intenta nuevamente.'
+        toast.error(t('auth.errors.createAccountError'), {
+          description: t('auth.errors.createAccountErrorHint')
         });
       }
       console.error('Registration failed:', err);
@@ -150,10 +161,10 @@ export function Register() {
             </div>
           </div>
           <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Crear Cuenta
+            {t('auth.createAccount')}
           </CardTitle>
           <CardDescription className="text-center text-gray-600 text-base">
-            Regístrate en la plataforma de gestión psicológica
+            {t('auth.platformDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-2">
@@ -165,12 +176,12 @@ export function Register() {
                   name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700 font-medium">Nombre</FormLabel>
+                      <FormLabel className="text-gray-700 font-medium">{t('auth.firstName')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="text"
-                          placeholder="Juan"
+                          placeholder={t('auth.enterFirstName')}
                           disabled={isLoading}
                           className="h-11"
                         />
@@ -185,12 +196,12 @@ export function Register() {
                   name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700 font-medium">Apellido</FormLabel>
+                      <FormLabel className="text-gray-700 font-medium">{t('auth.lastName')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="text"
-                          placeholder="Pérez"
+                          placeholder={t('auth.enterLastName')}
                           disabled={isLoading}
                           className="h-11"
                         />
@@ -206,12 +217,12 @@ export function Register() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">Email</FormLabel>
+                    <FormLabel className="text-gray-700 font-medium">{t('auth.email')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="email"
-                        placeholder="doctor@clinica.com"
+                        placeholder={t('auth.enterEmail')}
                         disabled={isLoading}
                         className="h-11"
                       />
@@ -227,12 +238,12 @@ export function Register() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700 font-medium">Teléfono (opcional)</FormLabel>
+                      <FormLabel className="text-gray-700 font-medium">{t('auth.phoneOptional')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="tel"
-                          placeholder="+54 11 1234-5678"
+                          placeholder={t('auth.enterPhone')}
                           disabled={isLoading}
                           className="h-11"
                         />
@@ -247,12 +258,12 @@ export function Register() {
                   name="licenseNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700 font-medium">Matrícula (opcional)</FormLabel>
+                      <FormLabel className="text-gray-700 font-medium">{t('auth.licenseNumberOptional')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="text"
-                          placeholder="MN 12345"
+                          placeholder={t('auth.enterLicense')}
                           disabled={isLoading}
                           className="h-11"
                         />
@@ -268,11 +279,11 @@ export function Register() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">Contraseña</FormLabel>
+                    <FormLabel className="text-gray-700 font-medium">{t('auth.password')}</FormLabel>
                     <FormControl>
                       <PasswordInput
                         {...field}
-                        placeholder="••••••••"
+                        placeholder={t('auth.enterPassword')}
                         disabled={isLoading}
                         className="h-11"
                         onChange={(e) => {
@@ -293,19 +304,19 @@ export function Register() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-gray-700 font-medium">
-                      Passphrase (Encriptación)
+                      {t('auth.passphrase')}
                     </FormLabel>
                     <FormControl>
                       <PasswordInput
                         {...field}
-                        placeholder="••••••••"
+                        placeholder={t('auth.enterPassword')}
                         disabled={isLoading}
                         className="h-11"
                       />
                     </FormControl>
                     <FormMessage />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Esta frase se usará para cifrar los datos sensibles de tus pacientes. <strong>No la olvides</strong>, no podrá ser recuperada.
+                      {t('auth.passphraseHelp')} <strong>{t('auth.passphraseWarning')}</strong>, {t('auth.passphraseCannotRecover')}
                     </p>
                   </FormItem>
                 )}
@@ -316,7 +327,7 @@ export function Register() {
                 className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium shadow-lg hover:shadow-xl transition-all"
                 disabled={isLoading}
               >
-                {isLoading ? 'Registrando...' : 'Crear Cuenta'}
+                {isLoading ? t('auth.registering') : t('auth.createAccount')}
               </Button>
 
               <div className="text-center mt-4">
@@ -326,7 +337,7 @@ export function Register() {
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                   disabled={isLoading}
                 >
-                  ¿Ya tienes cuenta? <span className="font-semibold">Inicia sesión</span>
+                  {t('auth.hasAccount')} <span className="font-semibold">{t('auth.loginHere')}</span>
                 </button>
               </div>
             </form>

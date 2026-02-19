@@ -1,5 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { User, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,7 @@ import { useEffect, useState } from 'react';
 import type { LoginDto } from '@/lib/types/api.types';
 
 export function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { login, isLoading, error: _error, clearError } = useAuth();
@@ -20,11 +22,11 @@ export function Login() {
   // Show success message if coming from registration
   useEffect(() => {
     if (searchParams.get('registered') === 'true') {
-      toast.success('¡Cuenta creada exitosamente!', {
-        description: 'Ahora puedes iniciar sesión con tus credenciales'
+      toast.success(t('auth.accountCreated'), {
+        description: t('auth.loginToContinue')
       });
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   const form = useForm<LoginDto>({
     defaultValues: {
@@ -42,10 +44,10 @@ export function Login() {
     
     try {
       await login(data);
-      toast.success('¡Bienvenido!');
+      toast.success(t('auth.welcomeBack'));
       navigate('/dashboard');
     } catch (err: any) {
-      const errorMsg = err?.message || 'Error al iniciar sesión';
+      const errorMsg = err?.message || t('auth.loginError');
       const errorMsgLower = errorMsg.toLowerCase();
       
       // Check if error indicates user doesn't exist or invalid credentials
@@ -59,8 +61,8 @@ export function Login() {
       
       if (isAuthError) {
         setShowSignupPrompt(true);
-        toast.error('Credenciales incorrectas', {
-          description: '¿No tienes cuenta? Regístrate para comenzar.'
+        toast.error(t('auth.invalidCredentials'), {
+          description: t('auth.invalidCredentialsHint')
         });
       } else {
         toast.error(errorMsg);
@@ -78,10 +80,10 @@ export function Login() {
             </div>
           </div>
           <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Lavenius
+            {t('landing.brand')}
           </CardTitle>
           <CardDescription className="text-center text-gray-600 text-base">
-            Plataforma de gestión psicológica
+            {t('auth.platformDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-2">
@@ -92,12 +94,12 @@ export function Login() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">Email</FormLabel>
+                    <FormLabel className="text-gray-700 font-medium">{t('auth.email')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="email"
-                        placeholder="doctor@clinica.com"
+                        placeholder={t('auth.enterEmail')}
                         disabled={isLoading}
                         className="h-11"
                       />
@@ -112,11 +114,11 @@ export function Login() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">Contraseña</FormLabel>
+                    <FormLabel className="text-gray-700 font-medium">{t('auth.password')}</FormLabel>
                     <FormControl>
                       <PasswordInput
                         {...field}
-                        placeholder="••••••••"
+                        placeholder={t('auth.enterPassword')}
                         disabled={isLoading}
                         className="h-11"
                       />
@@ -131,11 +133,11 @@ export function Login() {
                 name="passphrase"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">Passphrase (Encriptación)</FormLabel>
+                    <FormLabel className="text-gray-700 font-medium">{t('auth.passphrase')}</FormLabel>
                     <FormControl>
                       <PasswordInput
                         {...field}
-                        placeholder="••••••••"
+                        placeholder={t('auth.enterPassword')}
                         disabled={isLoading}
                         className="h-11"
                       />
@@ -150,14 +152,14 @@ export function Login() {
                 className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium shadow-lg hover:shadow-xl transition-all"
                 disabled={isLoading}
               >
-                {isLoading ? 'Ingresando...' : 'Ingresar'}
+                {isLoading ? t('auth.loggingIn') : t('auth.login')}
               </Button>
 
               {/* Signup prompt when auth fails */}
               {showSignupPrompt && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
                   <p className="text-amber-800 text-sm">
-                    ¿Es tu primera vez? Necesitas crear una cuenta para comenzar.
+                    {t('auth.firstTime')}
                   </p>
                   <Button
                     type="button"
@@ -165,7 +167,7 @@ export function Login() {
                     className="w-full h-10 bg-amber-500 hover:bg-amber-600 text-white font-medium"
                   >
                     <UserPlus className="w-4 h-4 mr-2" />
-                    Crear cuenta nueva
+                    {t('auth.createNewAccount')}
                   </Button>
                 </div>
               )}
@@ -177,7 +179,7 @@ export function Login() {
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                   disabled={isLoading}
                 >
-                  ¿No tienes cuenta? <span className="font-semibold">Regístrate aquí</span>
+                  {t('auth.noAccount')} <span className="font-semibold">{t('auth.registerHere')}</span>
                 </button>
               </div>
             </form>
