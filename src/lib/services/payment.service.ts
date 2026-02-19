@@ -87,8 +87,27 @@ class PaymentService {
    * @returns Normalized response with payments, pagination and totals
    */
   async getAll(filters?: PaymentFilters): Promise<NormalizedPaymentResponse> {
-    // Backend doesn't support filters yet, just fetch all
-    const url = this.basePath;
+    // Build query params for backend filters
+    const params = new URLSearchParams();
+    
+    if (filters?.from) {
+      params.append('from', filters.from);
+    }
+    if (filters?.to) {
+      params.append('to', filters.to);
+    }
+    if (filters?.search) {
+      params.append('search', filters.search);
+    }
+    if (filters?.page) {
+      params.append('page', filters.page.toString());
+    }
+    if (filters?.limit) {
+      params.append('limit', filters.limit.toString());
+    }
+    
+    const queryString = params.toString();
+    const url = queryString ? `${this.basePath}?${queryString}` : this.basePath;
     
     const response = await apiClient.get<Payment[] | BackendPaymentResponse>(url);
     
@@ -171,16 +190,9 @@ class PaymentService {
 
   /**
    * Update an existing payment
-   * NOTE: Backend endpoint not yet implemented - will throw error
-   * TODO: Remove this error once backend implements PATCH /payments/:id
    */
   async update(id: string, data: UpdatePaymentDto): Promise<Payment> {
-    // Backend doesn't have this endpoint yet
-    // When implemented, uncomment the following:
-    // return apiClient.patch<Payment, UpdatePaymentDto>(`${this.basePath}/${id}`, data);
-    
-    console.warn('[PaymentService] Update endpoint not yet implemented in backend', { id, data });
-    throw new Error('La edición de pagos estará disponible próximamente');
+    return apiClient.patch<Payment, UpdatePaymentDto>(`${this.basePath}/${id}`, data);
   }
 
   /**
