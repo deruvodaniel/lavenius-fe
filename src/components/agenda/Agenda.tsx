@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, Calendar, X, CalendarX, Search, List, LayoutGrid, CheckCircle2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { TurnoDrawer } from './TurnoDrawer';
@@ -32,20 +33,21 @@ interface ViewModeToggleProps {
   value: ViewMode;
   onChange: (mode: ViewMode) => void;
   isMobile: boolean;
+  labels: { list: string; calendar: string; both: string };
 }
 
-const ViewModeToggle = ({ value, onChange, isMobile }: ViewModeToggleProps) => {
+const ViewModeToggle = ({ value, onChange, isMobile, labels }: ViewModeToggleProps) => {
   // Mobile: Only list and calendar options (segmented control)
   // Desktop: List, Calendar, Both options
   const options: { value: ViewMode; label: string; icon: React.ReactNode }[] = isMobile
     ? [
-        { value: 'list', label: 'Lista', icon: <List className="w-4 h-4" /> },
-        { value: 'calendar', label: 'Calendario', icon: <Calendar className="w-4 h-4" /> },
+        { value: 'list', label: labels.list, icon: <List className="w-4 h-4" /> },
+        { value: 'calendar', label: labels.calendar, icon: <Calendar className="w-4 h-4" /> },
       ]
     : [
-        { value: 'list', label: 'Lista', icon: <List className="w-4 h-4" /> },
-        { value: 'both', label: 'Ambos', icon: <LayoutGrid className="w-4 h-4" /> },
-        { value: 'calendar', label: 'Calendario', icon: <Calendar className="w-4 h-4" /> },
+        { value: 'list', label: labels.list, icon: <List className="w-4 h-4" /> },
+        { value: 'both', label: labels.both, icon: <LayoutGrid className="w-4 h-4" /> },
+        { value: 'calendar', label: labels.calendar, icon: <Calendar className="w-4 h-4" /> },
       ];
 
   return (
@@ -74,6 +76,7 @@ const ViewModeToggle = ({ value, onChange, isMobile }: ViewModeToggleProps) => {
 };
 
 export function Agenda() {
+  const { t } = useTranslation();
   const { sessionsUI, isLoading, error, fetchUpcoming, createSession, updateSession, deleteSession, clearError } = useSessions();
   const { patients, selectedPatient, fetchPatients, fetchPatientById, setSelectedPatient } = usePatients();
   const { isSessionPaid, fetchPayments } = usePayments();
@@ -288,9 +291,9 @@ export function Agenda() {
     targetDate.setHours(0, 0, 0, 0);
     
     if (targetDate.getTime() === today.getTime()) {
-      return 'Hoy';
+      return t('agenda.today');
     } else if (targetDate.getTime() === tomorrow.getTime()) {
-      return 'Mañana';
+      return t('agenda.tomorrow');
     }
     
     return date.toLocaleDateString('es-AR', {
@@ -383,13 +386,13 @@ export function Agenda() {
         if (sessionData.type) updateData.type = sessionData.type;
         
         await updateSession(selectedSession.id, updateData);
-        toast.success('Turno actualizado exitosamente');
+        toast.success(t('agenda.messages.updateSuccess'));
         // Refresh sessions and payments to ensure UI is in sync
         await Promise.all([fetchUpcoming(), fetchPayments(true)]);
       } else {
         // Create new session
         await createSession(sessionData);
-        toast.success('Turno creado exitosamente');
+        toast.success(t('agenda.messages.createSuccess'));
         // Refresh sessions and payments to ensure UI is in sync
         await Promise.all([fetchUpcoming(), fetchPayments(true)]);
       }
@@ -399,12 +402,12 @@ export function Agenda() {
       console.error('Error saving session:', error);
       
       // Show user-friendly error message
-      let errorMessage = 'Error al guardar el turno';
+      let errorMessage = t('agenda.messages.saveError');
       
       if (error?.message?.includes('already exists')) {
-        errorMessage = 'Ya existe una sesión en este horario. Por favor elige otro horario.';
+        errorMessage = t('agenda.messages.conflictError');
       } else if (error?.statusCode === 409) {
-        errorMessage = 'Conflicto de horarios. Ya tienes una sesión programada en este momento.';
+        errorMessage = t('agenda.messages.scheduleConflict');
       } else if (error?.message) {
         errorMessage = error.message;
       }
@@ -416,13 +419,13 @@ export function Agenda() {
   const handleDeleteTurno = async (sessionId: string) => {
     try {
       await deleteSession(sessionId);
-      toast.success('Turno eliminado exitosamente');
+      toast.success(t('agenda.messages.deleteSuccess'));
       setTurnoDrawerOpen(false);
       // Refresh sessions and payments
       await Promise.all([fetchUpcoming(), fetchPayments(true)]);
     } catch (error) {
       console.error('Error deleting session:', error);
-      toast.error('Error al eliminar el turno');
+      toast.error(t('agenda.messages.deleteError'));
       throw error; // Re-throw so drawer can handle it
     }
   };
@@ -438,14 +441,14 @@ export function Agenda() {
     setIsDeleting(true);
     try {
       await deleteSession(sessionToDelete.id);
-      toast.success('Turno eliminado exitosamente');
+      toast.success(t('agenda.messages.deleteSuccess'));
       setDeleteConfirmOpen(false);
       setSessionToDelete(null);
       // Refresh sessions and payments
       await Promise.all([fetchUpcoming(), fetchPayments(true)]);
     } catch (error) {
       console.error('Error deleting session:', error);
-      toast.error('Error al eliminar el turno');
+      toast.error(t('agenda.messages.deleteError'));
     } finally {
       setIsDeleting(false);
     }
@@ -458,7 +461,7 @@ export function Agenda() {
     turno: { fecha: string; hora: string }
   ) => {
     if (!paciente) {
-      toast.info('No se encontró el paciente');
+      toast.info(t('agenda.messages.patientNotFound'));
       return;
     }
 
@@ -467,20 +470,20 @@ export function Agenda() {
     // If phone is not available, fetch patient details
     if (!phoneNumber && paciente.id) {
       try {
-        toast.loading('Obteniendo datos del paciente...', { id: 'whatsapp-fetch' });
+        toast.loading(t('agenda.messages.fetchingPatientData'), { id: 'whatsapp-fetch' });
         const patientDetails = await patientService.getById(paciente.id);
         phoneNumber = sanitizeString(patientDetails.phone);
         toast.dismiss('whatsapp-fetch');
       } catch (error) {
         toast.dismiss('whatsapp-fetch');
         console.error('Error fetching patient for WhatsApp:', error);
-        toast.error('Error al obtener datos del paciente');
+        toast.error(t('agenda.messages.fetchPatientError'));
         return;
       }
     }
 
     if (!phoneNumber) {
-      toast.info('El paciente no tiene número de teléfono registrado');
+      toast.info(t('agenda.messages.patientNoPhone'));
       return;
     }
 
@@ -497,7 +500,7 @@ export function Agenda() {
       await fetchPatientById(patientId);
     } catch (err) {
       console.error('Error fetching patient details:', err);
-      toast.error('Error al cargar los detalles del paciente');
+      toast.error(t('agenda.messages.loadPatientError'));
     } finally {
       setIsLoadingPatientDetails(false);
     }
@@ -521,7 +524,7 @@ export function Agenda() {
               <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
               <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
             </div>
-            <p className="text-gray-500">Cargando ficha del paciente...</p>
+            <p className="text-gray-500">{t('agenda.loadingPatientDetails')}</p>
           </div>
         </div>
       );
@@ -542,9 +545,9 @@ export function Agenda() {
         {/* Title row */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Agenda</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('agenda.title')}</h1>
             <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
-              Gestiona tus turnos y citas
+              {t('agenda.subtitle')}
             </p>
           </div>
           <button
@@ -552,7 +555,7 @@ export function Agenda() {
             className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors w-full sm:w-auto"
           >
             <Plus className="w-4 h-4" />
-            Nuevo Turno
+            {t('agenda.newSession')}
           </button>
         </div>
 
@@ -563,7 +566,7 @@ export function Agenda() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               type="text"
-              placeholder="Buscar por paciente..."
+              placeholder={t('agenda.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9"
@@ -583,14 +586,19 @@ export function Agenda() {
             value={viewMode} 
             onChange={setViewMode} 
             isMobile={!isDesktop}
+            labels={{
+              list: t('agenda.views.list'),
+              calendar: t('agenda.views.calendar'),
+              both: t('agenda.views.both'),
+            }}
           />
         </div>
 
         {/* Search results count */}
         {searchTerm && (
           <p className="text-sm text-gray-500">
-            {futurosTurnos.length} turno{futurosTurnos.length !== 1 ? 's' : ''} encontrado{futurosTurnos.length !== 1 ? 's' : ''}
-            {searchTerm && ` para "${searchTerm}"`}
+            {t('agenda.searchResults', { count: futurosTurnos.length })}
+            {searchTerm && ` ${t('agenda.searchResultsFor', { search: searchTerm })}`}
           </p>
         )}
 
@@ -598,11 +606,11 @@ export function Agenda() {
         {!isCalendarConnected ? (
           <TipBanner
             tipId="agenda-connect-calendar"
-            title="Conecta tu Google Calendar"
-            description="Sincroniza tus turnos con Google Calendar para recibir recordatorios y que tus pacientes reciban invitaciones automáticas."
+            title={t('agenda.googleCalendar.connectTitle')}
+            description={t('agenda.googleCalendar.connectDescription')}
             variant="info"
             action={{
-              label: "Conectar ahora",
+              label: t('agenda.googleCalendar.connectNow'),
               onClick: connectCalendar
             }}
           />
@@ -610,10 +618,10 @@ export function Agenda() {
           <div className="flex items-center justify-between gap-3 px-4 py-3 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-center gap-2 text-green-700">
               <CheckCircle2 className="w-4 h-4 text-green-500" />
-              <span className="text-sm font-medium">Google Calendar conectado</span>
+              <span className="text-sm font-medium">{t('agenda.googleCalendar.connected')}</span>
               {lastSyncAt && (
                 <span className="text-xs text-green-600">
-                  · Última sincronización: {new Date(lastSyncAt).toLocaleString('es-AR', { 
+                  · {t('agenda.googleCalendar.lastSync')}: {new Date(lastSyncAt).toLocaleString('es-AR', { 
                     day: 'numeric', 
                     month: 'short', 
                     hour: '2-digit', 
@@ -628,7 +636,7 @@ export function Agenda() {
               className="flex items-center gap-1.5 text-sm font-medium text-green-700 hover:text-green-900 px-3 py-1.5 rounded-md hover:bg-green-100 transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-              {isSyncing ? 'Sincronizando...' : 'Sincronizar'}
+              {isSyncing ? t('agenda.googleCalendar.syncing') : t('agenda.googleCalendar.sync')}
             </button>
           </div>
         )}
@@ -643,7 +651,7 @@ export function Agenda() {
         {/* Lista de Turnos */}
         {(viewMode === 'list' || viewMode === 'both') && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col flex-1">
-            <h2 className="text-gray-900 px-6 pt-6 pb-4 flex-shrink-0">Próximos Turnos</h2>
+            <h2 className="text-gray-900 px-6 pt-6 pb-4 flex-shrink-0">{t('agenda.upcoming')}</h2>
             <div className="flex-1 overflow-y-auto px-6 pb-6">
               {isLoading ? (
                 <SkeletonList items={5} />
@@ -651,16 +659,16 @@ export function Agenda() {
                 <div className="space-y-6">
                   <EmptyState
                     icon={searchTerm ? Search : CalendarX}
-                    title={searchTerm ? "Sin resultados" : "No hay turnos programados"}
+                    title={searchTerm ? t('agenda.noResults') : t('agenda.noSessions')}
                     description={searchTerm 
-                      ? `No se encontraron turnos para "${searchTerm}"`
-                      : "Aún no tienes turnos agendados. Comienza creando un nuevo turno o sincroniza con Google Calendar."
+                      ? t('agenda.noResultsDescription', { search: searchTerm })
+                      : t('agenda.noSessionsDescription')
                     }
                     action={searchTerm ? {
-                      label: "Limpiar búsqueda",
+                      label: t('agenda.clearSearch'),
                       onClick: () => setSearchTerm('')
                     } : {
-                      label: "Crear primer turno",
+                      label: t('agenda.addFirstSession'),
                       onClick: handleNuevoTurno
                     }}
                     variant="subtle"
@@ -735,7 +743,7 @@ export function Agenda() {
                         <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
                         <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                       </div>
-                      <p className="text-sm text-gray-500">Cargando más turnos...</p>
+                      <p className="text-sm text-gray-500">{t('agenda.loadingMore')}</p>
                     </div>
                   ) : (
                     <div className="h-4"></div>
@@ -773,11 +781,11 @@ export function Agenda() {
                       scheduledFrom: _newStart.toISOString(),
                       scheduledTo: _newEnd.toISOString(),
                     });
-                    toast.success('Turno reagendado exitosamente');
+                    toast.success(t('agenda.messages.rescheduleSuccess'));
                     await fetchUpcoming();
                   } catch (error) {
                     console.error('Error rescheduling session:', error);
-                    toast.error('Error al reagendar el turno');
+                    toast.error(t('agenda.messages.rescheduleError'));
                   }
                 }}
               />
@@ -821,10 +829,10 @@ export function Agenda() {
       <ConfirmDialog
         open={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}
-        title="Eliminar turno"
-        description={`¿Estás seguro de que deseas eliminar el turno de ${sessionToDelete?.patientName}? Esta acción no se puede deshacer.`}
-        confirmLabel="Eliminar"
-        cancelLabel="Cancelar"
+        title={t('agenda.messages.deleteConfirmTitle')}
+        description={t('agenda.messages.deleteConfirmDescription', { patientName: sessionToDelete?.patientName })}
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
         variant="danger"
         onConfirm={confirmDeleteTurno}
         onCancel={() => {

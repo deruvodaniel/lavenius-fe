@@ -5,6 +5,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import type { EventClickArg, DateSelectArg, EventContentArg, EventDropArg } from '@fullcalendar/core';
+import { useTranslation } from 'react-i18next';
 import { SessionType, SessionStatus, type SessionUI } from '@/lib/types/session';
 import { SESSION_STATUS_COLORS } from '@/lib/constants/sessionColors';
 import { Card } from '../ui/card';
@@ -105,6 +106,7 @@ export function FullCalendarView({
   isSessionPaid,
   getPatientNameFallback
 }: FullCalendarViewProps) {
+  const { t } = useTranslation();
   const calendarRef = useRef<FullCalendar>(null);
   const { isMobile } = useResponsive();
   
@@ -188,7 +190,7 @@ export function FullCalendarView({
         // Try to get patient name from session, or use fallback
         const patientName = session.patientName 
           || getPatientNameFallback?.(session.patient?.id) 
-          || 'Sin paciente';
+          || t('agenda.details.noPatient');
 
         return {
           id: session.id,
@@ -233,9 +235,9 @@ export function FullCalendarView({
       const isFullDay = tipo === 'full';
       
       // Build label with time info for partial days
-      let label = dia.motivo || 'Día Off';
+      let label = dia.motivo || t('agenda.calendar.allDay');
       if (!isFullDay) {
-        const timeLabel = tipo === 'morning' ? 'Mañana' : tipo === 'afternoon' ? 'Tarde' : `${startTime}-${endTime}`;
+        const timeLabel = tipo === 'morning' ? t('agenda.dayOff.morning') : tipo === 'afternoon' ? t('agenda.dayOff.afternoon') : `${startTime}-${endTime}`;
         label = `${label} (${timeLabel})`;
       }
       
@@ -284,7 +286,7 @@ export function FullCalendarView({
     });
     
     return events;
-  }, [diasOff]);
+  }, [diasOff, t]);
 
   // Combine all events
   const events = [...sessionEvents, ...diaOffEvents];
@@ -305,19 +307,22 @@ export function FullCalendarView({
       const { start, end } = getDiaOffTimeRange(diaOff);
       const tipo = diaOff.tipo || 'full';
       const timeInfo = tipo === 'full' ? '' : ` (${start} - ${end})`;
-      toast.warning(`Este horario está marcado como día off${timeInfo}${diaOff.motivo ? `: ${diaOff.motivo}` : ''}`);
+      const message = diaOff.motivo 
+        ? t('agenda.dayOff.warningWithReason', { reason: diaOff.motivo }) + timeInfo
+        : t('agenda.dayOff.warning') + timeInfo;
+      toast.warning(message);
       return;
     }
     
     // Check if it's a non-working day
     if (isNonWorkingDay(selectInfo.start)) {
-      toast.warning('Este día no está configurado como día laboral');
+      toast.warning(t('agenda.dayOff.nonWorkingDay'));
       return;
     }
     
     // Check if time is outside working hours (only for time-based selections)
     if (!selectInfo.allDay && isOutsideWorkingHours(selectInfo.start)) {
-      toast.warning(`El horario seleccionado está fuera de tu horario laboral (${workingHours.startTime} - ${workingHours.endTime})`);
+      toast.warning(t('agenda.dayOff.outsideWorkingHours', { start: workingHours.startTime, end: workingHours.endTime }));
       return;
     }
     
@@ -340,21 +345,24 @@ export function FullCalendarView({
       const { start, end } = getDiaOffTimeRange(diaOff);
       const tipo = diaOff.tipo || 'full';
       const timeInfo = tipo === 'full' ? '' : ` (${start} - ${end})`;
-      toast.warning(`No puedes mover el turno a un día off${timeInfo}${diaOff.motivo ? `: ${diaOff.motivo}` : ''}`);
+      const message = diaOff.motivo 
+        ? t('agenda.dayOff.cannotMoveToOff') + timeInfo + `: ${diaOff.motivo}`
+        : t('agenda.dayOff.cannotMoveToOff') + timeInfo;
+      toast.warning(message);
       dropInfo.revert();
       return;
     }
     
     // Check if dropped on a non-working day
     if (isNonWorkingDay(newStart)) {
-      toast.warning('No puedes mover el turno a un día no laboral');
+      toast.warning(t('agenda.dayOff.cannotMoveToNonWorking'));
       dropInfo.revert();
       return;
     }
     
     // Check if dropped outside working hours
     if (isOutsideWorkingHours(newStart)) {
-      toast.warning(`No puedes mover el turno fuera del horario laboral (${workingHours.startTime} - ${workingHours.endTime})`);
+      toast.warning(t('agenda.dayOff.cannotMoveOutsideHours', { start: workingHours.startTime, end: workingHours.endTime }));
       dropInfo.revert();
       return;
     }
@@ -382,7 +390,7 @@ export function FullCalendarView({
           {/* Show modality icon in day view */}
           {isDayView && (
             <div className="text-[10px] opacity-80 mt-0.5">
-              {extendedProps.type === SessionType.REMOTE ? '💻 Remoto' : '📍 Presencial'}
+              {extendedProps.type === SessionType.REMOTE ? `💻 ${t('agenda.sessionTypes.remote')}` : `📍 ${t('agenda.sessionTypes.presential')}`}
             </div>
           )}
         </div>

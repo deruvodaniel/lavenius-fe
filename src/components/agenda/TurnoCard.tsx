@@ -1,4 +1,6 @@
 import { Clock, Video, MapPin, MoreVertical, MessageCircle, Edit2, Trash2, AlertTriangle, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Card } from '@/components/ui/card';
-import { SESSION_STATUS_BORDER_CLASSES, SESSION_STATUS_LABELS } from '@/lib/constants/sessionColors';
+import { SESSION_STATUS_BORDER_CLASSES } from '@/lib/constants/sessionColors';
 import type { SessionResponse, SessionStatus } from '@/lib/types/session';
 
 // ============================================================================
@@ -34,31 +36,42 @@ interface TurnoCardProps {
 }
 
 // ============================================================================
+// STATUS KEY MAPPING
+// ============================================================================
+
+const STATUS_KEY_MAP: Record<SessionStatus, string> = {
+  pending: 'scheduled',
+  confirmed: 'confirmed',
+  completed: 'completed',
+  cancelled: 'cancelled',
+};
+
+// ============================================================================
 // RISK INDICATOR
 // ============================================================================
 
-const RiskIndicator = ({ level }: { level: 'low' | 'medium' | 'high' }) => {
+const RiskIndicator = ({ level, t }: { level: 'low' | 'medium' | 'high'; t: TFunction }) => {
   if (level === 'low') return null;
   
   const config = {
     medium: { 
       color: 'text-yellow-600', 
       bg: 'bg-yellow-50',
-      label: 'Riesgo medio' 
+      labelKey: 'agenda.card.riskMedium' 
     },
     high: { 
       color: 'text-red-600', 
       bg: 'bg-red-50',
-      label: 'Riesgo alto' 
+      labelKey: 'agenda.card.riskHigh' 
     },
   };
   
-  const { color, bg, label } = config[level];
+  const { color, bg, labelKey } = config[level];
   
   return (
     <span 
       className={`flex items-center gap-1 px-1.5 py-0.5 rounded ${bg} ${color}`}
-      title={label}
+      title={t(labelKey)}
     >
       <AlertTriangle className="w-3 h-3" />
     </span>
@@ -80,9 +93,11 @@ export function TurnoCard({
   onDeleteClick,
   onWhatsAppClick,
 }: TurnoCardProps) {
+  const { t } = useTranslation();
   const status = session.status as SessionStatus;
   const borderClass = SESSION_STATUS_BORDER_CLASSES[status] || 'border-l-gray-300';
-  const statusLabel = SESSION_STATUS_LABELS[status] || 'Desconocido';
+  const statusKey = STATUS_KEY_MAP[status] || 'unknown';
+  const statusLabel = t(`agenda.status.${statusKey}`);
   const isRemote = session.sessionType === 'remote';
   
   // Get patient initials
@@ -96,7 +111,7 @@ export function TurnoCard({
   };
   
   const initials = patient ? getInitials(patient.nombre) : '?';
-  const patientName = patient?.nombre || 'Sin paciente';
+  const patientName = patient?.nombre || t('agenda.details.noPatient');
 
   return (
     <Card className={`p-3 sm:p-4 border-l-4 bg-white hover:shadow-md transition-shadow ${borderClass}`}>
@@ -127,7 +142,7 @@ export function TurnoCard({
                 <span className="text-gray-300">•</span>
                 <span className="flex items-center gap-1">
                   {isRemote ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-                  {isRemote ? 'Remoto' : 'Presencial'}
+                  {isRemote ? t('agenda.sessionTypes.remote') : t('agenda.sessionTypes.presential')}
                 </span>
               </div>
             )}
@@ -138,16 +153,16 @@ export function TurnoCard({
         <div className="flex items-center gap-1.5">
           {/* Risk indicator */}
           {patient?.riskLevel && patient.riskLevel !== 'low' && (
-            <RiskIndicator level={patient.riskLevel} />
+            <RiskIndicator level={patient.riskLevel} t={t} />
           )}
           
           {/* Paid indicator */}
           {isPaid && (
             <span 
               className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700"
-              title="Sesión pagada"
+              title={t('agenda.card.paid')}
             >
-              Pagado
+              {t('agenda.card.paid')}
             </span>
           )}
           
@@ -155,7 +170,7 @@ export function TurnoCard({
           {isCompactView && (
             <span 
               className={`p-1 rounded ${isRemote ? 'text-blue-600' : 'text-purple-600'}`}
-              title={isRemote ? 'Remoto' : 'Presencial'}
+              title={isRemote ? t('agenda.sessionTypes.remote') : t('agenda.sessionTypes.presential')}
             >
               {isRemote ? <Video className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
             </span>
@@ -167,7 +182,7 @@ export function TurnoCard({
           <DropdownMenuTrigger asChild>
             <button 
               className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-              aria-label="Acciones"
+              aria-label={t('agenda.card.actions')}
             >
               <MoreVertical className="w-4 h-4" />
             </button>
@@ -179,11 +194,11 @@ export function TurnoCard({
               className="cursor-pointer"
             >
               <User className="w-4 h-4 mr-2" />
-              Ver ficha
+              {t('agenda.card.viewFile')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onEditClick} className="cursor-pointer">
               <Edit2 className="w-4 h-4 mr-2" />
-              Editar turno
+              {t('agenda.card.editAppointment')}
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={onWhatsAppClick} 
@@ -191,7 +206,7 @@ export function TurnoCard({
               className="cursor-pointer"
             >
               <MessageCircle className="w-4 h-4 mr-2" />
-              Enviar WhatsApp
+              {t('agenda.card.sendWhatsApp')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
@@ -199,7 +214,7 @@ export function TurnoCard({
               className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Eliminar turno
+              {t('agenda.card.deleteAppointment')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

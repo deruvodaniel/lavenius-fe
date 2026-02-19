@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { X, Calendar, Clock, User, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore, usePatientStore } from '@/lib/stores';
 import { ConfirmDialog } from '@/components/shared';
 import type { Patient } from '@/lib/types/api.types';
@@ -37,6 +38,7 @@ interface TurnoDrawerProps {
 }
 
 export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, initialDate, onSave, onDelete }: TurnoDrawerProps) {
+  const { t } = useTranslation();
   const user = useAuthStore(state => state.user);
   const fetchPatientById = usePatientStore(state => state.fetchPatientById);
   const selectedPatientFromStore = usePatientStore(state => state.selectedPatient);
@@ -128,7 +130,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       await fetchPatientById(patientId);
     } catch (error) {
       console.error('Error loading patient data:', error);
-      toast.error('Error al cargar datos del paciente');
+      toast.error(t('agenda.messages.loadPatientDataError'));
     } finally {
       setIsLoadingPatient(false);
     }
@@ -160,11 +162,11 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
   const handleSave = () => {
     // Validate before showing confirmation
     if (!formData.pacienteId) {
-      toast.error('Por favor seleccione un paciente');
+      toast.error(t('agenda.validation.selectPatient'));
       return;
     }
     if (!formData.fecha) {
-      toast.error('Por favor seleccione una fecha');
+      toast.error(t('agenda.validation.selectDate'));
       return;
     }
     
@@ -173,20 +175,20 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     const now = new Date();
     if (selectedDate < now && !session) {
       // Only block past dates for new appointments, allow editing existing ones
-      toast.error('No se pueden agendar turnos en fechas pasadas. Por favor seleccione una fecha futura.');
+      toast.error(t('agenda.messages.pastDateError'));
       return;
     }
     
     if (!formData.horaInicio || !formData.horaFin) {
-      toast.error('Por favor seleccione hora de inicio y fin');
+      toast.error(t('agenda.validation.selectTime'));
       return;
     }
     if (!formData.sessionType) {
-      toast.error('Por favor seleccione un tipo de sesión');
+      toast.error(t('agenda.validation.selectSessionType'));
       return;
     }
     if (!formData.estado) {
-      toast.error('Por favor seleccione un estado');
+      toast.error(t('agenda.validation.selectStatus'));
       return;
     }
     
@@ -195,12 +197,12 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
   const confirmSave = async () => {
     if (!user?.id) {
-      toast.error('Error: No se pudo obtener el ID del usuario. Por favor, inicie sesión nuevamente.');
+      toast.error(t('agenda.validation.userIdError'));
       return;
     }
 
     if (!formData.pacienteId || !formData.fecha || !formData.horaInicio || !formData.horaFin) {
-      toast.error('Por favor complete todos los campos requeridos');
+      toast.error(t('agenda.validation.completeAllFields'));
       return;
     }
 
@@ -212,7 +214,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     
     // Use full patient data (fetched via fetchPatientById) to get email
     if (!fullPatientData?.email) {
-      toast.error('El paciente seleccionado no tiene email configurado. Por favor, actualice la información del paciente.');
+      toast.error(t('agenda.messages.patientNoEmail'));
       return;
     }
 
@@ -271,12 +273,12 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 md:p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-white text-xl">
-              {isEditing ? 'Editar Turno' : 'Nuevo Turno'}
+              {isEditing ? t('agenda.editSession') : t('agenda.newSession')}
             </h2>
             <button
               onClick={onClose}
               className="text-indigo-200 hover:text-white transition-colors"
-              aria-label="Cerrar"
+              aria-label={t('common.close')}
             >
               <X className="w-6 h-6" />
             </button>
@@ -289,7 +291,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           <div>
             <label htmlFor="turno-paciente" className="flex items-center gap-2 text-gray-700 mb-2">
               <User className="w-4 h-4" />
-              Paciente <span className="text-red-500">*</span>
+              {t('agenda.fields.patient')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
             </label>
             <select
               id="turno-paciente"
@@ -300,7 +302,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               }`}
               required
             >
-              <option value="">Seleccionar paciente...</option>
+              <option value="">{t('agenda.drawer.selectPatient')}</option>
               {patients.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.firstName} {p.lastName}
@@ -311,17 +313,17 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
             {formData.pacienteId && isLoadingPatient && (
               <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Cargando datos del paciente...</span>
+                <span>{t('agenda.drawer.loadingPatientData')}</span>
               </div>
             )}
             {formData.pacienteId && !isLoadingPatient && fullPatientData && !fullPatientData.email && (
               <div className="mt-1 text-sm text-red-500">
-                Este paciente no tiene email configurado. Por favor, actualice su información.
+                {t('agenda.messages.patientEmailRequired')}
               </div>
             )}
             {formData.pacienteId && !isLoadingPatient && fullPatientData?.email && (
               <div className="mt-1 text-sm text-green-600">
-                Email: {fullPatientData.email}
+                {t('agenda.drawer.emailLabel')}: {fullPatientData.email}
               </div>
             )}
           </div>
@@ -330,7 +332,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           <div>
             <label htmlFor="turno-fecha" className="flex items-center gap-2 text-gray-700 mb-2">
               <Calendar className="w-4 h-4" />
-              Fecha <span className="text-red-500">*</span>
+              {t('agenda.fields.date')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
             </label>
             <input
               id="turno-fecha"
@@ -348,7 +350,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           <div>
             <label htmlFor="turno-hora-inicio" className="flex items-center gap-2 text-gray-700 mb-2">
               <Clock className="w-4 h-4" />
-              Hora Inicio <span className="text-red-500">*</span>
+              {t('agenda.fields.startTime')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
             </label>
             <select
               id="turno-hora-inicio"
@@ -366,7 +368,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           <div>
             <label htmlFor="turno-hora-fin" className="flex items-center gap-2 text-gray-700 mb-2">
               <Clock className="w-4 h-4" />
-              Hora Fin <span className="text-red-500">*</span>
+              {t('agenda.fields.endTime')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
             </label>
             <select
               id="turno-hora-fin"
@@ -383,52 +385,52 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           {/* Motivo */}
           <div>
             <label htmlFor="turno-motivo" className="block text-gray-700 mb-2">
-              Motivo de consulta
+              {t('agenda.fields.reason')}
             </label>
             <input
               id="turno-motivo"
               type="text"
               value={formData.motivo}
               onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}
-              placeholder="Ej: Sesión de seguimiento"
+              placeholder={t('agenda.fields.reasonPlaceholder')}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
           {/* Tipo de Sesión */}
           <div>
-            <label htmlFor="turno-tipo-sesion" className="block text-gray-700 mb-2">Tipo de Sesión</label>
+            <label htmlFor="turno-tipo-sesion" className="block text-gray-700 mb-2">{t('agenda.fields.type')}</label>
             <select
               id="turno-tipo-sesion"
               value={formData.sessionType}
               onChange={(e) => setFormData({ ...formData, sessionType: e.target.value as SessionType })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="presential">Presencial</option>
-              <option value="remote">Remoto</option>
+              <option value="presential">{t('agenda.sessionTypes.presential')}</option>
+              <option value="remote">{t('agenda.sessionTypes.remote')}</option>
             </select>
           </div>
 
           {/* Estado */}
           <div>
-            <label htmlFor="turno-estado" className="block text-gray-700 mb-2">Estado</label>
+            <label htmlFor="turno-estado" className="block text-gray-700 mb-2">{t('agenda.fields.status')}</label>
             <select
               id="turno-estado"
               value={formData.estado}
               onChange={(e) => setFormData({ ...formData, estado: e.target.value as SessionStatus })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="pending">Agendada</option>
-              <option value="confirmed">Confirmada</option>
-              <option value="completed">Completada</option>
-              <option value="cancelled">Cancelada</option>
+              <option value="pending">{t('agenda.status.scheduled')}</option>
+              <option value="confirmed">{t('agenda.status.confirmed')}</option>
+              <option value="completed">{t('agenda.status.completed')}</option>
+              <option value="cancelled">{t('agenda.status.cancelled')}</option>
             </select>
           </div>
 
           {/* Monto */}
           <div>
             <label htmlFor="turno-monto" className="block text-gray-700 mb-2">
-              Monto (ARS)
+              {t('agenda.fields.amount')}
             </label>
             <input
               id="turno-monto"
@@ -450,14 +452,14 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
-              {isEditing ? 'Guardar cambios' : 'Crear turno'}
+              {isEditing ? t('agenda.drawer.saveChanges') : t('agenda.drawer.createAppointment')}
             </button>
             {isEditing && onDelete && (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
                 className="px-6 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors"
               >
-                Eliminar
+                {t('common.delete')}
               </button>
             )}
           </div>
@@ -468,14 +470,14 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       <ConfirmDialog
         open={showSaveConfirm}
         onOpenChange={setShowSaveConfirm}
-        title={isEditing ? '¿Guardar cambios?' : '¿Crear turno?'}
+        title={isEditing ? t('agenda.drawer.saveConfirmTitle') : t('agenda.drawer.saveConfirmTitleCreate')}
         description={
           isEditing
-            ? 'Los cambios se aplicarán al turno seleccionado.'
-            : 'Se creará un nuevo turno con la información ingresada.'
+            ? t('agenda.drawer.saveConfirmDescription')
+            : t('agenda.drawer.saveConfirmDescriptionCreate')
         }
-        confirmLabel={isSaving ? 'Guardando...' : 'Confirmar'}
-        cancelLabel="Cancelar"
+        confirmLabel={isSaving ? t('agenda.drawer.saving') : t('common.confirm')}
+        cancelLabel={t('common.cancel')}
         variant="default"
         icon={Calendar}
         onConfirm={confirmSave}
@@ -486,10 +488,10 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       <ConfirmDialog
         open={showDeleteConfirm}
         onOpenChange={setShowDeleteConfirm}
-        title="¿Eliminar turno?"
-        description="Esta acción no se puede deshacer. El turno será eliminado permanentemente."
-        confirmLabel={isSaving ? 'Eliminando...' : 'Eliminar'}
-        cancelLabel="Cancelar"
+        title={t('agenda.drawer.deleteConfirmTitle')}
+        description={t('agenda.drawer.deleteConfirmDescription')}
+        confirmLabel={isSaving ? t('agenda.drawer.deleting') : t('common.delete')}
+        cancelLabel={t('common.cancel')}
         variant="danger"
         onConfirm={confirmDelete}
         isLoading={isSaving}
