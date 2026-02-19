@@ -48,6 +48,10 @@ export const useCalendarStore = create<CalendarState>()(
       lastSyncAt: null,
 
   checkConnection: async () => {
+    // Avoid duplicate calls - if already checking, skip
+    const state = useCalendarStore.getState();
+    if (state.isCheckingConnection) return;
+    
     set({ isCheckingConnection: true });
     try {
       const calendars = await calendarService.getCalendars();

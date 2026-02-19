@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, DollarSign, Calendar, FileText, Sparkles, CalendarRange, Pencil } from 'lucide-react';
+import { X, DollarSign, Calendar, FileText, Sparkles, CalendarRange, Pencil, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatISODate } from '@/lib/utils/dateFormatters';
 import type { CreatePaymentDto, Payment, UpdatePaymentDto } from '@/lib/types/api.types';
+import { PaymentStatus } from '@/lib/types/api.types';
 import type { SessionUI } from '@/lib/types/session';
 
 // ============================================================================
@@ -45,6 +46,65 @@ const PaymentTypeSelector = ({ selected, onChange, disabled }: PaymentTypeSelect
       <CalendarRange className="w-5 h-5 mx-auto mb-1" />
       <span className="text-sm font-medium block">Plan mensual</span>
     </button>
+  </div>
+);
+
+// ============================================================================
+// PAYMENT STATUS SELECTOR
+// ============================================================================
+
+const STATUS_OPTIONS = [
+  { 
+    value: PaymentStatus.PENDING, 
+    label: 'Pendiente', 
+    icon: Clock, 
+    className: 'border-yellow-500 bg-yellow-50 text-yellow-700',
+    iconColor: 'text-yellow-600'
+  },
+  { 
+    value: PaymentStatus.PAID, 
+    label: 'Pagado', 
+    icon: CheckCircle2, 
+    className: 'border-green-500 bg-green-50 text-green-700',
+    iconColor: 'text-green-600'
+  },
+  { 
+    value: PaymentStatus.OVERDUE, 
+    label: 'Vencido', 
+    icon: AlertCircle, 
+    className: 'border-red-500 bg-red-50 text-red-700',
+    iconColor: 'text-red-600'
+  },
+];
+
+interface PaymentStatusSelectorProps {
+  selected: PaymentStatus;
+  onChange: (status: PaymentStatus) => void;
+  disabled?: boolean;
+}
+
+const PaymentStatusSelector = ({ selected, onChange, disabled }: PaymentStatusSelectorProps) => (
+  <div className="flex gap-2">
+    {STATUS_OPTIONS.map((option) => {
+      const Icon = option.icon;
+      const isActive = selected === option.value;
+      return (
+        <button
+          key={option.value}
+          type="button"
+          onClick={() => onChange(option.value)}
+          disabled={disabled}
+          className={`flex-1 p-3 rounded-lg border-2 transition-all ${
+            isActive
+              ? option.className
+              : 'border-gray-200 hover:border-gray-300 text-gray-600'
+          } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          <Icon className={`w-5 h-5 mx-auto mb-1 ${isActive ? option.iconColor : 'text-gray-400'}`} />
+          <span className="text-sm font-medium block">{option.label}</span>
+        </button>
+      );
+    })}
   </div>
 );
 
@@ -133,6 +193,7 @@ export const PaymentDrawer = ({
     amount: 0,
     paymentDate: formatISODate(new Date()),
     description: '',
+    status: PaymentStatus.PENDING,
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -147,6 +208,7 @@ export const PaymentDrawer = ({
           amount: editPayment.amount,
           paymentDate: editPayment.paymentDate.split('T')[0], // Extract date part
           description: editPayment.description || '',
+          status: editPayment.status || PaymentStatus.PENDING,
         });
       } else {
         // Create mode
@@ -159,6 +221,7 @@ export const PaymentDrawer = ({
           amount: preselectedSession?.cost ? Number(preselectedSession.cost) : 0,
           paymentDate: formatISODate(new Date()),
           description: '',
+          status: PaymentStatus.PENDING,
         });
       }
     }
@@ -196,11 +259,13 @@ export const PaymentDrawer = ({
       setIsSaving(true);
       
       if (isEditMode && editPayment && onUpdate) {
-        // Edit mode - update existing payment
+        // Edit mode - update existing payment with all editable fields
         const updateData: UpdatePaymentDto = {
+          sessionId: formData.sessionId,
           amount: Math.round(formData.amount * 100) / 100,
           paymentDate: formData.paymentDate,
           description: formData.description?.trim() || undefined,
+          status: formData.status,
         };
         
         await onUpdate(editPayment.id, updateData);
@@ -211,6 +276,7 @@ export const PaymentDrawer = ({
           amount: Math.round(formData.amount * 100) / 100,
           paymentDate: formData.paymentDate,
           description: formData.description?.trim() || undefined,
+          status: formData.status,
         };
         
         await onSave(paymentData);
@@ -314,7 +380,7 @@ export const PaymentDrawer = ({
           {/* Single Payment Form */}
           {(isEditMode || paymentType === 'single') && (
             <>
-              {/* Session Selector - disabled in edit mode */}
+              {/* Session Selector */}
               <div>
                 <label className="flex items-center gap-2 text-gray-700 mb-2">
                   <Calendar className="w-4 h-4" />
@@ -325,8 +391,8 @@ export const PaymentDrawer = ({
                   onChange={(e) => setFormData({ ...formData, sessionId: e.target.value })}
                   className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                     !formData.sessionId ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  } ${isEditMode ? 'bg-gray-50 text-gray-500' : ''}`}
-                  disabled={isLoading || isSaving || !!preselectedSessionId || isEditMode}
+                  }`}
+                  disabled={isLoading || isSaving || !!preselectedSessionId}
                   required
                 >
                   <option value="">Seleccionar sesión...</option>
@@ -336,14 +402,9 @@ export const PaymentDrawer = ({
                     </option>
                   ))}
                 </select>
-                {isEditMode && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    La sesión no puede modificarse
-                  </p>
-                )}
 
                 {/* Selected session preview */}
-                {!isEditMode && selectedSession && (
+                {selectedSession && (
                   <div className="mt-3 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
                     <p className="font-medium text-indigo-900">
                       {selectedSession.patientName || selectedSession.patient?.firstName}
@@ -394,6 +455,19 @@ export const PaymentDrawer = ({
                   onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   required
+                  disabled={isLoading || isSaving}
+                />
+              </div>
+
+              {/* Payment Status */}
+              <div>
+                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  Estado del Pago
+                </label>
+                <PaymentStatusSelector
+                  selected={formData.status || PaymentStatus.PENDING}
+                  onChange={(status) => setFormData({ ...formData, status })}
                   disabled={isLoading || isSaving}
                 />
               </div>

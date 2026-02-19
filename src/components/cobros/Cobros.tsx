@@ -876,6 +876,7 @@ export function Cobros() {
     isLoading: isLoadingPayments, 
     fetchPayments, 
     createPayment,
+    updatePayment,
     markAsPaid,
     deletePayment,
   } = usePayments();
@@ -890,6 +891,7 @@ export function Cobros() {
   const [deletePaymentData, setDeletePaymentData] = useState<Payment | null>(null);
   const [isDeletingPayment, setIsDeletingPayment] = useState(false);
   const [detailPayment, setDetailPayment] = useState<Payment | null>(null);
+  const [editPayment, setEditPayment] = useState<Payment | null>(null);
 
   // Filter state
   const [dateFrom, setDateFrom] = useState('');
@@ -1169,9 +1171,30 @@ export function Cobros() {
     }
   }, [createPayment, fetchUpcoming, fetchPayments, serverFilters]);
 
+  const handleUpdatePayment = useCallback(async (id: string, data: UpdatePaymentDto) => {
+    try {
+      setIsRefreshing(true);
+      await updatePayment(id, data);
+      toast.success('Pago actualizado correctamente');
+      setIsPaymentDrawerOpen(false);
+      setEditPayment(null);
+      // Refresh data
+      await Promise.all([
+        fetchUpcoming(),
+        fetchPayments(true, serverFilters),
+      ]);
+    } catch (error) {
+      console.error('Error updating payment:', error);
+      toast.error('No se pudo actualizar el pago. Por favor intenta nuevamente.');
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [updatePayment, fetchUpcoming, fetchPayments, serverFilters]);
+
   const handleCloseDrawer = useCallback(() => {
     setIsPaymentDrawerOpen(false);
     setPreselectedSession(null);
+    setEditPayment(null);
   }, []);
 
   const handleViewDetail = useCallback((payment: Payment) => {
@@ -1183,11 +1206,12 @@ export function Cobros() {
   }, []);
 
   const handleEditFromDetail = useCallback(() => {
-    // Close detail modal - edit functionality coming soon
-    // When backend supports PATCH /payments/:id, we can enable edit mode
-    setDetailPayment(null);
-    toast.info('La edición de pagos estará disponible próximamente');
-  }, []);
+    if (detailPayment) {
+      setEditPayment(detailPayment);
+      setDetailPayment(null);
+      setIsPaymentDrawerOpen(true);
+    }
+  }, [detailPayment]);
 
   const handleDeleteFromDetail = useCallback(() => {
     if (detailPayment) {
@@ -1459,9 +1483,11 @@ export function Cobros() {
         isOpen={isPaymentDrawerOpen}
         onClose={handleCloseDrawer}
         onSave={handleSavePayment}
+        onUpdate={handleUpdatePayment}
         sessions={sessionsUI}
         preselectedSessionId={preselectedSession?.id}
         isLoading={isLoadingPayments}
+        editPayment={editPayment}
       />
 
       {/* Reminder Modal */}

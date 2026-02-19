@@ -79,16 +79,22 @@ const getDateRange = (range: TimeRange): { start: Date; end: Date } => {
   
   switch (range) {
     case 'week':
+      // Last 7 days
       start.setDate(now.getDate() - 7);
       break;
     case 'month':
-      start.setMonth(now.getMonth() - 1);
+      // Current calendar month (1st to today)
+      start.setDate(1);
       break;
     case 'quarter':
-      start.setMonth(now.getMonth() - 3);
+      // Last 3 calendar months
+      start.setMonth(now.getMonth() - 2);
+      start.setDate(1);
       break;
     case 'year':
-      start.setFullYear(now.getFullYear() - 1);
+      // Current calendar year (Jan 1st to today)
+      start.setMonth(0);
+      start.setDate(1);
       break;
   }
   
@@ -217,18 +223,21 @@ export function Analitica() {
         const fromDate = start.toISOString().split('T')[0];
         const toDate = end.toISOString().split('T')[0];
         
-        // Fetch monthly sessions for each month in the range
-        const monthsToFetch: { year: number; month: number }[] = [];
-        const current = new Date(start);
-        while (current <= end) {
-          monthsToFetch.push({ year: current.getFullYear(), month: current.getMonth() + 1 });
+        // Get unique months needed for the date range
+        const monthsToFetch = new Set<string>();
+        const current = new Date(start.getFullYear(), start.getMonth(), 1);
+        const endMonth = new Date(end.getFullYear(), end.getMonth(), 1);
+        
+        while (current <= endMonth) {
+          monthsToFetch.add(`${current.getFullYear()}-${current.getMonth() + 1}`);
           current.setMonth(current.getMonth() + 1);
         }
         
-        // Fetch sessions for all months in parallel
-        const sessionPromises = monthsToFetch.map(({ year, month }) => 
-          sessionService.getMonthly(year, month)
-        );
+        // Fetch sessions for unique months in parallel
+        const sessionPromises = Array.from(monthsToFetch).map(key => {
+          const [year, month] = key.split('-').map(Number);
+          return sessionService.getMonthly(year, month);
+        });
         
         // Fetch all data in parallel
         const [sessionsResults] = await Promise.all([
@@ -239,11 +248,18 @@ export function Analitica() {
         
         if (!isMounted) return;
         
-        // Flatten and deduplicate sessions by id
+        // Flatten and deduplicate sessions by id, then filter by date range
         const sessionsMap = new Map<string, SessionResponse>();
+        const startTime = start.getTime();
+        const endTime = end.getTime();
+        
         sessionsResults.flat().forEach(session => {
-          if (session?.id) {
-            sessionsMap.set(session.id, session);
+          if (session?.id && session.scheduledFrom) {
+            const sessionTime = new Date(session.scheduledFrom).getTime();
+            // Only include sessions within the actual date range
+            if (sessionTime >= startTime && sessionTime <= endTime) {
+              sessionsMap.set(session.id, session);
+            }
           }
         });
         
@@ -331,8 +347,17 @@ export function Analitica() {
       .filter(p => p.status === PaymentStatus.PENDING || p.status === PaymentStatus.OVERDUE)
       .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
 
-    // Patient stats
-    const activePatients = patients.filter(p => p.status === 'ACTIVE').length;
+    // Patient stats - "active" means patients with sessions in the selected range
+    // Get unique patient IDs from sessions in the time range
+    const uniquePatientIds = new Set<string>();
+    filteredSessions.forEach(session => {
+      if (session.patient?.id) {
+        uniquePatientIds.add(session.patient.id);
+      }
+    });
+    const activePatients = uniquePatientIds.size;
+    
+    // New patients created in the time range
     const newPatients = patients.filter(p => {
       const createdDate = new Date(p.createdAt);
       return createdDate >= start && createdDate <= end;
@@ -601,9 +626,9 @@ export function Analitica() {
           iconColor="text-green-600"
         />
         <StatCard
-          title="Pacientes Activos"
+          title="Pacientes Atendidos"
           value={stats.activePatients}
-          subtitle={`${stats.newPatients} nuevos`}
+          subtitle={`${stats.newPatients} nuevos en el período`}
           icon={Users}
           iconBg="bg-blue-100"
           iconColor="text-blue-600"

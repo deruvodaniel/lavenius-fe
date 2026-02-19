@@ -111,33 +111,56 @@ class PaymentService {
     
     const response = await apiClient.get<Payment[] | BackendPaymentResponse>(url);
     
-    // Handle both array response (current backend) and object response (future)
+    // Handle both array response (legacy) and structured object response (current backend)
     let paymentsData: Payment[];
+    let serverPagination: PaginationInfo | null = null;
+    let serverTotals: { total: number; totalPaid: number; totalPending: number; totalOverdue: number } | null = null;
     
     if (Array.isArray(response)) {
-      // Backend returns array directly
+      // Legacy: Backend returns array directly
       paymentsData = response;
     } else if (response.payments?.data) {
-      // Backend returns paginated object
+      // Current: Backend returns structured object with totals and pagination
       paymentsData = response.payments.data;
+      serverPagination = response.payments.pagination;
+      // Backend returns totals at root level
+      serverTotals = {
+        total: response.total,
+        totalPaid: response.totalPaid,
+        totalPending: response.totalPending,
+        totalOverdue: response.totalOverdue,
+      };
     } else {
       paymentsData = [];
     }
     
-    // Calculate totals from the data using PaymentStatus enum
-    const paidPayments = paymentsData.filter(p => p.status === PaymentStatus.PAID);
-    const pendingPayments = paymentsData.filter(p => p.status === PaymentStatus.PENDING);
-    const overduePayments = paymentsData.filter(p => p.status === PaymentStatus.OVERDUE);
+    // Use server totals if available, otherwise calculate from data
+    let totals: PaymentTotals;
     
-    return {
-      payments: paymentsData,
-      pagination: {
-        page: 1,
-        limit: paymentsData.length,
-        total: paymentsData.length,
-        totalPages: 1,
-      },
-      totals: {
+    if (serverTotals) {
+      // Use accurate server-calculated totals (includes all matching payments, not just current page)
+      const paidPayments = paymentsData.filter(p => p.status === PaymentStatus.PAID);
+      const pendingPayments = paymentsData.filter(p => p.status === PaymentStatus.PENDING);
+      const overduePayments = paymentsData.filter(p => p.status === PaymentStatus.OVERDUE);
+      
+      totals = {
+        totalAmount: serverTotals.total,
+        paidAmount: serverTotals.totalPaid,
+        pendingAmount: serverTotals.totalPending,
+        overdueAmount: serverTotals.totalOverdue,
+        // Counts are from current page data (for display purposes)
+        totalCount: serverPagination?.total ?? paymentsData.length,
+        paidCount: paidPayments.length,
+        pendingCount: pendingPayments.length,
+        overdueCount: overduePayments.length,
+      };
+    } else {
+      // Fallback: Calculate totals from data
+      const paidPayments = paymentsData.filter(p => p.status === PaymentStatus.PAID);
+      const pendingPayments = paymentsData.filter(p => p.status === PaymentStatus.PENDING);
+      const overduePayments = paymentsData.filter(p => p.status === PaymentStatus.OVERDUE);
+      
+      totals = {
         totalAmount: paymentsData.reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
         paidAmount: paidPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
         pendingAmount: pendingPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
@@ -146,7 +169,18 @@ class PaymentService {
         paidCount: paidPayments.length,
         pendingCount: pendingPayments.length,
         overdueCount: overduePayments.length,
+      };
+    }
+    
+    return {
+      payments: paymentsData,
+      pagination: serverPagination ?? {
+        page: 1,
+        limit: paymentsData.length,
+        total: paymentsData.length,
+        totalPages: 1,
       },
+      totals,
     };
   }
 
