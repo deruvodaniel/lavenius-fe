@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Globe } from 'lucide-react';
+import { Check, ChevronDown, Globe } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -8,90 +8,203 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/components/ui/utils';
+import { useState, useRef, useEffect } from 'react';
 
-const languages = [
-  { code: 'es', label: 'Español', flag: '🇪🇸' },
-  { code: 'en', label: 'English', flag: '🇺🇸' },
-  { code: 'pt', label: 'Português', flag: '🇧🇷' },
-] as const;
+// SVG Flag components for reliable cross-platform rendering
+const FlagES = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#c60b1e" d="M0 0h640v480H0z"/>
+    <path fill="#ffc400" d="M0 120h640v240H0z"/>
+  </svg>
+);
 
-type LanguageCode = (typeof languages)[number]['code'];
+const FlagUS = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#bd3d44" d="M0 0h640v480H0z"/>
+    <path stroke="#fff" strokeWidth="37" d="M0 55.3h640M0 129h640M0 203h640M0 277h640M0 351h640M0 425h640"/>
+    <path fill="#192f5d" d="M0 0h364.8v258.5H0z"/>
+    <marker id="us"><circle r="16" fill="#fff"/></marker>
+    <path fill="none" markerMid="url(#us)" d="m0 0 18.3 0h36.6l36.6 0h36.6l36.6 0h36.6l36.6 0h36.6l36.6 0h9.2M0 0l0 32.4v32.4l0 32.4v32.4l0 32.4v32.4l0 32.4v32.4l0 9.3" transform="matrix(.73 0 0 .69 24 14.6)"/>
+  </svg>
+);
+
+const FlagBR = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#229e45" d="M0 0h640v480H0z"/>
+    <path fill="#f8e509" d="M321.4 436.5 21.5 240l299.9-196.5L620.8 240z"/>
+    <circle cx="321.4" cy="240" r="100" fill="#2b49a3"/>
+    <path fill="#fff" d="M221.4 240a100 100 0 0 1 200 0 115 50 0 0 0-200 0z"/>
+  </svg>
+);
+
+type LanguageCode = 'es' | 'en' | 'pt';
+
+interface LanguageOption {
+  code: LanguageCode;
+  label: string;
+  Flag: React.FC<{ className?: string }>;
+}
+
+const languages: LanguageOption[] = [
+  { code: 'es', label: 'Español', Flag: FlagES },
+  { code: 'en', label: 'English', Flag: FlagUS },
+  { code: 'pt', label: 'Português', Flag: FlagBR },
+];
 
 interface LanguageSwitcherProps {
-  /** Display variant - dropdown uses Select, buttons uses toggle group */
-  variant?: 'dropdown' | 'buttons';
+  /**
+   * Display variant:
+   * - 'compact': Flag-only button with dropdown (ideal for headers/landing)
+   * - 'dropdown': Full Select with icon and label (for settings pages)
+   * - 'buttons': Toggle button group (legacy, kept for backwards compatibility)
+   */
+  variant?: 'compact' | 'dropdown' | 'buttons';
   /** Show "Language" / "Idioma" label above the selector */
   showLabel?: boolean;
   /** Additional CSS classes */
   className?: string;
+  /** Alignment of dropdown content (for compact variant) */
+  align?: 'start' | 'center' | 'end';
 }
 
 /**
  * LanguageSwitcher - Allows users to change the application language
- * 
+ *
+ * @example
+ * // Compact flag dropdown for landing/header (recommended)
+ * <LanguageSwitcher variant="compact" />
+ *
  * @example
  * // In Settings page with label
  * <LanguageSwitcher showLabel variant="dropdown" />
- * 
+ *
  * @example
- * // In Landing page header (compact)
+ * // Legacy button group style
  * <LanguageSwitcher variant="buttons" />
  */
 export function LanguageSwitcher({
-  variant = 'dropdown',
+  variant = 'compact',
   showLabel = false,
   className,
+  align = 'end',
 }: LanguageSwitcherProps) {
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language as LanguageCode;
+  const [open, setOpen] = useState(false);
 
   const handleLanguageChange = (code: string) => {
     i18n.changeLanguage(code);
+    setOpen(false);
   };
 
-  const currentLang = languages.find((lang) => lang.code === currentLanguage) || languages[0];
+  const currentLang =
+    languages.find((lang) => lang.code === currentLanguage) || languages[0];
 
-  if (variant === 'buttons') {
+  // Handle click outside to close dropdown
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [open]);
+
+  // Compact: Flag-only dropdown (ideal for landing page headers)
+  if (variant === 'compact' || variant === 'buttons') {
     return (
-      <div
-        className={cn('flex items-center', className)}
-        role="group"
-        aria-label={t('common.selectLanguage', 'Select language')}
-      >
+      <div className={cn('relative flex items-center', className)} ref={dropdownRef}>
         {showLabel && (
           <span className="mr-3 text-sm font-medium text-gray-700">
             {t('common.language', 'Idioma')}
           </span>
         )}
-        <div className="inline-flex rounded-lg border border-gray-200 bg-white p-1 gap-1">
-          {languages.map((lang) => {
-            const isActive = lang.code === currentLanguage;
-            return (
-              <button
-                key={lang.code}
-                onClick={() => handleLanguageChange(lang.code)}
-                className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1',
-                  isActive
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                )}
-                aria-pressed={isActive}
-                aria-label={`${t('common.switchTo', 'Switch to')} ${lang.label}`}
-              >
-                <span aria-hidden="true">{lang.flag}</span>
-                <span className="hidden sm:inline">{lang.label}</span>
-                <span className="sm:hidden">{lang.code.toUpperCase()}</span>
-              </button>
-            );
-          })}
-        </div>
+        {/* Trigger Button */}
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className={cn(
+            'inline-flex items-center h-9 gap-1.5 px-2.5 rounded-md',
+            'bg-white/80 backdrop-blur-md border border-gray-200/60 shadow-sm',
+            'hover:bg-white hover:shadow-md hover:border-gray-300/60',
+            'text-gray-700 hover:text-gray-900',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1',
+            'transition-all duration-200'
+          )}
+          aria-label={t('common.selectLanguage', 'Select language')}
+          aria-expanded={open}
+          aria-haspopup="listbox"
+        >
+          <currentLang.Flag className="w-5 h-4 rounded-sm" aria-hidden="true" />
+          <ChevronDown
+            className={cn(
+              'h-3.5 w-3.5 text-gray-500 transition-transform duration-200',
+              open && 'rotate-180'
+            )}
+            aria-hidden="true"
+          />
+          <span className="sr-only">{currentLang.label}</span>
+        </button>
+        
+        {/* Dropdown Menu */}
+        {open && (
+          <div
+            className={cn(
+              'absolute top-full mt-2 z-[100]',
+              align === 'end' ? 'right-0' : align === 'start' ? 'left-0' : 'left-1/2 -translate-x-1/2',
+              'min-w-[160px] p-1.5',
+              'bg-white border border-gray-200 shadow-xl rounded-xl',
+              'animate-in fade-in-0 zoom-in-95 duration-150'
+            )}
+            role="listbox"
+            aria-label={t('common.selectLanguage', 'Select language')}
+          >
+            <div className="flex flex-col gap-0.5">
+              {languages.map((lang) => {
+                const isActive = lang.code === currentLanguage;
+                return (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    role="option"
+                    aria-selected={isActive}
+                    onClick={() => handleLanguageChange(lang.code)}
+                    className={cn(
+                      'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg',
+                      'text-sm font-medium text-left',
+                      'transition-colors duration-150',
+                      'hover:bg-gray-100',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset',
+                      isActive
+                        ? 'bg-indigo-50 text-indigo-700'
+                        : 'text-gray-700'
+                    )}
+                  >
+                    <lang.Flag className="w-5 h-4 rounded-sm" aria-hidden="true" />
+                    <span className="flex-1">{lang.label}</span>
+                    {isActive && (
+                      <Check
+                        className="h-4 w-4 text-indigo-600 shrink-0"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
-  // Default: dropdown variant
+  // Default: Full dropdown with Select (for settings pages)
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       {showLabel && (
@@ -111,7 +224,7 @@ export function LanguageSwitcher({
           <SelectValue>
             <span className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-indigo-600" aria-hidden="true" />
-              <span aria-hidden="true">{currentLang.flag}</span>
+              <currentLang.Flag className="w-5 h-4 rounded-sm" aria-hidden="true" />
               <span>{currentLang.label}</span>
             </span>
           </SelectValue>
@@ -124,7 +237,7 @@ export function LanguageSwitcher({
               className="cursor-pointer"
             >
               <span className="flex items-center gap-2">
-                <span aria-hidden="true">{lang.flag}</span>
+                <lang.Flag className="w-5 h-4 rounded-sm" aria-hidden="true" />
                 <span>{lang.label}</span>
               </span>
             </SelectItem>
