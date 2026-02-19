@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   BarChart, 
   Bar, 
@@ -39,11 +40,11 @@ import type { SessionResponse } from '@/lib/types/session';
 
 type TimeRange = 'week' | 'month' | 'quarter' | 'year';
 
-const TIME_RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
-  { value: 'week', label: 'Esta semana' },
-  { value: 'month', label: 'Este mes' },
-  { value: 'quarter', label: 'Ultimo trimestre' },
-  { value: 'year', label: 'Este año' },
+const TIME_RANGE_KEYS: { value: TimeRange; key: string }[] = [
+  { value: 'week', key: 'analytics.timeRange.week' },
+  { value: 'month', key: 'analytics.timeRange.month' },
+  { value: 'quarter', key: 'analytics.timeRange.quarter' },
+  { value: 'year', key: 'analytics.timeRange.year' },
 ];
 
 const COLORS = {
@@ -101,14 +102,14 @@ const getDateRange = (range: TimeRange): { start: Date; end: Date } => {
   return { start, end };
 };
 
-const getWeekdayName = (day: number): string => {
-  const names = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
-  return names[day];
+const getWeekdayName = (day: number, t: (key: string) => string): string => {
+  const keys = ['analytics.weekdays.sun', 'analytics.weekdays.mon', 'analytics.weekdays.tue', 'analytics.weekdays.wed', 'analytics.weekdays.thu', 'analytics.weekdays.fri', 'analytics.weekdays.sat'];
+  return t(keys[day]);
 };
 
-const getMonthName = (month: number): string => {
-  const names = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-  return names[month];
+const getMonthName = (month: number, t: (key: string) => string): string => {
+  const keys = ['analytics.months.jan', 'analytics.months.feb', 'analytics.months.mar', 'analytics.months.apr', 'analytics.months.may', 'analytics.months.jun', 'analytics.months.jul', 'analytics.months.aug', 'analytics.months.sep', 'analytics.months.oct', 'analytics.months.nov', 'analytics.months.dec'];
+  return t(keys[month]);
 };
 
 // ============================================================================
@@ -125,7 +126,7 @@ interface StatCardProps {
   trend?: { value: number; isPositive: boolean };
 }
 
-const StatCard = ({ title, value, subtitle, icon: Icon, iconBg, iconColor, trend }: StatCardProps) => (
+const StatCard = ({ title, value, subtitle, icon: Icon, iconBg, iconColor, trend, trendLabel }: StatCardProps & { trendLabel?: string }) => (
   <Card className="p-3 sm:p-4 lg:p-6 bg-white">
     <div className="flex items-start justify-between gap-2">
       <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
@@ -135,7 +136,7 @@ const StatCard = ({ title, value, subtitle, icon: Icon, iconBg, iconColor, trend
         {trend && (
           <div className={`flex items-center gap-1 text-[10px] sm:text-xs ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
             <TrendingUp className={`w-3 h-3 ${!trend.isPositive ? 'rotate-180' : ''}`} />
-            <span className="truncate">{trend.value}% vs anterior</span>
+            <span className="truncate">{trend.value}% {trendLabel}</span>
           </div>
         )}
       </div>
@@ -198,6 +199,7 @@ const CustomTooltip = ({ active, payload, label, formatter }: TooltipProps) => {
 // ============================================================================
 
 export function Analitica() {
+  const { t } = useTranslation();
   const { payments, fetchPayments } = usePayments();
   const { patients, fetchPatients } = usePatients();
   const { isMobile } = useResponsive();
@@ -386,12 +388,12 @@ export function Analitica() {
   // Sessions by status (Pie Chart)
   const sessionsByStatus = useMemo(() => {
     return [
-      { name: 'Completadas', value: stats.completedSessions, color: COLORS.success },
-      { name: 'Confirmadas', value: filteredSessions.filter(s => s.status === SessionStatus.CONFIRMED).length, color: COLORS.primary },
-      { name: 'Pendientes', value: filteredSessions.filter(s => s.status === SessionStatus.PENDING).length, color: COLORS.warning },
-      { name: 'Canceladas', value: stats.cancelledSessions, color: COLORS.danger },
+      { name: t('analytics.labels.completed'), value: stats.completedSessions, color: COLORS.success },
+      { name: t('analytics.labels.confirmed'), value: filteredSessions.filter(s => s.status === SessionStatus.CONFIRMED).length, color: COLORS.primary },
+      { name: t('analytics.labels.pendingStatus'), value: filteredSessions.filter(s => s.status === SessionStatus.PENDING).length, color: COLORS.warning },
+      { name: t('analytics.labels.cancelled'), value: stats.cancelledSessions, color: COLORS.danger },
     ].filter(item => item.value > 0);
-  }, [stats, filteredSessions]);
+  }, [stats, filteredSessions, t]);
 
   // Sessions over time (Line Chart)
   const sessionsOverTime = useMemo(() => {
@@ -406,9 +408,9 @@ export function Analitica() {
       } else if (timeRange === 'month') {
         // Group by week
         const weekNum = Math.ceil(date.getDate() / 7);
-        key = `Semana ${weekNum}`;
+        key = t('analytics.labels.weekNumber', { number: weekNum });
       } else {
-        key = getMonthName(date.getMonth());
+        key = getMonthName(date.getMonth(), t);
       }
       
       if (!grouped[key]) {
@@ -425,7 +427,7 @@ export function Analitica() {
       completadas: data.completed,
       canceladas: data.cancelled,
     }));
-  }, [filteredSessions, timeRange]);
+  }, [filteredSessions, timeRange, t]);
 
   // Income over time (Bar Chart)
   const incomeOverTime = useMemo(() => {
@@ -439,9 +441,9 @@ export function Analitica() {
         key = `${date.getDate()}/${date.getMonth() + 1}`;
       } else if (timeRange === 'month') {
         const weekNum = Math.ceil(date.getDate() / 7);
-        key = `Semana ${weekNum}`;
+        key = t('analytics.labels.weekNumber', { number: weekNum });
       } else {
-        key = getMonthName(date.getMonth());
+        key = getMonthName(date.getMonth(), t);
       }
       
       if (!grouped[key]) {
@@ -461,7 +463,7 @@ export function Analitica() {
       cobrado: data.paid,
       pendiente: data.pending,
     }));
-  }, [filteredPayments, timeRange]);
+  }, [filteredPayments, timeRange, t]);
 
   // Sessions by hour (Bar Chart)
   const sessionsByHour = useMemo(() => {
@@ -495,10 +497,10 @@ export function Analitica() {
     // Monday to Sunday (1-0 reordered)
     const days = [1, 2, 3, 4, 5, 6, 0];
     return days.map(day => ({
-      name: getWeekdayName(day),
+      name: getWeekdayName(day, t),
       sesiones: dayCounts[day] || 0,
     }));
-  }, [filteredSessions]);
+  }, [filteredSessions, t]);
 
   // Payments by status (Pie Chart)
   const paymentsByStatus = useMemo(() => {
@@ -507,11 +509,11 @@ export function Analitica() {
     const overdue = filteredPayments.filter(p => p.status === PaymentStatus.OVERDUE).length;
 
     return [
-      { name: 'Pagados', value: paid, color: COLORS.success },
-      { name: 'Pendientes', value: pending, color: COLORS.warning },
-      { name: 'Vencidos', value: overdue, color: COLORS.danger },
+      { name: t('analytics.labels.paid'), value: paid, color: COLORS.success },
+      { name: t('analytics.labels.pendingStatus'), value: pending, color: COLORS.warning },
+      { name: t('analytics.labels.overdue'), value: overdue, color: COLORS.danger },
     ].filter(item => item.value > 0);
-  }, [filteredPayments]);
+  }, [filteredPayments, t]);
 
   // Top patients by sessions
   const topPatientsBySessions = useMemo(() => {
@@ -539,8 +541,8 @@ export function Analitica() {
     return (
       <div className="p-4 md:p-6 lg:p-8 space-y-6">
         <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Analitica</h1>
-          <p className="text-sm text-gray-500">Cargando datos...</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('analytics.title')}</h1>
+          <p className="text-sm text-gray-500">{t('analytics.loading')}</p>
         </div>
         <SkeletonList items={4} />
       </div>
@@ -552,8 +554,8 @@ export function Analitica() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Analitica</h1>
-          <p className="text-sm text-gray-500">Visualiza el rendimiento de tu consultorio</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('analytics.title')}</h1>
+          <p className="text-sm text-gray-500">{t('analytics.subtitle')}</p>
         </div>
         
         {/* Time Range Selector and Refresh */}
@@ -563,8 +565,8 @@ export function Analitica() {
             size="icon"
             onClick={() => setRefreshKey(k => k + 1)}
             disabled={isLoading}
-            title="Actualizar datos"
-            aria-label="Actualizar datos"
+            title={t('analytics.refresh')}
+            aria-label={t('analytics.refresh')}
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
@@ -576,7 +578,7 @@ export function Analitica() {
               className="w-full sm:w-auto justify-between"
             >
               <Calendar className="w-4 h-4 mr-2" />
-              {TIME_RANGE_OPTIONS.find(o => o.value === timeRange)?.label}
+              {t(TIME_RANGE_KEYS.find(o => o.value === timeRange)?.key || '')}
               <ChevronDown className="w-4 h-4 ml-2" />
             </Button>
             
@@ -587,7 +589,7 @@ export function Analitica() {
                   onClick={() => setShowRangeDropdown(false)} 
                 />
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                  {TIME_RANGE_OPTIONS.map(option => (
+                  {TIME_RANGE_KEYS.map(option => (
                     <button
                       key={option.value}
                       onClick={() => {
@@ -598,7 +600,7 @@ export function Analitica() {
                         timeRange === option.value ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-700'
                       }`}
                     >
-                      {option.label}
+                      {t(option.key)}
                     </button>
                   ))}
                 </div>
@@ -611,43 +613,47 @@ export function Analitica() {
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Sesiones"
+          title={t('analytics.stats.sessions')}
           value={stats.totalSessions}
-          subtitle={`${stats.completedSessions} completadas`}
+          subtitle={`${stats.completedSessions} ${t('analytics.stats.completed')}`}
           icon={Calendar}
           iconBg="bg-indigo-100"
           iconColor="text-indigo-600"
+          trendLabel={t('analytics.stats.vsPrevious')}
         />
         <StatCard
-          title="Ingresos"
+          title={t('analytics.stats.income')}
           value={formatCurrency(stats.totalIncome)}
-          subtitle={`${formatCurrency(stats.pendingIncome)} pendiente`}
+          subtitle={`${formatCurrency(stats.pendingIncome)} ${t('analytics.stats.pending')}`}
           icon={DollarSign}
           iconBg="bg-green-100"
           iconColor="text-green-600"
+          trendLabel={t('analytics.stats.vsPrevious')}
         />
         <StatCard
-          title="Pacientes Atendidos"
+          title={t('analytics.stats.patientsAttended')}
           value={stats.activePatients}
-          subtitle={`${stats.newPatients} nuevos en el período`}
+          subtitle={`${stats.newPatients} ${t('analytics.stats.newInPeriod')}`}
           icon={Users}
           iconBg="bg-blue-100"
           iconColor="text-blue-600"
+          trendLabel={t('analytics.stats.vsPrevious')}
         />
         <StatCard
-          title="Tasa de Asistencia"
+          title={t('analytics.stats.attendanceRate')}
           value={`${stats.completionRate}%`}
-          subtitle={`${stats.cancelledSessions} cancelaciones`}
+          subtitle={`${stats.cancelledSessions} ${t('analytics.stats.cancellations')}`}
           icon={CheckCircle2}
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
+          trendLabel={t('analytics.stats.vsPrevious')}
         />
       </div>
 
       {/* Charts Grid - Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sessions Over Time */}
-        <ChartCard title="Sesiones en el Tiempo" subtitle="Evolución de sesiones por período">
+        <ChartCard title={t('analytics.charts.sessionsOverTime.title')} subtitle={t('analytics.charts.sessionsOverTime.subtitle')}>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={sessionsOverTime}>
@@ -659,7 +665,7 @@ export function Analitica() {
                 <Line 
                   type="monotone" 
                   dataKey="total" 
-                  name="Total"
+                  name={t('analytics.labels.total')}
                   stroke={COLORS.primary} 
                   strokeWidth={2}
                   dot={{ fill: COLORS.primary }}
@@ -667,7 +673,7 @@ export function Analitica() {
                 <Line 
                   type="monotone" 
                   dataKey="completadas" 
-                  name="Completadas"
+                  name={t('analytics.labels.completed')}
                   stroke={COLORS.success} 
                   strokeWidth={2}
                   dot={{ fill: COLORS.success }}
@@ -678,7 +684,7 @@ export function Analitica() {
         </ChartCard>
 
         {/* Sessions by Status */}
-        <ChartCard title="Estado de Sesiones" subtitle="Distribución por estado">
+        <ChartCard title={t('analytics.charts.sessionStatus.title')} subtitle={t('analytics.charts.sessionStatus.subtitle')}>
           <div className="h-64 flex items-center justify-center">
             {sessionsByStatus.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -702,7 +708,7 @@ export function Analitica() {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-gray-500 text-sm">Sin datos para mostrar</p>
+              <p className="text-gray-500 text-sm">{t('analytics.noData')}</p>
             )}
           </div>
         </ChartCard>
@@ -711,7 +717,7 @@ export function Analitica() {
       {/* Charts Grid - Row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Income Over Time */}
-        <ChartCard title="Ingresos en el Tiempo" subtitle="Cobros realizados vs pendientes">
+        <ChartCard title={t('analytics.charts.incomeOverTime.title')} subtitle={t('analytics.charts.incomeOverTime.subtitle')}>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={incomeOverTime}>
@@ -720,15 +726,15 @@ export function Analitica() {
                 <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" tickFormatter={(v) => `$${v/1000}k`} />
                 <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
                 <Legend />
-                <Bar dataKey="cobrado" name="Cobrado" fill={COLORS.success} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="pendiente" name="Pendiente" fill={COLORS.warning} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="cobrado" name={t('analytics.labels.collected')} fill={COLORS.success} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="pendiente" name={t('analytics.labels.pendingAmount')} fill={COLORS.warning} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </ChartCard>
 
         {/* Payments by Status */}
-        <ChartCard title="Estado de Cobros" subtitle="Distribución de pagos">
+        <ChartCard title={t('analytics.charts.paymentStatus.title')} subtitle={t('analytics.charts.paymentStatus.subtitle')}>
           <div className="h-64 flex items-center justify-center">
             {paymentsByStatus.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -752,7 +758,7 @@ export function Analitica() {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-gray-500 text-sm">Sin datos para mostrar</p>
+              <p className="text-gray-500 text-sm">{t('analytics.noData')}</p>
             )}
           </div>
         </ChartCard>
@@ -761,7 +767,7 @@ export function Analitica() {
       {/* Charts Grid - Row 3: Occupancy */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sessions by Hour */}
-        <ChartCard title="Ocupación por Hora" subtitle="Horarios más demandados">
+        <ChartCard title={t('analytics.charts.hourlyOccupancy.title')} subtitle={t('analytics.charts.hourlyOccupancy.subtitle')}>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={sessionsByHour}>
@@ -769,14 +775,14 @@ export function Analitica() {
                 <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="#9ca3af" interval={0} angle={-45} textAnchor="end" height={50} />
                 <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" allowDecimals={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="sesiones" name="Sesiones" fill={COLORS.primary} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="sesiones" name={t('analytics.labels.sessions')} fill={COLORS.primary} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </ChartCard>
 
         {/* Sessions by Weekday */}
-        <ChartCard title="Ocupación por Día" subtitle="Días más activos de la semana">
+        <ChartCard title={t('analytics.charts.dailyOccupancy.title')} subtitle={t('analytics.charts.dailyOccupancy.subtitle')}>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={sessionsByWeekday}>
@@ -784,7 +790,7 @@ export function Analitica() {
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9ca3af" />
                 <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" allowDecimals={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="sesiones" name="Sesiones" fill={COLORS.blue} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="sesiones" name={t('analytics.labels.sessions')} fill={COLORS.blue} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -792,7 +798,7 @@ export function Analitica() {
       </div>
 
       {/* Top Patients */}
-      <ChartCard title="Pacientes Frecuentes" subtitle="Top 5 pacientes con más sesiones">
+      <ChartCard title={t('analytics.charts.topPatients.title')} subtitle={t('analytics.charts.topPatients.subtitle')}>
         <div className="h-64">
           {topPatientsBySessions.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
@@ -807,12 +813,12 @@ export function Analitica() {
                   width={120}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="sesiones" name="Sesiones" fill={COLORS.purple} radius={[0, 4, 4, 0]} />
+                <Bar dataKey="sesiones" name={t('analytics.labels.sessions')} fill={COLORS.purple} radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
             <div className="h-full flex items-center justify-center">
-              <p className="text-gray-500 text-sm">Sin datos para mostrar</p>
+              <p className="text-gray-500 text-sm">{t('analytics.noData')}</p>
             </div>
           )}
         </div>
