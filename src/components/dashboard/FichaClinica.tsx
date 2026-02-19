@@ -1,5 +1,6 @@
 import { ArrowLeft, Mail, Phone, Heart, Calendar, FileText, User, Clock, Flag, Edit2, Save, X, Plus, MessageCircle, Pencil, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { TurnoDrawer } from '../agenda';
 import { NoteDrawer } from '../notes/NoteDrawer';
@@ -17,21 +18,8 @@ interface FichaClinicaProps {
   onBack: () => void;
 }
 
-// Helper to format frequency label
-const getFrecuenciaLabel = (frecuencia?: string) => {
-  switch (frecuencia?.toLowerCase()) {
-    case 'semanal':
-      return 'Semanal';
-    case 'quincenal':
-      return 'Quincenal';
-    case 'mensual':
-      return 'Mensual';
-    default:
-      return frecuencia || 'No especificada';
-  }
-};
-
 export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
+  const { t } = useTranslation();
   const { updatePatient, fetchPatients } = usePatients();
   const { sessionsUI, isLoading: isLoadingSessions, fetchUpcoming, createSession } = useSessions();
   const { notes, isLoading: isLoadingNotes, error: notesError, fetchNotesByPatient, createNote, updateNote, deleteNote, clearNotes, clearError: clearNotesError } = useNotes();
@@ -81,6 +69,20 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
 
   if (!patient) return null;
 
+  // Helper to format frequency label
+  const getFrecuenciaLabel = (frecuencia?: string) => {
+    switch (frecuencia?.toLowerCase()) {
+      case 'semanal':
+        return t('clinicalFile.frequency.weekly');
+      case 'quincenal':
+        return t('clinicalFile.frequency.biweekly');
+      case 'mensual':
+        return t('clinicalFile.frequency.monthly');
+      default:
+        return frecuencia || t('clinicalFile.frequency.notSpecified');
+    }
+  };
+
   // Calculate age
   let edad = patient.age || 0;
   if (patient.birthDate && !patient.age) {
@@ -112,14 +114,14 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
       await updatePatient(patient.id, {
         riskLevel: newFlagValue ? 'high' : 'low',
       });
-      toast.success(newFlagValue ? 'Paciente marcado como riesgo alto' : 'Marcador de riesgo removido');
+      toast.success(newFlagValue ? t('clinicalFile.messages.riskMarked') : t('clinicalFile.messages.riskRemoved'));
       // Refresh patients list to update other views
       await fetchPatients();
     } catch (error) {
       // Revert on error
       setIsFlagged(!newFlagValue);
       console.error('Error updating patient flag:', error);
-      toast.error('Error al actualizar el marcador');
+      toast.error(t('clinicalFile.messages.riskUpdateError'));
     } finally {
       setIsSavingFlag(false);
     }
@@ -135,10 +137,10 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
         observations: editableData.observaciones || undefined,
       });
       setIsEditing(false);
-      toast.success('Información actualizada exitosamente');
+      toast.success(t('clinicalFile.messages.infoUpdateSuccess'));
     } catch (error) {
       console.error('Error updating patient:', error);
-      toast.error('Error al actualizar la información');
+      toast.error(t('clinicalFile.messages.infoUpdateError'));
     }
   };
 
@@ -157,12 +159,12 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   const handleSaveTurno = async (sessionData: CreateSessionDto) => {
     try {
       await createSession(sessionData);
-      toast.success('Turno creado exitosamente');
+      toast.success(t('clinicalFile.messages.appointmentCreateSuccess'));
       await fetchUpcoming();
       setIsTurnoDrawerOpen(false);
     } catch (error: any) {
       console.error('Error creating session:', error);
-      const errorMessage = error?.message || 'Error al crear el turno';
+      const errorMessage = error?.message || t('clinicalFile.messages.appointmentCreateError');
       toast.error(errorMessage);
     }
   };
@@ -171,16 +173,16 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     try {
       if (noteId) {
         await updateNote(noteId, data as UpdateNoteDto);
-        toast.success('Nota actualizada exitosamente');
+        toast.success(t('clinicalFile.messages.noteUpdateSuccess'));
       } else {
         await createNote(data as CreateNoteDto);
-        toast.success('Nota creada exitosamente');
+        toast.success(t('clinicalFile.messages.noteCreateSuccess'));
       }
       setIsNoteDrawerOpen(false);
       setSelectedNote(null);
     } catch (error) {
       console.error('Error saving note:', error);
-      toast.error('Error al guardar la nota');
+      toast.error(t('clinicalFile.messages.noteSaveError'));
     }
   };
 
@@ -192,10 +194,10 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   const handleDeleteNote = async (id: string) => {
     try {
       await deleteNote(id);
-      toast.success('Nota eliminada exitosamente');
+      toast.success(t('clinicalFile.messages.noteDeleteSuccess'));
     } catch (error) {
       console.error('Error deleting note:', error);
-      toast.error('Error al eliminar la nota');
+      toast.error(t('clinicalFile.messages.noteDeleteError'));
     }
   };
 
@@ -208,7 +210,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   const handleSavePatientFromDrawer = async (patientData: CreatePatientDto) => {
     try {
       await updatePatient(patient.id, patientData);
-      toast.success('Paciente actualizado exitosamente');
+      toast.success(t('clinicalFile.messages.patientUpdateSuccess'));
       setIsPacienteDrawerOpen(false);
       // Refresh para actualizar la vista
       await fetchPatients();
@@ -222,19 +224,19 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
       });
     } catch (error) {
       console.error('Error updating patient:', error);
-      toast.error('Error al actualizar el paciente');
+      toast.error(t('clinicalFile.messages.patientUpdateError'));
     }
   };
 
   // Send WhatsApp message to patient
   const handleSendWhatsApp = (message?: string) => {
     if (!editableData.telefono) {
-      toast.info('El paciente no tiene número de teléfono registrado');
+      toast.info(t('clinicalFile.messages.noPhone'));
       return;
     }
 
     const phone = editableData.telefono.replace(/\D/g, '');
-    const defaultMessage = `Hola ${patient.firstName}! Te escribo desde el consultorio. Como estas?`;
+    const defaultMessage = t('clinicalFile.whatsapp.defaultMessage', { name: patient.firstName });
     const encodedMessage = encodeURIComponent(message || defaultMessage);
     window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
   };
@@ -261,7 +263,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
         className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 mb-6 transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />
-        <span>Volver a Pacientes</span>
+        <span>{t('clinicalFile.backToPatients')}</span>
       </button>
 
       {/* Patient Header */}
@@ -282,7 +284,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               <h1 className="text-white text-2xl md:text-3xl">{patient.firstName} {patient.lastName}</h1>
               {isFlagged && (
                 <span className="px-2 py-0.5 bg-yellow-400 text-red-900 text-xs font-bold rounded">
-                  RIESGO ALTO
+                  {t('clinicalFile.highRisk')}
                 </span>
               )}
             </div>
@@ -293,7 +295,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Heart className="w-4 h-4" />
-                <span>{patient.healthInsurance || 'Sin cobertura médica'}</span>
+                <span>{patient.healthInsurance || t('clinicalFile.noHealthInsurance')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <RefreshCw className="w-4 h-4" />
@@ -306,7 +308,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
             <button
               onClick={() => setIsPacienteDrawerOpen(true)}
               className={`p-3 rounded-lg ${isFlagged ? 'hover:bg-red-600' : 'hover:bg-indigo-600'} transition-colors`}
-              title="Editar información del paciente"
+              title={t('clinicalFile.actions.editPatient')}
             >
               <Pencil className={`w-6 h-6 ${isFlagged ? 'text-red-200 hover:text-white' : 'text-indigo-200 hover:text-white'}`} />
             </button>
@@ -314,7 +316,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               onClick={handleToggleFlag}
               disabled={isSavingFlag}
               className={`p-3 rounded-lg ${isFlagged ? 'hover:bg-red-600' : 'hover:bg-indigo-600'} transition-colors disabled:opacity-50`}
-              title={isFlagged ? "Quitar marcador de riesgo" : "Marcar como riesgo alto"}
+              title={isFlagged ? t('clinicalFile.actions.removeRisk') : t('clinicalFile.actions.markHighRisk')}
             >
               <Flag
                 className={`w-6 h-6 ${isFlagged ? 'fill-yellow-400 text-yellow-400' : 'text-indigo-200'}`}
@@ -332,13 +334,13 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-gray-900 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-indigo-600" />
-                Información de Contacto
+                {t('clinicalFile.sections.contactInfo')}
               </h3>
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
                   className="p-1 hover:bg-gray-100 rounded transition-colors"
-                  title="Editar información"
+                  title={t('clinicalFile.actions.editInfo')}
                 >
                   <Edit2 className="w-4 h-4 text-gray-600" />
                 </button>
@@ -346,7 +348,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
             </div>
             <div className="space-y-4">
               <div>
-                <label className="text-gray-500 text-sm block mb-1">Teléfono</label>
+                <label className="text-gray-500 text-sm block mb-1">{t('clinicalFile.fields.phone')}</label>
                 {isEditing ? (
                   <input
                     type="text"
@@ -358,13 +360,13 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-gray-900">
                       <Phone className="w-4 h-4 text-gray-400" />
-                      <span>{editableData.telefono || 'No registrado'}</span>
+                      <span>{editableData.telefono || t('clinicalFile.notRegistered')}</span>
                     </div>
                     {editableData.telefono && (
                       <button
                         onClick={() => handleSendWhatsApp()}
                         className="p-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-                        title="Enviar WhatsApp"
+                        title={t('clinicalFile.actions.sendWhatsApp')}
                       >
                         <MessageCircle className="w-4 h-4" />
                       </button>
@@ -373,7 +375,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
                 )}
               </div>
               <div>
-                <label className="text-gray-500 text-sm block mb-1">Email</label>
+                <label className="text-gray-500 text-sm block mb-1">{t('clinicalFile.fields.email')}</label>
                 {isEditing ? (
                   <input
                     type="email"
@@ -384,13 +386,13 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
                 ) : (
                   <div className="flex items-center gap-2 text-gray-900">
                     <Mail className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">{editableData.email || 'No registrado'}</span>
+                    <span className="text-sm">{editableData.email || t('clinicalFile.notRegistered')}</span>
                   </div>
                 )}
               </div>
               {ultimaConsulta && (
                 <div>
-                  <label className="text-gray-500 text-sm block mb-1">Última Consulta</label>
+                  <label className="text-gray-500 text-sm block mb-1">{t('clinicalFile.fields.lastAppointment')}</label>
                   <div className="flex items-center gap-2 text-gray-900">
                     <Calendar className="w-4 h-4 text-gray-400" />
                     <span>{formatFecha(ultimaConsulta.scheduledFrom)}</span>
@@ -406,14 +408,14 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
                   className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition-colors"
                 >
                   <Save className="w-4 h-4" />
-                  <span>Guardar</span>
+                  <span>{t('common.save')}</span>
                 </button>
                 <button
                   onClick={handleCancelEdit}
                   className="flex-1 flex items-center justify-center gap-2 bg-gray-200 text-gray-700 py-2 rounded hover:bg-gray-300 transition-colors"
                 >
                   <X className="w-4 h-4" />
-                  <span>Cancelar</span>
+                  <span>{t('common.cancel')}</span>
                 </button>
               </div>
             )}
@@ -423,7 +425,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <h3 className="text-gray-900 mb-4 flex items-center gap-2">
               <Clock className="w-5 h-5 text-indigo-600" />
-              Próximos Turnos
+              {t('clinicalFile.sections.upcomingAppointments')}
             </h3>
             {isLoadingSessions ? (
               <div className="space-y-3">
@@ -437,16 +439,16 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
                   const fecha = dateTime.toISOString().split('T')[0];
                   const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
                   
-                  return (
+                    return (
                     <div key={turno.id} className="p-3 bg-indigo-50 rounded border border-indigo-100">
                       <p className="text-gray-900 text-sm mb-1">{formatFecha(fecha)}</p>
-                      <p className="text-gray-600 text-sm">{hora} - {turno.sessionSummary || 'Sesión'}</p>
+                      <p className="text-gray-600 text-sm">{hora} - {turno.sessionSummary || t('clinicalFile.defaultSession')}</p>
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm">No hay turnos próximos</p>
+              <p className="text-gray-500 text-sm">{t('clinicalFile.noUpcomingAppointments')}</p>
             )}
             
             {/* Botón Agendar Turno - ahora debajo de Próximos Turnos */}
@@ -455,7 +457,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               className="w-full mt-4 flex items-center justify-center gap-2 bg-indigo-600 text-white py-2.5 rounded-lg hover:bg-indigo-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
-              Agendar Turno
+              {t('clinicalFile.scheduleAppointment')}
             </button>
           </div>
         </div>
@@ -464,7 +466,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
         <div className="col-span-2 space-y-6">
           {/* Diagnóstico */}
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-gray-900 mb-4">Diagnóstico</h3>
+            <h3 className="text-gray-900 mb-4">{t('clinicalFile.sections.diagnosis')}</h3>
             {isEditing ? (
               <textarea
                 value={editableData.diagnostico}
@@ -473,14 +475,14 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               />
             ) : (
               <p className="text-gray-700 leading-relaxed">
-                {editableData.diagnostico || 'Sin diagnóstico registrado'}
+                {editableData.diagnostico || t('clinicalFile.noDiagnosis')}
               </p>
             )}
           </div>
 
           {/* Tratamiento Actual */}
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-gray-900 mb-4">Tratamiento Actual</h3>
+            <h3 className="text-gray-900 mb-4">{t('clinicalFile.sections.currentTreatment')}</h3>
             {isEditing ? (
               <textarea
                 value={editableData.tratamientoActual}
@@ -489,14 +491,14 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               />
             ) : (
               <p className="text-gray-700 leading-relaxed">
-                {editableData.tratamientoActual || 'Sin tratamiento registrado'}
+                {editableData.tratamientoActual || t('clinicalFile.noTreatment')}
               </p>
             )}
           </div>
 
           {/* Observaciones */}
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-gray-900 mb-4">Observaciones Clínicas</h3>
+            <h3 className="text-gray-900 mb-4">{t('clinicalFile.sections.observations')}</h3>
             {isEditing ? (
               <textarea
                 value={editableData.observaciones}
@@ -505,7 +507,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               />
             ) : (
               <p className="text-gray-700 leading-relaxed">
-                {editableData.observaciones || 'Sin observaciones registradas'}
+                {editableData.observaciones || t('clinicalFile.noObservations')}
               </p>
             )}
           </div>
@@ -515,14 +517,14 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-gray-900 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-indigo-600" />
-                Notas de Sesión
+                {t('clinicalFile.sections.sessionNotes')}
               </h3>
               <button
                 onClick={handleCreateNote}
                 className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                Nueva Nota
+                {t('clinicalFile.newNote')}
               </button>
             </div>
             
@@ -531,17 +533,17 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
             ) : notesError ? (
               <div className="text-center py-8">
                 <FileText className="w-12 h-12 text-amber-400 mx-auto mb-3" />
-                <p className="text-gray-700 text-sm mb-1">No se pudieron cargar las notas existentes</p>
+                <p className="text-gray-700 text-sm mb-1">{t('clinicalFile.notes.loadError')}</p>
                 <p className="text-gray-500 text-xs mb-3">
                   {notesError.includes('validación') 
-                    ? 'Puedes crear nuevas notas normalmente.' 
-                    : 'Intenta de nuevo más tarde.'}
+                    ? t('clinicalFile.notes.canCreateNew')
+                    : t('clinicalFile.notes.tryAgainLater')}
                 </p>
                 <button
                   onClick={() => patient?.id && fetchNotesByPatient(patient.id)}
                   className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
                 >
-                  Reintentar
+                  {t('clinicalFile.notes.retry')}
                 </button>
               </div>
             ) : (
@@ -549,7 +551,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
                 notes={notes}
                 onEdit={handleEditNote}
                 onDelete={handleDeleteNote}
-                emptyMessage="No hay notas registradas para este paciente"
+                emptyMessage={t('clinicalFile.notes.noNotes')}
               />
             )}
           </div>
