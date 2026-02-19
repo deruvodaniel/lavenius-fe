@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Sparkles, 
   Calendar, 
@@ -30,6 +31,7 @@ export function OnboardingModal({
   onConnectCalendar,
   onCreatePatient
 }: OnboardingModalProps) {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const { completeOnboarding } = useOnboarding();
 
@@ -73,8 +75,8 @@ export function OnboardingModal({
         return (
           <OnboardingStep
             icon={Sparkles}
-            title="¡Bienvenido a Lavenius!"
-            description="Tu nueva herramienta para gestionar pacientes, agendar sesiones y llevar el control de tu práctica terapéutica de forma simple y organizada."
+            title={t('onboarding.welcome')}
+            description={t('onboarding.welcomeDescription')}
           />
         );
 
@@ -82,21 +84,21 @@ export function OnboardingModal({
         return (
           <OnboardingStep
             icon={Calendar}
-            title="Conecta tu calendario"
-            description="Sincroniza con Google Calendar para agendar turnos automáticamente y recibir recordatorios. Tus pacientes también recibirán invitaciones."
+            title={t('onboarding.calendar.title')}
+            description={t('onboarding.calendar.description')}
           >
             <div className="space-y-3">
               <Button
                 onClick={handleConnectCalendar}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
               >
-                Conectar Google Calendar
+                {t('onboarding.calendar.connect')}
               </Button>
               <button
                 onClick={handleNext}
                 className="w-full text-sm text-gray-500 hover:text-gray-700 py-2"
               >
-                Lo haré más tarde
+                {t('onboarding.calendar.later')}
               </button>
             </div>
           </OnboardingStep>
@@ -106,21 +108,21 @@ export function OnboardingModal({
         return (
           <OnboardingStep
             icon={UserPlus}
-            title="Registra tu primer paciente"
-            description="Comienza agregando a tus pacientes para poder agendar sesiones, llevar notas clínicas y gestionar sus pagos."
+            title={t('onboarding.patient.title')}
+            description={t('onboarding.patient.description')}
           >
             <div className="space-y-3">
               <Button
                 onClick={handleCreatePatient}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
               >
-                Crear paciente
+                {t('onboarding.patient.create')}
               </Button>
               <button
                 onClick={handleNext}
                 className="w-full text-sm text-gray-500 hover:text-gray-700 py-2"
               >
-                Lo haré después
+                {t('onboarding.patient.later')}
               </button>
             </div>
           </OnboardingStep>
@@ -130,14 +132,13 @@ export function OnboardingModal({
         return (
           <OnboardingStep
             icon={PartyPopper}
-            title="¡Todo listo!"
-            description="Ya puedes comenzar a usar Lavenius. Recuerda que siempre puedes acceder a la ayuda desde el menú lateral si tienes dudas."
+            title={t('onboarding.complete.title')}
+            description={t('onboarding.complete.description')}
           >
             <div className="bg-gray-50 rounded-lg p-4 text-left space-y-2">
               <p className="text-sm text-gray-600">
-                <span className="font-medium text-gray-900">Tip:</span> Usa la sección{' '}
-                <span className="text-indigo-600 font-medium">Ayuda</span> para ver tutoriales
-                y resolver dudas frecuentes.
+                <span className="font-medium text-gray-900">{t('onboarding.complete.tip')}</span> {t('onboarding.complete.tipText')}{' '}
+                <span className="text-indigo-600 font-medium">{t('onboarding.complete.helpSection')}</span> {t('onboarding.complete.tipSuffix')}
               </p>
             </div>
           </OnboardingStep>
@@ -155,7 +156,7 @@ export function OnboardingModal({
         <button
           onClick={handleSkip}
           className="absolute right-4 top-4 p-1 rounded-full hover:bg-gray-100 transition-colors z-10"
-          aria-label="Cerrar"
+          aria-label={t('onboarding.navigation.close')}
         >
           <X className="w-5 h-5 text-gray-400" />
         </button>
@@ -176,7 +177,7 @@ export function OnboardingModal({
                   className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  Atrás
+                  {t('onboarding.navigation.back')}
                 </button>
               )}
             </div>
@@ -194,7 +195,7 @@ export function OnboardingModal({
                   onClick={handleNext}
                   className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
                 >
-                  Siguiente
+                  {t('onboarding.navigation.next')}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               ) : (
@@ -203,7 +204,7 @@ export function OnboardingModal({
                   size="sm"
                   className="bg-indigo-600 hover:bg-indigo-700 text-white"
                 >
-                  Comenzar
+                  {t('onboarding.navigation.start')}
                 </Button>
               )}
             </div>

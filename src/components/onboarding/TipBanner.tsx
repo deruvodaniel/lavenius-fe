@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { X, Lightbulb, AlertCircle, CheckCircle2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useOnboarding } from '@/lib/hooks/useOnboarding';
@@ -71,6 +72,7 @@ export function TipBanner({
   dismissible = true,
   className = '',
 }: TipBannerProps) {
+  const { t } = useTranslation();
   const { shouldShowTip, dismissTip } = useOnboarding();
 
   // Don't render if tip has been dismissed
@@ -118,7 +120,7 @@ export function TipBanner({
           <button
             onClick={handleDismiss}
             className={`flex-shrink-0 p-1 rounded-md transition-colors ${styles.dismiss}`}
-            aria-label="Descartar tip"
+            aria-label={t('onboarding.tip.dismiss')}
           >
             <X className="w-4 h-4" />
           </button>
