@@ -1,0 +1,524 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "add": "Agregar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "clear": "Limpiar",
+    "reset": "Restablecer",
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "deleting": "Eliminando...",
+    "processing": "Procesando...",
+    "error": "Error",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "info": "Información",
+    "yes": "Sí",
+    "no": "No",
+    "all": "Todos",
+    "none": "Ninguno",
+    "optional": "Opcional",
+    "required": "Requerido",
+    "actions": "Acciones",
+    "details": "Detalles",
+    "options": "Opciones",
+    "noResults": "Sin resultados",
+    "noData": "Sin datos",
+    "tryAgain": "Intentar de nuevo",
+    "comingSoon": "Próximamente",
+    "unsavedChanges": "Hay cambios sin guardar",
+    "date": "Fecha",
+    "time": "Hora",
+    "from": "Desde",
+    "to": "Hasta",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "tomorrow": "Mañana",
+    "week": "Semana",
+    "month": "Mes",
+    "year": "Año"
+  },
+  "navigation": {
+    "dashboard": "Panel",
+    "agenda": "Agenda",
+    "patients": "Pacientes",
+    "payments": "Cobros",
+    "analytics": "Analítica",
+    "settings": "Configuración",
+    "profile": "Perfil",
+    "help": "Ayuda",
+    "logout": "Cerrar sesión"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "passphrase": "Passphrase (Encriptación)",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "registerHere": "Regístrate aquí",
+    "loginHere": "Inicia sesión aquí",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "confirmPassword": "Confirmar contraseña",
+    "enterEmail": "doctor@clinica.com",
+    "enterPassword": "••••••••",
+    "enterFirstName": "Ingresa tu nombre",
+    "enterLastName": "Ingresa tu apellido",
+    "loggingIn": "Ingresando...",
+    "registering": "Registrando...",
+    "welcomeBack": "¡Bienvenido!",
+    "accountCreated": "¡Cuenta creada exitosamente!",
+    "loginToContinue": "Ahora puedes iniciar sesión con tus credenciales",
+    "invalidCredentials": "Credenciales incorrectas",
+    "invalidCredentialsHint": "¿No tienes cuenta? Regístrate para comenzar.",
+    "firstTime": "¿Es tu primera vez? Necesitas crear una cuenta para comenzar.",
+    "createNewAccount": "Crear cuenta nueva",
+    "loginError": "Error al iniciar sesión",
+    "registerError": "Error al registrar",
+    "platformDescription": "Plataforma de gestión psicológica"
+  },
+  "patients": {
+    "title": "Pacientes",
+    "subtitle": "Gestión de pacientes",
+    "newPatient": "Nuevo Paciente",
+    "editPatient": "Editar Paciente",
+    "addPatient": "Agregar Paciente",
+    "searchPlaceholder": "Buscar paciente por nombre...",
+    "noPatients": "No hay pacientes registrados",
+    "noPatientsDescription": "Agrega tu primer paciente para comenzar",
+    "addFirstPatient": "Agregar primer paciente",
+    "patientDetails": "Detalles del paciente",
+    "clinicalFile": "Ficha clínica",
+    "sessions": "Sesiones",
+    "notes": "Notas",
+    "payments": "Pagos",
+    "fields": {
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo electrónico",
+      "phone": "Teléfono",
+      "dateOfBirth": "Fecha de nacimiento",
+      "address": "Dirección",
+      "diagnosis": "Diagnóstico",
+      "notes": "Notas",
+      "status": "Estado",
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "messages": {
+      "createSuccess": "Paciente creado exitosamente",
+      "updateSuccess": "Paciente actualizado exitosamente",
+      "deleteSuccess": "Paciente eliminado",
+      "deleteConfirmTitle": "¿Eliminar paciente?",
+      "deleteConfirmDescription": "Esta acción eliminará permanentemente al paciente y todos sus datos asociados. Esta acción no se puede deshacer."
+    }
+  },
+  "agenda": {
+    "title": "Agenda",
+    "subtitle": "Gestión de turnos",
+    "newSession": "Nuevo Turno",
+    "editSession": "Editar Turno",
+    "addSession": "Agregar Turno",
+    "upcoming": "Próximos turnos",
+    "past": "Turnos pasados",
+    "today": "Turnos de hoy",
+    "noSessions": "No hay turnos programados",
+    "noSessionsDescription": "Agenda tu primera sesión para comenzar",
+    "addFirstSession": "Agregar primer turno",
+    "loadingAgenda": "Cargando agenda...",
+    "loadingPatients": "Cargando pacientes...",
+    "fields": {
+      "patient": "Paciente",
+      "date": "Fecha",
+      "time": "Hora",
+      "duration": "Duración",
+      "type": "Tipo de sesión",
+      "status": "Estado",
+      "notes": "Notas",
+      "price": "Precio"
+    },
+    "status": {
+      "scheduled": "Programada",
+      "confirmed": "Confirmada",
+      "completed": "Completada",
+      "cancelled": "Cancelada",
+      "noShow": "No asistió"
+    },
+    "sessionTypes": {
+      "individual": "Individual",
+      "couple": "Pareja",
+      "family": "Familia",
+      "group": "Grupo"
+    },
+    "messages": {
+      "createSuccess": "Turno creado exitosamente",
+      "updateSuccess": "Turno actualizado exitosamente",
+      "deleteSuccess": "Turno eliminado",
+      "cancelSuccess": "Turno cancelado",
+      "deleteConfirmTitle": "¿Eliminar turno?",
+      "deleteConfirmDescription": "Esta acción eliminará el turno permanentemente."
+    },
+    "calendar": {
+      "today": "Hoy",
+      "month": "Mes",
+      "week": "Semana",
+      "day": "Día",
+      "list": "Lista"
+    }
+  },
+  "payments": {
+    "title": "Cobros",
+    "subtitle": "Gestión de pagos",
+    "newPayment": "Nuevo Cobro",
+    "editPayment": "Editar Cobro",
+    "pending": "Pendiente",
+    "paid": "Pagado",
+    "partial": "Parcial",
+    "overdue": "Vencido",
+    "noPayments": "No hay cobros registrados",
+    "noPaymentsDescription": "Los cobros aparecerán aquí cuando tengas sesiones completadas",
+    "totalPending": "Total pendiente",
+    "totalCollected": "Total cobrado",
+    "collectionRate": "Tasa de cobro",
+    "fields": {
+      "patient": "Paciente",
+      "session": "Sesión",
+      "amount": "Monto",
+      "status": "Estado",
+      "date": "Fecha",
+      "paymentDate": "Fecha de pago",
+      "method": "Método de pago",
+      "notes": "Notas"
+    },
+    "methods": {
+      "cash": "Efectivo",
+      "transfer": "Transferencia",
+      "card": "Tarjeta",
+      "other": "Otro"
+    },
+    "messages": {
+      "markAsPaid": "Marcar como pagado",
+      "markAsPaidSuccess": "Pago registrado exitosamente",
+      "sendReminder": "Enviar recordatorio",
+      "reminderSent": "Recordatorio enviado",
+      "deleteConfirmTitle": "¿Eliminar cobro?",
+      "deleteConfirmDescription": "Esta acción eliminará el registro de cobro."
+    },
+    "filters": {
+      "all": "Todos",
+      "pending": "Pendientes",
+      "paid": "Pagados",
+      "thisMonth": "Este mes",
+      "lastMonth": "Mes pasado"
+    },
+    "stats": {
+      "monthlyIncome": "Ingresos del mes",
+      "sessionsCompleted": "Sesiones realizadas",
+      "activePatients": "Pacientes activos",
+      "collectionRate": "Tasa de cobro"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Personaliza tu experiencia en Lavenius",
+    "language": "Idioma",
+    "selectLanguage": "Seleccionar idioma",
+    "languageChanged": "Idioma cambiado correctamente",
+    "sections": {
+      "general": "General",
+      "notifications": "Notificaciones",
+      "calendar": "Calendario",
+      "payments": "Cobros",
+      "account": "Cuenta"
+    },
+    "calendarSync": {
+      "title": "Sincronización de Calendario",
+      "description": "Sincroniza tu agenda con Google Calendar",
+      "connect": "Conectar Google Calendar",
+      "disconnect": "Desconectar",
+      "connected": "Conectado",
+      "notConnected": "No conectado"
+    },
+    "daysOff": {
+      "title": "Días Off",
+      "description": "Configura los días en los que no atenderás",
+      "addDayOff": "Agregar Día Off",
+      "noDaysOff": "No hay días off configurados",
+      "noDaysOffHint": "Agrega días para bloquearlos en tu agenda",
+      "date": "Fecha",
+      "reason": "Motivo",
+      "reasonPlaceholder": "Ej: Feriado, Vacaciones...",
+      "blockType": "Tipo de bloqueo",
+      "fullDay": "Todo el día",
+      "morning": "Mañana",
+      "afternoon": "Tarde",
+      "customRange": "Rango horario",
+      "noService": "Sin atención",
+      "custom": "Personalizado",
+      "added": "Día off agregado",
+      "removed": "Día off eliminado"
+    },
+    "workingHours": {
+      "title": "Horario Laboral",
+      "description": "Define tu horario de atención y días de trabajo",
+      "schedule": "Horario de atención",
+      "workingDays": "Días de trabajo",
+      "nonWorkingDaysHint": "Los días no seleccionados aparecerán bloqueados en tu calendario",
+      "yourSchedule": "Tu horario",
+      "noWorkingDays": "No hay días de trabajo seleccionados"
+    },
+    "paymentReminders": {
+      "title": "Recordatorios de Cobros",
+      "description": "Configura notificaciones y mensajes para cobros pendientes",
+      "automation": "Automatización de recordatorios",
+      "enableAuto": "Activar recordatorios automáticos de cobros pendientes",
+      "enableAutoHint": "Te notificaremos cuando tengas turnos realizados sin marcar como cobrados",
+      "frequency": "Frecuencia de recordatorio",
+      "daily": "Diariamente",
+      "weekly": "Semanalmente (lunes)",
+      "biweekly": "Cada 15 días",
+      "minimumSessions": "Recordar cuando haya al menos",
+      "sessionsUnpaid": "turno sin cobrar",
+      "sessionsUnpaidPlural": "turnos sin cobrar",
+      "example": "Ejemplo",
+      "exampleText": "Tienes {{count}} turnos de la semana pasada sin marcar como cobrados.",
+      "whatsappTemplate": "Mensaje de WhatsApp para recordatorio de pago",
+      "whatsappTemplateHint": "Este mensaje se usará cuando envíes recordatorios de pago a tus pacientes.",
+      "variablesAvailable": "Variables disponibles",
+      "restoreDefault": "Restaurar mensaje por defecto"
+    },
+    "appointmentReminders": {
+      "title": "Recordatorios de Turnos",
+      "description": "Configura notificaciones y mensajes para turnos de pacientes",
+      "automation": "Automatización de recordatorios",
+      "enableAuto": "Activar recordatorios automáticos para pacientes",
+      "enableAutoHint": "Te avisaremos cuando sea momento de recordar a tus pacientes sus turnos",
+      "hoursBeforeLabel": "Horas de anticipación",
+      "hoursBeforeAppointment": "horas antes del turno",
+      "example": "Ejemplo",
+      "exampleText": "Recordatorio para paciente con turno en {{hours}} horas.",
+      "whatsappTemplate": "Mensaje de WhatsApp para recordatorio de turno",
+      "whatsappTemplateHint": "Este mensaje se usará cuando envíes recordatorios de turno a tus pacientes."
+    },
+    "messages": {
+      "saved": "Configuración guardada correctamente",
+      "saveError": "Error al guardar la configuración",
+      "selectDate": "Selecciona una fecha",
+      "selectTimeRange": "Selecciona el rango horario",
+      "startBeforeEnd": "La hora de inicio debe ser menor a la hora de fin"
+    },
+    "weekdays": {
+      "monday": "Lunes",
+      "tuesday": "Martes",
+      "wednesday": "Miércoles",
+      "thursday": "Jueves",
+      "friday": "Viernes",
+      "saturday": "Sábado",
+      "sunday": "Domingo",
+      "mon": "L",
+      "tue": "M",
+      "wed": "X",
+      "thu": "J",
+      "fri": "V",
+      "sat": "S",
+      "sun": "D"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "subtitle": "Gestiona tu información personal",
+    "personalInfo": "Información Personal",
+    "changePassword": "Cambiar Contraseña",
+    "currentPassword": "Contraseña actual",
+    "newPassword": "Nueva contraseña",
+    "confirmNewPassword": "Confirmar nueva contraseña",
+    "messages": {
+      "updateSuccess": "Perfil actualizado exitosamente",
+      "passwordChanged": "Contraseña cambiada exitosamente"
+    }
+  },
+  "help": {
+    "title": "Centro de Ayuda",
+    "subtitle": "¿Cómo podemos ayudarte?",
+    "searchPlaceholder": "Buscar en la ayuda...",
+    "faq": "Preguntas Frecuentes",
+    "contact": "Contacto",
+    "tutorials": "Tutoriales",
+    "documentation": "Documentación"
+  },
+  "landing": {
+    "brand": "Lavenius",
+    "tagline": "Gestión de Pacientes",
+    "hero": {
+      "badge": "Gestión inteligente para profesionales de salud mental",
+      "title": "Control total de tu consultorio",
+      "titleHighlight": "y tus finanzas",
+      "description": "Elimina el Excel y el papel. Ahorra tiempo con turnos inteligentes, seguimiento de cobros automatizado y toda la información de tus pacientes en un solo lugar.",
+      "cta": "Comenzar gratis",
+      "hasAccount": "Ya tengo cuenta",
+      "noCreditCard": "Sin tarjeta de crédito",
+      "dataEncrypted": "Datos encriptados",
+      "supportIncluded": "Soporte incluido"
+    },
+    "features": {
+      "title": "Todo lo que necesitas en un solo lugar",
+      "subtitle": "Módulos diseñados específicamente para profesionales de la salud mental",
+      "scheduler": {
+        "title": "Turnero Inteligente",
+        "description": "Gestiona disponibilidad y reglas de recurrencia (quincenales, mensuales). Sincroniza con Google Calendar."
+      },
+      "payments": {
+        "title": "Gestión de Cobros",
+        "description": "Seguimiento riguroso de pagos con recordatorios automáticos vía WhatsApp y Email."
+      },
+      "records": {
+        "title": "Fichero Digital",
+        "description": "Historias clínicas seguras, consentimientos informados y cuestionarios de filtro inicial."
+      },
+      "calendar": {
+        "title": "Calendario Sync",
+        "description": "Sincronización total con tu calendario para evitar solapamientos y olvidos."
+      }
+    },
+    "analytics": {
+      "badge": "Panel de Analytics",
+      "title": "Visibilidad total de tu práctica profesional",
+      "description": "Toma decisiones informadas con datos claros sobre tus ingresos, sesiones realizadas y métricas de crecimiento mensual.",
+      "features": {
+        "income": "Ingresos mensuales y proyecciones",
+        "sessions": "Sesiones por cobrar y cobradas",
+        "patients": "Pacientes activos vs nuevos",
+        "attendance": "Tasa de asistencia y cancelación"
+      },
+      "stats": {
+        "monthlyIncome": "Ingresos del mes",
+        "sessions": "Sesiones",
+        "thisMonth": "este mes",
+        "activePatients": "Pacientes activos",
+        "collectionRate": "Tasa de cobro",
+        "vsLastMonth": "+12% vs mes anterior",
+        "lastSixMonths": "Ingresos últimos 6 meses"
+      }
+    },
+    "reminders": {
+      "badge": "Recordatorios Automáticos",
+      "title": "Reduce la morosidad sin esfuerzo manual",
+      "description": "El sistema envía recordatorios automáticos a tus pacientes vía WhatsApp o Email, tanto para confirmar turnos como para gestionar pagos pendientes.",
+      "features": {
+        "whatsapp": "Recordatorios de turno por WhatsApp",
+        "payments": "Avisos de cobro automáticos",
+        "confirmations": "Confirmaciones de asistencia",
+        "scheduling": "Programación flexible de envíos"
+      },
+      "notifications": "Notificaciones automáticas",
+      "types": {
+        "whatsapp": "WhatsApp",
+        "pendingPayment": "Cobro pendiente",
+        "confirmation": "Confirmación"
+      },
+      "messages": {
+        "sessionReminder": "¡Hola María! Te recordamos tu sesión mañana a las 15:00hs. ¿Confirmas tu asistencia?",
+        "paymentReminder": "Juan García tiene 2 sesiones pendientes de pago ($12.000)",
+        "appointmentConfirmed": "Pedro López confirmó su turno del Viernes 14:00hs"
+      },
+      "timestamps": {
+        "sentAutomatically": "Enviado automáticamente",
+        "reminderSent": "Recordatorio enviado",
+        "fiveMinutesAgo": "Hace 5 minutos"
+      }
+    },
+    "security": {
+      "title": "Seguridad de nivel clínico",
+      "description": "Todos los datos de tus pacientes están encriptados de extremo a extremo. Cumplimos con los más altos estándares de seguridad para proteger la información sensible.",
+      "encryption": "Encriptación",
+      "e2e": "Extremo a extremo"
+    },
+    "cta": {
+      "title": "Comienza a gestionar tu consultorio de forma inteligente",
+      "subtitle": "Únete a profesionales que ya ahorraron horas de trabajo administrativo",
+      "createAccount": "Crear cuenta gratis",
+      "login": "Iniciar sesión"
+    },
+    "footer": {
+      "rights": "Todos los derechos reservados."
+    }
+  },
+  "notes": {
+    "title": "Notas",
+    "newNote": "Nueva Nota",
+    "editNote": "Editar Nota",
+    "noNotes": "No hay notas",
+    "noNotesDescription": "Agrega notas para llevar un registro de las sesiones",
+    "fields": {
+      "title": "Título",
+      "content": "Contenido",
+      "date": "Fecha",
+      "session": "Sesión asociada"
+    },
+    "messages": {
+      "createSuccess": "Nota creada exitosamente",
+      "updateSuccess": "Nota actualizada exitosamente",
+      "deleteSuccess": "Nota eliminada"
+    }
+  },
+  "onboarding": {
+    "welcome": "¡Bienvenido a Lavenius!",
+    "welcomeSubtitle": "Te guiaremos por los primeros pasos",
+    "steps": {
+      "profile": "Completa tu perfil",
+      "firstPatient": "Agrega tu primer paciente",
+      "firstSession": "Programa tu primera sesión",
+      "calendarSync": "Sincroniza tu calendario"
+    },
+    "skip": "Saltar tutorial",
+    "finish": "Finalizar"
+  },
+  "errors": {
+    "generic": "Ocurrió un error. Intente nuevamente.",
+    "network": "Error de conexión. Verifique su internet.",
+    "notFound": "No encontrado",
+    "unauthorized": "No autorizado",
+    "forbidden": "Acceso denegado",
+    "serverError": "Error del servidor",
+    "validation": "Error de validación",
+    "pageNotFound": {
+      "title": "Página no encontrada",
+      "description": "La página que buscas no existe o fue movida.",
+      "backHome": "Volver al inicio"
+    }
+  },
+  "validation": {
+    "required": "Este campo es requerido",
+    "invalidEmail": "Email inválido",
+    "minLength": "Mínimo {{min}} caracteres",
+    "maxLength": "Máximo {{max}} caracteres",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "invalidPhone": "Número de teléfono inválido",
+    "invalidDate": "Fecha inválida"
+  },
+  "confirmDialog": {
+    "defaultTitle": "¿Estás seguro?",
+    "defaultDescription": "Esta acción no se puede deshacer.",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar"
+  },
+  "logout": {
+    "confirmTitle": "¿Cerrar sesión?",
+    "confirmDescription": "Estás a punto de cerrar tu sesión. Tendrás que volver a iniciar sesión para acceder a tu cuenta."
+  }
+}

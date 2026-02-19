@@ -7,3 +7,4 @@ export { ErrorBoundary } from './ErrorBoundary';
 export { ConfirmDialog, type ConfirmDialogVariant } from './ConfirmDialog';
 export { SimplePagination } from './SimplePagination';
 export { InfiniteScrollLoader } from './InfiniteScrollLoader';
+export { LanguageSwitcher, type LanguageSwitcherProps } from './LanguageSwitcher';

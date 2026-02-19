@@ -4,3 +4,5 @@ export { useAppointments } from './useAppointments';
 export { useErrorToast } from './useErrorToast';
 export { useMediaQuery, useBreakpoint, useResponsive } from './useMediaQuery';
 export { useOnboarding } from './useOnboarding';
+export { useLanguage } from './useLanguage';
+export type { UseLanguageReturn } from './useLanguage';

@@ -1,0 +1,524 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "reset": "Reset",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "processing": "Processing...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "yes": "Yes",
+    "no": "No",
+    "all": "All",
+    "none": "None",
+    "optional": "Optional",
+    "required": "Required",
+    "actions": "Actions",
+    "details": "Details",
+    "options": "Options",
+    "noResults": "No results",
+    "noData": "No data",
+    "tryAgain": "Try again",
+    "comingSoon": "Coming soon",
+    "unsavedChanges": "There are unsaved changes",
+    "date": "Date",
+    "time": "Time",
+    "from": "From",
+    "to": "To",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "week": "Week",
+    "month": "Month",
+    "year": "Year"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "agenda": "Schedule",
+    "patients": "Patients",
+    "payments": "Billing",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "profile": "Profile",
+    "help": "Help",
+    "logout": "Log out"
+  },
+  "auth": {
+    "login": "Log in",
+    "register": "Sign up",
+    "logout": "Log out",
+    "email": "Email",
+    "password": "Password",
+    "passphrase": "Passphrase (Encryption)",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "registerHere": "Sign up here",
+    "loginHere": "Log in here",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "confirmPassword": "Confirm password",
+    "enterEmail": "doctor@clinic.com",
+    "enterPassword": "••••••••",
+    "enterFirstName": "Enter your first name",
+    "enterLastName": "Enter your last name",
+    "loggingIn": "Logging in...",
+    "registering": "Signing up...",
+    "welcomeBack": "Welcome back!",
+    "accountCreated": "Account created successfully!",
+    "loginToContinue": "You can now log in with your credentials",
+    "invalidCredentials": "Invalid credentials",
+    "invalidCredentialsHint": "Don't have an account? Sign up to get started.",
+    "firstTime": "First time here? You need to create an account to get started.",
+    "createNewAccount": "Create new account",
+    "loginError": "Login error",
+    "registerError": "Registration error",
+    "platformDescription": "Psychological management platform"
+  },
+  "patients": {
+    "title": "Patients",
+    "subtitle": "Patient management",
+    "newPatient": "New Patient",
+    "editPatient": "Edit Patient",
+    "addPatient": "Add Patient",
+    "searchPlaceholder": "Search patient by name...",
+    "noPatients": "No patients registered",
+    "noPatientsDescription": "Add your first patient to get started",
+    "addFirstPatient": "Add first patient",
+    "patientDetails": "Patient details",
+    "clinicalFile": "Clinical file",
+    "sessions": "Sessions",
+    "notes": "Notes",
+    "payments": "Payments",
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "dateOfBirth": "Date of birth",
+      "address": "Address",
+      "diagnosis": "Diagnosis",
+      "notes": "Notes",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "messages": {
+      "createSuccess": "Patient created successfully",
+      "updateSuccess": "Patient updated successfully",
+      "deleteSuccess": "Patient deleted",
+      "deleteConfirmTitle": "Delete patient?",
+      "deleteConfirmDescription": "This action will permanently delete the patient and all associated data. This action cannot be undone."
+    }
+  },
+  "agenda": {
+    "title": "Schedule",
+    "subtitle": "Appointment management",
+    "newSession": "New Appointment",
+    "editSession": "Edit Appointment",
+    "addSession": "Add Appointment",
+    "upcoming": "Upcoming appointments",
+    "past": "Past appointments",
+    "today": "Today's appointments",
+    "noSessions": "No appointments scheduled",
+    "noSessionsDescription": "Schedule your first session to get started",
+    "addFirstSession": "Add first appointment",
+    "loadingAgenda": "Loading schedule...",
+    "loadingPatients": "Loading patients...",
+    "fields": {
+      "patient": "Patient",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "type": "Session type",
+      "status": "Status",
+      "notes": "Notes",
+      "price": "Price"
+    },
+    "status": {
+      "scheduled": "Scheduled",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "noShow": "No show"
+    },
+    "sessionTypes": {
+      "individual": "Individual",
+      "couple": "Couple",
+      "family": "Family",
+      "group": "Group"
+    },
+    "messages": {
+      "createSuccess": "Appointment created successfully",
+      "updateSuccess": "Appointment updated successfully",
+      "deleteSuccess": "Appointment deleted",
+      "cancelSuccess": "Appointment cancelled",
+      "deleteConfirmTitle": "Delete appointment?",
+      "deleteConfirmDescription": "This action will permanently delete the appointment."
+    },
+    "calendar": {
+      "today": "Today",
+      "month": "Month",
+      "week": "Week",
+      "day": "Day",
+      "list": "List"
+    }
+  },
+  "payments": {
+    "title": "Billing",
+    "subtitle": "Payment management",
+    "newPayment": "New Payment",
+    "editPayment": "Edit Payment",
+    "pending": "Pending",
+    "paid": "Paid",
+    "partial": "Partial",
+    "overdue": "Overdue",
+    "noPayments": "No payments registered",
+    "noPaymentsDescription": "Payments will appear here when you have completed sessions",
+    "totalPending": "Total pending",
+    "totalCollected": "Total collected",
+    "collectionRate": "Collection rate",
+    "fields": {
+      "patient": "Patient",
+      "session": "Session",
+      "amount": "Amount",
+      "status": "Status",
+      "date": "Date",
+      "paymentDate": "Payment date",
+      "method": "Payment method",
+      "notes": "Notes"
+    },
+    "methods": {
+      "cash": "Cash",
+      "transfer": "Transfer",
+      "card": "Card",
+      "other": "Other"
+    },
+    "messages": {
+      "markAsPaid": "Mark as paid",
+      "markAsPaidSuccess": "Payment recorded successfully",
+      "sendReminder": "Send reminder",
+      "reminderSent": "Reminder sent",
+      "deleteConfirmTitle": "Delete payment?",
+      "deleteConfirmDescription": "This action will delete the payment record."
+    },
+    "filters": {
+      "all": "All",
+      "pending": "Pending",
+      "paid": "Paid",
+      "thisMonth": "This month",
+      "lastMonth": "Last month"
+    },
+    "stats": {
+      "monthlyIncome": "Monthly income",
+      "sessionsCompleted": "Sessions completed",
+      "activePatients": "Active patients",
+      "collectionRate": "Collection rate"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize your Lavenius experience",
+    "language": "Language",
+    "selectLanguage": "Select language",
+    "languageChanged": "Language changed successfully",
+    "sections": {
+      "general": "General",
+      "notifications": "Notifications",
+      "calendar": "Calendar",
+      "payments": "Billing",
+      "account": "Account"
+    },
+    "calendarSync": {
+      "title": "Calendar Sync",
+      "description": "Sync your schedule with Google Calendar",
+      "connect": "Connect Google Calendar",
+      "disconnect": "Disconnect",
+      "connected": "Connected",
+      "notConnected": "Not connected"
+    },
+    "daysOff": {
+      "title": "Days Off",
+      "description": "Set up the days when you won't be available",
+      "addDayOff": "Add Day Off",
+      "noDaysOff": "No days off configured",
+      "noDaysOffHint": "Add days to block them in your schedule",
+      "date": "Date",
+      "reason": "Reason",
+      "reasonPlaceholder": "E.g.: Holiday, Vacation...",
+      "blockType": "Block type",
+      "fullDay": "Full day",
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "customRange": "Custom time range",
+      "noService": "No service",
+      "custom": "Custom",
+      "added": "Day off added",
+      "removed": "Day off removed"
+    },
+    "workingHours": {
+      "title": "Working Hours",
+      "description": "Set your service hours and working days",
+      "schedule": "Service hours",
+      "workingDays": "Working days",
+      "nonWorkingDaysHint": "Non-selected days will appear blocked in your calendar",
+      "yourSchedule": "Your schedule",
+      "noWorkingDays": "No working days selected"
+    },
+    "paymentReminders": {
+      "title": "Payment Reminders",
+      "description": "Configure notifications and messages for pending payments",
+      "automation": "Reminder automation",
+      "enableAuto": "Enable automatic reminders for pending payments",
+      "enableAutoHint": "We'll notify you when you have sessions without marked payments",
+      "frequency": "Reminder frequency",
+      "daily": "Daily",
+      "weekly": "Weekly (Monday)",
+      "biweekly": "Every 2 weeks",
+      "minimumSessions": "Remind when there are at least",
+      "sessionsUnpaid": "unpaid session",
+      "sessionsUnpaidPlural": "unpaid sessions",
+      "example": "Example",
+      "exampleText": "You have {{count}} sessions from last week without payments marked.",
+      "whatsappTemplate": "WhatsApp message for payment reminder",
+      "whatsappTemplateHint": "This message will be used when you send payment reminders to your patients.",
+      "variablesAvailable": "Available variables",
+      "restoreDefault": "Restore default message"
+    },
+    "appointmentReminders": {
+      "title": "Appointment Reminders",
+      "description": "Configure notifications and messages for patient appointments",
+      "automation": "Reminder automation",
+      "enableAuto": "Enable automatic reminders for patients",
+      "enableAutoHint": "We'll notify you when it's time to remind your patients about their appointments",
+      "hoursBeforeLabel": "Hours in advance",
+      "hoursBeforeAppointment": "hours before appointment",
+      "example": "Example",
+      "exampleText": "Reminder for patient with appointment in {{hours}} hours.",
+      "whatsappTemplate": "WhatsApp message for appointment reminder",
+      "whatsappTemplateHint": "This message will be used when you send appointment reminders to your patients."
+    },
+    "messages": {
+      "saved": "Settings saved successfully",
+      "saveError": "Error saving settings",
+      "selectDate": "Select a date",
+      "selectTimeRange": "Select time range",
+      "startBeforeEnd": "Start time must be before end time"
+    },
+    "weekdays": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday",
+      "mon": "M",
+      "tue": "T",
+      "wed": "W",
+      "thu": "T",
+      "fri": "F",
+      "sat": "S",
+      "sun": "S"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your personal information",
+    "personalInfo": "Personal Information",
+    "changePassword": "Change Password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "messages": {
+      "updateSuccess": "Profile updated successfully",
+      "passwordChanged": "Password changed successfully"
+    }
+  },
+  "help": {
+    "title": "Help Center",
+    "subtitle": "How can we help you?",
+    "searchPlaceholder": "Search help...",
+    "faq": "Frequently Asked Questions",
+    "contact": "Contact",
+    "tutorials": "Tutorials",
+    "documentation": "Documentation"
+  },
+  "landing": {
+    "brand": "Lavenius",
+    "tagline": "Patient Management",
+    "hero": {
+      "badge": "Smart management for mental health professionals",
+      "title": "Complete control of your practice",
+      "titleHighlight": "and your finances",
+      "description": "Ditch Excel and paper. Save time with smart scheduling, automated billing tracking, and all your patient information in one place.",
+      "cta": "Start for free",
+      "hasAccount": "I already have an account",
+      "noCreditCard": "No credit card required",
+      "dataEncrypted": "Encrypted data",
+      "supportIncluded": "Support included"
+    },
+    "features": {
+      "title": "Everything you need in one place",
+      "subtitle": "Modules designed specifically for mental health professionals",
+      "scheduler": {
+        "title": "Smart Scheduler",
+        "description": "Manage availability and recurrence rules (bi-weekly, monthly). Sync with Google Calendar."
+      },
+      "payments": {
+        "title": "Billing Management",
+        "description": "Rigorous payment tracking with automatic reminders via WhatsApp and Email."
+      },
+      "records": {
+        "title": "Digital Records",
+        "description": "Secure clinical records, informed consents, and initial screening questionnaires."
+      },
+      "calendar": {
+        "title": "Calendar Sync",
+        "description": "Full synchronization with your calendar to avoid overlaps and missed appointments."
+      }
+    },
+    "analytics": {
+      "badge": "Analytics Dashboard",
+      "title": "Full visibility of your professional practice",
+      "description": "Make informed decisions with clear data about your income, completed sessions, and monthly growth metrics.",
+      "features": {
+        "income": "Monthly income and projections",
+        "sessions": "Sessions to collect and collected",
+        "patients": "Active vs new patients",
+        "attendance": "Attendance and cancellation rate"
+      },
+      "stats": {
+        "monthlyIncome": "Monthly income",
+        "sessions": "Sessions",
+        "thisMonth": "this month",
+        "activePatients": "Active patients",
+        "collectionRate": "Collection rate",
+        "vsLastMonth": "+12% vs last month",
+        "lastSixMonths": "Income last 6 months"
+      }
+    },
+    "reminders": {
+      "badge": "Automatic Reminders",
+      "title": "Reduce delinquency without manual effort",
+      "description": "The system sends automatic reminders to your patients via WhatsApp or Email, both to confirm appointments and to manage pending payments.",
+      "features": {
+        "whatsapp": "Appointment reminders via WhatsApp",
+        "payments": "Automatic billing notices",
+        "confirmations": "Attendance confirmations",
+        "scheduling": "Flexible send scheduling"
+      },
+      "notifications": "Automatic notifications",
+      "types": {
+        "whatsapp": "WhatsApp",
+        "pendingPayment": "Pending payment",
+        "confirmation": "Confirmation"
+      },
+      "messages": {
+        "sessionReminder": "Hi Maria! We remind you of your session tomorrow at 3:00 PM. Can you confirm your attendance?",
+        "paymentReminder": "Juan Garcia has 2 pending sessions ($12,000)",
+        "appointmentConfirmed": "Pedro Lopez confirmed his Friday 2:00 PM appointment"
+      },
+      "timestamps": {
+        "sentAutomatically": "Sent automatically",
+        "reminderSent": "Reminder sent",
+        "fiveMinutesAgo": "5 minutes ago"
+      }
+    },
+    "security": {
+      "title": "Clinical-grade security",
+      "description": "All your patient data is encrypted end-to-end. We comply with the highest security standards to protect sensitive information.",
+      "encryption": "Encryption",
+      "e2e": "End-to-end"
+    },
+    "cta": {
+      "title": "Start managing your practice smartly",
+      "subtitle": "Join professionals who have already saved hours of administrative work",
+      "createAccount": "Create free account",
+      "login": "Log in"
+    },
+    "footer": {
+      "rights": "All rights reserved."
+    }
+  },
+  "notes": {
+    "title": "Notes",
+    "newNote": "New Note",
+    "editNote": "Edit Note",
+    "noNotes": "No notes",
+    "noNotesDescription": "Add notes to keep track of sessions",
+    "fields": {
+      "title": "Title",
+      "content": "Content",
+      "date": "Date",
+      "session": "Associated session"
+    },
+    "messages": {
+      "createSuccess": "Note created successfully",
+      "updateSuccess": "Note updated successfully",
+      "deleteSuccess": "Note deleted"
+    }
+  },
+  "onboarding": {
+    "welcome": "Welcome to Lavenius!",
+    "welcomeSubtitle": "We'll guide you through the first steps",
+    "steps": {
+      "profile": "Complete your profile",
+      "firstPatient": "Add your first patient",
+      "firstSession": "Schedule your first session",
+      "calendarSync": "Sync your calendar"
+    },
+    "skip": "Skip tutorial",
+    "finish": "Finish"
+  },
+  "errors": {
+    "generic": "An error occurred. Please try again.",
+    "network": "Connection error. Check your internet.",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Access denied",
+    "serverError": "Server error",
+    "validation": "Validation error",
+    "pageNotFound": {
+      "title": "Page not found",
+      "description": "The page you're looking for doesn't exist or has been moved.",
+      "backHome": "Back to home"
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email",
+    "minLength": "Minimum {{min}} characters",
+    "maxLength": "Maximum {{max}} characters",
+    "passwordMismatch": "Passwords do not match",
+    "invalidPhone": "Invalid phone number",
+    "invalidDate": "Invalid date"
+  },
+  "confirmDialog": {
+    "defaultTitle": "Are you sure?",
+    "defaultDescription": "This action cannot be undone.",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "logout": {
+    "confirmTitle": "Log out?",
+    "confirmDescription": "You are about to log out. You will need to log in again to access your account."
+  }
+}

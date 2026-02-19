@@ -80,6 +80,11 @@ export default defineConfig({
               id.includes('node_modules/axios')) {
             return 'vendor-state';
           }
+          // i18n libraries
+          if (id.includes('i18next') || 
+              id.includes('node_modules/i18next')) {
+            return 'vendor-i18n';
+          }
           // Let other dependencies be handled automatically by Rollup
           return undefined;
         },

@@ -1,0 +1,524 @@
+{
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "add": "Adicionar",
+    "close": "Fechar",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "search": "Pesquisar",
+    "filter": "Filtrar",
+    "clear": "Limpar",
+    "reset": "Redefinir",
+    "loading": "Carregando...",
+    "saving": "Salvando...",
+    "deleting": "Excluindo...",
+    "processing": "Processando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "warning": "Aviso",
+    "info": "Informação",
+    "yes": "Sim",
+    "no": "Não",
+    "all": "Todos",
+    "none": "Nenhum",
+    "optional": "Opcional",
+    "required": "Obrigatório",
+    "actions": "Ações",
+    "details": "Detalhes",
+    "options": "Opções",
+    "noResults": "Sem resultados",
+    "noData": "Sem dados",
+    "tryAgain": "Tentar novamente",
+    "comingSoon": "Em breve",
+    "unsavedChanges": "Há alterações não salvas",
+    "date": "Data",
+    "time": "Hora",
+    "from": "De",
+    "to": "Até",
+    "today": "Hoje",
+    "yesterday": "Ontem",
+    "tomorrow": "Amanhã",
+    "week": "Semana",
+    "month": "Mês",
+    "year": "Ano"
+  },
+  "navigation": {
+    "dashboard": "Painel",
+    "agenda": "Agenda",
+    "patients": "Pacientes",
+    "payments": "Cobranças",
+    "analytics": "Análises",
+    "settings": "Configurações",
+    "profile": "Perfil",
+    "help": "Ajuda",
+    "logout": "Sair"
+  },
+  "auth": {
+    "login": "Entrar",
+    "register": "Cadastrar",
+    "logout": "Sair",
+    "email": "Email",
+    "password": "Senha",
+    "passphrase": "Passphrase (Criptografia)",
+    "forgotPassword": "Esqueceu sua senha?",
+    "noAccount": "Não tem conta?",
+    "hasAccount": "Já tem conta?",
+    "registerHere": "Cadastre-se aqui",
+    "loginHere": "Entre aqui",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "confirmPassword": "Confirmar senha",
+    "enterEmail": "medico@clinica.com",
+    "enterPassword": "••••••••",
+    "enterFirstName": "Digite seu nome",
+    "enterLastName": "Digite seu sobrenome",
+    "loggingIn": "Entrando...",
+    "registering": "Cadastrando...",
+    "welcomeBack": "Bem-vindo de volta!",
+    "accountCreated": "Conta criada com sucesso!",
+    "loginToContinue": "Agora você pode entrar com suas credenciais",
+    "invalidCredentials": "Credenciais inválidas",
+    "invalidCredentialsHint": "Não tem conta? Cadastre-se para começar.",
+    "firstTime": "Primeira vez aqui? Você precisa criar uma conta para começar.",
+    "createNewAccount": "Criar nova conta",
+    "loginError": "Erro ao entrar",
+    "registerError": "Erro ao cadastrar",
+    "platformDescription": "Plataforma de gestão psicológica"
+  },
+  "patients": {
+    "title": "Pacientes",
+    "subtitle": "Gestão de pacientes",
+    "newPatient": "Novo Paciente",
+    "editPatient": "Editar Paciente",
+    "addPatient": "Adicionar Paciente",
+    "searchPlaceholder": "Pesquisar paciente por nome...",
+    "noPatients": "Nenhum paciente cadastrado",
+    "noPatientsDescription": "Adicione seu primeiro paciente para começar",
+    "addFirstPatient": "Adicionar primeiro paciente",
+    "patientDetails": "Detalhes do paciente",
+    "clinicalFile": "Ficha clínica",
+    "sessions": "Sessões",
+    "notes": "Anotações",
+    "payments": "Pagamentos",
+    "fields": {
+      "firstName": "Nome",
+      "lastName": "Sobrenome",
+      "email": "Email",
+      "phone": "Telefone",
+      "dateOfBirth": "Data de nascimento",
+      "address": "Endereço",
+      "diagnosis": "Diagnóstico",
+      "notes": "Anotações",
+      "status": "Status",
+      "active": "Ativo",
+      "inactive": "Inativo"
+    },
+    "messages": {
+      "createSuccess": "Paciente criado com sucesso",
+      "updateSuccess": "Paciente atualizado com sucesso",
+      "deleteSuccess": "Paciente excluído",
+      "deleteConfirmTitle": "Excluir paciente?",
+      "deleteConfirmDescription": "Esta ação excluirá permanentemente o paciente e todos os dados associados. Esta ação não pode ser desfeita."
+    }
+  },
+  "agenda": {
+    "title": "Agenda",
+    "subtitle": "Gestão de consultas",
+    "newSession": "Nova Consulta",
+    "editSession": "Editar Consulta",
+    "addSession": "Adicionar Consulta",
+    "upcoming": "Próximas consultas",
+    "past": "Consultas passadas",
+    "today": "Consultas de hoje",
+    "noSessions": "Nenhuma consulta agendada",
+    "noSessionsDescription": "Agende sua primeira sessão para começar",
+    "addFirstSession": "Adicionar primeira consulta",
+    "loadingAgenda": "Carregando agenda...",
+    "loadingPatients": "Carregando pacientes...",
+    "fields": {
+      "patient": "Paciente",
+      "date": "Data",
+      "time": "Hora",
+      "duration": "Duração",
+      "type": "Tipo de sessão",
+      "status": "Status",
+      "notes": "Anotações",
+      "price": "Preço"
+    },
+    "status": {
+      "scheduled": "Agendada",
+      "confirmed": "Confirmada",
+      "completed": "Concluída",
+      "cancelled": "Cancelada",
+      "noShow": "Não compareceu"
+    },
+    "sessionTypes": {
+      "individual": "Individual",
+      "couple": "Casal",
+      "family": "Família",
+      "group": "Grupo"
+    },
+    "messages": {
+      "createSuccess": "Consulta criada com sucesso",
+      "updateSuccess": "Consulta atualizada com sucesso",
+      "deleteSuccess": "Consulta excluída",
+      "cancelSuccess": "Consulta cancelada",
+      "deleteConfirmTitle": "Excluir consulta?",
+      "deleteConfirmDescription": "Esta ação excluirá a consulta permanentemente."
+    },
+    "calendar": {
+      "today": "Hoje",
+      "month": "Mês",
+      "week": "Semana",
+      "day": "Dia",
+      "list": "Lista"
+    }
+  },
+  "payments": {
+    "title": "Cobranças",
+    "subtitle": "Gestão de pagamentos",
+    "newPayment": "Nova Cobrança",
+    "editPayment": "Editar Cobrança",
+    "pending": "Pendente",
+    "paid": "Pago",
+    "partial": "Parcial",
+    "overdue": "Atrasado",
+    "noPayments": "Nenhuma cobrança registrada",
+    "noPaymentsDescription": "As cobranças aparecerão aqui quando você tiver sessões concluídas",
+    "totalPending": "Total pendente",
+    "totalCollected": "Total recebido",
+    "collectionRate": "Taxa de recebimento",
+    "fields": {
+      "patient": "Paciente",
+      "session": "Sessão",
+      "amount": "Valor",
+      "status": "Status",
+      "date": "Data",
+      "paymentDate": "Data de pagamento",
+      "method": "Método de pagamento",
+      "notes": "Anotações"
+    },
+    "methods": {
+      "cash": "Dinheiro",
+      "transfer": "Transferência",
+      "card": "Cartão",
+      "other": "Outro"
+    },
+    "messages": {
+      "markAsPaid": "Marcar como pago",
+      "markAsPaidSuccess": "Pagamento registrado com sucesso",
+      "sendReminder": "Enviar lembrete",
+      "reminderSent": "Lembrete enviado",
+      "deleteConfirmTitle": "Excluir cobrança?",
+      "deleteConfirmDescription": "Esta ação excluirá o registro de cobrança."
+    },
+    "filters": {
+      "all": "Todos",
+      "pending": "Pendentes",
+      "paid": "Pagos",
+      "thisMonth": "Este mês",
+      "lastMonth": "Mês passado"
+    },
+    "stats": {
+      "monthlyIncome": "Receita mensal",
+      "sessionsCompleted": "Sessões realizadas",
+      "activePatients": "Pacientes ativos",
+      "collectionRate": "Taxa de recebimento"
+    }
+  },
+  "settings": {
+    "title": "Configurações",
+    "subtitle": "Personalize sua experiência no Lavenius",
+    "language": "Idioma",
+    "selectLanguage": "Selecionar idioma",
+    "languageChanged": "Idioma alterado com sucesso",
+    "sections": {
+      "general": "Geral",
+      "notifications": "Notificações",
+      "calendar": "Calendário",
+      "payments": "Cobranças",
+      "account": "Conta"
+    },
+    "calendarSync": {
+      "title": "Sincronização de Calendário",
+      "description": "Sincronize sua agenda com o Google Calendar",
+      "connect": "Conectar Google Calendar",
+      "disconnect": "Desconectar",
+      "connected": "Conectado",
+      "notConnected": "Não conectado"
+    },
+    "daysOff": {
+      "title": "Dias de Folga",
+      "description": "Configure os dias em que você não atenderá",
+      "addDayOff": "Adicionar Dia de Folga",
+      "noDaysOff": "Nenhum dia de folga configurado",
+      "noDaysOffHint": "Adicione dias para bloqueá-los na sua agenda",
+      "date": "Data",
+      "reason": "Motivo",
+      "reasonPlaceholder": "Ex: Feriado, Férias...",
+      "blockType": "Tipo de bloqueio",
+      "fullDay": "Dia inteiro",
+      "morning": "Manhã",
+      "afternoon": "Tarde",
+      "customRange": "Horário personalizado",
+      "noService": "Sem atendimento",
+      "custom": "Personalizado",
+      "added": "Dia de folga adicionado",
+      "removed": "Dia de folga removido"
+    },
+    "workingHours": {
+      "title": "Horário de Trabalho",
+      "description": "Defina seu horário de atendimento e dias de trabalho",
+      "schedule": "Horário de atendimento",
+      "workingDays": "Dias de trabalho",
+      "nonWorkingDaysHint": "Os dias não selecionados aparecerão bloqueados no seu calendário",
+      "yourSchedule": "Seu horário",
+      "noWorkingDays": "Nenhum dia de trabalho selecionado"
+    },
+    "paymentReminders": {
+      "title": "Lembretes de Pagamento",
+      "description": "Configure notificações e mensagens para pagamentos pendentes",
+      "automation": "Automação de lembretes",
+      "enableAuto": "Ativar lembretes automáticos de pagamentos pendentes",
+      "enableAutoHint": "Notificaremos você quando tiver sessões sem pagamentos marcados",
+      "frequency": "Frequência do lembrete",
+      "daily": "Diariamente",
+      "weekly": "Semanalmente (segunda-feira)",
+      "biweekly": "A cada 15 dias",
+      "minimumSessions": "Lembrar quando houver pelo menos",
+      "sessionsUnpaid": "sessão não paga",
+      "sessionsUnpaidPlural": "sessões não pagas",
+      "example": "Exemplo",
+      "exampleText": "Você tem {{count}} sessões da semana passada sem pagamentos marcados.",
+      "whatsappTemplate": "Mensagem do WhatsApp para lembrete de pagamento",
+      "whatsappTemplateHint": "Esta mensagem será usada quando você enviar lembretes de pagamento aos seus pacientes.",
+      "variablesAvailable": "Variáveis disponíveis",
+      "restoreDefault": "Restaurar mensagem padrão"
+    },
+    "appointmentReminders": {
+      "title": "Lembretes de Consulta",
+      "description": "Configure notificações e mensagens para consultas de pacientes",
+      "automation": "Automação de lembretes",
+      "enableAuto": "Ativar lembretes automáticos para pacientes",
+      "enableAutoHint": "Notificaremos você quando for hora de lembrar seus pacientes sobre suas consultas",
+      "hoursBeforeLabel": "Horas de antecedência",
+      "hoursBeforeAppointment": "horas antes da consulta",
+      "example": "Exemplo",
+      "exampleText": "Lembrete para paciente com consulta em {{hours}} horas.",
+      "whatsappTemplate": "Mensagem do WhatsApp para lembrete de consulta",
+      "whatsappTemplateHint": "Esta mensagem será usada quando você enviar lembretes de consulta aos seus pacientes."
+    },
+    "messages": {
+      "saved": "Configurações salvas com sucesso",
+      "saveError": "Erro ao salvar configurações",
+      "selectDate": "Selecione uma data",
+      "selectTimeRange": "Selecione o intervalo de horário",
+      "startBeforeEnd": "O horário de início deve ser anterior ao horário de término"
+    },
+    "weekdays": {
+      "monday": "Segunda-feira",
+      "tuesday": "Terça-feira",
+      "wednesday": "Quarta-feira",
+      "thursday": "Quinta-feira",
+      "friday": "Sexta-feira",
+      "saturday": "Sábado",
+      "sunday": "Domingo",
+      "mon": "S",
+      "tue": "T",
+      "wed": "Q",
+      "thu": "Q",
+      "fri": "S",
+      "sat": "S",
+      "sun": "D"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "subtitle": "Gerencie suas informações pessoais",
+    "personalInfo": "Informações Pessoais",
+    "changePassword": "Alterar Senha",
+    "currentPassword": "Senha atual",
+    "newPassword": "Nova senha",
+    "confirmNewPassword": "Confirmar nova senha",
+    "messages": {
+      "updateSuccess": "Perfil atualizado com sucesso",
+      "passwordChanged": "Senha alterada com sucesso"
+    }
+  },
+  "help": {
+    "title": "Central de Ajuda",
+    "subtitle": "Como podemos ajudar você?",
+    "searchPlaceholder": "Pesquisar na ajuda...",
+    "faq": "Perguntas Frequentes",
+    "contact": "Contato",
+    "tutorials": "Tutoriais",
+    "documentation": "Documentação"
+  },
+  "landing": {
+    "brand": "Lavenius",
+    "tagline": "Gestão de Pacientes",
+    "hero": {
+      "badge": "Gestão inteligente para profissionais de saúde mental",
+      "title": "Controle total do seu consultório",
+      "titleHighlight": "e suas finanças",
+      "description": "Elimine o Excel e o papel. Economize tempo com agendamentos inteligentes, acompanhamento de cobranças automatizado e todas as informações dos seus pacientes em um só lugar.",
+      "cta": "Começar grátis",
+      "hasAccount": "Já tenho conta",
+      "noCreditCard": "Sem cartão de crédito",
+      "dataEncrypted": "Dados criptografados",
+      "supportIncluded": "Suporte incluído"
+    },
+    "features": {
+      "title": "Tudo que você precisa em um só lugar",
+      "subtitle": "Módulos projetados especificamente para profissionais de saúde mental",
+      "scheduler": {
+        "title": "Agendamento Inteligente",
+        "description": "Gerencie disponibilidade e regras de recorrência (quinzenais, mensais). Sincronize com o Google Calendar."
+      },
+      "payments": {
+        "title": "Gestão de Cobranças",
+        "description": "Acompanhamento rigoroso de pagamentos com lembretes automáticos via WhatsApp e Email."
+      },
+      "records": {
+        "title": "Prontuário Digital",
+        "description": "Prontuários clínicos seguros, consentimentos informados e questionários de triagem inicial."
+      },
+      "calendar": {
+        "title": "Sincronização de Calendário",
+        "description": "Sincronização total com seu calendário para evitar sobreposições e esquecimentos."
+      }
+    },
+    "analytics": {
+      "badge": "Painel de Análises",
+      "title": "Visibilidade total da sua prática profissional",
+      "description": "Tome decisões informadas com dados claros sobre sua receita, sessões realizadas e métricas de crescimento mensal.",
+      "features": {
+        "income": "Receita mensal e projeções",
+        "sessions": "Sessões a receber e recebidas",
+        "patients": "Pacientes ativos vs novos",
+        "attendance": "Taxa de comparecimento e cancelamento"
+      },
+      "stats": {
+        "monthlyIncome": "Receita do mês",
+        "sessions": "Sessões",
+        "thisMonth": "este mês",
+        "activePatients": "Pacientes ativos",
+        "collectionRate": "Taxa de recebimento",
+        "vsLastMonth": "+12% vs mês anterior",
+        "lastSixMonths": "Receita últimos 6 meses"
+      }
+    },
+    "reminders": {
+      "badge": "Lembretes Automáticos",
+      "title": "Reduza a inadimplência sem esforço manual",
+      "description": "O sistema envia lembretes automáticos para seus pacientes via WhatsApp ou Email, tanto para confirmar consultas quanto para gerenciar pagamentos pendentes.",
+      "features": {
+        "whatsapp": "Lembretes de consulta por WhatsApp",
+        "payments": "Avisos de cobrança automáticos",
+        "confirmations": "Confirmações de presença",
+        "scheduling": "Programação flexível de envios"
+      },
+      "notifications": "Notificações automáticas",
+      "types": {
+        "whatsapp": "WhatsApp",
+        "pendingPayment": "Pagamento pendente",
+        "confirmation": "Confirmação"
+      },
+      "messages": {
+        "sessionReminder": "Olá Maria! Lembramos você da sua sessão amanhã às 15h. Pode confirmar sua presença?",
+        "paymentReminder": "Juan Garcia tem 2 sessões com pagamento pendente (R$ 12.000)",
+        "appointmentConfirmed": "Pedro Lopez confirmou sua consulta de sexta-feira às 14h"
+      },
+      "timestamps": {
+        "sentAutomatically": "Enviado automaticamente",
+        "reminderSent": "Lembrete enviado",
+        "fiveMinutesAgo": "Há 5 minutos"
+      }
+    },
+    "security": {
+      "title": "Segurança de nível clínico",
+      "description": "Todos os dados dos seus pacientes são criptografados de ponta a ponta. Cumprimos os mais altos padrões de segurança para proteger informações sensíveis.",
+      "encryption": "Criptografia",
+      "e2e": "Ponta a ponta"
+    },
+    "cta": {
+      "title": "Comece a gerenciar seu consultório de forma inteligente",
+      "subtitle": "Junte-se a profissionais que já economizaram horas de trabalho administrativo",
+      "createAccount": "Criar conta grátis",
+      "login": "Entrar"
+    },
+    "footer": {
+      "rights": "Todos os direitos reservados."
+    }
+  },
+  "notes": {
+    "title": "Anotações",
+    "newNote": "Nova Anotação",
+    "editNote": "Editar Anotação",
+    "noNotes": "Sem anotações",
+    "noNotesDescription": "Adicione anotações para acompanhar as sessões",
+    "fields": {
+      "title": "Título",
+      "content": "Conteúdo",
+      "date": "Data",
+      "session": "Sessão associada"
+    },
+    "messages": {
+      "createSuccess": "Anotação criada com sucesso",
+      "updateSuccess": "Anotação atualizada com sucesso",
+      "deleteSuccess": "Anotação excluída"
+    }
+  },
+  "onboarding": {
+    "welcome": "Bem-vindo ao Lavenius!",
+    "welcomeSubtitle": "Vamos guiá-lo pelos primeiros passos",
+    "steps": {
+      "profile": "Complete seu perfil",
+      "firstPatient": "Adicione seu primeiro paciente",
+      "firstSession": "Agende sua primeira sessão",
+      "calendarSync": "Sincronize seu calendário"
+    },
+    "skip": "Pular tutorial",
+    "finish": "Finalizar"
+  },
+  "errors": {
+    "generic": "Ocorreu um erro. Tente novamente.",
+    "network": "Erro de conexão. Verifique sua internet.",
+    "notFound": "Não encontrado",
+    "unauthorized": "Não autorizado",
+    "forbidden": "Acesso negado",
+    "serverError": "Erro do servidor",
+    "validation": "Erro de validação",
+    "pageNotFound": {
+      "title": "Página não encontrada",
+      "description": "A página que você procura não existe ou foi movida.",
+      "backHome": "Voltar ao início"
+    }
+  },
+  "validation": {
+    "required": "Este campo é obrigatório",
+    "invalidEmail": "Email inválido",
+    "minLength": "Mínimo {{min}} caracteres",
+    "maxLength": "Máximo {{max}} caracteres",
+    "passwordMismatch": "As senhas não coincidem",
+    "invalidPhone": "Número de telefone inválido",
+    "invalidDate": "Data inválida"
+  },
+  "confirmDialog": {
+    "defaultTitle": "Tem certeza?",
+    "defaultDescription": "Esta ação não pode ser desfeita.",
+    "delete": "Excluir",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar"
+  },
+  "logout": {
+    "confirmTitle": "Sair?",
+    "confirmDescription": "Você está prestes a sair. Precisará entrar novamente para acessar sua conta."
+  }
+}
