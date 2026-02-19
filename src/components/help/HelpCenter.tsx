@@ -103,7 +103,7 @@ Para cancelar un turno, cambia el estado a "Cancelado" desde el drawer de edici�
 1. Ve a la sección **Pacientes** desde el menú lateral
 2. Haz clic en **"Nuevo Paciente"**
 3. Completa los datos personales (nombre, email, teléfono)
-4. Agrega información adicional (obra social, frecuencia de sesiones)
+4. Agrega información adicional (cobertura médica, frecuencia de sesiones)
 5. Haz clic en **"Guardar"**
 
 **Tip:** Puedes agregar notas iniciales en el campo de observaciones.`,

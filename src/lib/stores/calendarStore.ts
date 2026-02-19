@@ -6,7 +6,14 @@ import { toast } from 'sonner';
 interface CalendarInfo {
   id: string;
   summary: string;
+  description?: string;
   primary?: boolean;
+}
+
+interface CalendarSyncStatus {
+  hasToken: boolean;           // Google account connected (has calendars)
+  hasSessionsCalendar: boolean; // "Sesiones" calendar exists
+  sessionsCalendarId: string | null;
 }
 
 interface CalendarState {
@@ -14,6 +21,7 @@ interface CalendarState {
   isSyncing: boolean;
   isCheckingConnection: boolean;
   calendars: CalendarInfo[];
+  syncStatus: CalendarSyncStatus;
   lastSyncAt: string | null;
   
   // Actions
@@ -32,15 +40,34 @@ export const useCalendarStore = create<CalendarState>()(
       isSyncing: false,
       isCheckingConnection: false,
       calendars: [],
+      syncStatus: {
+        hasToken: false,
+        hasSessionsCalendar: false,
+        sessionsCalendarId: null,
+      },
       lastSyncAt: null,
 
   checkConnection: async () => {
     set({ isCheckingConnection: true });
     try {
       const calendars = await calendarService.getCalendars();
+      const hasCalendars = Array.isArray(calendars) && calendars.length > 0;
+      
+      // Find the "Sesiones" calendar (created by Lavenius)
+      const sessionsCalendar = calendars?.find(
+        (cal) => cal.summary === 'Sesiones' || cal.description?.includes('sesiones de terapia')
+      );
+      
+      const syncStatus: CalendarSyncStatus = {
+        hasToken: hasCalendars,
+        hasSessionsCalendar: !!sessionsCalendar,
+        sessionsCalendarId: sessionsCalendar?.id || null,
+      };
+      
       set({ 
-        isConnected: Array.isArray(calendars) && calendars.length > 0, 
+        isConnected: hasCalendars, 
         calendars: calendars || [],
+        syncStatus,
         isCheckingConnection: false 
       });
     } catch (error: any) {
@@ -49,7 +76,16 @@ export const useCalendarStore = create<CalendarState>()(
       if (error?.statusCode !== 400) {
         console.error('Error checking calendar connection:', error);
       }
-      set({ isConnected: false, calendars: [], isCheckingConnection: false });
+      set({ 
+        isConnected: false, 
+        calendars: [], 
+        syncStatus: {
+          hasToken: false,
+          hasSessionsCalendar: false,
+          sessionsCalendarId: null,
+        },
+        isCheckingConnection: false 
+      });
     }
   },
 
@@ -84,7 +120,7 @@ export const useCalendarStore = create<CalendarState>()(
       let messageReceived = false;
 
       // Listen for message from popup
-      const handleMessage = (event: MessageEvent) => {
+      const handleMessage = async (event: MessageEvent) => {
         // Verify message origin if needed
         if (event.data.type === 'GOOGLE_CALENDAR_SUCCESS') {
           messageReceived = true;
@@ -97,8 +133,17 @@ export const useCalendarStore = create<CalendarState>()(
           // Update connection status
           set({ isConnected: true });
           
-          // Refresh calendar list
-          useCalendarStore.getState().checkConnection();
+          // Refresh calendar list and auto-sync
+          await useCalendarStore.getState().checkConnection();
+          
+          // Auto-sync to create "Sesiones" calendar
+          const state = useCalendarStore.getState();
+          if (state.isConnected && !state.syncStatus.hasSessionsCalendar) {
+            toast.info('Creando calendario de sesiones...', {
+              description: 'Sincronizando automáticamente'
+            });
+            await useCalendarStore.getState().syncCalendar();
+          }
         } else if (event.data.type === 'GOOGLE_CALENDAR_ERROR') {
           messageReceived = true;
           window.removeEventListener('message', handleMessage);
@@ -121,8 +166,17 @@ export const useCalendarStore = create<CalendarState>()(
           // (user may have completed auth but popup didn't send message)
           if (!messageReceived) {
             // Small delay to allow backend to process the OAuth callback
-            setTimeout(() => {
-              useCalendarStore.getState().checkConnection();
+            setTimeout(async () => {
+              await useCalendarStore.getState().checkConnection();
+              
+              // Auto-sync after successful connection to create "Sesiones" calendar
+              const state = useCalendarStore.getState();
+              if (state.isConnected && !state.syncStatus.hasSessionsCalendar) {
+                toast.info('Creando calendario de sesiones...', {
+                  description: 'Sincronizando automáticamente'
+                });
+                await useCalendarStore.getState().syncCalendar();
+              }
             }, 1000);
           }
         }
@@ -150,6 +204,9 @@ export const useCalendarStore = create<CalendarState>()(
       });
       
       set({ isSyncing: false, isConnected: true, lastSyncAt: new Date().toISOString() });
+      
+      // Refresh connection to update syncStatus (calendar may have been created)
+      useCalendarStore.getState().checkConnection();
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al sincronizar calendario';
       toast.error(errorMessage);
@@ -164,7 +221,16 @@ export const useCalendarStore = create<CalendarState>()(
       
       toast.success('Google Calendar desconectado');
       
-      set({ isConnected: false, calendars: [], lastSyncAt: null });
+      set({ 
+        isConnected: false, 
+        calendars: [], 
+        syncStatus: {
+          hasToken: false,
+          hasSessionsCalendar: false,
+          sessionsCalendarId: null,
+        },
+        lastSyncAt: null 
+      });
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Error al desconectar Google Calendar';
       toast.error(errorMessage);
@@ -176,6 +242,7 @@ export const useCalendarStore = create<CalendarState>()(
       name: STORAGE_KEY,
       partialize: (state) => ({
         isConnected: state.isConnected,
+        syncStatus: state.syncStatus,
         lastSyncAt: state.lastSyncAt,
       }),
     }

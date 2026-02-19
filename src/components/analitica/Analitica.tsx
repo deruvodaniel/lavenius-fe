@@ -21,6 +21,7 @@ import {
   TrendingUp, 
   CheckCircle2,
   ChevronDown,
+  RefreshCw,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -200,6 +201,9 @@ export function Analitica() {
   const [showRangeDropdown, setShowRangeDropdown] = useState(false);
   const [allSessions, setAllSessions] = useState<SessionResponse[]>([]);
 
+  // Track component mount to force refresh on initial load
+  const [refreshKey, setRefreshKey] = useState(0);
+
   // Fetch all data on mount and when time range changes
   useEffect(() => {
     const loadData = async () => {
@@ -221,10 +225,11 @@ export function Analitica() {
           sessionService.getMonthly(year, month)
         );
         
+        // Force refresh all data - don't use cached data
         const [sessionsResults] = await Promise.all([
           Promise.all(sessionPromises),
-          fetchPayments(true),
-          fetchPatients(),
+          fetchPayments(true),  // true = forceRefresh
+          fetchPatients(),      // Always fetches fresh from server
         ]);
         
         // Flatten and deduplicate sessions by id
@@ -243,7 +248,7 @@ export function Analitica() {
     };
     loadData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timeRange]);
+  }, [timeRange, refreshKey]);
 
   // Transform sessions to UI-friendly format
   const sessionsUI = useMemo(() => {
@@ -511,42 +516,54 @@ export function Analitica() {
           <p className="text-sm text-gray-500">Visualiza el rendimiento de tu consultorio</p>
         </div>
         
-        {/* Time Range Selector */}
-        <div className="relative">
+        {/* Time Range Selector and Refresh */}
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            onClick={() => setShowRangeDropdown(!showRangeDropdown)}
-            className="w-full sm:w-auto justify-between"
+            size="icon"
+            onClick={() => setRefreshKey(k => k + 1)}
+            disabled={isLoading}
+            title="Actualizar datos"
           >
-            <Calendar className="w-4 h-4 mr-2" />
-            {TIME_RANGE_OPTIONS.find(o => o.value === timeRange)?.label}
-            <ChevronDown className="w-4 h-4 ml-2" />
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
           
-          {showRangeDropdown && (
-            <>
-              <div 
-                className="fixed inset-0 z-10" 
-                onClick={() => setShowRangeDropdown(false)} 
-              />
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                {TIME_RANGE_OPTIONS.map(option => (
-                  <button
-                    key={option.value}
-                    onClick={() => {
-                      setTimeRange(option.value);
-                      setShowRangeDropdown(false);
-                    }}
-                    className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
-                      timeRange === option.value ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-700'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+          <div className="relative">
+            <Button
+              variant="outline"
+              onClick={() => setShowRangeDropdown(!showRangeDropdown)}
+              className="w-full sm:w-auto justify-between"
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              {TIME_RANGE_OPTIONS.find(o => o.value === timeRange)?.label}
+              <ChevronDown className="w-4 h-4 ml-2" />
+            </Button>
+            
+            {showRangeDropdown && (
+              <>
+                <div 
+                  className="fixed inset-0 z-10" 
+                  onClick={() => setShowRangeDropdown(false)} 
+                />
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+                  {TIME_RANGE_OPTIONS.map(option => (
+                    <button
+                      key={option.value}
+                      onClick={() => {
+                        setTimeRange(option.value);
+                        setShowRangeDropdown(false);
+                      }}
+                      className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                        timeRange === option.value ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-700'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 

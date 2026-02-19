@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { SkeletonList } from '@/components/shared/Skeleton';
 import { Input } from '@/components/ui/input';
+import { formatPaymentReminderMessage, openWhatsApp } from '@/lib/utils/whatsappTemplates';
 import type { CreatePaymentDto, Payment, UpdatePaymentDto } from '@/lib/types/api.types';
 import { PaymentStatus } from '@/lib/types/api.types';
 import type { SessionUI } from '@/lib/types/session';
@@ -753,7 +754,11 @@ const ReminderModal = ({ payment, onClose }: ReminderModalProps) => {
     ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
     : 'Paciente';
   
-  const defaultMessage = `Hola ${patientName}! Te escribo para recordarte que tenes un pago pendiente del *${formatDate(payment.paymentDate)}* por *${formatCurrency(payment.amount)}*. Podes abonar por transferencia o en efectivo en tu proxima sesion. Gracias!`;
+  const defaultMessage = formatPaymentReminderMessage(
+    patientName,
+    formatDate(payment.paymentDate),
+    formatCurrency(payment.amount)
+  );
   
   const [message, setMessage] = useState(defaultMessage);
 
@@ -790,8 +795,7 @@ const ReminderModal = ({ payment, onClose }: ReminderModalProps) => {
 
   const handleWhatsApp = () => {
     if (patientPhone) {
-      const cleanPhone = patientPhone.replace(/\D/g, '');
-      window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
+      openWhatsApp(patientPhone, message);
     } else {
       toast.info('El paciente no tiene número de teléfono registrado');
     }

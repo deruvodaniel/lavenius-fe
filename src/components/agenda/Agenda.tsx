@@ -14,6 +14,7 @@ import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { patientService } from '@/lib/services/patient.service';
+import { formatTurnoReminderMessage, openWhatsApp } from '@/lib/utils/whatsappTemplates';
 import { Input } from '@/components/ui/input';
 import type { CreateSessionDto, SessionResponse, UpdateSessionDto } from '@/lib/types/session';
 
@@ -168,8 +169,6 @@ export function Agenda() {
     const day = scheduledFrom.getDate().toString().padStart(2, '0');
     const fecha = `${year}-${month}-${day}`;
     const hora = `${scheduledFrom.getHours().toString().padStart(2, '0')}:${scheduledFrom.getMinutes().toString().padStart(2, '0')}`;
-    const numericId = Number.parseInt(s.id, 10);
-    const safeId = Number.isNaN(numericId) ? index : numericId;
 
     // Map status to legacy format for display
     const mapEstado = (status: string): 'pendiente' | 'confirmado' | 'completado' => {
@@ -180,13 +179,10 @@ export function Agenda() {
     };
 
     const patientId = s.patient?.id || '';
-    const numericPatientId = Number.parseInt(patientId, 10);
 
     return {
-      id: safeId,
-      rawId: s.id,
-      pacienteId: Number.isNaN(numericPatientId) ? null : numericPatientId,
-      pacienteRawId: patientId,
+      id: s.id,
+      pacienteId: patientId,
       fecha,
       hora,
       modalidad: s.sessionType === 'remote' ? 'remoto' as const : 'presencial' as const,
@@ -201,18 +197,14 @@ export function Agenda() {
     return value;
   };
 
-  const pacientes = patients.map((p, index) => {
-    const numericId = Number.parseInt(p.id, 10);
-    const safeId = Number.isNaN(numericId) ? index : numericId;
-
+  const pacientes = patients.map((p) => {
     return {
-      id: safeId,
-      rawId: p.id,
+      id: p.id,
       nombre: `${p.firstName} ${p.lastName}`,
       telefono: sanitizeString(p.phone),
       email: sanitizeString(p.email),
       edad: 0,
-      obraSocial: sanitizeString(p.healthInsurance),
+      coberturaMedica: sanitizeString(p.healthInsurance),
       modalidad: 'presencial' as const,
       frecuencia: 'semanal' as const,
       historiaClinica: sanitizeString(p.notes),
@@ -225,16 +217,14 @@ export function Agenda() {
 
   // Helper to get patient name for a turno
   const getPatientNameForTurno = (turno: typeof turnos[0]) => {
-    const paciente = pacientes.find(p => 
-      p.rawId === turno.pacienteRawId || p.id === turno.pacienteId
-    );
+    const paciente = pacientes.find(p => p.id === turno.pacienteId);
     return paciente?.nombre || '';
   };
 
   // Fallback function to get patient name by ID (used when session.patientName is not available)
   const getPatientNameById = (patientId: string | undefined): string | undefined => {
     if (!patientId) return undefined;
-    const paciente = pacientes.find(p => p.rawId === patientId);
+    const paciente = pacientes.find(p => p.id === patientId);
     return paciente?.nombre;
   };
 
@@ -276,13 +266,9 @@ export function Agenda() {
     });
   }, [sessionsUI, searchTerm]);
 
-  const getPaciente = (pacienteId: number | string | null) => {
+  const getPaciente = (pacienteId: string | null) => {
     if (pacienteId === null || pacienteId === undefined) {
       return undefined;
-    }
-
-    if (typeof pacienteId === 'string') {
-      return pacientes.find((p) => p.rawId === pacienteId);
     }
 
     return pacientes.find((p) => p.id === pacienteId);
@@ -468,7 +454,7 @@ export function Agenda() {
   // Send WhatsApp confirmation request for a turno
   // Fetches patient details if phone is not available in the list
   const handleSendWhatsAppConfirmation = async (
-    paciente: { rawId?: string; nombre: string; telefono: string } | undefined, 
+    paciente: { id?: string; nombre: string; telefono: string } | undefined, 
     turno: { fecha: string; hora: string }
   ) => {
     if (!paciente) {
@@ -479,10 +465,10 @@ export function Agenda() {
     let phoneNumber = paciente.telefono;
 
     // If phone is not available, fetch patient details
-    if (!phoneNumber && paciente.rawId) {
+    if (!phoneNumber && paciente.id) {
       try {
         toast.loading('Obteniendo datos del paciente...', { id: 'whatsapp-fetch' });
-        const patientDetails = await patientService.getById(paciente.rawId);
+        const patientDetails = await patientService.getById(paciente.id);
         phoneNumber = sanitizeString(patientDetails.phone);
         toast.dismiss('whatsapp-fetch');
       } catch (error) {
@@ -499,10 +485,8 @@ export function Agenda() {
     }
 
     const fechaFormateada = formatFecha(turno.fecha);
-    const message = `Hola ${paciente.nombre}! Te recuerdo que tenes un turno agendado para el *${fechaFormateada}* a las *${turno.hora}*. Podes confirmar tu asistencia? Responde *Si* para confirmar o *No* si necesitas cancelar. Gracias!`;
-    const phone = phoneNumber.replace(/\D/g, '');
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+    const message = formatTurnoReminderMessage(paciente.nombre, fechaFormateada, turno.hora);
+    openWhatsApp(phoneNumber, message);
   };
 
   // Function to select a patient and fetch full details
@@ -704,19 +688,19 @@ export function Agenda() {
                       {/* Appointments for this day */}
                       <div className="space-y-3">
                         {turnosDelDia.map((turno) => {
-                          const paciente = getPaciente(turno.pacienteRawId ?? turno.pacienteId ?? null);
-                          const session = sessionsUI.find(s => s.id === turno.rawId);
+                          const paciente = getPaciente(turno.pacienteId ?? null);
+                          const session = sessionsUI.find(s => s.id === turno.id);
                           const isPaid = session ? isSessionPaid(session.id) : false;
-                          const originalPatient = patients.find(p => p.id === paciente?.rawId);
+                          const originalPatient = patients.find(p => p.id === paciente?.id);
 
                           if (!session) return null;
 
                           return (
                             <TurnoCard
-                              key={turno.rawId ?? turno.id}
+                              key={turno.id}
                               session={session}
                               patient={paciente ? {
-                                id: paciente.rawId,
+                                id: paciente.id,
                                 nombre: paciente.nombre,
                                 telefono: paciente.telefono,
                                 riskLevel: originalPatient?.riskLevel,

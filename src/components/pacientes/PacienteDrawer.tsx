@@ -57,7 +57,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
     edad: '',
     telefono: '',
     email: '',
-    obraSocial: '',
+    coberturaMedica: '',
     tipoSesion: 'presential' as PatientSessionType,
     frecuencia: 'semanal' as Frecuencia,
     frecuenciaOtra: '',
@@ -92,7 +92,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
         edad: patient.age?.toString() || '',
         telefono: patient.phone || '',
         email: patient.email || '',
-        obraSocial: patient.healthInsurance || '',
+        coberturaMedica: patient.healthInsurance || '',
         tipoSesion: (patient.sessionType as PatientSessionType) || 'presential',
         frecuencia,
         frecuenciaOtra,
@@ -110,7 +110,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
         edad: '',
         telefono: '',
         email: '',
-        obraSocial: '',
+        coberturaMedica: '',
         tipoSesion: 'presential',
         frecuencia: 'semanal',
         frecuenciaOtra: '',
@@ -200,7 +200,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
       email: formData.email.trim() || undefined,
       phone: formData.telefono.trim() || undefined,
       age: formData.edad ? Number(formData.edad) : undefined,
-      healthInsurance: formData.obraSocial.trim() || undefined,
+      healthInsurance: formData.coberturaMedica.trim() || undefined,
       sessionType: formData.tipoSesion as SessionType,
       frequency: frequency || undefined,
       diagnosis: formData.diagnostico.trim() || undefined,
@@ -360,12 +360,12 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               <div>
                 <label className="flex items-center gap-2 text-gray-700 mb-2">
                   <Heart className="w-4 h-4" />
-                  Obra Social
+                  Cobertura Médica
                 </label>
                 <input
                   type="text"
-                  value={formData.obraSocial}
-                  onChange={(e) => setFormData({ ...formData, obraSocial: e.target.value })}
+                  value={formData.coberturaMedica}
+                  onChange={(e) => setFormData({ ...formData, coberturaMedica: e.target.value })}
                   placeholder="Ej: OSDE, Swiss Medical, etc."
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />

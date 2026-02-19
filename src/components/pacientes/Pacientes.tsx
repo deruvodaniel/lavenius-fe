@@ -341,7 +341,7 @@ export function Pacientes() {
   };
 
   // Map API data to component format
-  const pacientes = patients.map((p, index) => {
+  const pacientes = patients.map((p) => {
     // Calculate age from birthDate if available
     let edad = p.age || 0;
     if (p.birthDate && !p.age) {
@@ -353,9 +353,6 @@ export function Pacientes() {
         edad--;
       }
     }
-
-    const numericId = Number.parseInt(p.id, 10);
-    const safeId = Number.isNaN(numericId) ? index : numericId;
 
     // Map sessionType from API to display values
     const mapSessionType = (sessionType?: string): 'presencial' | 'remoto' | 'mixto' => {
@@ -370,16 +367,16 @@ export function Pacientes() {
     };
 
     return {
-      id: safeId,
-      rawId: p.id,
+      id: p.id,
       nombre: `${p.firstName} ${p.lastName}`,
       telefono: p.phone || '',
       email: p.email || '',
       edad,
-      obraSocial: p.healthInsurance || '',
+      coberturaMedica: p.healthInsurance || '',
       modalidad: mapSessionType(p.sessionType),
       frecuencia: (p.frequency as 'semanal' | 'quincenal' | 'mensual') || 'semanal',
       historiaClinica: p.notes || '',
+      createdAt: p.createdAt,
     };
   });
 
@@ -400,7 +397,7 @@ export function Pacientes() {
         case 'age-desc':
           return b.edad - a.edad;
         case 'recent':
-          return b.id - a.id; // Assuming higher ID = more recent
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         default:
           return 0;
       }
@@ -663,7 +660,7 @@ export function Pacientes() {
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Edad</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Obra Social</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cobertura Médica</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modalidad</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Próximo Turno</th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -671,14 +668,14 @@ export function Pacientes() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {displayedPacientes.map((paciente) => {
-                  const proximoTurno = getProximoTurno(paciente.rawId);
-                  const patient = patients.find(p => p.id === paciente.rawId);
+                  const proximoTurno = getProximoTurno(paciente.id);
+                  const patient = patients.find(p => p.id === paciente.id);
                   
                   return (
                     <tr 
-                      key={paciente.rawId} 
+                      key={paciente.id} 
                       className="hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => handleSelectPatient(paciente.rawId)}
+                      onClick={() => handleSelectPatient(paciente.id)}
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
@@ -693,7 +690,7 @@ export function Pacientes() {
                       <td className="px-4 py-3 text-sm text-gray-600">{paciente.edad} años</td>
                       <td className="px-4 py-3">
                         <span className="px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700">
-                          {paciente.obraSocial || '-'}
+                          {paciente.coberturaMedica || '-'}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -763,18 +760,18 @@ export function Pacientes() {
         // Cards View
         <AnimatedList animation="slide-up" stagger={100} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayedPacientes.map((paciente) => {
-          const proximoTurno = getProximoTurno(paciente.rawId);
-          const patient = patients.find(p => p.id === paciente.rawId);
+          const proximoTurno = getProximoTurno(paciente.id);
+          const patient = patients.find(p => p.id === paciente.id);
 
           return (
             <div
-              key={paciente.rawId}
+              key={paciente.id}
               className="bg-white rounded-lg shadow-sm p-6 hover:shadow-lg transition-all border border-gray-200"
             >
               <div className="flex items-start justify-between mb-4">
                 <div 
                   className="flex items-center gap-3 cursor-pointer flex-1"
-                  onClick={() => handleSelectPatient(paciente.rawId)}
+                  onClick={() => handleSelectPatient(paciente.id)}
                 >
                   <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
                     <span className="text-indigo-600">
@@ -836,9 +833,9 @@ export function Pacientes() {
                   {getFrecuenciaLabel(paciente.frecuencia)}
                 </span>
 
-                {paciente.obraSocial && (
+                {paciente.coberturaMedica && (
                   <span className="px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700">
-                    {paciente.obraSocial}
+                    {paciente.coberturaMedica}
                   </span>
                 )}
               </div>

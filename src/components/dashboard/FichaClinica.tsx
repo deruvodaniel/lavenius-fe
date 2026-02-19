@@ -293,7 +293,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Heart className="w-4 h-4" />
-                <span>{patient.healthInsurance || 'Sin obra social'}</span>
+                <span>{patient.healthInsurance || 'Sin cobertura médica'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <RefreshCw className="w-4 h-4" />

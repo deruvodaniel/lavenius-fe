@@ -1,14 +1,46 @@
 import { useEffect } from 'react';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { Button } from '../ui/button';
-import { Calendar as CalendarIcon, RefreshCw, Link2Off, CheckCircle2, Circle, ExternalLink, AlertTriangle } from 'lucide-react';
+import { Calendar as CalendarIcon, RefreshCw, Link2Off, CheckCircle2, Circle, ExternalLink, AlertTriangle, Loader2 } from 'lucide-react';
 import { Card } from '../ui/card';
+
+// Checklist item component
+interface ChecklistItemProps {
+  label: string;
+  checked: boolean;
+  isLoading?: boolean;
+  description?: string;
+}
+
+const ChecklistItem = ({ label, checked, isLoading, description }: ChecklistItemProps) => (
+  <div className="flex items-start gap-3 py-2">
+    <div className="mt-0.5">
+      {isLoading ? (
+        <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+      ) : checked ? (
+        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+      ) : (
+        <Circle className="w-5 h-5 text-gray-300" />
+      )}
+    </div>
+    <div className="flex-1">
+      <p className={`text-sm font-medium ${checked ? 'text-gray-900' : 'text-gray-500'}`}>
+        {label}
+      </p>
+      {description && (
+        <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+      )}
+    </div>
+  </div>
+);
 
 export default function CalendarSync() {
   const {
     isConnected,
     isSyncing,
     isCheckingConnection,
+    syncStatus,
+    lastSyncAt,
     connectCalendar,
     syncCalendar,
     disconnectCalendar,
@@ -18,6 +50,24 @@ export default function CalendarSync() {
   useEffect(() => {
     checkConnection();
   }, [checkConnection]);
+
+  // Format last sync date
+  const formatLastSync = (isoDate: string | null) => {
+    if (!isoDate) return null;
+    try {
+      const date = new Date(isoDate);
+      return date.toLocaleDateString('es-AR', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return null;
+    }
+  };
+
+  const lastSyncFormatted = formatLastSync(lastSyncAt);
 
   return (
     <Card className="overflow-hidden bg-white">
@@ -30,13 +80,19 @@ export default function CalendarSync() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-base sm:text-lg font-semibold text-gray-900">Google Calendar</h2>
-              {isConnected && (
+              {syncStatus.hasToken && syncStatus.hasSessionsCalendar && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
                   <CheckCircle2 className="w-3 h-3" />
-                  Conectado
+                  Listo
                 </span>
               )}
-              {!isConnected && !isCheckingConnection && (
+              {syncStatus.hasToken && !syncStatus.hasSessionsCalendar && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                  <AlertTriangle className="w-3 h-3" />
+                  Pendiente
+                </span>
+              )}
+              {!syncStatus.hasToken && !isCheckingConnection && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                   <Circle className="w-3 h-3" />
                   Desconectado
@@ -44,8 +100,10 @@ export default function CalendarSync() {
               )}
             </div>
             <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
-              {isConnected
-                ? 'Tu calendario está sincronizado con Google Calendar'
+              {syncStatus.hasToken && syncStatus.hasSessionsCalendar
+                ? 'Tu calendario está completamente configurado'
+                : syncStatus.hasToken
+                ? 'Conectado - Sincroniza para crear el calendario de sesiones'
                 : 'Conecta tu cuenta de Google para sincronizar tus sesiones'}
             </p>
           </div>
@@ -54,6 +112,38 @@ export default function CalendarSync() {
 
       {/* Content */}
       <div className="p-4 sm:p-6 space-y-4">
+        
+        {/* Status Checklist */}
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <p className="text-sm font-medium text-gray-700 mb-2">Estado de configuración</p>
+          <div className="divide-y divide-gray-100">
+            <ChecklistItem
+              label="Cuenta de Google conectada"
+              checked={syncStatus.hasToken}
+              isLoading={isCheckingConnection}
+              description={syncStatus.hasToken ? 'Autorización completada' : 'Conecta tu cuenta de Google'}
+            />
+            <ChecklistItem
+              label="Calendario 'Sesiones' creado"
+              checked={syncStatus.hasSessionsCalendar}
+              isLoading={isCheckingConnection}
+              description={
+                syncStatus.hasSessionsCalendar 
+                  ? 'Calendario listo en tu Google Calendar' 
+                  : syncStatus.hasToken 
+                    ? 'Presiona "Sincronizar" para crearlo' 
+                    : 'Se creará al sincronizar'
+              }
+            />
+          </div>
+          {lastSyncFormatted && (
+            <p className="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-200">
+              Última sincronización: {lastSyncFormatted}
+            </p>
+          )}
+        </div>
+
+        {/* Actions */}
         {!isConnected && (
           <Button
             onClick={connectCalendar}
