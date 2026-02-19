@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   Calendar, 
   DollarSign, 
@@ -17,7 +18,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { AnimatedSection } from '@/components/shared/AnimatedSection';
+import { AnimatedSection, LanguageSwitcher } from '@/components/shared';
 
 // ============================================================================
 // MOCK DATA FOR DASHBOARD PREVIEW
@@ -45,6 +46,7 @@ const mockStats = {
 
 function NavBar() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
@@ -55,22 +57,23 @@ function NavBar() {
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Lavenius
+              {t('landing.brand')}
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <LanguageSwitcher variant="buttons" />
             <Button 
               variant="ghost" 
               onClick={() => navigate('/login')}
               className="text-gray-600 hover:text-gray-900"
             >
-              Iniciar sesion
+              {t('landing.cta.login')}
             </Button>
             <Button 
               onClick={() => navigate('/register')}
               className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
             >
-              Comenzar gratis
+              {t('landing.hero.cta')}
             </Button>
           </div>
         </div>
@@ -81,6 +84,7 @@ function NavBar() {
 
 function HeroSection() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   return (
     <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30">
@@ -89,23 +93,22 @@ function HeroSection() {
           <AnimatedSection animation="fade" duration={400}>
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mb-6">
               <Sparkles className="w-4 h-4" />
-              Gestion inteligente para profesionales de salud mental
+              {t('landing.hero.badge')}
             </div>
           </AnimatedSection>
           
           <AnimatedSection animation="slide-up" delay={100} duration={500}>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-              Control total de tu consultorio{' '}
+              {t('landing.hero.title')}{' '}
               <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                y tus finanzas
+                {t('landing.hero.titleHighlight')}
               </span>
             </h1>
           </AnimatedSection>
           
           <AnimatedSection animation="slide-up" delay={200} duration={500}>
             <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Elimina el Excel y el papel. Ahorra tiempo con turnos inteligentes, 
-              seguimiento de cobros automatizado y toda la informacion de tus pacientes en un solo lugar.
+              {t('landing.hero.description')}
             </p>
           </AnimatedSection>
           
@@ -116,7 +119,7 @@ function HeroSection() {
                 onClick={() => navigate('/register')}
                 className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
               >
-                Comenzar gratis
+                {t('landing.hero.cta')}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <Button 
@@ -125,7 +128,7 @@ function HeroSection() {
                 onClick={() => navigate('/login')}
                 className="w-full sm:w-auto px-8 py-6 text-lg"
               >
-                Ya tengo cuenta
+                {t('landing.hero.hasAccount')}
               </Button>
             </div>
           </AnimatedSection>
@@ -134,15 +137,15 @@ function HeroSection() {
             <div className="flex items-center justify-center gap-8 mt-12 text-sm text-gray-500">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-green-500" />
-                Sin tarjeta de credito
+                {t('landing.hero.noCreditCard')}
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-green-500" />
-                Datos encriptados
+                {t('landing.hero.dataEncrypted')}
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-green-500" />
-                Soporte incluido
+                {t('landing.hero.supportIncluded')}
               </div>
             </div>
           </AnimatedSection>
@@ -153,29 +156,31 @@ function HeroSection() {
 }
 
 function FeaturesSection() {
+  const { t } = useTranslation();
+  
   const features = [
     {
       icon: Calendar,
-      title: 'Turnero Inteligente',
-      description: 'Gestiona disponibilidad y reglas de recurrencia (quincenales, mensuales). Sincroniza con Google Calendar.',
+      titleKey: 'landing.features.scheduler.title',
+      descriptionKey: 'landing.features.scheduler.description',
       color: 'indigo',
     },
     {
       icon: DollarSign,
-      title: 'Gestion de Cobros',
-      description: 'Seguimiento riguroso de pagos con recordatorios automaticos via WhatsApp y Email.',
+      titleKey: 'landing.features.payments.title',
+      descriptionKey: 'landing.features.payments.description',
       color: 'emerald',
     },
     {
       icon: FileText,
-      title: 'Fichero Digital',
-      description: 'Historias clinicas seguras, consentimientos informados y cuestionarios de filtro inicial.',
+      titleKey: 'landing.features.records.title',
+      descriptionKey: 'landing.features.records.description',
       color: 'purple',
     },
     {
       icon: RefreshCw,
-      title: 'Calendario Sync',
-      description: 'Sincronizacion total con tu calendario para evitar solapamientos y olvidos.',
+      titleKey: 'landing.features.calendar.title',
+      descriptionKey: 'landing.features.calendar.description',
       color: 'blue',
     },
   ];
@@ -193,10 +198,10 @@ function FeaturesSection() {
         <AnimatedSection animation="slide-up" duration={500}>
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Todo lo que necesitas en un solo lugar
+              {t('landing.features.title')}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Modulos disenados especificamente para profesionales de la salud mental
+              {t('landing.features.subtitle')}
             </p>
           </div>
         </AnimatedSection>
@@ -204,7 +209,7 @@ function FeaturesSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
             <AnimatedSection 
-              key={feature.title} 
+              key={feature.titleKey} 
               animation="slide-up" 
               delay={index * 100} 
               duration={500}
@@ -214,8 +219,8 @@ function FeaturesSection() {
                   <div className={`w-12 h-12 rounded-xl ${colorClasses[feature.color as keyof typeof colorClasses]} flex items-center justify-center mb-4`}>
                     <feature.icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                  <p className="text-gray-600 text-sm">{feature.description}</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{t(feature.titleKey)}</h3>
+                  <p className="text-gray-600 text-sm">{t(feature.descriptionKey)}</p>
                 </CardContent>
               </Card>
             </AnimatedSection>
@@ -227,6 +232,15 @@ function FeaturesSection() {
 }
 
 function AnalyticsSection() {
+  const { t } = useTranslation();
+  
+  const analyticsFeatures = [
+    t('landing.analytics.features.income'),
+    t('landing.analytics.features.sessions'),
+    t('landing.analytics.features.patients'),
+    t('landing.analytics.features.attendance'),
+  ];
+  
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 to-indigo-900 text-white">
       <div className="max-w-7xl mx-auto">
@@ -236,23 +250,17 @@ function AnalyticsSection() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-sm font-medium mb-6">
                 <BarChart3 className="w-4 h-4" />
-                Panel de Analytics
+                {t('landing.analytics.badge')}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-                Visibilidad total de tu practica profesional
+                {t('landing.analytics.title')}
               </h2>
               <p className="text-lg text-indigo-200 mb-8">
-                Toma decisiones informadas con datos claros sobre tus ingresos, 
-                sesiones realizadas y metricas de crecimiento mensual.
+                {t('landing.analytics.description')}
               </p>
               
               <div className="space-y-4">
-                {[
-                  'Ingresos mensuales y proyecciones',
-                  'Sesiones por cobrar y cobradas',
-                  'Pacientes activos vs nuevos',
-                  'Tasa de asistencia y cancelacion',
-                ].map((item, index) => (
+                {analyticsFeatures.map((item, index) => (
                   <AnimatedSection key={item} animation="slide-left" delay={200 + index * 100} duration={400}>
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 bg-indigo-500/30 rounded-full flex items-center justify-center">
@@ -274,33 +282,33 @@ function AnalyticsSection() {
                 <div className="bg-white/10 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-indigo-300 text-sm mb-1">
                     <DollarSign className="w-4 h-4" />
-                    Ingresos del mes
+                    {t('landing.analytics.stats.monthlyIncome')}
                   </div>
                   <div className="text-2xl font-bold text-white">{mockStats.ingresosMes}</div>
                   <div className="text-xs text-emerald-400 flex items-center gap-1 mt-1">
                     <TrendingUp className="w-3 h-3" />
-                    +12% vs mes anterior
+                    {t('landing.analytics.stats.vsLastMonth')}
                   </div>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-indigo-300 text-sm mb-1">
                     <Clock className="w-4 h-4" />
-                    Sesiones
+                    {t('landing.analytics.stats.sessions')}
                   </div>
                   <div className="text-2xl font-bold text-white">{mockStats.sesionesRealizadas}</div>
-                  <div className="text-xs text-indigo-300 mt-1">este mes</div>
+                  <div className="text-xs text-indigo-300 mt-1">{t('landing.analytics.stats.thisMonth')}</div>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-indigo-300 text-sm mb-1">
                     <Users className="w-4 h-4" />
-                    Pacientes activos
+                    {t('landing.analytics.stats.activePatients')}
                   </div>
                   <div className="text-2xl font-bold text-white">{mockStats.pacientesActivos}</div>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-indigo-300 text-sm mb-1">
                     <CheckCircle2 className="w-4 h-4" />
-                    Tasa de cobro
+                    {t('landing.analytics.stats.collectionRate')}
                   </div>
                   <div className="text-2xl font-bold text-emerald-400">{mockStats.tasaCobro}</div>
                 </div>
@@ -308,7 +316,7 @@ function AnalyticsSection() {
               
               {/* Mini Chart */}
               <div className="bg-white/10 rounded-xl p-4">
-                <div className="text-sm text-indigo-300 mb-3">Ingresos ultimos 6 meses</div>
+                <div className="text-sm text-indigo-300 mb-3">{t('landing.analytics.stats.lastSixMonths')}</div>
                 <div className="flex items-end gap-2 h-24">
                   {mockChartData.map((data) => (
                     <div key={data.month} className="flex-1 flex flex-col items-center gap-1">
@@ -330,28 +338,37 @@ function AnalyticsSection() {
 }
 
 function RemindersSection() {
+  const { t } = useTranslation();
+  
   const reminders = [
     {
-      type: 'WhatsApp',
+      type: t('landing.reminders.types.whatsapp'),
       icon: MessageCircle,
-      message: 'Hola Maria! Te recordamos tu sesion manana a las 15:00hs. Confirma tu asistencia.',
-      time: 'Enviado automaticamente',
+      message: t('landing.reminders.messages.sessionReminder'),
+      time: t('landing.reminders.timestamps.sentAutomatically'),
       color: 'green',
     },
     {
-      type: 'Cobro pendiente',
+      type: t('landing.reminders.types.pendingPayment'),
       icon: DollarSign,
-      message: 'Juan Garcia tiene 2 sesiones pendientes de pago ($12.000)',
-      time: 'Recordatorio enviado',
+      message: t('landing.reminders.messages.paymentReminder'),
+      time: t('landing.reminders.timestamps.reminderSent'),
       color: 'amber',
     },
     {
-      type: 'Confirmacion',
+      type: t('landing.reminders.types.confirmation'),
       icon: CheckCircle2,
-      message: 'Pedro Lopez confirmo su turno del Viernes 14:00hs',
-      time: 'Hace 5 minutos',
+      message: t('landing.reminders.messages.appointmentConfirmed'),
+      time: t('landing.reminders.timestamps.fiveMinutesAgo'),
       color: 'emerald',
     },
+  ];
+  
+  const reminderFeatures = [
+    { icon: MessageCircle, text: t('landing.reminders.features.whatsapp') },
+    { icon: DollarSign, text: t('landing.reminders.features.payments') },
+    { icon: CheckCircle2, text: t('landing.reminders.features.confirmations') },
+    { icon: Clock, text: t('landing.reminders.features.scheduling') },
   ];
   
   const colorClasses = {
@@ -369,7 +386,7 @@ function RemindersSection() {
             <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
               <div className="flex items-center gap-2 mb-6">
                 <Bell className="w-5 h-5 text-indigo-600" />
-                <span className="font-semibold text-gray-900">Notificaciones automaticas</span>
+                <span className="font-semibold text-gray-900">{t('landing.reminders.notifications')}</span>
               </div>
               
               <div className="space-y-4">
@@ -398,23 +415,17 @@ function RemindersSection() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium mb-6">
                 <Bell className="w-4 h-4" />
-                Recordatorios Automaticos
+                {t('landing.reminders.badge')}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
-                Reduce la morosidad sin esfuerzo manual
+                {t('landing.reminders.title')}
               </h2>
               <p className="text-lg text-gray-600 mb-8">
-                El sistema envia recordatorios automaticos a tus pacientes via WhatsApp o Email, 
-                tanto para confirmar turnos como para gestionar pagos pendientes.
+                {t('landing.reminders.description')}
               </p>
               
               <div className="space-y-4">
-                {[
-                  { icon: MessageCircle, text: 'Recordatorios de turno por WhatsApp' },
-                  { icon: DollarSign, text: 'Avisos de cobro automaticos' },
-                  { icon: CheckCircle2, text: 'Confirmaciones de asistencia' },
-                  { icon: Clock, text: 'Programacion flexible de envios' },
-                ].map((item, index) => (
+                {reminderFeatures.map((item, index) => (
                   <AnimatedSection key={index} animation="slide-left" delay={100 + index * 100} duration={400}>
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
@@ -434,6 +445,8 @@ function RemindersSection() {
 }
 
 function SecuritySection() {
+  const { t } = useTranslation();
+  
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
@@ -445,21 +458,20 @@ function SecuritySection() {
               </div>
               <div className="flex-1 text-center lg:text-left">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  Seguridad de nivel clinico
+                  {t('landing.security.title')}
                 </h3>
                 <p className="text-gray-600">
-                  Todos los datos de tus pacientes estan encriptados de extremo a extremo. 
-                  Cumplimos con los mas altos estandares de seguridad para proteger la informacion sensible.
+                  {t('landing.security.description')}
                 </p>
               </div>
               <div className="flex items-center gap-6 text-sm">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-indigo-600">256-bit</div>
-                  <div className="text-gray-500">Encriptacion</div>
+                  <div className="text-gray-500">{t('landing.security.encryption')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-indigo-600">E2E</div>
-                  <div className="text-gray-500">Extremo a extremo</div>
+                  <div className="text-gray-500">{t('landing.security.e2e')}</div>
                 </div>
               </div>
             </div>
@@ -472,18 +484,19 @@ function SecuritySection() {
 
 function CTASection() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-600 to-purple-700">
       <div className="max-w-4xl mx-auto text-center">
         <AnimatedSection animation="slide-up" duration={500}>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-            Comienza a gestionar tu consultorio de forma inteligente
+            {t('landing.cta.title')}
           </h2>
         </AnimatedSection>
         <AnimatedSection animation="fade" delay={200} duration={500}>
           <p className="text-lg text-indigo-100 mb-8">
-            Unete a profesionales que ya ahorraron horas de trabajo administrativo
+            {t('landing.cta.subtitle')}
           </p>
         </AnimatedSection>
         <AnimatedSection animation="slide-up" delay={300} duration={500}>
@@ -493,7 +506,7 @@ function CTASection() {
               onClick={() => navigate('/register')}
               className="w-full sm:w-auto bg-white text-indigo-600 hover:bg-indigo-50 px-8 py-6 text-lg shadow-lg"
             >
-              Crear cuenta gratis
+              {t('landing.cta.createAccount')}
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button 
@@ -502,7 +515,7 @@ function CTASection() {
               onClick={() => navigate('/login')}
               className="w-full sm:w-auto px-8 py-6 text-lg border-white/30 text-white hover:bg-white/10"
             >
-              Iniciar sesion
+              {t('landing.cta.login')}
             </Button>
           </div>
         </AnimatedSection>
@@ -512,6 +525,9 @@ function CTASection() {
 }
 
 function Footer() {
+  const { t } = useTranslation();
+  const currentYear = new Date().getFullYear();
+  
   return (
     <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-900 text-gray-400">
       <div className="max-w-7xl mx-auto">
@@ -520,10 +536,10 @@ function Footer() {
             <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-bold text-white">Lavenius</span>
+            <span className="text-lg font-bold text-white">{t('landing.brand')}</span>
           </div>
           <div className="text-sm">
-            © {new Date().getFullYear()} Lavenius. Todos los derechos reservados.
+            © {currentYear} {t('landing.brand')}. {t('landing.footer.rights')}
           </div>
         </div>
       </div>
