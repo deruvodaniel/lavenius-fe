@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, DollarSign, Calendar, FileText, Sparkles, CalendarRange, Pencil, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatISODate } from '@/lib/utils/dateFormatters';
@@ -18,36 +19,40 @@ interface PaymentTypeSelectorProps {
   disabled?: boolean;
 }
 
-const PaymentTypeSelector = ({ selected, onChange, disabled }: PaymentTypeSelectorProps) => (
-  <div className="flex gap-2">
-    <button
-      type="button"
-      onClick={() => onChange('single')}
-      disabled={disabled}
-      className={`flex-1 p-3 rounded-lg border-2 transition-all ${
-        selected === 'single'
-          ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-          : 'border-gray-200 hover:border-gray-300 text-gray-600'
-      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-    >
-      <DollarSign className="w-5 h-5 mx-auto mb-1" />
-      <span className="text-sm font-medium block">Pago único</span>
-    </button>
-    <button
-      type="button"
-      onClick={() => onChange('monthly')}
-      disabled={disabled}
-      className={`flex-1 p-3 rounded-lg border-2 transition-all ${
-        selected === 'monthly'
-          ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-          : 'border-gray-200 hover:border-gray-300 text-gray-600'
-      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-    >
-      <CalendarRange className="w-5 h-5 mx-auto mb-1" />
-      <span className="text-sm font-medium block">Plan mensual</span>
-    </button>
-  </div>
-);
+const PaymentTypeSelector = ({ selected, onChange, disabled }: PaymentTypeSelectorProps) => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="flex gap-2">
+      <button
+        type="button"
+        onClick={() => onChange('single')}
+        disabled={disabled}
+        className={`flex-1 p-3 rounded-lg border-2 transition-all ${
+          selected === 'single'
+            ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+            : 'border-gray-200 hover:border-gray-300 text-gray-600'
+        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      >
+        <DollarSign className="w-5 h-5 mx-auto mb-1" />
+        <span className="text-sm font-medium block">{t('payments.drawer.singlePayment')}</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange('monthly')}
+        disabled={disabled}
+        className={`flex-1 p-3 rounded-lg border-2 transition-all ${
+          selected === 'monthly'
+            ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+            : 'border-gray-200 hover:border-gray-300 text-gray-600'
+        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      >
+        <CalendarRange className="w-5 h-5 mx-auto mb-1" />
+        <span className="text-sm font-medium block">{t('payments.drawer.monthlyPlan')}</span>
+      </button>
+    </div>
+  );
+};
 
 // ============================================================================
 // PAYMENT STATUS SELECTOR
@@ -56,21 +61,21 @@ const PaymentTypeSelector = ({ selected, onChange, disabled }: PaymentTypeSelect
 const STATUS_OPTIONS = [
   { 
     value: PaymentStatus.PENDING, 
-    label: 'Pendiente', 
+    labelKey: 'payments.pending', 
     icon: Clock, 
     className: 'border-yellow-500 bg-yellow-50 text-yellow-700',
     iconColor: 'text-yellow-600'
   },
   { 
     value: PaymentStatus.PAID, 
-    label: 'Pagado', 
+    labelKey: 'payments.paid', 
     icon: CheckCircle2, 
     className: 'border-green-500 bg-green-50 text-green-700',
     iconColor: 'text-green-600'
   },
   { 
     value: PaymentStatus.OVERDUE, 
-    label: 'Vencido', 
+    labelKey: 'payments.overdue', 
     icon: AlertCircle, 
     className: 'border-red-500 bg-red-50 text-red-700',
     iconColor: 'text-red-600'
@@ -83,86 +88,98 @@ interface PaymentStatusSelectorProps {
   disabled?: boolean;
 }
 
-const PaymentStatusSelector = ({ selected, onChange, disabled }: PaymentStatusSelectorProps) => (
-  <div className="flex gap-2">
-    {STATUS_OPTIONS.map((option) => {
-      const Icon = option.icon;
-      const isActive = selected === option.value;
-      return (
-        <button
-          key={option.value}
-          type="button"
-          onClick={() => onChange(option.value)}
-          disabled={disabled}
-          className={`flex-1 p-3 rounded-lg border-2 transition-all ${
-            isActive
-              ? option.className
-              : 'border-gray-200 hover:border-gray-300 text-gray-600'
-          } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          <Icon className={`w-5 h-5 mx-auto mb-1 ${isActive ? option.iconColor : 'text-gray-400'}`} />
-          <span className="text-sm font-medium block">{option.label}</span>
-        </button>
-      );
-    })}
-  </div>
-);
+const PaymentStatusSelector = ({ selected, onChange, disabled }: PaymentStatusSelectorProps) => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="flex gap-2">
+      {STATUS_OPTIONS.map((option) => {
+        const Icon = option.icon;
+        const isActive = selected === option.value;
+        return (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => onChange(option.value)}
+            disabled={disabled}
+            className={`flex-1 p-3 rounded-lg border-2 transition-all ${
+              isActive
+                ? option.className
+                : 'border-gray-200 hover:border-gray-300 text-gray-600'
+            } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <Icon className={`w-5 h-5 mx-auto mb-1 ${isActive ? option.iconColor : 'text-gray-400'}`} />
+            <span className="text-sm font-medium block">{t(option.labelKey)}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 // ============================================================================
 // COMING SOON OVERLAY
 // ============================================================================
 
-const ComingSoonOverlay = () => (
-  <div className="absolute inset-0 bg-white/90 backdrop-blur-[1px] rounded-lg flex flex-col items-center justify-center z-10">
-    <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
-      <Sparkles className="w-8 h-8 text-indigo-600" />
+const ComingSoonOverlay = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="absolute inset-0 bg-white/90 backdrop-blur-[1px] rounded-lg flex flex-col items-center justify-center z-10">
+      <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+        <Sparkles className="w-8 h-8 text-indigo-600" />
+      </div>
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('payments.comingSoon.title')}</h3>
+      <p className="text-sm text-gray-500 text-center max-w-xs px-4">
+        {t('payments.comingSoon.description')}
+      </p>
     </div>
-    <h3 className="text-lg font-semibold text-gray-900 mb-2">Próximamente</h3>
-    <p className="text-sm text-gray-500 text-center max-w-xs px-4">
-      Los planes mensuales y pagos adelantados estarán disponibles pronto
-    </p>
-  </div>
-);
+  );
+};
 
 // ============================================================================
 // MONTHLY PAYMENT FORM (placeholder)
 // ============================================================================
 
-const MonthlyPaymentForm = () => (
-  <div className="relative">
-    <ComingSoonOverlay />
-    <div className="space-y-4 opacity-50 pointer-events-none select-none p-4 border border-gray-200 rounded-lg">
-      <div>
-        <label className="text-gray-700 text-sm mb-2 block">Paciente</label>
-        <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
-          Seleccionar paciente...
+const MonthlyPaymentForm = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="relative">
+      <ComingSoonOverlay />
+      <div className="space-y-4 opacity-50 pointer-events-none select-none p-4 border border-gray-200 rounded-lg">
+        <div>
+          <label className="text-gray-700 text-sm mb-2 block">{t('payments.fields.patient')}</label>
+          <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
+            {t('payments.drawer.selectPatient')}
+          </div>
         </div>
-      </div>
-      <div>
-        <label className="text-gray-700 text-sm mb-2 block">Cantidad de sesiones</label>
-        <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
-          4 sesiones / mes
+        <div>
+          <label className="text-gray-700 text-sm mb-2 block">{t('payments.drawer.sessionCount')}</label>
+          <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
+            {t('payments.drawer.sessionsPerMonth')}
+          </div>
         </div>
-      </div>
-      <div>
-        <label className="text-gray-700 text-sm mb-2 block">Precio por sesión</label>
-        <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
-          $15,000
+        <div>
+          <label className="text-gray-700 text-sm mb-2 block">{t('payments.drawer.pricePerSession')}</label>
+          <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
+            $15,000
+          </div>
         </div>
-      </div>
-      <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-        <div className="flex justify-between items-center">
-          <span className="text-green-700 text-sm">Descuento plan mensual (10%)</span>
-          <span className="text-green-700 font-medium">-$6,000</span>
-        </div>
-        <div className="flex justify-between items-center mt-2 pt-2 border-t border-green-200">
-          <span className="text-green-800 font-medium">Total plan mensual</span>
-          <span className="text-green-800 font-bold text-lg">$54,000</span>
+        <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+          <div className="flex justify-between items-center">
+            <span className="text-green-700 text-sm">{t('payments.drawer.monthlyDiscount')}</span>
+            <span className="text-green-700 font-medium">-$6,000</span>
+          </div>
+          <div className="flex justify-between items-center mt-2 pt-2 border-t border-green-200">
+            <span className="text-green-800 font-medium">{t('payments.drawer.totalMonthlyPlan')}</span>
+            <span className="text-green-800 font-bold text-lg">$54,000</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 interface PaymentDrawerProps {
   isOpen: boolean;
@@ -186,6 +203,7 @@ export const PaymentDrawer = ({
   isLoading = false,
   editPayment = null,
 }: PaymentDrawerProps) => {
+  const { t } = useTranslation();
   const isEditMode = !!editPayment;
   const [paymentType, setPaymentType] = useState<PaymentType>('single');
   const [formData, setFormData] = useState<CreatePaymentDto>({
@@ -246,12 +264,12 @@ export const PaymentDrawer = ({
     e.preventDefault();
 
     if (!formData.sessionId) {
-      toast.error('Debe seleccionar una sesión');
+      toast.error(t('payments.messages.selectSession'));
       return;
     }
 
     if (formData.amount <= 0) {
-      toast.error('El monto debe ser mayor a 0');
+      toast.error(t('payments.messages.amountGreaterThanZero'));
       return;
     }
 
@@ -284,7 +302,7 @@ export const PaymentDrawer = ({
       onClose();
     } catch (error: unknown) {
       console.error('Error al guardar pago:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Error al guardar el pago';
+      const errorMessage = error instanceof Error ? error.message : t('payments.messages.errorSave');
       toast.error(errorMessage);
     } finally {
       setIsSaving(false);
@@ -302,7 +320,7 @@ export const PaymentDrawer = ({
       hour: '2-digit',
       minute: '2-digit',
     });
-    const patientName = session.patientName || session.patient?.firstName || 'Sin paciente';
+    const patientName = session.patientName || session.patient?.firstName || t('payments.noPatient');
     return `${formattedDate} ${formattedTime} - ${patientName}`;
   };
 
@@ -336,25 +354,25 @@ export const PaymentDrawer = ({
                 {isEditMode ? <Pencil className="w-5 h-5" /> : <DollarSign className="w-5 h-5" />}
               </div>
               <h2 className="text-white text-xl">
-                {isEditMode ? 'Editar Pago' : 'Registrar Pago'}
+                {isEditMode ? t('payments.editPayment') : t('payments.registerPayment')}
               </h2>
             </div>
             <button
               onClick={onClose}
               className="text-indigo-200 hover:text-white transition-colors"
-              aria-label="Cerrar panel"
+              aria-label={t('payments.drawer.closePanel')}
             >
               <X className="w-6 h-6" />
             </button>
           </div>
           {isEditMode && editPatientName && (
             <p className="text-indigo-200 text-sm mt-2">
-              Pago de {editPatientName}
+              {t('payments.paymentOf', { name: editPatientName })}
             </p>
           )}
           {!isEditMode && preselectedSessionId && selectedSession && (
             <p className="text-indigo-200 text-sm mt-2">
-              Pago para sesión de {selectedSession.patientName || selectedSession.patient?.firstName}
+              {t('payments.paymentForSession', { name: selectedSession.patientName || selectedSession.patient?.firstName })}
             </p>
           )}
         </div>
@@ -364,7 +382,7 @@ export const PaymentDrawer = ({
           {/* Payment Type Selector - only show in create mode */}
           {!isEditMode && (
             <div>
-              <label className="text-gray-700 mb-2 block text-sm font-medium">Tipo de pago</label>
+              <label className="text-gray-700 mb-2 block text-sm font-medium">{t('payments.drawer.paymentType')}</label>
               <PaymentTypeSelector
                 selected={paymentType}
                 onChange={setPaymentType}
@@ -385,7 +403,7 @@ export const PaymentDrawer = ({
               <div>
                 <label htmlFor="payment-session" className="flex items-center gap-2 text-gray-700 mb-2">
                   <Calendar className="w-4 h-4" />
-                  Sesión <span className="text-red-500">*</span>
+                  {t('payments.fields.session')} <span className="text-red-500">*</span>
                 </label>
                 <select
                   id="payment-session"
@@ -397,7 +415,7 @@ export const PaymentDrawer = ({
                   disabled={isLoading || isSaving || !!preselectedSessionId}
                   required
                 >
-                  <option value="">Seleccionar sesión...</option>
+                  <option value="">{t('payments.drawer.selectSession')}</option>
                   {sessions.map((session) => (
                     <option key={session.id} value={session.id}>
                       {formatSessionOption(session)}
@@ -429,7 +447,7 @@ export const PaymentDrawer = ({
               <div>
                 <label htmlFor="payment-amount" className="flex items-center gap-2 text-gray-700 mb-2">
                   <DollarSign className="w-4 h-4" />
-                  Monto (ARS) <span className="text-red-500">*</span>
+                  {t('payments.fields.amountARS')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="payment-amount"
@@ -450,7 +468,7 @@ export const PaymentDrawer = ({
               <div>
                 <label htmlFor="payment-date" className="flex items-center gap-2 text-gray-700 mb-2">
                   <Calendar className="w-4 h-4" />
-                  Fecha de Pago <span className="text-red-500">*</span>
+                  {t('payments.fields.paymentDate')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="payment-date"
@@ -467,7 +485,7 @@ export const PaymentDrawer = ({
               <div>
                 <label className="flex items-center gap-2 text-gray-700 mb-2">
                   <CheckCircle2 className="w-4 h-4" />
-                  Estado del Pago
+                  {t('payments.fields.paymentStatus')}
                 </label>
                 <PaymentStatusSelector
                   selected={formData.status || PaymentStatus.PENDING}
@@ -480,13 +498,13 @@ export const PaymentDrawer = ({
               <div>
                 <label htmlFor="payment-description" className="flex items-center gap-2 text-gray-700 mb-2">
                   <FileText className="w-4 h-4" />
-                  Descripción <span className="text-gray-400 text-sm">(opcional)</span>
+                  {t('payments.fields.descriptionOptional')}
                 </label>
                 <textarea
                   id="payment-description"
                   value={formData.description || ''}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Notas adicionales sobre el pago..."
+                  placeholder={t('payments.fields.descriptionPlaceholder')}
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                   disabled={isLoading || isSaving}
@@ -503,7 +521,7 @@ export const PaymentDrawer = ({
               className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               disabled={isLoading || isSaving}
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
             {(isEditMode || paymentType === 'single') && (
               <button
@@ -516,10 +534,10 @@ export const PaymentDrawer = ({
                 }`}
               >
                 {isSaving 
-                  ? 'Guardando...' 
+                  ? t('payments.drawer.saving')
                   : isEditMode 
-                    ? 'Guardar Cambios' 
-                    : 'Registrar Pago'
+                    ? t('payments.drawer.saveChanges') 
+                    : t('payments.registerPayment')
                 }
               </button>
             )}

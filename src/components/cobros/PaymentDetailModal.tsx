@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { X, DollarSign, Calendar, FileText, User, Clock, CheckCircle2, AlertCircle, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Payment } from '@/lib/types/api.types';
@@ -50,21 +51,21 @@ const formatCurrency = (amount: number) => {
 
 const STATUS_CONFIG = {
   [PaymentStatus.PAID]: { 
-    label: 'Pagado', 
+    labelKey: 'payments.paid', 
     className: 'bg-green-100 text-green-800',
     iconBgColor: 'bg-green-100',
     iconColor: 'text-green-600',
     Icon: CheckCircle2,
   },
   [PaymentStatus.PENDING]: { 
-    label: 'Pendiente', 
+    labelKey: 'payments.pending', 
     className: 'bg-yellow-100 text-yellow-800',
     iconBgColor: 'bg-yellow-100',
     iconColor: 'text-yellow-600',
     Icon: Clock,
   },
   [PaymentStatus.OVERDUE]: { 
-    label: 'Vencido', 
+    labelKey: 'payments.overdue', 
     className: 'bg-red-100 text-red-800',
     iconBgColor: 'bg-red-100',
     iconColor: 'text-red-600',
@@ -107,9 +108,11 @@ export const PaymentDetailModal = ({
   onMarkAsPaid,
   isMarkingAsPaid,
 }: PaymentDetailModalProps) => {
+  const { t } = useTranslation();
+  
   const patientName = payment.patient 
     ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
-    : 'Sin paciente';
+    : t('payments.noPatient');
   
   const config = STATUS_CONFIG[payment.status];
   const StatusIcon = config.Icon;
@@ -133,14 +136,14 @@ export const PaymentDetailModal = ({
                 <DollarSign className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Detalle del Pago</h2>
+                <h2 className="text-lg font-semibold">{t('payments.paymentDetail')}</h2>
                 <p className="text-indigo-200 text-sm">{formatShortDate(payment.paymentDate)}</p>
               </div>
             </div>
             <button
               onClick={onClose}
               className="text-indigo-200 hover:text-white transition-colors p-1"
-              aria-label="Cerrar"
+              aria-label={t('common.close')}
             >
               <X className="w-6 h-6" />
             </button>
@@ -151,12 +154,12 @@ export const PaymentDetailModal = ({
         <div className="flex-1 overflow-y-auto p-4 sm:p-5">
           {/* Amount Card */}
           <div className="bg-gray-50 rounded-xl p-4 mb-4 text-center">
-            <p className="text-sm text-gray-500 mb-1">Monto</p>
+            <p className="text-sm text-gray-500 mb-1">{t('payments.fields.amount')}</p>
             <p className="text-3xl font-bold text-gray-900">{formatCurrency(payment.amount)}</p>
             <div className="mt-3 flex justify-center">
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${config.className}`}>
                 <StatusIcon className="w-4 h-4" />
-                {config.label}
+                {t(config.labelKey)}
               </span>
             </div>
           </div>
@@ -165,20 +168,20 @@ export const PaymentDetailModal = ({
           <div className="divide-y divide-gray-100">
             <DetailRow 
               icon={User}
-              label="Paciente"
+              label={t('payments.fields.patient')}
               value={patientName}
             />
             
             <DetailRow 
               icon={Calendar}
-              label="Fecha del pago"
+              label={t('payments.fields.paymentDate')}
               value={formatDate(payment.paymentDate)}
             />
 
             {payment.paidDate && (
               <DetailRow 
                 icon={CheckCircle2}
-                label="Fecha de cobro"
+                label={t('payments.fields.paidDate')}
                 value={formatDate(payment.paidDate)}
               />
             )}
@@ -186,7 +189,7 @@ export const PaymentDetailModal = ({
             {payment.description && (
               <DetailRow 
                 icon={FileText}
-                label="Descripción"
+                label={t('payments.fields.description')}
                 value={payment.description}
               />
             )}
@@ -205,12 +208,12 @@ export const PaymentDetailModal = ({
               {isMarkingAsPaid ? (
                 <>
                   <Clock className="w-4 h-4 mr-2 animate-spin" />
-                  Procesando...
+                  {t('payments.messages.processing')}
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Marcar como cobrado
+                  {t('payments.actions.markAsCollected')}
                 </>
               )}
             </Button>
@@ -223,7 +226,7 @@ export const PaymentDetailModal = ({
               onClick={onEdit}
             >
               <Pencil className="w-4 h-4 mr-2" />
-              Editar
+              {t('payments.actions.edit')}
             </Button>
             <Button 
               variant="outline" 
@@ -231,7 +234,7 @@ export const PaymentDetailModal = ({
               onClick={onDelete}
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Eliminar
+              {t('payments.actions.delete')}
             </Button>
           </div>
         </div>

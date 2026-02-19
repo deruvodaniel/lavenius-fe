@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Calendar, Search, ArrowUpDown, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -13,18 +14,20 @@ export type SortOption = 'date-desc' | 'date-asc' | 'price-desc' | 'price-asc';
 export type QuickFilter = 'all' | 'week' | 'month' | 'custom';
 export type StatusFilterOption = 'all' | PaymentStatus;
 
-export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'date-desc', label: 'Más reciente' },
-  { value: 'date-asc', label: 'Más antiguo' },
-  { value: 'price-desc', label: 'Mayor precio' },
-  { value: 'price-asc', label: 'Menor precio' },
+// Sort options with translation keys
+export const SORT_OPTIONS: { value: SortOption; labelKey: string }[] = [
+  { value: 'date-desc', labelKey: 'payments.sort.dateDesc' },
+  { value: 'date-asc', labelKey: 'payments.sort.dateAsc' },
+  { value: 'price-desc', labelKey: 'payments.sort.priceDesc' },
+  { value: 'price-asc', labelKey: 'payments.sort.priceAsc' },
 ];
 
-export const STATUS_FILTER_OPTIONS: { value: StatusFilterOption; label: string }[] = [
-  { value: 'all', label: 'Todos los estados' },
-  { value: PaymentStatus.PENDING, label: 'Pendiente' },
-  { value: PaymentStatus.OVERDUE, label: 'Vencido' },
-  { value: PaymentStatus.PAID, label: 'Pagado' },
+// Status filter options with translation keys
+export const STATUS_FILTER_OPTIONS: { value: StatusFilterOption; labelKey: string }[] = [
+  { value: 'all', labelKey: 'payments.filters.allStatuses' },
+  { value: PaymentStatus.PENDING, labelKey: 'payments.pending' },
+  { value: PaymentStatus.OVERDUE, labelKey: 'payments.overdue' },
+  { value: PaymentStatus.PAID, labelKey: 'payments.paid' },
 ];
 
 // ============================================================================
@@ -93,6 +96,7 @@ export function DateFilters({
   quickFilter,
   onQuickFilterChange,
 }: DateFiltersProps) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleQuickFilter = (filter: QuickFilter) => {
@@ -127,7 +131,7 @@ export function DateFilters({
           onClick={() => handleQuickFilter('all')}
           className={quickFilter === 'all' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
         >
-          Todos
+          {t('payments.filters.all')}
         </Button>
         <Button
           variant={quickFilter === 'week' ? 'default' : 'outline'}
@@ -135,7 +139,7 @@ export function DateFilters({
           onClick={() => handleQuickFilter('week')}
           className={quickFilter === 'week' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
         >
-          Semana actual
+          {t('payments.filters.thisWeek')}
         </Button>
         <Button
           variant={quickFilter === 'month' ? 'default' : 'outline'}
@@ -143,7 +147,7 @@ export function DateFilters({
           onClick={() => handleQuickFilter('month')}
           className={quickFilter === 'month' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
         >
-          Mes actual
+          {t('payments.filters.thisMonth')}
         </Button>
         <Button
           variant={quickFilter === 'custom' ? 'default' : 'outline'}
@@ -152,7 +156,7 @@ export function DateFilters({
           className={quickFilter === 'custom' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
         >
           <Calendar className="h-4 w-4 mr-1.5" />
-          Rango
+          {t('payments.filters.range')}
         </Button>
       </div>
 
@@ -162,7 +166,7 @@ export function DateFilters({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label htmlFor="date-from" className="text-xs text-gray-500 mb-1 block">
-                Desde
+                {t('payments.filters.from')}
               </label>
               <Input
                 id="date-from"
@@ -176,7 +180,7 @@ export function DateFilters({
             </div>
             <div>
               <label htmlFor="date-to" className="text-xs text-gray-500 mb-1 block">
-                Hasta
+                {t('payments.filters.to')}
               </label>
               <Input
                 id="date-to"
@@ -191,7 +195,7 @@ export function DateFilters({
           </div>
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" onClick={onClearFilters} className="text-gray-500">
-              Limpiar filtros
+              {t('payments.filters.clearFilters')}
             </Button>
           )}
         </Card>
@@ -227,6 +231,8 @@ export function SearchAndFilters({
   sortBy, 
   onSortChange 
 }: SearchAndFiltersProps) {
+  const { t } = useTranslation();
+  
   return (
     <div className="flex flex-col sm:flex-row gap-2">
       {/* Search */}
@@ -234,11 +240,11 @@ export function SearchAndFilters({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
           type="text"
-          placeholder="Buscar por paciente..."
+          placeholder={t('payments.filters.searchByPatient')}
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-9"
-          aria-label="Buscar por paciente"
+          aria-label={t('payments.filters.searchByPatient')}
         />
       </div>
       
@@ -249,10 +255,10 @@ export function SearchAndFilters({
             value={statusFilter}
             onChange={(e) => onStatusFilterChange(e.target.value as StatusFilterOption)}
             className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
-            aria-label="Filtrar por estado"
+            aria-label={t('payments.filters.sortBy')}
           >
             {STATUS_FILTER_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>{option.label}</option>
+              <option key={option.value} value={option.value}>{t(option.labelKey)}</option>
             ))}
           </select>
           <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
@@ -264,10 +270,10 @@ export function SearchAndFilters({
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as SortOption)}
             className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
-            aria-label="Ordenar por"
+            aria-label={t('payments.filters.sortBy')}
           >
             {SORT_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>{option.label}</option>
+              <option key={option.value} value={option.value}>{t(option.labelKey)}</option>
             ))}
           </select>
           <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Bell, Plus, DollarSign, CheckCircle2, Clock, AlertCircle, Loader2, Trash2, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSessions } from '@/lib/stores/sessionStore';
@@ -47,7 +48,7 @@ const getInitials = (name: string) =>
 
 const STATUS_CONFIG = {
   [PaymentStatus.PAID]: { 
-    label: 'Pagado', 
+    labelKey: 'payments.paid', 
     className: 'bg-green-100 text-green-800',
     borderColor: 'border-l-green-500',
     iconBgColor: 'bg-green-100',
@@ -55,7 +56,7 @@ const STATUS_CONFIG = {
     Icon: CheckCircle2,
   },
   [PaymentStatus.PENDING]: { 
-    label: 'Pendiente', 
+    labelKey: 'payments.pending', 
     className: 'bg-yellow-100 text-yellow-800',
     borderColor: 'border-l-yellow-500',
     iconBgColor: 'bg-yellow-100',
@@ -63,7 +64,7 @@ const STATUS_CONFIG = {
     Icon: Clock,
   },
   [PaymentStatus.OVERDUE]: { 
-    label: 'Vencido', 
+    labelKey: 'payments.overdue', 
     className: 'bg-red-100 text-red-800',
     borderColor: 'border-l-red-500',
     iconBgColor: 'bg-red-100',
@@ -77,10 +78,11 @@ const STATUS_CONFIG = {
 // ============================================================================
 
 const PaymentStatusBadge = ({ status }: { status: PaymentStatus }) => {
+  const { t } = useTranslation();
   const config = STATUS_CONFIG[status];
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${config.className}`}>
-      {config.label}
+      {t(config.labelKey)}
     </span>
   );
 };
@@ -123,6 +125,7 @@ interface CobroCardProps {
 }
 
 const CobroCard = ({ item, onMarkAsPaid, onReminder, onDelete, onViewDetail, onRegisterPayment, isMarkingAsPaid }: CobroCardProps) => {
+  const { t } = useTranslation();
   const initials = getInitials(item.patientName || 'SP');
   const config = STATUS_CONFIG[item.status];
   const Icon = config.Icon;
@@ -146,7 +149,7 @@ const CobroCard = ({ item, onMarkAsPaid, onReminder, onDelete, onViewDetail, onR
               )}
             </div>
             <div className="min-w-0">
-              <p className="font-medium text-gray-900 text-sm truncate">{item.patientName || 'Sin paciente'}</p>
+              <p className="font-medium text-gray-900 text-sm truncate">{item.patientName || t('payments.noPatient')}</p>
               <p className="text-xs text-gray-500">{formatDateShort(item.date)}</p>
             </div>
           </div>
@@ -171,14 +174,14 @@ const CobroCard = ({ item, onMarkAsPaid, onReminder, onDelete, onViewDetail, onR
             onClick={onRegisterPayment}
           >
             <DollarSign className="h-4 w-4 mr-1.5" />
-            Registrar Pago
+            {t('payments.registerPayment')}
           </Button>
         )}
         {/* Real payments - show Reminder and Mark as Paid buttons */}
         {!item.isVirtual && !isPaid && onReminder && (
           <Button size="sm" variant="outline" className="flex-1" onClick={onReminder}>
             <Bell className="h-4 w-4 mr-1.5" />
-            Recordatorio
+            {t('payments.messages.reminder')}
           </Button>
         )}
         {!item.isVirtual && !isPaid && onMarkAsPaid && (
@@ -193,7 +196,7 @@ const CobroCard = ({ item, onMarkAsPaid, onReminder, onDelete, onViewDetail, onR
             ) : (
               <DollarSign className="h-4 w-4 mr-1.5" />
             )}
-            Cobrar
+            {t('payments.messages.markAsPaidShort')}
           </Button>
         )}
         {!item.isVirtual && onDelete && (
@@ -204,7 +207,7 @@ const CobroCard = ({ item, onMarkAsPaid, onReminder, onDelete, onViewDetail, onR
             onClick={onDelete}
           >
             <Trash2 className="h-4 w-4" />
-            {isPaid && <span className="ml-1.5">Eliminar</span>}
+            {isPaid && <span className="ml-1.5">{t('common.delete')}</span>}
           </Button>
         )}
       </div>
@@ -226,9 +229,10 @@ interface PaymentCardProps {
 }
 
 const PaymentCard = ({ payment, onMarkAsPaid, onReminder, onDelete, onViewDetail, isMarkingAsPaid }: PaymentCardProps) => {
+  const { t } = useTranslation();
   const patientName = payment.patient 
     ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
-    : 'Sin paciente';
+    : t('payments.noPatient');
   
   const initials = getInitials(patientName);
   const config = STATUS_CONFIG[payment.status];
@@ -272,7 +276,7 @@ const PaymentCard = ({ payment, onMarkAsPaid, onReminder, onDelete, onViewDetail
         {!isPaid && onReminder && (
           <Button size="sm" variant="outline" className="flex-1" onClick={onReminder}>
             <Bell className="h-4 w-4 mr-1.5" />
-            Recordatorio
+            {t('payments.messages.reminder')}
           </Button>
         )}
         {!isPaid && onMarkAsPaid && (
@@ -287,7 +291,7 @@ const PaymentCard = ({ payment, onMarkAsPaid, onReminder, onDelete, onViewDetail
             ) : (
               <DollarSign className="h-4 w-4 mr-1.5" />
             )}
-            Cobrar
+            {t('payments.messages.markAsPaidShort')}
           </Button>
         )}
         {onDelete && (
@@ -298,7 +302,7 @@ const PaymentCard = ({ payment, onMarkAsPaid, onReminder, onDelete, onViewDetail
             onClick={onDelete}
           >
             <Trash2 className="h-4 w-4" />
-            {isPaid && <span className="ml-1.5">Eliminar</span>}
+            {isPaid && <span className="ml-1.5">{t('common.delete')}</span>}
           </Button>
         )}
       </div>
@@ -308,11 +312,11 @@ const PaymentCard = ({ payment, onMarkAsPaid, onReminder, onDelete, onViewDetail
 
 // ConfirmDialog is now imported from @/components/shared
 
-// Helper to get patient name from payment
-const getPaymentPatientName = (payment: Payment): string => {
+// Helper to get patient name from payment (used with t() in component)
+const getPaymentPatientName = (payment: Payment, fallback: string): string => {
   return payment.patient 
     ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
-    : 'Sin paciente';
+    : fallback;
 };
 
 // ============================================================================
@@ -320,6 +324,7 @@ const getPaymentPatientName = (payment: Payment): string => {
 // ============================================================================
 
 export function Cobros() {
+  const { t } = useTranslation();
   const { sessionsUI, fetchUpcoming } = useSessions();
   const { fetchPatients } = usePatients();
   const { 
@@ -473,12 +478,12 @@ export function Cobros() {
         status: PaymentStatus.PENDING,
         amount: session.cost || 0,
         date: session.scheduledFrom,
-        patientName: session.patientName || 'Sin paciente',
+        patientName: session.patientName || t('payments.noPatient'),
         patientId: session.patient?.id,
         sessionId: session.id,
-        description: session.sessionSummary || 'Sesión sin cobrar',
+        description: session.sessionSummary || t('payments.virtual.sessionUnpaid'),
       }));
-  }, [sessionsUI, sessionIdsWithPayment]);
+  }, [sessionsUI, sessionIdsWithPayment, t]);
 
   // Convert real payments to CobroItems
   const realPaymentItems = useMemo((): CobroItem[] => {
@@ -575,16 +580,16 @@ export function Cobros() {
     try {
       setMarkingAsPaidId(paymentId);
       await markAsPaid(paymentId);
-      toast.success('Pago marcado como cobrado');
+      toast.success(t('payments.messages.markedAsPaid'));
       // Refresh data
       await fetchPayments(true, serverFilters);
     } catch (error) {
       console.error('Error marking payment as paid:', error);
-      toast.error('No se pudo marcar el pago como cobrado');
+      toast.error(t('payments.messages.errorMarkAsPaid'));
     } finally {
       setMarkingAsPaidId(null);
     }
-  }, [markAsPaid, fetchPayments, serverFilters]);
+  }, [markAsPaid, fetchPayments, serverFilters, t]);
 
   const handleDeletePayment = useCallback(async () => {
     if (!deletePaymentData) return;
@@ -592,23 +597,23 @@ export function Cobros() {
     try {
       setIsDeletingPayment(true);
       await deletePayment(deletePaymentData.id);
-      toast.success('Pago eliminado correctamente');
+      toast.success(t('payments.messages.deleted'));
       setDeletePaymentData(null);
       // Refresh data
       await fetchPayments(true, serverFilters);
     } catch (error) {
       console.error('Error deleting payment:', error);
-      toast.error('No se pudo eliminar el pago');
+      toast.error(t('payments.messages.errorDelete'));
     } finally {
       setIsDeletingPayment(false);
     }
-  }, [deletePaymentData, deletePayment, fetchPayments, serverFilters]);
+  }, [deletePaymentData, deletePayment, fetchPayments, serverFilters, t]);
 
   const handleSavePayment = useCallback(async (data: CreatePaymentDto) => {
     try {
       setIsRefreshing(true);
       await createPayment(data);
-      toast.success('Pago registrado correctamente');
+      toast.success(t('payments.messages.created'));
       setIsPaymentDrawerOpen(false);
       setPreselectedSession(null);
       // Refresh data
@@ -618,17 +623,17 @@ export function Cobros() {
       ]);
     } catch (error) {
       console.error('Error saving payment:', error);
-      toast.error('No se pudo guardar el pago. Por favor intenta nuevamente.');
+      toast.error(t('payments.messages.errorSave'));
     } finally {
       setIsRefreshing(false);
     }
-  }, [createPayment, fetchUpcoming, fetchPayments, serverFilters]);
+  }, [createPayment, fetchUpcoming, fetchPayments, serverFilters, t]);
 
   const handleUpdatePayment = useCallback(async (id: string, data: UpdatePaymentDto) => {
     try {
       setIsRefreshing(true);
       await updatePayment(id, data);
-      toast.success('Pago actualizado correctamente');
+      toast.success(t('payments.messages.updated'));
       setIsPaymentDrawerOpen(false);
       setEditPayment(null);
       // Refresh data
@@ -638,11 +643,11 @@ export function Cobros() {
       ]);
     } catch (error) {
       console.error('Error updating payment:', error);
-      toast.error('No se pudo actualizar el pago. Por favor intenta nuevamente.');
+      toast.error(t('payments.messages.errorUpdate'));
     } finally {
       setIsRefreshing(false);
     }
-  }, [updatePayment, fetchUpcoming, fetchPayments, serverFilters]);
+  }, [updatePayment, fetchUpcoming, fetchPayments, serverFilters, t]);
 
   const handleCloseDrawer = useCallback(() => {
     setIsPaymentDrawerOpen(false);
@@ -704,14 +709,14 @@ export function Cobros() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Cobros</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('payments.title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
-            Gestiona los pagos de tus sesiones
+            {t('payments.managePayments')}
           </p>
         </div>
         <Button onClick={handleCreatePayment} className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white">
           <Plus className="h-4 w-4 mr-2" />
-          Registrar Pago
+          {t('payments.registerPayment')}
         </Button>
       </div>
 
@@ -746,8 +751,8 @@ export function Cobros() {
       ) : filteredCobroItems.length === 0 ? (
         <EmptyState 
           icon={DollarSign} 
-          title={hasAnyFilters ? "Sin resultados" : "Sin cobros"}
-          description={hasAnyFilters ? "No hay cobros que coincidan con los filtros" : "Aún no hay cobros pendientes ni pagos registrados"}
+          title={hasAnyFilters ? t('payments.noResults') : t('payments.noPayments')}
+          description={hasAnyFilters ? t('payments.noResultsDescription') : t('payments.noPendingPayments')}
           variant="subtle"
         />
       ) : isMobile ? (
@@ -796,11 +801,11 @@ export function Cobros() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('payments.table.patient')}</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('payments.table.date')}</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('payments.table.status')}</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('payments.table.amount')}</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('payments.table.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -828,7 +833,7 @@ export function Cobros() {
                               )}
                               {item.isVirtual && (
                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-600 mt-0.5">
-                                  Sesión sin cobrar
+                                  {t('payments.virtual.sessionUnpaid')}
                                 </span>
                               )}
                             </div>
@@ -853,7 +858,7 @@ export function Cobros() {
                                   handleRegisterPaymentForSession(item.sessionId!);
                                 }}
                                 className="p-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors"
-                                title="Registrar pago"
+                                title={t('payments.actions.registerPayment')}
                               >
                                 <DollarSign className="w-4 h-4" />
                               </button>
@@ -866,7 +871,7 @@ export function Cobros() {
                                   handleViewDetail(item.payment!);
                                 }}
                                 className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                                title="Ver detalle"
+                                title={t('payments.actions.viewDetail')}
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
@@ -880,7 +885,7 @@ export function Cobros() {
                                     setReminderPayment(item.payment!);
                                   }}
                                   className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                                  title="Enviar recordatorio"
+                                  title={t('payments.actions.sendReminder')}
                                 >
                                   <Bell className="w-4 h-4" />
                                 </button>
@@ -890,7 +895,7 @@ export function Cobros() {
                                     handleMarkAsPaid(item.payment!.id);
                                   }}
                                   className="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors"
-                                  title="Marcar como cobrado"
+                                  title={t('payments.actions.markAsCollected')}
                                   disabled={markingAsPaidId === item.payment!.id}
                                 >
                                   {markingAsPaidId === item.payment!.id ? (
@@ -909,7 +914,7 @@ export function Cobros() {
                                   setDeletePaymentData(item.payment!);
                                 }}
                                 className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                title="Eliminar pago"
+                                title={t('payments.actions.deletePayment')}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -957,13 +962,16 @@ export function Cobros() {
       <ConfirmDialog
         open={!!deletePaymentData}
         onOpenChange={(open) => !open && setDeletePaymentData(null)}
-        title="Eliminar Pago"
+        title={t('payments.messages.deleteConfirmTitle')}
         description={deletePaymentData 
-          ? `¿Estás seguro que deseas eliminar el pago de ${getPaymentPatientName(deletePaymentData)} por ${formatCurrency(deletePaymentData.amount)}? Esta acción no se puede deshacer.`
+          ? t('payments.messages.deleteConfirmDescription', {
+              name: getPaymentPatientName(deletePaymentData, t('payments.noPatient')),
+              amount: formatCurrency(deletePaymentData.amount)
+            })
           : ''
         }
-        confirmLabel="Eliminar"
-        cancelLabel="Cancelar"
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
         variant="danger"
         onConfirm={handleDeletePayment}
         isLoading={isDeletingPayment}
