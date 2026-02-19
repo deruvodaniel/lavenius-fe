@@ -342,6 +342,7 @@ export const PaymentDrawer = ({
             <button
               onClick={onClose}
               className="text-indigo-200 hover:text-white transition-colors"
+              aria-label="Cerrar panel"
             >
               <X className="w-6 h-6" />
             </button>
@@ -382,11 +383,12 @@ export const PaymentDrawer = ({
             <>
               {/* Session Selector */}
               <div>
-                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                <label htmlFor="payment-session" className="flex items-center gap-2 text-gray-700 mb-2">
                   <Calendar className="w-4 h-4" />
                   Sesión <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="payment-session"
                   value={formData.sessionId}
                   onChange={(e) => setFormData({ ...formData, sessionId: e.target.value })}
                   className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
@@ -425,11 +427,12 @@ export const PaymentDrawer = ({
 
               {/* Amount */}
               <div>
-                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                <label htmlFor="payment-amount" className="flex items-center gap-2 text-gray-700 mb-2">
                   <DollarSign className="w-4 h-4" />
                   Monto (ARS) <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="payment-amount"
                   type="number"
                   min="0"
                   step="0.01"
@@ -445,11 +448,12 @@ export const PaymentDrawer = ({
 
               {/* Payment Date */}
               <div>
-                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                <label htmlFor="payment-date" className="flex items-center gap-2 text-gray-700 mb-2">
                   <Calendar className="w-4 h-4" />
                   Fecha de Pago <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="payment-date"
                   type="date"
                   value={formData.paymentDate}
                   onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
@@ -474,11 +478,12 @@ export const PaymentDrawer = ({
 
               {/* Description */}
               <div>
-                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                <label htmlFor="payment-description" className="flex items-center gap-2 text-gray-700 mb-2">
                   <FileText className="w-4 h-4" />
                   Descripción <span className="text-gray-400 text-sm">(opcional)</span>
                 </label>
                 <textarea
+                  id="payment-description"
                   value={formData.description || ''}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Notas adicionales sobre el pago..."

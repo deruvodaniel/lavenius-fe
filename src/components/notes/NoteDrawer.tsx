@@ -118,6 +118,7 @@ export function NoteDrawer({
               onClick={handleClose}
               className="text-indigo-200 hover:text-white transition-colors"
               disabled={isSaving}
+              aria-label="Cerrar"
             >
               <X className="w-6 h-6" />
             </button>
@@ -128,11 +129,12 @@ export function NoteDrawer({
         <div className="p-4 md:p-6 space-y-6">
           {/* Note Date */}
           <div>
-            <label className="block text-gray-700 mb-2">
+            <label htmlFor="note-date" className="block text-gray-700 mb-2">
               <CalendarIcon className="w-4 h-4 inline mr-1" />
               Fecha de la nota
             </label>
             <input
+              id="note-date"
               type="date"
               value={formatISODate(new Date(formData.noteDate))}
               onChange={(e) => {
@@ -149,10 +151,11 @@ export function NoteDrawer({
 
           {/* Note Content */}
           <div>
-            <label className="block text-gray-700 mb-2">
+            <label htmlFor="note-content" className="block text-gray-700 mb-2">
               Contenido de la nota
             </label>
             <Textarea
+              id="note-content"
               value={formData.text}
               onChange={(e) => setFormData({ ...formData, text: e.target.value })}
               placeholder="Escribe aquí las observaciones de la sesión..."

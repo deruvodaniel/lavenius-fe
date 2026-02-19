@@ -104,28 +104,35 @@ interface InputFieldProps {
   type?: string;
   icon?: React.ElementType;
   disabled?: boolean;
+  id?: string;
 }
 
-const InputField = ({ label, value, onChange, placeholder, type = 'text', icon: Icon, disabled }: InputFieldProps) => (
-  <div className="space-y-1.5">
-    <label className="block text-sm font-medium text-gray-700">{label}</label>
-    <div className="relative">
-      {Icon && (
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Icon className="w-4 h-4 text-gray-400" />
-        </div>
-      )}
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        disabled={disabled}
-        className={`w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${Icon ? 'pl-10' : ''}`}
-      />
+const InputField = ({ label, value, onChange, placeholder, type = 'text', icon: Icon, disabled, id }: InputFieldProps) => {
+  // Generate a stable id from label if not provided
+  const inputId = id || `input-${label.toLowerCase().replace(/\s+/g, '-')}`;
+  
+  return (
+    <div className="space-y-1.5">
+      <label htmlFor={inputId} className="block text-sm font-medium text-gray-700">{label}</label>
+      <div className="relative">
+        {Icon && (
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Icon className="w-4 h-4 text-gray-400" />
+          </div>
+        )}
+        <input
+          id={inputId}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={`w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${Icon ? 'pl-10' : ''}`}
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ============================================================================
 // MAIN COMPONENT
@@ -230,6 +237,7 @@ export function Perfil() {
                     onClick={removeAvatar}
                     className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
                     title="Eliminar foto"
+                    aria-label="Eliminar foto de perfil"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -274,8 +282,9 @@ export function Perfil() {
               placeholder="Ej: Psicologo Clinico, Terapeuta Cognitivo-Conductual..."
             />
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-gray-700">Descripcion / Bio</label>
+              <label htmlFor="profile-bio" className="block text-sm font-medium text-gray-700">Descripcion / Bio</label>
               <textarea
+                id="profile-bio"
                 value={profile.bio || ''}
                 onChange={(e) => updateProfile('bio', e.target.value)}
                 placeholder="Cuentale a tus pacientes sobre ti, tu enfoque terapeutico y experiencia..."

@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { Video, MapPin, Calendar, Plus, Edit2, Trash2, Users, Search, X, ChevronLeft, ChevronRight, ArrowUpDown, LayoutGrid, List } from 'lucide-react';
+import { Video, MapPin, Calendar, Plus, Edit2, Trash2, Users, Search, X, ArrowUpDown, LayoutGrid, List } from 'lucide-react';
 import { toast } from 'sonner';
 import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
 import { usePatients, useErrorToast, useResponsive } from '@/lib/hooks';
 import { useSessionStore } from '@/lib/stores/sessionStore';
 import { SessionStatus } from '@/lib/types/session';
-import { AnimatedList, SkeletonCard, EmptyState, ConfirmDialog } from '../shared';
+import { AnimatedList, SkeletonCard, EmptyState, ConfirmDialog, SimplePagination, InfiniteScrollLoader } from '../shared';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import type { CreatePatientDto } from '@/lib/types/api.types';
@@ -29,86 +29,6 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'age-desc', label: 'Mayor edad' },
   { value: 'recent', label: 'Más reciente' },
 ];
-
-// ============================================================================
-// PAGINATION COMPONENT
-// ============================================================================
-
-interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  totalItems: number;
-  onPageChange: (page: number) => void;
-}
-
-const Pagination = ({ currentPage, totalPages, totalItems, onPageChange }: PaginationProps) => {
-  if (totalPages <= 1) return null;
-
-  const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
-  const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
-
-  return (
-    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-      <p className="text-sm text-gray-500">
-        {startItem}-{endItem} de {totalItems}
-      </p>
-      <div className="flex items-center gap-1">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="h-8 w-8"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span className="px-3 text-sm text-gray-600">
-          {currentPage} / {totalPages}
-        </span>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="h-8 w-8"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-// ============================================================================
-// INFINITE SCROLL LOADER COMPONENT
-// ============================================================================
-
-interface InfiniteScrollLoaderProps {
-  isLoading: boolean;
-  hasMore: boolean;
-  loadMoreRef: React.RefObject<HTMLDivElement | null>;
-}
-
-const InfiniteScrollLoader = ({ isLoading, hasMore, loadMoreRef }: InfiniteScrollLoaderProps) => {
-  if (!hasMore) return null;
-
-  return (
-    <div ref={loadMoreRef} className="py-6 text-center">
-      {isLoading ? (
-        <div className="flex flex-col items-center gap-3">
-          <div className="inline-flex items-center gap-2">
-            <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-          </div>
-          <p className="text-sm text-gray-500">Cargando más...</p>
-        </div>
-      ) : (
-        <div className="h-4"></div>
-      )}
-    </div>
-  );
-};
 
 export function Pacientes() {
   const { patients, selectedPatient, isLoading, error, fetchPatients, fetchPatientById, createPatient, updatePatient, deletePatient, clearError, setSelectedPatient } = usePatients();
@@ -564,8 +484,9 @@ export function Pacientes() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {/* Modalidad Filter */}
           <div>
-            <label className="block text-gray-700 mb-2 text-sm">Modalidad</label>
+            <label htmlFor="filter-modalidad" className="block text-gray-700 mb-2 text-sm">Modalidad</label>
             <select
+              id="filter-modalidad"
               value={modalidadFilter}
               onChange={(e) => setModalidadFilter(e.target.value as any)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
@@ -579,8 +500,9 @@ export function Pacientes() {
 
           {/* Frecuencia Filter */}
           <div>
-            <label className="block text-gray-700 mb-2 text-sm">Frecuencia</label>
+            <label htmlFor="filter-frecuencia" className="block text-gray-700 mb-2 text-sm">Frecuencia</label>
             <select
+              id="filter-frecuencia"
               value={frecuenciaFilter}
               onChange={(e) => setFrecuenciaFilter(e.target.value as any)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
@@ -878,10 +800,11 @@ export function Pacientes() {
             loadMoreRef={loadMoreRef}
           />
         ) : (
-          <Pagination
+          <SimplePagination
             currentPage={currentPage}
             totalPages={totalPages}
             totalItems={filteredPacientes.length}
+            itemsPerPage={ITEMS_PER_PAGE}
             onPageChange={setCurrentPage}
           />
         )

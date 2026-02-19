@@ -564,6 +564,7 @@ export function Analitica() {
             onClick={() => setRefreshKey(k => k + 1)}
             disabled={isLoading}
             title="Actualizar datos"
+            aria-label="Actualizar datos"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>

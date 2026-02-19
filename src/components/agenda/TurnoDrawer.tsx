@@ -276,6 +276,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
             <button
               onClick={onClose}
               className="text-indigo-200 hover:text-white transition-colors"
+              aria-label="Cerrar"
             >
               <X className="w-6 h-6" />
             </button>
@@ -286,11 +287,12 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         <div className="p-4 md:p-6 space-y-4 md:space-y-6">
           {/* Paciente */}
           <div>
-            <label className="flex items-center gap-2 text-gray-700 mb-2">
+            <label htmlFor="turno-paciente" className="flex items-center gap-2 text-gray-700 mb-2">
               <User className="w-4 h-4" />
               Paciente <span className="text-red-500">*</span>
             </label>
             <select
+              id="turno-paciente"
               value={formData.pacienteId}
               onChange={(e) => setFormData({ ...formData, pacienteId: e.target.value })}
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
@@ -326,11 +328,12 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
           {/* Fecha */}
           <div>
-            <label className="flex items-center gap-2 text-gray-700 mb-2">
+            <label htmlFor="turno-fecha" className="flex items-center gap-2 text-gray-700 mb-2">
               <Calendar className="w-4 h-4" />
               Fecha <span className="text-red-500">*</span>
             </label>
             <input
+              id="turno-fecha"
               type="date"
               value={formData.fecha}
               onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
@@ -343,11 +346,12 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
           {/* Hora Inicio */}
           <div>
-            <label className="flex items-center gap-2 text-gray-700 mb-2">
+            <label htmlFor="turno-hora-inicio" className="flex items-center gap-2 text-gray-700 mb-2">
               <Clock className="w-4 h-4" />
               Hora Inicio <span className="text-red-500">*</span>
             </label>
             <select
+              id="turno-hora-inicio"
               value={formData.horaInicio}
               onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -360,11 +364,12 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
           {/* Hora Fin */}
           <div>
-            <label className="flex items-center gap-2 text-gray-700 mb-2">
+            <label htmlFor="turno-hora-fin" className="flex items-center gap-2 text-gray-700 mb-2">
               <Clock className="w-4 h-4" />
               Hora Fin <span className="text-red-500">*</span>
             </label>
             <select
+              id="turno-hora-fin"
               value={formData.horaFin}
               onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -377,10 +382,11 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
           {/* Motivo */}
           <div>
-            <label className="block text-gray-700 mb-2">
+            <label htmlFor="turno-motivo" className="block text-gray-700 mb-2">
               Motivo de consulta
             </label>
             <input
+              id="turno-motivo"
               type="text"
               value={formData.motivo}
               onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}
@@ -391,8 +397,9 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
           {/* Tipo de Sesión */}
           <div>
-            <label className="block text-gray-700 mb-2">Tipo de Sesión</label>
+            <label htmlFor="turno-tipo-sesion" className="block text-gray-700 mb-2">Tipo de Sesión</label>
             <select
+              id="turno-tipo-sesion"
               value={formData.sessionType}
               onChange={(e) => setFormData({ ...formData, sessionType: e.target.value as SessionType })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -404,8 +411,9 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
           {/* Estado */}
           <div>
-            <label className="block text-gray-700 mb-2">Estado</label>
+            <label htmlFor="turno-estado" className="block text-gray-700 mb-2">Estado</label>
             <select
+              id="turno-estado"
               value={formData.estado}
               onChange={(e) => setFormData({ ...formData, estado: e.target.value as SessionStatus })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -419,10 +427,11 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
           {/* Monto */}
           <div>
-            <label className="block text-gray-700 mb-2">
+            <label htmlFor="turno-monto" className="block text-gray-700 mb-2">
               Monto (ARS)
             </label>
             <input
+              id="turno-monto"
               type="number"
               value={formData.monto}
               onChange={(e) => setFormData({ ...formData, monto: Number(e.target.value) })}

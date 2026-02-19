@@ -1,6 +1,6 @@
 # Implementation Status
 
-> Última actualización: Febrero 16, 2026
+> Última actualización: Febrero 19, 2026
 
 ## ✅ Completado
 
@@ -14,96 +14,62 @@
 
 ### Componentes Migrados
 - [x] Login/Registro (auth flow completo con JWT)
-- [x] Pacientes component (con sorting y vista tabla)
-- [x] PacienteDrawer component
+- [x] Pacientes component (con sorting, vista tabla, componentes compartidos)
+- [x] PacienteDrawer component (con a11y)
 - [x] Agenda component (con FullCalendar mejorado)
 - [x] Dashboard component
 - [x] FichaClinica component
-- [x] Cobros component (con sorting y filtros)
-- [x] Configuración component (reorganizado)
-- [x] Perfil component (nuevo - edición de usuario)
-- [x] NotFound 404 page (nuevo)
+- [x] Cobros component (refactorizado, 988 líneas)
+- [x] Configuración component (reorganizado, con a11y)
+- [x] Perfil component (con a11y)
+- [x] NotFound 404 page
 
 ### Features Implementadas
-- [x] Session Notes (NoteCard, NoteList, NoteDrawer)
-  - CRUD completo de notas
-  - 4 tipos: SESSION, GENERAL, TREATMENT_PLAN, PROGRESS
-  - Integración con FichaClinica
-  - Encriptación E2E en backend
+- [x] Session Notes (NoteCard, NoteList, NoteDrawer con a11y)
+- [x] Payment Management (PaymentDrawer, PaymentStats, sorting, filtros, paginación)
+- [x] UX/UI Consistency (cards con bg-white, bordes consistentes)
+- [x] Onboarding & Help System
+- [x] UI Modals & Confirmations (ConfirmDialog responsivo)
 
-- [x] Payment Management
-  - PaymentDrawer component
-  - PaymentStats component (con bg-white)
-  - Sorting por fecha/precio
-  - Filtros por rango de fecha
-  - Paginación desktop / Infinite scroll mobile
-
-- [x] UX/UI Consistency (Febrero 2026)
-  - Cards con bg-white en todas las secciones
-  - Bordes consistentes (border-gray-200)
-  - FullCalendar con diseño moderno
-  - Sidebar con perfil clickeable
-  - Días Off sincronizados en calendario
-  - Overlay "PRÓXIMAMENTE" en features pendientes
-
-- [x] Onboarding & Help System (Febrero 2026)
-  - OnboardingModal: 4-step wizard for first-time users
-  - OnboardingProgress: Step indicator component
-  - OnboardingStep: Individual step component
-  - TipBanner: Dismissible contextual tips
-  - HelpCenter: Searchable help articles by category
-  - Zustand store with localStorage persistence
-  - Calendar connection tip in Agenda view
-
-- [x] UI Modals & Confirmations (Febrero 2026)
-  - ConfirmDialog: Responsive confirm dialog (AlertDialog desktop, Drawer mobile)
-  - Replaced all native browser alerts/confirms
-  - Variants: danger, warning, info, default
-  - Custom icon support
-  - Logout confirmation in Sidebar
-  - Validation errors via toast (sonner)
+### Refactoring & A11y (Febrero 2026)
+- [x] **Cobros.tsx refactorizado** (1,364 → 988 líneas)
+  - ReminderModal.tsx extraído
+  - PaymentFilters.tsx extraído
+- [x] **Componentes compartidos**
+  - SimplePagination.tsx
+  - InfiniteScrollLoader.tsx
+- [x] **Accesibilidad completa** (~38 form labels corregidos)
+  - Todos los drawers con htmlFor/id
+  - Configuracion.tsx con fieldset/legend
+  - Perfil.tsx InputField mejorado
+  - Pacientes.tsx filtros accesibles
 
 ### Documentación
-- [x] Documentación consolidada en docs/
 - [x] Guidelines.md (arquitectura y estilo)
 - [x] A11Y.md (accesibilidad)
 - [x] API_INTEGRATION.md
 - [x] GOOGLE_CALENDAR_SYNC.md
-- [x] UI Store & ConfirmDialog docs en CONTEXT.md
+- [x] CONTEXT.md (UI Store, ConfirmDialog)
 
 ## 📝 Next Steps (Prioridad)
 
-1. **Google Calendar OAuth** (Alta prioridad)
+1. **Focus Trap y Keyboard Dismiss** (Alta prioridad)
+   - Agregar focus trap a todos los drawers/modals
+   - ESC para cerrar
+
+2. **Google Calendar OAuth** (Alta prioridad)
    - Agregar test users en Google Cloud Console
    - Configurar redirect URIs para producción
-   - Testing de sincronización completa
 
-2. **Notificaciones y Recordatorios**
-   - Implementar sistema de recordatorios (actualmente "PRÓXIMAMENTE")
-   - Notificaciones push
-   - Email reminders
+3. **Refactoring pendiente** (Media prioridad)
+   - Agenda.tsx (~720 líneas) → dividir
+   - FichaClinica.tsx (~458 líneas) → extraer tabs
+   - Crear BaseDrawer reutilizable
 
-3. **Backend: Onboarding Persistence** (Cuando se integre)
-   ```typescript
-   // PATCH /users/me/preferences
-   // Body: { hasCompletedOnboarding: boolean, dismissedTips?: string[] }
-   
-   // User entity additions:
-   @Column({ default: false }) hasCompletedOnboarding: boolean;
-   @Column('simple-array', { nullable: true }) dismissedTips: string[];
-   ```
+4. **TypeScript cleanup** (Media prioridad)
+   - Eliminar ~20 instancias de `any` en catch blocks
 
-4. **Code Cleanup** (Completado)
-   - ✅ mockData.ts y turnos2026.ts eliminados (839 líneas de código muerto)
-   - ✅ Console.logs de debug removidos (mantenidos solo console.error)
-   - ✅ Carpeta src/data/ eliminada
-
-5. **Performance Optimization** (Completado)
-   - ✅ Code splitting implementado via rollupOptions.manualChunks
-   - ✅ Lazy loading para Agenda, Cobros y HelpCenter
-   - ✅ FullCalendar solo se carga al navegar a Agenda
-
-## 🎯 Pattern Established
+## 🎯 Patterns Establecidos
 
 ```typescript
 // 1. Store pattern (Zustand)
@@ -111,84 +77,51 @@ export const useNoteStore = create<NoteStore>((set) => ({
   notes: [],
   isLoading: false,
   error: null,
-  fetchNotesByPatient: async (patientId) => {
-    set({ isLoading: true, error: null });
-    try {
-      const notes = await noteApi.getNotesByPatient(patientId);
-      set({ notes, isLoading: false });
-    } catch (error) {
-      set({ error, isLoading: false });
-    }
-  }
+  fetchNotes: async () => { ... }
 }));
 
 // 2. Custom hook pattern
-export const useNotes = () => {
-  const store = useNoteStore();
-  return store;
-};
+export const useNotes = () => useNoteStore();
 
 // 3. Component pattern
 const MyComponent = () => {
-  const { notes, isLoading, fetchNotes } = useNotes();
-  
-  useEffect(() => {
-    fetchNotes();
-  }, []);
-  
+  const { notes, isLoading } = useNotes();
+  useEffect(() => { fetchNotes(); }, []);
   if (isLoading) return <LoadingSpinner />;
-  if (!notes.length) return <EmptyState />;
-  
   return <NoteList notes={notes} />;
 };
 
-// 4. shadcn/ui components only
-<Button variant="default">Click me</Button>
+// 4. A11y pattern for form fields
+<label htmlFor="field-id">Label</label>
+<input id="field-id" ... />
 
-// 5. react-hook-form for forms
-const form = useForm({ resolver: zodResolver(schema) });
+// 5. Fieldset for grouped controls
+<fieldset>
+  <legend>Group label</legend>
+  <div role="radiogroup">...</div>
+</fieldset>
 ```
 
 ## 📊 Métricas
-- **Carga inicial**: ~593 kB (gzip: ~176 kB)
-  - index (app): 243.13 kB
-  - vendor-react: 180.01 kB
-  - vendor-radix: 43.81 kB
-  - vendor-forms: 87.24 kB
-  - vendor-state: 39.33 kB
-- **Lazy loaded** (solo cuando se navega):
-  - Agenda + vendor-calendar: 299.07 kB
-  - Cobros: 31.51 kB
-  - HelpCenter: 11.53 kB
-- Build time: ~8s
-- TypeScript strict: ✅
-- ESLint warnings: <10
+- **Build**: ~10s
+- **TypeScript strict**: ✅
+- **ESLint warnings**: <10
+- **A11y form labels**: 100% coverage
 
-## 🎨 UI/UX Guidelines Establecidas
+## 🎨 UI/UX Guidelines
 
 ### Card Styling
 ```tsx
-// Todas las cards deben tener bg-white para consistencia
 <Card className="p-4 bg-white">
-  {/* contenido */}
-</Card>
-
-// Cards con borde izquierdo de color
 <Card className="p-4 bg-white border-l-4 border-l-indigo-500">
-  {/* contenido */}
-</Card>
 ```
 
 ### Container Styling
 ```tsx
-// Contenedores principales con borde
 <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-  {/* contenido */}
-</div>
 ```
 
 ### Colores (minimalistas)
-- Solo iconos con color (ej: text-red-500, text-indigo-600)
+- Solo iconos con color (text-red-500, text-indigo-600)
 - Texto en tonos grises (text-gray-900, text-gray-500)
 - Fondos neutros o blancos
-- Badges con colores suaves (bg-red-100 text-red-800)

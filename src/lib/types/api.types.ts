@@ -130,12 +130,19 @@ export type Session = {
   updatedAt: string;
 };
 
+/**
+ * Note entity - matches backend NoteResponse
+ * Backend returns patientId, and optionally patient object when expanded
+ */
 export type Note = {
   id: string;
   text: string; // Decrypted text from backend
-  noteDate: string; // Date of the note
+  noteDate: string; // ISO date string (YYYY-MM-DD)
+  patientId: string; // UUID of the patient
   patient?: {
     id: string;
+    firstName?: string;
+    lastName?: string;
     active?: boolean;
   };
   createdAt: string;

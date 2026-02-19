@@ -1,0 +1,278 @@
+import { useState } from 'react';
+import { Calendar, Search, ArrowUpDown, Filter } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { PaymentStatus } from '@/lib/types/api.types';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export type SortOption = 'date-desc' | 'date-asc' | 'price-desc' | 'price-asc';
+export type QuickFilter = 'all' | 'week' | 'month' | 'custom';
+export type StatusFilterOption = 'all' | PaymentStatus;
+
+export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: 'date-desc', label: 'Más reciente' },
+  { value: 'date-asc', label: 'Más antiguo' },
+  { value: 'price-desc', label: 'Mayor precio' },
+  { value: 'price-asc', label: 'Menor precio' },
+];
+
+export const STATUS_FILTER_OPTIONS: { value: StatusFilterOption; label: string }[] = [
+  { value: 'all', label: 'Todos los estados' },
+  { value: PaymentStatus.PENDING, label: 'Pendiente' },
+  { value: PaymentStatus.OVERDUE, label: 'Vencido' },
+  { value: PaymentStatus.PAID, label: 'Pagado' },
+];
+
+// ============================================================================
+// UTILITIES
+// ============================================================================
+
+/** Get the date range for the current week (Monday to Sunday) */
+export const getWeekRange = () => {
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - diffToMonday);
+  monday.setHours(0, 0, 0, 0);
+  
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  
+  return {
+    from: monday.toISOString().split('T')[0],
+    to: sunday.toISOString().split('T')[0],
+  };
+};
+
+/** Get the date range for the current month */
+export const getMonthRange = () => {
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+  return {
+    from: firstDay.toISOString().split('T')[0],
+    to: lastDay.toISOString().split('T')[0],
+  };
+};
+
+// ============================================================================
+// DATE FILTERS COMPONENT
+// ============================================================================
+
+interface DateFiltersProps {
+  dateFrom: string;
+  dateTo: string;
+  onDateFromChange: (value: string) => void;
+  onDateToChange: (value: string) => void;
+  onClearFilters: () => void;
+  hasActiveFilters: boolean;
+  quickFilter: QuickFilter;
+  onQuickFilterChange: (filter: QuickFilter) => void;
+}
+
+/**
+ * DateFilters - Quick filter buttons and custom date range picker
+ * 
+ * Provides preset filters (All, This Week, This Month) and a custom
+ * date range picker that expands when selected.
+ */
+export function DateFilters({ 
+  dateFrom, 
+  dateTo, 
+  onDateFromChange, 
+  onDateToChange,
+  onClearFilters,
+  hasActiveFilters,
+  quickFilter,
+  onQuickFilterChange,
+}: DateFiltersProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleQuickFilter = (filter: QuickFilter) => {
+    onQuickFilterChange(filter);
+    
+    if (filter === 'week') {
+      const { from, to } = getWeekRange();
+      onDateFromChange(from);
+      onDateToChange(to);
+      setIsExpanded(false);
+    } else if (filter === 'month') {
+      const { from, to } = getMonthRange();
+      onDateFromChange(from);
+      onDateToChange(to);
+      setIsExpanded(false);
+    } else if (filter === 'all') {
+      onDateFromChange('');
+      onDateToChange('');
+      setIsExpanded(false);
+    } else if (filter === 'custom') {
+      setIsExpanded(true);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      {/* Quick filter buttons */}
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant={quickFilter === 'all' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => handleQuickFilter('all')}
+          className={quickFilter === 'all' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
+        >
+          Todos
+        </Button>
+        <Button
+          variant={quickFilter === 'week' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => handleQuickFilter('week')}
+          className={quickFilter === 'week' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
+        >
+          Semana actual
+        </Button>
+        <Button
+          variant={quickFilter === 'month' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => handleQuickFilter('month')}
+          className={quickFilter === 'month' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
+        >
+          Mes actual
+        </Button>
+        <Button
+          variant={quickFilter === 'custom' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => handleQuickFilter('custom')}
+          className={quickFilter === 'custom' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
+        >
+          <Calendar className="h-4 w-4 mr-1.5" />
+          Rango
+        </Button>
+      </div>
+
+      {/* Custom date range (expanded when "Rango" is selected) */}
+      {(isExpanded || quickFilter === 'custom') && (
+        <Card className="p-3 space-y-3 bg-white">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="date-from" className="text-xs text-gray-500 mb-1 block">
+                Desde
+              </label>
+              <Input
+                id="date-from"
+                type="date"
+                value={dateFrom}
+                onChange={(e) => {
+                  onDateFromChange(e.target.value);
+                  onQuickFilterChange('custom');
+                }}
+              />
+            </div>
+            <div>
+              <label htmlFor="date-to" className="text-xs text-gray-500 mb-1 block">
+                Hasta
+              </label>
+              <Input
+                id="date-to"
+                type="date"
+                value={dateTo}
+                onChange={(e) => {
+                  onDateToChange(e.target.value);
+                  onQuickFilterChange('custom');
+                }}
+              />
+            </div>
+          </div>
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" onClick={onClearFilters} className="text-gray-500">
+              Limpiar filtros
+            </Button>
+          )}
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
+// SEARCH AND FILTERS COMPONENT
+// ============================================================================
+
+interface SearchAndFiltersProps {
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  statusFilter: StatusFilterOption;
+  onStatusFilterChange: (status: StatusFilterOption) => void;
+  sortBy: SortOption;
+  onSortChange: (sort: SortOption) => void;
+}
+
+/**
+ * SearchAndFilters - Search input with status and sort dropdowns
+ * 
+ * Combines search, status filtering, and sort options in a compact layout
+ * that stacks on mobile and aligns horizontally on desktop.
+ */
+export function SearchAndFilters({ 
+  searchTerm, 
+  onSearchChange, 
+  statusFilter,
+  onStatusFilterChange,
+  sortBy, 
+  onSortChange 
+}: SearchAndFiltersProps) {
+  return (
+    <div className="flex flex-col sm:flex-row gap-2">
+      {/* Search */}
+      <div className="relative flex-1">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input
+          type="text"
+          placeholder="Buscar por paciente..."
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-9"
+          aria-label="Buscar por paciente"
+        />
+      </div>
+      
+      <div className="flex gap-2">
+        {/* Status filter dropdown */}
+        <div className="relative">
+          <select
+            value={statusFilter}
+            onChange={(e) => onStatusFilterChange(e.target.value as StatusFilterOption)}
+            className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
+            aria-label="Filtrar por estado"
+          >
+            {STATUS_FILTER_OPTIONS.map(option => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+          <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+        </div>
+        
+        {/* Sort dropdown */}
+        <div className="relative">
+          <select
+            value={sortBy}
+            onChange={(e) => onSortChange(e.target.value as SortOption)}
+            className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
+            aria-label="Ordenar por"
+          >
+            {SORT_OPTIONS.map(option => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+          <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+        </div>
+      </div>
+    </div>
+  );
+}

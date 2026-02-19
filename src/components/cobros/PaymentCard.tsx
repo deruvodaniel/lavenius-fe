@@ -127,6 +127,7 @@ export const PaymentCard = ({ payment, onMarkAsPaid, onDelete }: PaymentCardProp
               size="icon"
               onClick={handleDelete}
               title="Eliminar pago"
+              aria-label="Eliminar pago"
               className="text-destructive hover:text-destructive"
             >
               <Trash2 className="h-4 w-4" />

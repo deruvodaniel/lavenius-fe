@@ -365,6 +365,7 @@ export function Configuracion() {
                       onClick={() => handleRemoveDiaOff(dia.id)}
                       className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                       title="Eliminar"
+                      aria-label="Eliminar día off"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -385,8 +386,9 @@ export function Configuracion() {
                 {/* Fecha y Motivo */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Fecha</label>
+                    <label htmlFor="diaoff-fecha" className="block text-xs font-medium text-gray-700 mb-1">Fecha</label>
                     <input
+                      id="diaoff-fecha"
                       type="date"
                       value={newDiaOff.fecha}
                       onChange={(e) => setNewDiaOff({ ...newDiaOff, fecha: e.target.value })}
@@ -394,8 +396,9 @@ export function Configuracion() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Motivo (opcional)</label>
+                    <label htmlFor="diaoff-motivo" className="block text-xs font-medium text-gray-700 mb-1">Motivo (opcional)</label>
                     <input
+                      id="diaoff-motivo"
                       type="text"
                       value={newDiaOff.motivo}
                       onChange={(e) => setNewDiaOff({ ...newDiaOff, motivo: e.target.value })}
@@ -406,9 +409,9 @@ export function Configuracion() {
                 </div>
 
                 {/* Tipo de día off */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">Tipo de bloqueo</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <fieldset>
+                  <legend className="block text-xs font-medium text-gray-700 mb-2">Tipo de bloqueo</legend>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="radiogroup" aria-label="Tipo de bloqueo">
                     {DIA_OFF_TIPOS.map((tipo) => (
                       <button
                         key={tipo.value}
@@ -429,14 +432,15 @@ export function Configuracion() {
                       </button>
                     ))}
                   </div>
-                </div>
+                </fieldset>
 
                 {/* Rango horario personalizado */}
                 {newDiaOff.tipo === 'custom' && (
                   <div className="flex flex-wrap items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
                     <div className="flex items-center gap-2">
-                      <label className="text-sm text-gray-500">Desde</label>
+                      <label htmlFor="diaoff-start-time" className="text-sm text-gray-500">Desde</label>
                       <input
+                        id="diaoff-start-time"
                         type="time"
                         value={newDiaOff.startTime}
                         onChange={(e) => setNewDiaOff({ ...newDiaOff, startTime: e.target.value })}
@@ -444,8 +448,9 @@ export function Configuracion() {
                       />
                     </div>
                     <div className="flex items-center gap-2">
-                      <label className="text-sm text-gray-500">hasta</label>
+                      <label htmlFor="diaoff-end-time" className="text-sm text-gray-500">hasta</label>
                       <input
+                        id="diaoff-end-time"
                         type="time"
                         value={newDiaOff.endTime}
                         onChange={(e) => setNewDiaOff({ ...newDiaOff, endTime: e.target.value })}
@@ -500,14 +505,15 @@ export function Configuracion() {
         >
           <div className="space-y-6">
             {/* Horario de atención */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
+            <fieldset className="space-y-3">
+              <legend className="block text-sm font-medium text-gray-700">
                 Horario de atención
-              </label>
+              </legend>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-500">Desde</span>
+                  <label htmlFor="working-hours-start" className="text-sm text-gray-500">Desde</label>
                   <input
+                    id="working-hours-start"
                     type="time"
                     value={settings.workingHours.startTime}
                     onChange={(e) => updateSetting('workingHours', {
@@ -518,8 +524,9 @@ export function Configuracion() {
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-500">hasta</span>
+                  <label htmlFor="working-hours-end" className="text-sm text-gray-500">hasta</label>
                   <input
+                    id="working-hours-end"
                     type="time"
                     value={settings.workingHours.endTime}
                     onChange={(e) => updateSetting('workingHours', {
@@ -530,14 +537,14 @@ export function Configuracion() {
                   />
                 </div>
               </div>
-            </div>
+            </fieldset>
 
             {/* Días de trabajo */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
+            <fieldset className="space-y-3">
+              <legend className="block text-sm font-medium text-gray-700">
                 Días de trabajo
-              </label>
-              <div className="flex flex-wrap gap-2">
+              </legend>
+              <div className="flex flex-wrap gap-2" role="group" aria-label="Seleccionar días de trabajo">
                 {WEEKDAYS.map((day) => {
                   const isSelected = settings.workingHours.workingDays.includes(day.id);
                   return (
@@ -561,6 +568,8 @@ export function Configuracion() {
                         }
                       `}
                       title={day.name}
+                      aria-label={day.name}
+                      aria-pressed={isSelected}
                     >
                       {day.short}
                     </button>
@@ -570,7 +579,7 @@ export function Configuracion() {
               <p className="text-xs text-gray-500">
                 Los días no seleccionados aparecerán bloqueados en tu calendario
               </p>
-            </div>
+            </fieldset>
 
             {/* Preview */}
             <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
@@ -615,10 +624,11 @@ export function Configuracion() {
                   <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
                     {/* Frecuencia */}
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label htmlFor="frecuencia-recordatorio" className="block text-sm font-medium text-gray-700">
                         Frecuencia de recordatorio
                       </label>
                       <select
+                        id="frecuencia-recordatorio"
                         value={settings.frecuenciaRecordatorio}
                         onChange={(e) => updateSetting('frecuenciaRecordatorio', e.target.value)}
                         className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
@@ -631,11 +641,12 @@ export function Configuracion() {
 
                     {/* Mínimo de turnos */}
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label htmlFor="minimo-turnos" className="block text-sm font-medium text-gray-700">
                         Recordar cuando haya al menos
                       </label>
                       <div className="flex items-center gap-2">
                         <input
+                          id="minimo-turnos"
                           type="number"
                           min="1"
                           max="20"
@@ -664,7 +675,7 @@ export function Configuracion() {
             <div className="space-y-3 pt-2">
               <div className="flex items-center gap-2">
                 <MessageCircle className="w-4 h-4 text-green-600" />
-                <label className="block text-sm font-medium text-gray-700">
+                <label htmlFor="whatsapp-payment-template" className="block text-sm font-medium text-gray-700">
                   Mensaje de WhatsApp para recordatorio de pago
                 </label>
               </div>
@@ -673,6 +684,7 @@ export function Configuracion() {
                 Variables disponibles: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{monto}'}</code>
               </p>
               <textarea
+                id="whatsapp-payment-template"
                 value={settings.whatsappTemplates.paymentReminder}
                 onChange={(e) => updateSetting('whatsappTemplates', {
                   ...settings.whatsappTemplates,
@@ -722,11 +734,12 @@ export function Configuracion() {
                   <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
                     {/* Horas de anticipación */}
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label htmlFor="horas-anticipacion" className="block text-sm font-medium text-gray-700">
                         Horas de anticipación
                       </label>
                       <div className="flex items-center gap-2">
                         <input
+                          id="horas-anticipacion"
                           type="number"
                           min="1"
                           max="72"
@@ -753,7 +766,7 @@ export function Configuracion() {
             <div className="space-y-3 pt-2">
               <div className="flex items-center gap-2">
                 <MessageCircle className="w-4 h-4 text-green-600" />
-                <label className="block text-sm font-medium text-gray-700">
+                <label htmlFor="whatsapp-turno-template" className="block text-sm font-medium text-gray-700">
                   Mensaje de WhatsApp para recordatorio de turno
                 </label>
               </div>
@@ -762,6 +775,7 @@ export function Configuracion() {
                 Variables disponibles: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{hora}'}</code>
               </p>
               <textarea
+                id="whatsapp-turno-template"
                 value={settings.whatsappTemplates.turnoReminder}
                 onChange={(e) => updateSetting('whatsappTemplates', {
                   ...settings.whatsappTemplates,

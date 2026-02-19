@@ -140,6 +140,7 @@ export const PaymentDetailModal = ({
             <button
               onClick={onClose}
               className="text-indigo-200 hover:text-white transition-colors p-1"
+              aria-label="Cerrar"
             >
               <X className="w-6 h-6" />
             </button>

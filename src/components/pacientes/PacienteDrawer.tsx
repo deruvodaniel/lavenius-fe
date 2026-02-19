@@ -248,6 +248,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
             <button
               onClick={handleClose}
               className="text-indigo-200 hover:text-white transition-colors"
+              aria-label="Cerrar panel"
             >
               <X className="w-6 h-6" />
             </button>
@@ -271,10 +272,11 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
 
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label htmlFor="paciente-nombre" className="block text-gray-700 mb-2">
                   Nombre <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="paciente-nombre"
                   type="text"
                   value={formData.nombre}
                   onChange={(e) => handleFieldChange('nombre', e.target.value)}
@@ -288,10 +290,11 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label htmlFor="paciente-apellido" className="block text-gray-700 mb-2">
                   Apellido <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="paciente-apellido"
                   type="text"
                   value={formData.apellido}
                   onChange={(e) => handleFieldChange('apellido', e.target.value)}
@@ -305,8 +308,9 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">Edad</label>
+                <label htmlFor="paciente-edad" className="block text-gray-700 mb-2">Edad</label>
                 <input
+                  id="paciente-edad"
                   type="number"
                   min="0"
                   max="120"
@@ -322,11 +326,12 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                <label htmlFor="paciente-telefono" className="flex items-center gap-2 text-gray-700 mb-2">
                   <Phone className="w-4 h-4" />
                   Teléfono
                 </label>
                 <input
+                  id="paciente-telefono"
                   type="tel"
                   value={formData.telefono}
                   onChange={(e) => handleFieldChange('telefono', e.target.value)}
@@ -340,11 +345,12 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                <label htmlFor="paciente-email" className="flex items-center gap-2 text-gray-700 mb-2">
                   <Mail className="w-4 h-4" />
                   Email
                 </label>
                 <input
+                  id="paciente-email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleFieldChange('email', e.target.value)}
@@ -358,11 +364,12 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                <label htmlFor="paciente-cobertura" className="flex items-center gap-2 text-gray-700 mb-2">
                   <Heart className="w-4 h-4" />
                   Cobertura Médica
                 </label>
                 <input
+                  id="paciente-cobertura"
                   type="text"
                   value={formData.coberturaMedica}
                   onChange={(e) => setFormData({ ...formData, coberturaMedica: e.target.value })}
@@ -443,7 +450,11 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                   {/* Custom frequency input */}
                   {formData.frecuencia === 'otra' && (
                     <div className="ml-7 mt-2">
+                      <label htmlFor="paciente-frecuencia-otra" className="sr-only">
+                        Especificar frecuencia personalizada
+                      </label>
                       <input
+                        id="paciente-frecuencia-otra"
                         type="text"
                         value={formData.frecuenciaOtra}
                         onChange={(e) => handleFieldChange('frecuenciaOtra', e.target.value)}
@@ -467,8 +478,9 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
 
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 mb-2">Diagnóstico</label>
+                <label htmlFor="paciente-diagnostico" className="block text-gray-700 mb-2">Diagnóstico</label>
                 <textarea
+                  id="paciente-diagnostico"
                   value={formData.diagnostico}
                   onChange={(e) => setFormData({ ...formData, diagnostico: e.target.value })}
                   placeholder="Diagnóstico principal..."
@@ -478,8 +490,9 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">Tratamiento Actual</label>
+                <label htmlFor="paciente-tratamiento" className="block text-gray-700 mb-2">Tratamiento Actual</label>
                 <textarea
+                  id="paciente-tratamiento"
                   value={formData.tratamientoActual}
                   onChange={(e) => setFormData({ ...formData, tratamientoActual: e.target.value })}
                   placeholder="Plan de tratamiento..."
@@ -489,8 +502,9 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">Observaciones</label>
+                <label htmlFor="paciente-observaciones" className="block text-gray-700 mb-2">Observaciones</label>
                 <textarea
+                  id="paciente-observaciones"
                   value={formData.observaciones}
                   onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
                   placeholder="Observaciones clínicas adicionales..."
