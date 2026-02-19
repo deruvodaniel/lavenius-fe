@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Video, MapPin, Calendar, Plus, Edit2, Trash2, Users, Search, X, ArrowUpDown, LayoutGrid, List } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
 import { usePatients, useErrorToast, useResponsive } from '@/lib/hooks';
@@ -22,15 +23,8 @@ const INFINITE_SCROLL_BATCH = 9; // 3 rows of 3
 type SortOption = 'name-asc' | 'name-desc' | 'age-asc' | 'age-desc' | 'recent';
 type ViewMode = 'cards' | 'table';
 
-const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'name-asc', label: 'Nombre A-Z' },
-  { value: 'name-desc', label: 'Nombre Z-A' },
-  { value: 'age-asc', label: 'Menor edad' },
-  { value: 'age-desc', label: 'Mayor edad' },
-  { value: 'recent', label: 'Más reciente' },
-];
-
 export function Pacientes() {
+  const { t } = useTranslation();
   const { patients, selectedPatient, isLoading, error, fetchPatients, fetchPatientById, createPatient, updatePatient, deletePatient, clearError, setSelectedPatient } = usePatients();
   const { sessions, fetchUpcoming } = useSessionStore();
   const { isMobile } = useResponsive();
@@ -65,6 +59,15 @@ export function Pacientes() {
   const [visibleCount, setVisibleCount] = useState(INFINITE_SCROLL_BATCH);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  // Sort options with translations
+  const sortOptions: { value: SortOption; label: string }[] = useMemo(() => [
+    { value: 'name-asc', label: t('patients.sort.nameAsc') },
+    { value: 'name-desc', label: t('patients.sort.nameDesc') },
+    { value: 'age-asc', label: t('patients.sort.ageAsc') },
+    { value: 'age-desc', label: t('patients.sort.ageDesc') },
+    { value: 'recent', label: t('patients.sort.recent') },
+  ], [t]);
 
   // Debounce search term for server-side filtering
   useEffect(() => {
@@ -199,11 +202,11 @@ export function Pacientes() {
       await fetchPatientById(patientId);
     } catch (err) {
       console.error('Error fetching patient details:', err);
-      toast.error('Error al cargar los detalles del paciente');
+      toast.error(t('patients.messages.loadError'));
     } finally {
       setIsLoadingPatientDetails(false);
     }
-  }, [fetchPatientById]);
+  }, [fetchPatientById, t]);
 
   // Function to go back from FichaClinica
   const handleBackFromFicha = useCallback(() => {
@@ -220,11 +223,11 @@ export function Pacientes() {
       if (editingPatient) {
         // Update existing patient
         await updatePatient(editingPatient.id, patientData);
-        toast.success('Paciente actualizado exitosamente');
+        toast.success(t('patients.messages.updateSuccess'));
       } else {
         // Create new patient
         await createPatient(patientData);
-        toast.success('Paciente creado exitosamente');
+        toast.success(t('patients.messages.createSuccess'));
       }
       setPacienteDrawerOpen(false);
       setEditingPatient(null);
@@ -232,7 +235,7 @@ export function Pacientes() {
       await fetchPatients();
     } catch (error) {
       console.error('Error saving patient:', error);
-      toast.error('Error al guardar el paciente');
+      toast.error(t('patients.messages.saveError'));
     }
   };
 
@@ -247,14 +250,14 @@ export function Pacientes() {
     setIsDeleting(true);
     try {
       await deletePatient(patientToDelete.id);
-      toast.success('Paciente eliminado exitosamente');
+      toast.success(t('patients.messages.deleteSuccess'));
       setDeleteConfirmOpen(false);
       setPatientToDelete(null);
       // Refresh list
       await fetchPatients();
     } catch (error) {
       console.error('Error deleting patient:', error);
-      toast.error('Error al eliminar el paciente');
+      toast.error(t('patients.messages.deleteError'));
     } finally {
       setIsDeleting(false);
     }
@@ -344,11 +347,11 @@ export function Pacientes() {
   const getModalidadLabel = (modalidad: string) => {
     switch (modalidad) {
       case 'presencial':
-        return 'Presencial';
+        return t('patients.modality.presential');
       case 'remoto':
-        return 'Remoto';
+        return t('patients.modality.remote');
       case 'mixto':
-        return 'Mixto';
+        return t('patients.modality.mixed');
       default:
         return modalidad;
     }
@@ -357,11 +360,11 @@ export function Pacientes() {
   const getFrecuenciaLabel = (frecuencia: string) => {
     switch (frecuencia) {
       case 'semanal':
-        return 'Semanal';
+        return t('patients.frequency.weekly');
       case 'quincenal':
-        return 'Quincenal';
+        return t('patients.frequency.biweekly');
       case 'mensual':
-        return 'Mensual';
+        return t('patients.frequency.monthly');
       default:
         return frecuencia;
     }
@@ -379,7 +382,7 @@ export function Pacientes() {
               <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
               <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
             </div>
-            <p className="text-gray-500">Cargando ficha del paciente...</p>
+            <p className="text-gray-500">{t('patients.loadingPatientFile')}</p>
           </div>
         </div>
       );
@@ -399,10 +402,12 @@ export function Pacientes() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Pacientes</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('patients.title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
-            {filteredPacientes.length} paciente{filteredPacientes.length !== 1 ? 's' : ''} 
-            {hasActiveFilters ? ' encontrado' + (filteredPacientes.length !== 1 ? 's' : '') : ' registrado' + (filteredPacientes.length !== 1 ? 's' : '')}
+            {filteredPacientes.length} {t('patients.patientCount', { count: filteredPacientes.length }).split(' ').slice(1).join(' ')} 
+            {hasActiveFilters 
+              ? ` ${t(filteredPacientes.length !== 1 ? 'patients.found_plural' : 'patients.found')}` 
+              : ` ${t(filteredPacientes.length !== 1 ? 'patients.registered_plural' : 'patients.registered')}`}
           </p>
         </div>
         <button
@@ -410,7 +415,7 @@ export function Pacientes() {
           className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
-          Nuevo Paciente
+          {t('patients.newPatient')}
         </button>
       </div>
 
@@ -422,7 +427,7 @@ export function Pacientes() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               type="text"
-              placeholder="Buscar por nombre..."
+              placeholder={t('patients.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 pr-9"
@@ -444,7 +449,7 @@ export function Pacientes() {
               onChange={(e) => setSortBy(e.target.value as SortOption)}
               className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer min-w-[140px]"
             >
-              {SORT_OPTIONS.map(option => (
+              {sortOptions.map(option => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
@@ -463,7 +468,7 @@ export function Pacientes() {
                 }`}
               >
                 <LayoutGrid className="w-4 h-4" />
-                <span>Cards</span>
+                <span>{t('patients.view.cards')}</span>
               </button>
               <button
                 onClick={() => setViewMode('table')}
@@ -474,7 +479,7 @@ export function Pacientes() {
                 }`}
               >
                 <List className="w-4 h-4" />
-                <span>Tabla</span>
+                <span>{t('patients.view.table')}</span>
               </button>
             </div>
           )}
@@ -484,33 +489,33 @@ export function Pacientes() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {/* Modalidad Filter */}
           <div>
-            <label htmlFor="filter-modalidad" className="block text-gray-700 mb-2 text-sm">Modalidad</label>
+            <label htmlFor="filter-modalidad" className="block text-gray-700 mb-2 text-sm">{t('patients.modality.label')}</label>
             <select
               id="filter-modalidad"
               value={modalidadFilter}
               onChange={(e) => setModalidadFilter(e.target.value as any)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
             >
-              <option value="todas">Todas</option>
-              <option value="presencial">Presencial</option>
-              <option value="remoto">Remoto</option>
-              <option value="mixto">Mixto</option>
+              <option value="todas">{t('patients.modality.all')}</option>
+              <option value="presencial">{t('patients.modality.presential')}</option>
+              <option value="remoto">{t('patients.modality.remote')}</option>
+              <option value="mixto">{t('patients.modality.mixed')}</option>
             </select>
           </div>
 
           {/* Frecuencia Filter */}
           <div>
-            <label htmlFor="filter-frecuencia" className="block text-gray-700 mb-2 text-sm">Frecuencia</label>
+            <label htmlFor="filter-frecuencia" className="block text-gray-700 mb-2 text-sm">{t('patients.frequency.label')}</label>
             <select
               id="filter-frecuencia"
               value={frecuenciaFilter}
               onChange={(e) => setFrecuenciaFilter(e.target.value as any)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
             >
-              <option value="todas">Todas</option>
-              <option value="semanal">Semanal</option>
-              <option value="quincenal">Quincenal</option>
-              <option value="mensual">Mensual</option>
+              <option value="todas">{t('patients.frequency.all')}</option>
+              <option value="semanal">{t('patients.frequency.weekly')}</option>
+              <option value="quincenal">{t('patients.frequency.biweekly')}</option>
+              <option value="mensual">{t('patients.frequency.monthly')}</option>
             </select>
           </div>
 
@@ -523,7 +528,7 @@ export function Pacientes() {
                 onChange={(e) => setSoloTurnosEstaSemana(e.target.checked)}
                 className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
-              <span className="text-gray-700 text-sm">Solo con turnos esta semana</span>
+              <span className="text-gray-700 text-sm">{t('patients.filters.onlyWithSessionsThisWeek')}</span>
             </label>
           </div>
         </div>
@@ -542,7 +547,7 @@ export function Pacientes() {
               }}
               className="text-gray-500"
             >
-              Limpiar filtros
+              {t('patients.filters.clearFilters')}
             </Button>
           </div>
         )}
@@ -558,16 +563,16 @@ export function Pacientes() {
       ) : filteredPacientes.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="No hay pacientes"
+          title={t('patients.noPatients')}
           description={
             pacientes.length === 0
-              ? "Aún no has creado ningún paciente. Comienza agregando tu primer paciente."
-              : "No se encontraron pacientes con los filtros aplicados. Intenta ajustar los criterios de búsqueda."
+              ? t('patients.noPatientsDescription')
+              : t('patients.noPatientsFilterDescription')
           }
           action={
             pacientes.length === 0
               ? {
-                  label: "Crear primer paciente",
+                  label: t('patients.addFirstPatient'),
                   onClick: handleNuevoPaciente
                 }
               : undefined
@@ -580,12 +585,12 @@ export function Pacientes() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Edad</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cobertura Médica</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modalidad</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Próximo Turno</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('patients.table.patient')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('patients.table.age')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('patients.table.healthInsurance')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('patients.table.modality')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('patients.table.nextAppointment')}</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('patients.table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -609,7 +614,7 @@ export function Pacientes() {
                           <span className="font-medium text-gray-900">{paciente.nombre}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{paciente.edad} años</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{t('patients.fields.ageYears', { age: paciente.edad })}</td>
                       <td className="px-4 py-3">
                         <span className="px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700">
                           {paciente.coberturaMedica || '-'}
@@ -635,13 +640,13 @@ export function Pacientes() {
                         {proximoTurno ? (
                           <span className="text-indigo-600 font-medium">
                             {proximoTurno.dias === 0
-                              ? 'Hoy'
+                              ? t('patients.nextAppointment.today')
                               : proximoTurno.dias === 1
-                              ? 'En 1 día'
-                              : `En ${proximoTurno.dias} días`}
+                              ? t('patients.nextAppointment.inOneDay')
+                              : t('patients.nextAppointment.inDays', { days: proximoTurno.dias })}
                           </span>
                         ) : (
-                          <span className="text-gray-400">Sin turnos</span>
+                          <span className="text-gray-400">{t('patients.nextAppointment.noAppointments')}</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -653,7 +658,8 @@ export function Pacientes() {
                               setPacienteDrawerOpen(true);
                             }}
                             className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                            title="Editar paciente"
+                            title={t('patients.actions.editPatient')}
+                            aria-label={t('patients.actions.editPatient')}
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
@@ -665,7 +671,8 @@ export function Pacientes() {
                               }
                             }}
                             className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Eliminar paciente"
+                            title={t('patients.actions.deletePatient')}
+                            aria-label={t('patients.actions.deletePatient')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -702,7 +709,7 @@ export function Pacientes() {
                   </div>
                   <div>
                     <h3 className="text-gray-900">{paciente.nombre}</h3>
-                    <p className="text-gray-500 text-sm">{paciente.edad} años</p>
+                    <p className="text-gray-500 text-sm">{t('patients.fields.ageYears', { age: paciente.edad })}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -713,7 +720,8 @@ export function Pacientes() {
                       setPacienteDrawerOpen(true);
                     }}
                     className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                    title="Editar paciente"
+                    title={t('patients.actions.editPatient')}
+                    aria-label={t('patients.actions.editPatient')}
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
@@ -725,7 +733,8 @@ export function Pacientes() {
                       }
                     }}
                     className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Eliminar paciente"
+                    title={t('patients.actions.deletePatient')}
+                    aria-label={t('patients.actions.deletePatient')}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -768,20 +777,20 @@ export function Pacientes() {
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar className="w-4 h-4 text-indigo-600" />
                     <span className="text-gray-600">
-                      Próximo turno en{' '}
+                      {t('patients.nextAppointment.nextIn')}{' '}
                       <span className="text-indigo-600">
                         {proximoTurno.dias === 0
-                          ? 'hoy'
+                          ? t('patients.nextAppointment.todayLower')
                           : proximoTurno.dias === 1
-                          ? '1 día'
-                          : `${proximoTurno.dias} días`}
+                          ? t('patients.nextAppointment.oneDayLower')
+                          : t('patients.nextAppointment.daysLower', { days: proximoTurno.dias })}
                       </span>
                     </span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 text-sm text-gray-400">
                     <Calendar className="w-4 h-4" />
-                    <span>Sin turnos próximos</span>
+                    <span>{t('patients.nextAppointment.noUpcomingAppointments')}</span>
                   </div>
                 )}
               </div>
@@ -825,10 +834,10 @@ export function Pacientes() {
       <ConfirmDialog
         open={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}
-        title="Eliminar paciente"
-        description={`¿Estás seguro de que deseas eliminar al paciente ${patientToDelete?.name}? Esta acción no se puede deshacer.`}
-        confirmLabel="Eliminar"
-        cancelLabel="Cancelar"
+        title={t('patients.messages.deleteConfirmTitle')}
+        description={t('patients.messages.deleteConfirmDescription', { name: patientToDelete?.name })}
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
         variant="danger"
         onConfirm={confirmDeletePaciente}
         onCancel={() => {

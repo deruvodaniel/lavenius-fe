@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, User, Phone, Mail, Heart, Video, MapPin, Calendar, AlertCircle } from 'lucide-react';
+import { useTranslation, Trans } from 'react-i18next';
 import type { CreatePatientDto, Patient, SessionType } from '../../lib/types/api.types';
 
 type PatientSessionType = 'remote' | 'presential';
@@ -51,6 +52,7 @@ const validateName = (name: string): boolean => {
 };
 
 export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDrawerProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
@@ -127,17 +129,17 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
   const validateField = (field: string, value: string): string | undefined => {
     switch (field) {
       case 'nombre':
-        return !validateName(value) ? 'El nombre es requerido (mínimo 2 caracteres)' : undefined;
+        return !validateName(value) ? t('patients.drawer.validation.firstNameRequired') : undefined;
       case 'apellido':
-        return !value.trim() ? 'El apellido es requerido' : undefined;
+        return !value.trim() ? t('patients.drawer.validation.lastNameRequired') : undefined;
       case 'email':
-        return !validateEmail(value) ? 'Email inválido' : undefined;
+        return !validateEmail(value) ? t('patients.drawer.validation.invalidEmail') : undefined;
       case 'telefono':
-        return !validatePhone(value) ? 'Teléfono inválido (mínimo 8 dígitos)' : undefined;
+        return !validatePhone(value) ? t('patients.drawer.validation.invalidPhone') : undefined;
       case 'edad':
-        return !validateAge(value) ? 'Edad inválida (0-120)' : undefined;
+        return !validateAge(value) ? t('patients.drawer.validation.invalidAge') : undefined;
       case 'frecuenciaOtra':
-        return formData.frecuencia === 'otra' && !value.trim() ? 'Especifica la frecuencia' : undefined;
+        return formData.frecuencia === 'otra' && !value.trim() ? t('patients.drawer.validation.specifyFrequency') : undefined;
       default:
         return undefined;
     }
@@ -244,11 +246,11 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 md:p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-white text-xl">{patient ? 'Editar Paciente' : 'Nuevo Paciente'}</h2>
+            <h2 className="text-white text-xl">{patient ? t('patients.editPatient') : t('patients.newPatient')}</h2>
             <button
               onClick={handleClose}
               className="text-indigo-200 hover:text-white transition-colors"
-              aria-label="Cerrar panel"
+              aria-label={t('patients.drawer.closePanel')}
             >
               <X className="w-6 h-6" />
             </button>
@@ -259,7 +261,9 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
         <div className="p-4 md:p-6 space-y-4 md:space-y-6">
           <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
             <p className="text-indigo-800 text-sm">
-              Los campos marcados con <span className="text-red-500">*</span> son obligatorios.
+              <Trans i18nKey="patients.drawer.requiredFieldsNote">
+                Los campos marcados con <span className="text-red-500">*</span> son obligatorios.
+              </Trans>
             </p>
           </div>
 
@@ -267,13 +271,13 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <h3 className="text-gray-900 mb-4 flex items-center gap-2">
               <User className="w-5 h-5 text-indigo-600" />
-              Información Personal
+              {t('patients.drawer.sections.personalInfo')}
             </h3>
 
             <div className="space-y-4">
               <div>
                 <label htmlFor="paciente-nombre" className="block text-gray-700 mb-2">
-                  Nombre <span className="text-red-500">*</span>
+                  {t('patients.fields.firstName')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="paciente-nombre"
@@ -281,7 +285,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                   value={formData.nombre}
                   onChange={(e) => handleFieldChange('nombre', e.target.value)}
                   onBlur={() => handleFieldBlur('nombre')}
-                  placeholder="Ej: Juan"
+                  placeholder={t('patients.drawer.placeholders.firstName')}
                   className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                     errors.nombre && touched.nombre ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
@@ -291,7 +295,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
 
               <div>
                 <label htmlFor="paciente-apellido" className="block text-gray-700 mb-2">
-                  Apellido <span className="text-red-500">*</span>
+                  {t('patients.fields.lastName')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="paciente-apellido"
@@ -299,7 +303,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                   value={formData.apellido}
                   onChange={(e) => handleFieldChange('apellido', e.target.value)}
                   onBlur={() => handleFieldBlur('apellido')}
-                  placeholder="Ej: Pérez"
+                  placeholder={t('patients.drawer.placeholders.lastName')}
                   className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                     errors.apellido && touched.apellido ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
@@ -308,7 +312,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               </div>
 
               <div>
-                <label htmlFor="paciente-edad" className="block text-gray-700 mb-2">Edad</label>
+                <label htmlFor="paciente-edad" className="block text-gray-700 mb-2">{t('patients.fields.age')}</label>
                 <input
                   id="paciente-edad"
                   type="number"
@@ -317,7 +321,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                   value={formData.edad}
                   onChange={(e) => handleFieldChange('edad', e.target.value)}
                   onBlur={() => handleFieldBlur('edad')}
-                  placeholder="Ej: 30"
+                  placeholder={t('patients.drawer.placeholders.age')}
                   className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                     errors.edad && touched.edad ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
@@ -328,7 +332,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               <div>
                 <label htmlFor="paciente-telefono" className="flex items-center gap-2 text-gray-700 mb-2">
                   <Phone className="w-4 h-4" />
-                  Teléfono
+                  {t('patients.fields.phone')}
                 </label>
                 <input
                   id="paciente-telefono"
@@ -336,7 +340,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                   value={formData.telefono}
                   onChange={(e) => handleFieldChange('telefono', e.target.value)}
                   onBlur={() => handleFieldBlur('telefono')}
-                  placeholder="+54 11 1234-5678"
+                  placeholder={t('patients.drawer.placeholders.phone')}
                   className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                     errors.telefono && touched.telefono ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
@@ -347,7 +351,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               <div>
                 <label htmlFor="paciente-email" className="flex items-center gap-2 text-gray-700 mb-2">
                   <Mail className="w-4 h-4" />
-                  Email
+                  {t('patients.fields.email')}
                 </label>
                 <input
                   id="paciente-email"
@@ -355,7 +359,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                   value={formData.email}
                   onChange={(e) => handleFieldChange('email', e.target.value)}
                   onBlur={() => handleFieldBlur('email')}
-                  placeholder="ejemplo@email.com"
+                  placeholder={t('patients.drawer.placeholders.email')}
                   className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                     errors.email && touched.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
@@ -366,14 +370,14 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               <div>
                 <label htmlFor="paciente-cobertura" className="flex items-center gap-2 text-gray-700 mb-2">
                   <Heart className="w-4 h-4" />
-                  Cobertura Médica
+                  {t('patients.fields.healthInsurance')}
                 </label>
                 <input
                   id="paciente-cobertura"
                   type="text"
                   value={formData.coberturaMedica}
                   onChange={(e) => setFormData({ ...formData, coberturaMedica: e.target.value })}
-                  placeholder="Ej: OSDE, Swiss Medical, etc."
+                  placeholder={t('patients.drawer.placeholders.healthInsurance')}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
@@ -384,12 +388,12 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <h3 className="text-gray-900 mb-4 flex items-center gap-2">
               <Calendar className="w-5 h-5 text-indigo-600" />
-              Modalidad de Tratamiento
+              {t('patients.drawer.sections.treatmentModality')}
             </h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 mb-2">Tipo de Sesión</label>
+                <label className="block text-gray-700 mb-2">{t('patients.fields.sessionType')}</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
@@ -401,7 +405,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                     }`}
                   >
                     <MapPin className="w-5 h-5" />
-                    <span className="text-sm">Presencial</span>
+                    <span className="text-sm">{t('patients.modality.presential')}</span>
                   </button>
                   <button
                     type="button"
@@ -413,13 +417,13 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                     }`}
                   >
                     <Video className="w-5 h-5" />
-                    <span className="text-sm">Remoto</span>
+                    <span className="text-sm">{t('patients.modality.remote')}</span>
                   </button>
                 </div>
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-3">Frecuencia</label>
+                <label className="block text-gray-700 mb-3">{t('patients.fields.frequency')}</label>
                 <div className="space-y-2">
                   {(['semanal', 'quincenal', 'mensual', 'otra'] as const).map((freq) => (
                     <label
@@ -439,10 +443,10 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                         className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
                       />
                       <span className={`text-sm font-medium ${formData.frecuencia === freq ? 'text-indigo-700' : 'text-gray-700'}`}>
-                        {freq === 'semanal' && 'Semanal'}
-                        {freq === 'quincenal' && 'Quincenal'}
-                        {freq === 'mensual' && 'Mensual'}
-                        {freq === 'otra' && 'Otra'}
+                        {freq === 'semanal' && t('patients.frequency.weekly')}
+                        {freq === 'quincenal' && t('patients.frequency.biweekly')}
+                        {freq === 'mensual' && t('patients.frequency.monthly')}
+                        {freq === 'otra' && t('patients.frequency.other')}
                       </span>
                     </label>
                   ))}
@@ -451,7 +455,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                   {formData.frecuencia === 'otra' && (
                     <div className="ml-7 mt-2">
                       <label htmlFor="paciente-frecuencia-otra" className="sr-only">
-                        Especificar frecuencia personalizada
+                        {t('patients.drawer.validation.specifyFrequency')}
                       </label>
                       <input
                         id="paciente-frecuencia-otra"
@@ -459,7 +463,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
                         value={formData.frecuenciaOtra}
                         onChange={(e) => handleFieldChange('frecuenciaOtra', e.target.value)}
                         onBlur={() => handleFieldBlur('frecuenciaOtra')}
-                        placeholder="Especificar frecuencia (ej: cada 3 semanas)"
+                        placeholder={t('patients.drawer.placeholders.customFrequency')}
                         className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm ${
                           errors.frecuenciaOtra && touched.frecuenciaOtra ? 'border-red-300 bg-red-50' : 'border-gray-300'
                         }`}
@@ -474,40 +478,40 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
 
           {/* Historia Clínica */}
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-gray-900 mb-4">Historia Clínica</h3>
+            <h3 className="text-gray-900 mb-4">{t('patients.drawer.sections.clinicalHistory')}</h3>
 
             <div className="space-y-4">
               <div>
-                <label htmlFor="paciente-diagnostico" className="block text-gray-700 mb-2">Diagnóstico</label>
+                <label htmlFor="paciente-diagnostico" className="block text-gray-700 mb-2">{t('patients.fields.diagnosis')}</label>
                 <textarea
                   id="paciente-diagnostico"
                   value={formData.diagnostico}
                   onChange={(e) => setFormData({ ...formData, diagnostico: e.target.value })}
-                  placeholder="Diagnóstico principal..."
+                  placeholder={t('patients.drawer.placeholders.diagnosis')}
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                 />
               </div>
 
               <div>
-                <label htmlFor="paciente-tratamiento" className="block text-gray-700 mb-2">Tratamiento Actual</label>
+                <label htmlFor="paciente-tratamiento" className="block text-gray-700 mb-2">{t('patients.fields.currentTreatment')}</label>
                 <textarea
                   id="paciente-tratamiento"
                   value={formData.tratamientoActual}
                   onChange={(e) => setFormData({ ...formData, tratamientoActual: e.target.value })}
-                  placeholder="Plan de tratamiento..."
+                  placeholder={t('patients.drawer.placeholders.currentTreatment')}
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                 />
               </div>
 
               <div>
-                <label htmlFor="paciente-observaciones" className="block text-gray-700 mb-2">Observaciones</label>
+                <label htmlFor="paciente-observaciones" className="block text-gray-700 mb-2">{t('patients.fields.observations')}</label>
                 <textarea
                   id="paciente-observaciones"
                   value={formData.observaciones}
                   onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
-                  placeholder="Observaciones clínicas adicionales..."
+                  placeholder={t('patients.drawer.placeholders.observations')}
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                 />
@@ -521,7 +525,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               onClick={handleClose}
               className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              Cancelar
+              {t('patients.drawer.buttons.cancel')}
             </button>
             <button
               onClick={handleSave}
@@ -532,7 +536,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
               }`}
               disabled={!isFormValid}
             >
-              {patient ? 'Actualizar' : 'Crear Paciente'}
+              {patient ? t('patients.drawer.buttons.update') : t('patients.drawer.buttons.create')}
             </button>
           </div>
         </div>
