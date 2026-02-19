@@ -143,100 +143,326 @@
     "newPatient": "Novo Paciente",
     "editPatient": "Editar Paciente",
     "addPatient": "Adicionar Paciente",
-    "searchPlaceholder": "Pesquisar paciente por nome...",
-    "noPatients": "Nenhum paciente cadastrado",
-    "noPatientsDescription": "Adicione seu primeiro paciente para começar",
-    "addFirstPatient": "Adicionar primeiro paciente",
+    "searchPlaceholder": "Pesquisar por nome...",
+    "noPatients": "Não há pacientes",
+    "noPatientsDescription": "Você ainda não criou nenhum paciente. Comece adicionando seu primeiro paciente.",
+    "noPatientsFilterDescription": "Nenhum paciente encontrado com os filtros aplicados. Tente ajustar os critérios de pesquisa.",
+    "addFirstPatient": "Criar primeiro paciente",
     "patientDetails": "Detalhes do paciente",
     "clinicalFile": "Ficha clínica",
     "sessions": "Sessões",
     "notes": "Anotações",
     "payments": "Pagamentos",
+    "loadingPatientFile": "Carregando ficha do paciente...",
+    "patientCount": "{{count}} paciente",
+    "patientCount_plural": "{{count}} pacientes",
+    "found": "encontrado",
+    "found_plural": "encontrados",
+    "registered": "cadastrado",
+    "registered_plural": "cadastrados",
     "fields": {
       "firstName": "Nome",
       "lastName": "Sobrenome",
       "email": "Email",
       "phone": "Telefone",
+      "age": "Idade",
+      "ageYears": "{{age}} anos",
       "dateOfBirth": "Data de nascimento",
       "address": "Endereço",
       "diagnosis": "Diagnóstico",
       "notes": "Anotações",
       "status": "Status",
       "active": "Ativo",
-      "inactive": "Inativo"
+      "inactive": "Inativo",
+      "healthInsurance": "Plano de Saúde",
+      "sessionType": "Tipo de Sessão",
+      "frequency": "Frequência",
+      "currentTreatment": "Tratamento Atual",
+      "observations": "Observações"
+    },
+    "modality": {
+      "label": "Modalidade",
+      "all": "Todas",
+      "presential": "Presencial",
+      "remote": "Remoto",
+      "mixed": "Misto"
+    },
+    "frequency": {
+      "label": "Frequência",
+      "all": "Todas",
+      "weekly": "Semanal",
+      "biweekly": "Quinzenal",
+      "monthly": "Mensal",
+      "other": "Outra"
+    },
+    "sort": {
+      "nameAsc": "Nome A-Z",
+      "nameDesc": "Nome Z-A",
+      "ageAsc": "Mais jovem",
+      "ageDesc": "Mais velho",
+      "recent": "Mais recente"
+    },
+    "view": {
+      "cards": "Cards",
+      "table": "Tabela"
+    },
+    "filters": {
+      "clearFilters": "Limpar filtros",
+      "onlyWithSessionsThisWeek": "Apenas com sessões esta semana"
+    },
+    "table": {
+      "patient": "Paciente",
+      "age": "Idade",
+      "healthInsurance": "Plano de Saúde",
+      "modality": "Modalidade",
+      "nextAppointment": "Próxima Consulta",
+      "actions": "Ações"
+    },
+    "nextAppointment": {
+      "label": "Próxima consulta",
+      "today": "Hoje",
+      "inOneDay": "Em 1 dia",
+      "inDays": "Em {{days}} dias",
+      "noAppointments": "Sem consultas",
+      "noUpcomingAppointments": "Sem consultas próximas",
+      "nextIn": "Próxima consulta em",
+      "todayLower": "hoje",
+      "oneDayLower": "1 dia",
+      "daysLower": "{{days}} dias"
     },
     "messages": {
       "createSuccess": "Paciente criado com sucesso",
       "updateSuccess": "Paciente atualizado com sucesso",
-      "deleteSuccess": "Paciente excluído",
-      "deleteConfirmTitle": "Excluir paciente?",
-      "deleteConfirmDescription": "Esta ação excluirá permanentemente o paciente e todos os dados associados. Esta ação não pode ser desfeita."
+      "deleteSuccess": "Paciente excluído com sucesso",
+      "deleteConfirmTitle": "Excluir paciente",
+      "deleteConfirmDescription": "Tem certeza de que deseja excluir o paciente {{name}}? Esta ação não pode ser desfeita.",
+      "saveError": "Erro ao salvar paciente",
+      "deleteError": "Erro ao excluir paciente",
+      "loadError": "Erro ao carregar detalhes do paciente"
+    },
+    "actions": {
+      "editPatient": "Editar paciente",
+      "deletePatient": "Excluir paciente"
+    },
+    "drawer": {
+      "closePanel": "Fechar painel",
+      "requiredFieldsNote": "Os campos marcados com <1>*</1> são obrigatórios.",
+      "sections": {
+        "personalInfo": "Informações Pessoais",
+        "treatmentModality": "Modalidade de Tratamento",
+        "clinicalHistory": "História Clínica"
+      },
+      "placeholders": {
+        "firstName": "Ex: João",
+        "lastName": "Ex: Silva",
+        "age": "Ex: 30",
+        "phone": "+55 11 91234-5678",
+        "email": "exemplo@email.com",
+        "healthInsurance": "Ex: Unimed, Bradesco Saúde, etc.",
+        "diagnosis": "Diagnóstico principal...",
+        "currentTreatment": "Plano de tratamento...",
+        "observations": "Observações clínicas adicionais...",
+        "customFrequency": "Especificar frequência (ex: a cada 3 semanas)"
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "create": "Criar Paciente",
+        "update": "Atualizar"
+      },
+      "validation": {
+        "firstNameRequired": "O nome é obrigatório (mínimo 2 caracteres)",
+        "lastNameRequired": "O sobrenome é obrigatório",
+        "invalidEmail": "Email inválido",
+        "invalidPhone": "Telefone inválido (mínimo 8 dígitos)",
+        "invalidAge": "Idade inválida (0-120)",
+        "specifyFrequency": "Especifique a frequência"
+      }
     }
   },
   "agenda": {
     "title": "Agenda",
-    "subtitle": "Gestão de consultas",
+    "subtitle": "Gerencie suas consultas e sessões",
     "newSession": "Nova Consulta",
     "editSession": "Editar Consulta",
     "addSession": "Adicionar Consulta",
-    "upcoming": "Próximas consultas",
+    "upcoming": "Próximas Consultas",
     "past": "Consultas passadas",
-    "today": "Consultas de hoje",
+    "today": "Hoje",
+    "tomorrow": "Amanhã",
     "noSessions": "Nenhuma consulta agendada",
-    "noSessionsDescription": "Agende sua primeira sessão para começar",
-    "addFirstSession": "Adicionar primeira consulta",
+    "noSessionsDescription": "Você ainda não tem consultas agendadas. Comece criando uma nova consulta ou sincronize com o Google Calendar.",
+    "noResults": "Sem resultados",
+    "noResultsDescription": "Nenhuma consulta encontrada para \"{{search}}\"",
+    "addFirstSession": "Criar primeira consulta",
     "loadingAgenda": "Carregando agenda...",
     "loadingPatients": "Carregando pacientes...",
+    "loadingPatientDetails": "Carregando ficha do paciente...",
+    "loadingMore": "Carregando mais consultas...",
+    "clearSearch": "Limpar pesquisa",
+    "searchPlaceholder": "Pesquisar por paciente...",
+    "searchResults": "{{count}} consulta encontrada",
+    "searchResults_plural": "{{count}} consultas encontradas",
+    "searchResultsFor": "para \"{{search}}\"",
     "fields": {
       "patient": "Paciente",
       "date": "Data",
       "time": "Hora",
+      "startTime": "Hora de Início",
+      "endTime": "Hora de Término",
       "duration": "Duração",
-      "type": "Tipo de sessão",
+      "type": "Tipo de Sessão",
       "status": "Status",
       "notes": "Anotações",
-      "price": "Preço"
+      "price": "Preço",
+      "amount": "Valor (BRL)",
+      "reason": "Motivo da consulta",
+      "reasonPlaceholder": "Ex: Sessão de acompanhamento",
+      "modality": "Modalidade",
+      "summary": "Resumo",
+      "cost": "Custo",
+      "schedule": "Horário"
     },
     "status": {
       "scheduled": "Agendada",
       "confirmed": "Confirmada",
       "completed": "Concluída",
       "cancelled": "Cancelada",
-      "noShow": "Não compareceu"
+      "noShow": "Não compareceu",
+      "unknown": "Desconhecido"
     },
     "sessionTypes": {
       "individual": "Individual",
       "couple": "Casal",
       "family": "Família",
-      "group": "Grupo"
+      "group": "Grupo",
+      "presential": "Presencial",
+      "remote": "Remoto"
     },
     "messages": {
       "createSuccess": "Consulta criada com sucesso",
       "updateSuccess": "Consulta atualizada com sucesso",
-      "deleteSuccess": "Consulta excluída",
+      "deleteSuccess": "Consulta excluída com sucesso",
       "cancelSuccess": "Consulta cancelada",
-      "deleteConfirmTitle": "Excluir consulta?",
-      "deleteConfirmDescription": "Esta ação excluirá a consulta permanentemente."
+      "deleteConfirmTitle": "Excluir consulta",
+      "deleteConfirmDescription": "Tem certeza de que deseja excluir a consulta de {{patientName}}? Esta ação não pode ser desfeita.",
+      "saveError": "Erro ao salvar consulta",
+      "deleteError": "Erro ao excluir consulta",
+      "rescheduleSuccess": "Consulta reagendada com sucesso",
+      "rescheduleError": "Erro ao reagendar consulta",
+      "conflictError": "Já existe uma sessão neste horário. Por favor escolha outro horário.",
+      "scheduleConflict": "Conflito de horários. Você já tem uma sessão agendada neste momento.",
+      "pastDateError": "Não é possível agendar consultas no passado. Por favor selecione uma data futura.",
+      "patientNotFound": "Paciente não encontrado",
+      "patientNoPhone": "O paciente não tem número de telefone cadastrado",
+      "patientNoEmail": "O paciente selecionado não tem email configurado. Por favor, atualize as informações do paciente.",
+      "patientEmailRequired": "Este paciente não tem email configurado. Por favor, atualize suas informações.",
+      "fetchPatientError": "Erro ao obter dados do paciente",
+      "loadPatientError": "Erro ao carregar detalhes do paciente",
+      "loadPatientDataError": "Erro ao carregar dados do paciente",
+      "fetchingPatientData": "Obtendo dados do paciente..."
     },
     "calendar": {
       "today": "Hoje",
       "month": "Mês",
       "week": "Semana",
       "day": "Dia",
-      "list": "Lista"
+      "list": "Lista",
+      "allDay": "Dia de Folga",
+      "loadingSessions": "Carregando consultas..."
+    },
+    "views": {
+      "list": "Lista",
+      "calendar": "Calendário",
+      "both": "Ambos"
+    },
+    "googleCalendar": {
+      "connected": "Google Calendar conectado",
+      "lastSync": "Última sincronização",
+      "sync": "Sincronizar",
+      "syncing": "Sincronizando...",
+      "connectTitle": "Conecte seu Google Calendar",
+      "connectDescription": "Sincronize suas consultas com o Google Calendar para receber lembretes e seus pacientes receberem convites automáticos.",
+      "connectNow": "Conectar agora"
+    },
+    "drawer": {
+      "selectPatient": "Selecionar paciente...",
+      "loadingPatientData": "Carregando dados do paciente...",
+      "emailLabel": "Email",
+      "required": "*",
+      "saveChanges": "Salvar alterações",
+      "createAppointment": "Criar consulta",
+      "saveConfirmTitle": "Salvar alterações?",
+      "saveConfirmTitleCreate": "Criar consulta?",
+      "saveConfirmDescription": "As alterações serão aplicadas à consulta selecionada.",
+      "saveConfirmDescriptionCreate": "Uma nova consulta será criada com as informações inseridas.",
+      "saving": "Salvando...",
+      "deleting": "Excluindo...",
+      "deleteConfirmTitle": "Excluir consulta?",
+      "deleteConfirmDescription": "Esta ação não pode ser desfeita. A consulta será excluída permanentemente."
+    },
+    "card": {
+      "paid": "Pago",
+      "viewFile": "Ver ficha",
+      "editAppointment": "Editar consulta",
+      "sendWhatsApp": "Enviar WhatsApp",
+      "deleteAppointment": "Excluir consulta",
+      "actions": "Ações",
+      "riskMedium": "Risco médio",
+      "riskHigh": "Risco alto"
+    },
+    "details": {
+      "title": "Detalhes da Sessão",
+      "patient": "Paciente",
+      "noPatient": "Sem paciente",
+      "editSession": "Editar Sessão"
+    },
+    "validation": {
+      "selectPatient": "Por favor selecione um paciente",
+      "selectDate": "Por favor selecione uma data",
+      "selectTime": "Por favor selecione hora de início e término",
+      "selectSessionType": "Por favor selecione um tipo de sessão",
+      "selectStatus": "Por favor selecione um status",
+      "completeAllFields": "Por favor complete todos os campos obrigatórios",
+      "userIdError": "Erro: Não foi possível obter o ID do usuário. Por favor, faça login novamente."
+    },
+    "dayOff": {
+      "warning": "Este horário está marcado como dia de folga",
+      "warningWithReason": "Este horário está marcado como dia de folga: {{reason}}",
+      "nonWorkingDay": "Este dia não está configurado como dia de trabalho",
+      "outsideWorkingHours": "O horário selecionado está fora do seu horário de trabalho ({{start}} - {{end}})",
+      "cannotMoveToOff": "Não é possível mover a consulta para um dia de folga",
+      "cannotMoveToNonWorking": "Não é possível mover a consulta para um dia não útil",
+      "cannotMoveOutsideHours": "Não é possível mover a consulta para fora do horário de trabalho ({{start}} - {{end}})",
+      "morning": "Manhã",
+      "afternoon": "Tarde"
+    },
+    "legend": {
+      "scheduled": "Agendada",
+      "confirmed": "Confirmada",
+      "completed": "Concluída"
     }
   },
   "payments": {
     "title": "Cobranças",
     "subtitle": "Gestão de pagamentos",
+    "managePayments": "Gerencie os pagamentos das suas sessões",
     "newPayment": "Nova Cobrança",
-    "editPayment": "Editar Cobrança",
+    "editPayment": "Editar Pagamento",
+    "registerPayment": "Registrar Pagamento",
+    "paymentDetail": "Detalhe do Pagamento",
+    "paymentOf": "Pagamento de {{name}}",
+    "paymentForSession": "Pagamento para sessão de {{name}}",
     "pending": "Pendente",
     "paid": "Pago",
     "partial": "Parcial",
     "overdue": "Atrasado",
-    "noPayments": "Nenhuma cobrança registrada",
+    "noPayments": "Sem cobranças",
     "noPaymentsDescription": "As cobranças aparecerão aqui quando você tiver sessões concluídas",
+    "noPendingPayments": "Ainda não há cobranças pendentes ou pagamentos registrados",
+    "noResults": "Sem resultados",
+    "noResultsDescription": "Nenhuma cobrança corresponde aos filtros",
+    "noPatient": "Sem paciente",
+    "unknownPatient": "Paciente desconhecido",
     "totalPending": "Total pendente",
     "totalCollected": "Total recebido",
     "collectionRate": "Taxa de recebimento",
@@ -244,11 +470,17 @@
       "patient": "Paciente",
       "session": "Sessão",
       "amount": "Valor",
+      "amountARS": "Valor (BRL)",
       "status": "Status",
       "date": "Data",
-      "paymentDate": "Data de pagamento",
+      "paymentDate": "Data de Pagamento",
+      "paymentStatus": "Status do Pagamento",
+      "paidDate": "Data de recebimento",
       "method": "Método de pagamento",
-      "notes": "Anotações"
+      "notes": "Anotações",
+      "description": "Descrição",
+      "descriptionOptional": "Descrição (opcional)",
+      "descriptionPlaceholder": "Notas adicionais sobre o pagamento..."
     },
     "methods": {
       "cash": "Dinheiro",
@@ -258,24 +490,107 @@
     },
     "messages": {
       "markAsPaid": "Marcar como pago",
+      "markAsPaidShort": "Receber",
       "markAsPaidSuccess": "Pagamento registrado com sucesso",
+      "markedAsPaid": "Pagamento marcado como recebido",
       "sendReminder": "Enviar lembrete",
+      "reminder": "Lembrete",
       "reminderSent": "Lembrete enviado",
-      "deleteConfirmTitle": "Excluir cobrança?",
-      "deleteConfirmDescription": "Esta ação excluirá o registro de cobrança."
+      "deleteConfirmTitle": "Excluir Pagamento",
+      "deleteConfirmDescription": "Tem certeza de que deseja excluir o pagamento de {{name}} no valor de {{amount}}? Esta ação não pode ser desfeita.",
+      "deleteConfirmDescriptionSimple": "Tem certeza de que deseja excluir este pagamento de {{amount}}? Esta ação não pode ser desfeita.",
+      "deleted": "Pagamento excluído com sucesso",
+      "created": "Pagamento registrado com sucesso",
+      "updated": "Pagamento atualizado com sucesso",
+      "errorMarkAsPaid": "Não foi possível marcar o pagamento como recebido",
+      "errorDelete": "Não foi possível excluir o pagamento",
+      "errorSave": "Não foi possível salvar o pagamento. Por favor, tente novamente.",
+      "errorUpdate": "Não foi possível atualizar o pagamento. Por favor, tente novamente.",
+      "selectSession": "Você deve selecionar uma sessão",
+      "amountGreaterThanZero": "O valor deve ser maior que 0",
+      "processing": "Processando...",
+      "messageCopied": "Mensagem copiada para a área de transferência",
+      "noPhoneRegistered": "O paciente não tem número de telefone registrado"
     },
     "filters": {
       "all": "Todos",
       "pending": "Pendentes",
       "paid": "Pagos",
+      "thisWeek": "Esta semana",
       "thisMonth": "Este mês",
-      "lastMonth": "Mês passado"
+      "lastMonth": "Mês passado",
+      "range": "Intervalo",
+      "from": "De",
+      "to": "Até",
+      "clearFilters": "Limpar filtros",
+      "searchByPatient": "Pesquisar por paciente...",
+      "allStatuses": "Todos os status",
+      "sortBy": "Ordenar por"
+    },
+    "sort": {
+      "dateDesc": "Mais recente",
+      "dateAsc": "Mais antigo",
+      "priceDesc": "Maior preço",
+      "priceAsc": "Menor preço"
     },
     "stats": {
+      "totalSessions": "Total de Sessões",
+      "collected": "Recebido",
+      "pending": "Pendente",
+      "overdue": "Atrasado",
       "monthlyIncome": "Receita mensal",
       "sessionsCompleted": "Sessões realizadas",
       "activePatients": "Pacientes ativos",
-      "collectionRate": "Taxa de recebimento"
+      "collectionRate": "Taxa de recebimento",
+      "payment": "pagamento",
+      "payments": "pagamentos"
+    },
+    "drawer": {
+      "closePanel": "Fechar painel",
+      "paymentType": "Tipo de pagamento",
+      "singlePayment": "Pagamento único",
+      "monthlyPlan": "Plano mensal",
+      "selectSession": "Selecionar sessão...",
+      "selectPatient": "Selecionar paciente...",
+      "sessionCount": "Quantidade de sessões",
+      "pricePerSession": "Preço por sessão",
+      "sessionsPerMonth": "4 sessões / mês",
+      "monthlyDiscount": "Desconto plano mensal (10%)",
+      "totalMonthlyPlan": "Total plano mensal",
+      "saveChanges": "Salvar Alterações",
+      "saving": "Salvando..."
+    },
+    "comingSoon": {
+      "title": "Em breve",
+      "description": "Planos mensais e pagamentos antecipados estarão disponíveis em breve"
+    },
+    "virtual": {
+      "sessionUnpaid": "Sessão não paga"
+    },
+    "reminderModal": {
+      "title": "Lembrete de Pagamento",
+      "message": "Mensagem",
+      "loadingPatient": "Carregando dados do paciente...",
+      "phone": "Telefone",
+      "noPhone": "O paciente não tem telefone registrado",
+      "copy": "Copiar",
+      "whatsapp": "WhatsApp"
+    },
+    "table": {
+      "patient": "Paciente",
+      "date": "Data",
+      "status": "Status",
+      "amount": "Valor",
+      "actions": "Ações"
+    },
+    "actions": {
+      "registerPayment": "Registrar pagamento",
+      "viewDetail": "Ver detalhe",
+      "sendReminder": "Enviar lembrete",
+      "markAsCollected": "Marcar como recebido",
+      "deletePayment": "Excluir pagamento",
+      "edit": "Editar",
+      "delete": "Excluir"
     }
   },
   "settings": {
@@ -542,6 +857,29 @@
       "createSuccess": "Anotação criada com sucesso",
       "updateSuccess": "Anotação atualizada com sucesso",
       "deleteSuccess": "Anotação excluída"
+    },
+    "drawer": {
+      "closePanel": "Fechar painel",
+      "noteDate": "Data da anotação",
+      "noteContent": "Conteúdo da anotação",
+      "placeholder": "Escreva aqui as observações da sessão...",
+      "encryptionNote": "Esta anotação será criptografada automaticamente para proteger a privacidade do paciente",
+      "saving": "Salvando...",
+      "save": "Salvar",
+      "update": "Atualizar"
+    },
+    "card": {
+      "editNote": "Editar anotação",
+      "deleteNote": "Excluir anotação",
+      "edited": "Editado"
+    },
+    "deleteConfirm": {
+      "title": "Excluir anotação",
+      "description": "Tem certeza de que deseja excluir esta anotação? Esta ação não pode ser desfeita."
+    },
+    "emptyState": {
+      "description": "As anotações são exibidas ordenadas por data de criação",
+      "createFirst": "Criar primeira anotação"
     }
   },
   "onboarding": {

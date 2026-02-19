@@ -143,100 +143,326 @@
     "newPatient": "Nuevo Paciente",
     "editPatient": "Editar Paciente",
     "addPatient": "Agregar Paciente",
-    "searchPlaceholder": "Buscar paciente por nombre...",
-    "noPatients": "No hay pacientes registrados",
-    "noPatientsDescription": "Agrega tu primer paciente para comenzar",
-    "addFirstPatient": "Agregar primer paciente",
+    "searchPlaceholder": "Buscar por nombre...",
+    "noPatients": "No hay pacientes",
+    "noPatientsDescription": "Aún no has creado ningún paciente. Comienza agregando tu primer paciente.",
+    "noPatientsFilterDescription": "No se encontraron pacientes con los filtros aplicados. Intenta ajustar los criterios de búsqueda.",
+    "addFirstPatient": "Crear primer paciente",
     "patientDetails": "Detalles del paciente",
     "clinicalFile": "Ficha clínica",
     "sessions": "Sesiones",
     "notes": "Notas",
     "payments": "Pagos",
+    "loadingPatientFile": "Cargando ficha del paciente...",
+    "patientCount": "{{count}} paciente",
+    "patientCount_plural": "{{count}} pacientes",
+    "found": "encontrado",
+    "found_plural": "encontrados",
+    "registered": "registrado",
+    "registered_plural": "registrados",
     "fields": {
       "firstName": "Nombre",
       "lastName": "Apellido",
       "email": "Correo electrónico",
       "phone": "Teléfono",
+      "age": "Edad",
+      "ageYears": "{{age}} años",
       "dateOfBirth": "Fecha de nacimiento",
       "address": "Dirección",
       "diagnosis": "Diagnóstico",
       "notes": "Notas",
       "status": "Estado",
       "active": "Activo",
-      "inactive": "Inactivo"
+      "inactive": "Inactivo",
+      "healthInsurance": "Cobertura Médica",
+      "sessionType": "Tipo de Sesión",
+      "frequency": "Frecuencia",
+      "currentTreatment": "Tratamiento Actual",
+      "observations": "Observaciones"
+    },
+    "modality": {
+      "label": "Modalidad",
+      "all": "Todas",
+      "presential": "Presencial",
+      "remote": "Remoto",
+      "mixed": "Mixto"
+    },
+    "frequency": {
+      "label": "Frecuencia",
+      "all": "Todas",
+      "weekly": "Semanal",
+      "biweekly": "Quincenal",
+      "monthly": "Mensual",
+      "other": "Otra"
+    },
+    "sort": {
+      "nameAsc": "Nombre A-Z",
+      "nameDesc": "Nombre Z-A",
+      "ageAsc": "Menor edad",
+      "ageDesc": "Mayor edad",
+      "recent": "Más reciente"
+    },
+    "view": {
+      "cards": "Cards",
+      "table": "Tabla"
+    },
+    "filters": {
+      "clearFilters": "Limpiar filtros",
+      "onlyWithSessionsThisWeek": "Solo con turnos esta semana"
+    },
+    "table": {
+      "patient": "Paciente",
+      "age": "Edad",
+      "healthInsurance": "Cobertura Médica",
+      "modality": "Modalidad",
+      "nextAppointment": "Próximo Turno",
+      "actions": "Acciones"
+    },
+    "nextAppointment": {
+      "label": "Próximo turno",
+      "today": "Hoy",
+      "inOneDay": "En 1 día",
+      "inDays": "En {{days}} días",
+      "noAppointments": "Sin turnos",
+      "noUpcomingAppointments": "Sin turnos próximos",
+      "nextIn": "Próximo turno en",
+      "todayLower": "hoy",
+      "oneDayLower": "1 día",
+      "daysLower": "{{days}} días"
     },
     "messages": {
       "createSuccess": "Paciente creado exitosamente",
       "updateSuccess": "Paciente actualizado exitosamente",
-      "deleteSuccess": "Paciente eliminado",
-      "deleteConfirmTitle": "¿Eliminar paciente?",
-      "deleteConfirmDescription": "Esta acción eliminará permanentemente al paciente y todos sus datos asociados. Esta acción no se puede deshacer."
+      "deleteSuccess": "Paciente eliminado exitosamente",
+      "deleteConfirmTitle": "Eliminar paciente",
+      "deleteConfirmDescription": "¿Estás seguro de que deseas eliminar al paciente {{name}}? Esta acción no se puede deshacer.",
+      "saveError": "Error al guardar el paciente",
+      "deleteError": "Error al eliminar el paciente",
+      "loadError": "Error al cargar los detalles del paciente"
+    },
+    "actions": {
+      "editPatient": "Editar paciente",
+      "deletePatient": "Eliminar paciente"
+    },
+    "drawer": {
+      "closePanel": "Cerrar panel",
+      "requiredFieldsNote": "Los campos marcados con <1>*</1> son obligatorios.",
+      "sections": {
+        "personalInfo": "Información Personal",
+        "treatmentModality": "Modalidad de Tratamiento",
+        "clinicalHistory": "Historia Clínica"
+      },
+      "placeholders": {
+        "firstName": "Ej: Juan",
+        "lastName": "Ej: Pérez",
+        "age": "Ej: 30",
+        "phone": "+54 11 1234-5678",
+        "email": "ejemplo@email.com",
+        "healthInsurance": "Ej: OSDE, Swiss Medical, etc.",
+        "diagnosis": "Diagnóstico principal...",
+        "currentTreatment": "Plan de tratamiento...",
+        "observations": "Observaciones clínicas adicionales...",
+        "customFrequency": "Especificar frecuencia (ej: cada 3 semanas)"
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "create": "Crear Paciente",
+        "update": "Actualizar"
+      },
+      "validation": {
+        "firstNameRequired": "El nombre es requerido (mínimo 2 caracteres)",
+        "lastNameRequired": "El apellido es requerido",
+        "invalidEmail": "Email inválido",
+        "invalidPhone": "Teléfono inválido (mínimo 8 dígitos)",
+        "invalidAge": "Edad inválida (0-120)",
+        "specifyFrequency": "Especifica la frecuencia"
+      }
     }
   },
   "agenda": {
     "title": "Agenda",
-    "subtitle": "Gestión de turnos",
+    "subtitle": "Gestiona tus turnos y citas",
     "newSession": "Nuevo Turno",
     "editSession": "Editar Turno",
     "addSession": "Agregar Turno",
-    "upcoming": "Próximos turnos",
+    "upcoming": "Próximos Turnos",
     "past": "Turnos pasados",
-    "today": "Turnos de hoy",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
     "noSessions": "No hay turnos programados",
-    "noSessionsDescription": "Agenda tu primera sesión para comenzar",
-    "addFirstSession": "Agregar primer turno",
+    "noSessionsDescription": "Aún no tienes turnos agendados. Comienza creando un nuevo turno o sincroniza con Google Calendar.",
+    "noResults": "Sin resultados",
+    "noResultsDescription": "No se encontraron turnos para \"{{search}}\"",
+    "addFirstSession": "Crear primer turno",
     "loadingAgenda": "Cargando agenda...",
     "loadingPatients": "Cargando pacientes...",
+    "loadingPatientDetails": "Cargando ficha del paciente...",
+    "loadingMore": "Cargando más turnos...",
+    "clearSearch": "Limpiar búsqueda",
+    "searchPlaceholder": "Buscar por paciente...",
+    "searchResults": "{{count}} turno encontrado",
+    "searchResults_plural": "{{count}} turnos encontrados",
+    "searchResultsFor": "para \"{{search}}\"",
     "fields": {
       "patient": "Paciente",
       "date": "Fecha",
       "time": "Hora",
+      "startTime": "Hora Inicio",
+      "endTime": "Hora Fin",
       "duration": "Duración",
-      "type": "Tipo de sesión",
+      "type": "Tipo de Sesión",
       "status": "Estado",
       "notes": "Notas",
-      "price": "Precio"
+      "price": "Precio",
+      "amount": "Monto (ARS)",
+      "reason": "Motivo de consulta",
+      "reasonPlaceholder": "Ej: Sesión de seguimiento",
+      "modality": "Modalidad",
+      "summary": "Resumen",
+      "cost": "Costo",
+      "schedule": "Horario"
     },
     "status": {
-      "scheduled": "Programada",
+      "scheduled": "Agendada",
       "confirmed": "Confirmada",
       "completed": "Completada",
       "cancelled": "Cancelada",
-      "noShow": "No asistió"
+      "noShow": "No asistió",
+      "unknown": "Desconocido"
     },
     "sessionTypes": {
       "individual": "Individual",
       "couple": "Pareja",
       "family": "Familia",
-      "group": "Grupo"
+      "group": "Grupo",
+      "presential": "Presencial",
+      "remote": "Remoto"
     },
     "messages": {
       "createSuccess": "Turno creado exitosamente",
       "updateSuccess": "Turno actualizado exitosamente",
-      "deleteSuccess": "Turno eliminado",
+      "deleteSuccess": "Turno eliminado exitosamente",
       "cancelSuccess": "Turno cancelado",
-      "deleteConfirmTitle": "¿Eliminar turno?",
-      "deleteConfirmDescription": "Esta acción eliminará el turno permanentemente."
+      "deleteConfirmTitle": "Eliminar turno",
+      "deleteConfirmDescription": "¿Estás seguro de que deseas eliminar el turno de {{patientName}}? Esta acción no se puede deshacer.",
+      "saveError": "Error al guardar el turno",
+      "deleteError": "Error al eliminar el turno",
+      "rescheduleSuccess": "Turno reagendado exitosamente",
+      "rescheduleError": "Error al reagendar el turno",
+      "conflictError": "Ya existe una sesión en este horario. Por favor elige otro horario.",
+      "scheduleConflict": "Conflicto de horarios. Ya tienes una sesión programada en este momento.",
+      "pastDateError": "No se pueden agendar turnos en fechas pasadas. Por favor seleccione una fecha futura.",
+      "patientNotFound": "No se encontró el paciente",
+      "patientNoPhone": "El paciente no tiene número de teléfono registrado",
+      "patientNoEmail": "El paciente seleccionado no tiene email configurado. Por favor, actualice la información del paciente.",
+      "patientEmailRequired": "Este paciente no tiene email configurado. Por favor, actualice su información.",
+      "fetchPatientError": "Error al obtener datos del paciente",
+      "loadPatientError": "Error al cargar los detalles del paciente",
+      "loadPatientDataError": "Error al cargar datos del paciente",
+      "fetchingPatientData": "Obteniendo datos del paciente..."
     },
     "calendar": {
       "today": "Hoy",
       "month": "Mes",
       "week": "Semana",
       "day": "Día",
-      "list": "Lista"
+      "list": "Lista",
+      "allDay": "Día Off",
+      "loadingSessions": "Cargando turnos..."
+    },
+    "views": {
+      "list": "Lista",
+      "calendar": "Calendario",
+      "both": "Ambos"
+    },
+    "googleCalendar": {
+      "connected": "Google Calendar conectado",
+      "lastSync": "Última sincronización",
+      "sync": "Sincronizar",
+      "syncing": "Sincronizando...",
+      "connectTitle": "Conecta tu Google Calendar",
+      "connectDescription": "Sincroniza tus turnos con Google Calendar para recibir recordatorios y que tus pacientes reciban invitaciones automáticas.",
+      "connectNow": "Conectar ahora"
+    },
+    "drawer": {
+      "selectPatient": "Seleccionar paciente...",
+      "loadingPatientData": "Cargando datos del paciente...",
+      "emailLabel": "Email",
+      "required": "*",
+      "saveChanges": "Guardar cambios",
+      "createAppointment": "Crear turno",
+      "saveConfirmTitle": "¿Guardar cambios?",
+      "saveConfirmTitleCreate": "¿Crear turno?",
+      "saveConfirmDescription": "Los cambios se aplicarán al turno seleccionado.",
+      "saveConfirmDescriptionCreate": "Se creará un nuevo turno con la información ingresada.",
+      "saving": "Guardando...",
+      "deleting": "Eliminando...",
+      "deleteConfirmTitle": "¿Eliminar turno?",
+      "deleteConfirmDescription": "Esta acción no se puede deshacer. El turno será eliminado permanentemente."
+    },
+    "card": {
+      "paid": "Pagado",
+      "viewFile": "Ver ficha",
+      "editAppointment": "Editar turno",
+      "sendWhatsApp": "Enviar WhatsApp",
+      "deleteAppointment": "Eliminar turno",
+      "actions": "Acciones",
+      "riskMedium": "Riesgo medio",
+      "riskHigh": "Riesgo alto"
+    },
+    "details": {
+      "title": "Detalles de la Sesión",
+      "patient": "Paciente",
+      "noPatient": "Sin paciente",
+      "editSession": "Editar Sesión"
+    },
+    "validation": {
+      "selectPatient": "Por favor seleccione un paciente",
+      "selectDate": "Por favor seleccione una fecha",
+      "selectTime": "Por favor seleccione hora de inicio y fin",
+      "selectSessionType": "Por favor seleccione un tipo de sesión",
+      "selectStatus": "Por favor seleccione un estado",
+      "completeAllFields": "Por favor complete todos los campos requeridos",
+      "userIdError": "Error: No se pudo obtener el ID del usuario. Por favor, inicie sesión nuevamente."
+    },
+    "dayOff": {
+      "warning": "Este horario está marcado como día off",
+      "warningWithReason": "Este horario está marcado como día off: {{reason}}",
+      "nonWorkingDay": "Este día no está configurado como día laboral",
+      "outsideWorkingHours": "El horario seleccionado está fuera de tu horario laboral ({{start}} - {{end}})",
+      "cannotMoveToOff": "No puedes mover el turno a un día off",
+      "cannotMoveToNonWorking": "No puedes mover el turno a un día no laboral",
+      "cannotMoveOutsideHours": "No puedes mover el turno fuera del horario laboral ({{start}} - {{end}})",
+      "morning": "Mañana",
+      "afternoon": "Tarde"
+    },
+    "legend": {
+      "scheduled": "Agendada",
+      "confirmed": "Confirmada",
+      "completed": "Completada"
     }
   },
   "payments": {
     "title": "Cobros",
     "subtitle": "Gestión de pagos",
+    "managePayments": "Gestiona los pagos de tus sesiones",
     "newPayment": "Nuevo Cobro",
-    "editPayment": "Editar Cobro",
+    "editPayment": "Editar Pago",
+    "registerPayment": "Registrar Pago",
+    "paymentDetail": "Detalle del Pago",
+    "paymentOf": "Pago de {{name}}",
+    "paymentForSession": "Pago para sesión de {{name}}",
     "pending": "Pendiente",
     "paid": "Pagado",
     "partial": "Parcial",
     "overdue": "Vencido",
-    "noPayments": "No hay cobros registrados",
+    "noPayments": "Sin cobros",
     "noPaymentsDescription": "Los cobros aparecerán aquí cuando tengas sesiones completadas",
+    "noPendingPayments": "Aún no hay cobros pendientes ni pagos registrados",
+    "noResults": "Sin resultados",
+    "noResultsDescription": "No hay cobros que coincidan con los filtros",
+    "noPatient": "Sin paciente",
+    "unknownPatient": "Paciente desconocido",
     "totalPending": "Total pendiente",
     "totalCollected": "Total cobrado",
     "collectionRate": "Tasa de cobro",
@@ -244,11 +470,17 @@
       "patient": "Paciente",
       "session": "Sesión",
       "amount": "Monto",
+      "amountARS": "Monto (ARS)",
       "status": "Estado",
       "date": "Fecha",
-      "paymentDate": "Fecha de pago",
+      "paymentDate": "Fecha de Pago",
+      "paymentStatus": "Estado del Pago",
+      "paidDate": "Fecha de cobro",
       "method": "Método de pago",
-      "notes": "Notas"
+      "notes": "Notas",
+      "description": "Descripción",
+      "descriptionOptional": "Descripción (opcional)",
+      "descriptionPlaceholder": "Notas adicionales sobre el pago..."
     },
     "methods": {
       "cash": "Efectivo",
@@ -258,24 +490,107 @@
     },
     "messages": {
       "markAsPaid": "Marcar como pagado",
+      "markAsPaidShort": "Cobrar",
       "markAsPaidSuccess": "Pago registrado exitosamente",
+      "markedAsPaid": "Pago marcado como cobrado",
       "sendReminder": "Enviar recordatorio",
+      "reminder": "Recordatorio",
       "reminderSent": "Recordatorio enviado",
-      "deleteConfirmTitle": "¿Eliminar cobro?",
-      "deleteConfirmDescription": "Esta acción eliminará el registro de cobro."
+      "deleteConfirmTitle": "Eliminar Pago",
+      "deleteConfirmDescription": "¿Estás seguro que deseas eliminar el pago de {{name}} por {{amount}}? Esta acción no se puede deshacer.",
+      "deleteConfirmDescriptionSimple": "¿Estás seguro de que deseas eliminar este pago de {{amount}}? Esta acción no se puede deshacer.",
+      "deleted": "Pago eliminado correctamente",
+      "created": "Pago registrado correctamente",
+      "updated": "Pago actualizado correctamente",
+      "errorMarkAsPaid": "No se pudo marcar el pago como cobrado",
+      "errorDelete": "No se pudo eliminar el pago",
+      "errorSave": "No se pudo guardar el pago. Por favor intenta nuevamente.",
+      "errorUpdate": "No se pudo actualizar el pago. Por favor intenta nuevamente.",
+      "selectSession": "Debe seleccionar una sesión",
+      "amountGreaterThanZero": "El monto debe ser mayor a 0",
+      "processing": "Procesando...",
+      "messageCopied": "Mensaje copiado al portapapeles",
+      "noPhoneRegistered": "El paciente no tiene número de teléfono registrado"
     },
     "filters": {
       "all": "Todos",
       "pending": "Pendientes",
       "paid": "Pagados",
-      "thisMonth": "Este mes",
-      "lastMonth": "Mes pasado"
+      "thisWeek": "Semana actual",
+      "thisMonth": "Mes actual",
+      "lastMonth": "Mes pasado",
+      "range": "Rango",
+      "from": "Desde",
+      "to": "Hasta",
+      "clearFilters": "Limpiar filtros",
+      "searchByPatient": "Buscar por paciente...",
+      "allStatuses": "Todos los estados",
+      "sortBy": "Ordenar por"
+    },
+    "sort": {
+      "dateDesc": "Más reciente",
+      "dateAsc": "Más antiguo",
+      "priceDesc": "Mayor precio",
+      "priceAsc": "Menor precio"
     },
     "stats": {
+      "totalSessions": "Total Sesiones",
+      "collected": "Cobrado",
+      "pending": "Pendiente",
+      "overdue": "Vencido",
       "monthlyIncome": "Ingresos del mes",
       "sessionsCompleted": "Sesiones realizadas",
       "activePatients": "Pacientes activos",
-      "collectionRate": "Tasa de cobro"
+      "collectionRate": "Tasa de cobro",
+      "payment": "pago",
+      "payments": "pagos"
+    },
+    "drawer": {
+      "closePanel": "Cerrar panel",
+      "paymentType": "Tipo de pago",
+      "singlePayment": "Pago único",
+      "monthlyPlan": "Plan mensual",
+      "selectSession": "Seleccionar sesión...",
+      "selectPatient": "Seleccionar paciente...",
+      "sessionCount": "Cantidad de sesiones",
+      "pricePerSession": "Precio por sesión",
+      "sessionsPerMonth": "4 sesiones / mes",
+      "monthlyDiscount": "Descuento plan mensual (10%)",
+      "totalMonthlyPlan": "Total plan mensual",
+      "saveChanges": "Guardar Cambios",
+      "saving": "Guardando..."
+    },
+    "comingSoon": {
+      "title": "Próximamente",
+      "description": "Los planes mensuales y pagos adelantados estarán disponibles pronto"
+    },
+    "virtual": {
+      "sessionUnpaid": "Sesión sin cobrar"
+    },
+    "reminderModal": {
+      "title": "Recordatorio de Pago",
+      "message": "Mensaje",
+      "loadingPatient": "Cargando datos del paciente...",
+      "phone": "Teléfono",
+      "noPhone": "El paciente no tiene teléfono registrado",
+      "copy": "Copiar",
+      "whatsapp": "WhatsApp"
+    },
+    "table": {
+      "patient": "Paciente",
+      "date": "Fecha",
+      "status": "Estado",
+      "amount": "Monto",
+      "actions": "Acciones"
+    },
+    "actions": {
+      "registerPayment": "Registrar pago",
+      "viewDetail": "Ver detalle",
+      "sendReminder": "Enviar recordatorio",
+      "markAsCollected": "Marcar como cobrado",
+      "deletePayment": "Eliminar pago",
+      "edit": "Editar",
+      "delete": "Eliminar"
     }
   },
   "settings": {
@@ -542,6 +857,29 @@
       "createSuccess": "Nota creada exitosamente",
       "updateSuccess": "Nota actualizada exitosamente",
       "deleteSuccess": "Nota eliminada"
+    },
+    "drawer": {
+      "closePanel": "Cerrar panel",
+      "noteDate": "Fecha de la nota",
+      "noteContent": "Contenido de la nota",
+      "placeholder": "Escribe aquí las observaciones de la sesión...",
+      "encryptionNote": "Esta nota se encriptará automáticamente para proteger la privacidad del paciente",
+      "saving": "Guardando...",
+      "save": "Guardar",
+      "update": "Actualizar"
+    },
+    "card": {
+      "editNote": "Editar nota",
+      "deleteNote": "Eliminar nota",
+      "edited": "Editado"
+    },
+    "deleteConfirm": {
+      "title": "Eliminar nota",
+      "description": "¿Estás seguro de eliminar esta nota? Esta acción no se puede deshacer."
+    },
+    "emptyState": {
+      "description": "Las notas se muestran ordenadas por fecha de creación",
+      "createFirst": "Crear primera nota"
     }
   },
   "onboarding": {

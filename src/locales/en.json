@@ -143,100 +143,326 @@
     "newPatient": "New Patient",
     "editPatient": "Edit Patient",
     "addPatient": "Add Patient",
-    "searchPlaceholder": "Search patient by name...",
-    "noPatients": "No patients registered",
-    "noPatientsDescription": "Add your first patient to get started",
-    "addFirstPatient": "Add first patient",
+    "searchPlaceholder": "Search by name...",
+    "noPatients": "No patients",
+    "noPatientsDescription": "You haven't created any patients yet. Start by adding your first patient.",
+    "noPatientsFilterDescription": "No patients found with the applied filters. Try adjusting the search criteria.",
+    "addFirstPatient": "Create first patient",
     "patientDetails": "Patient details",
     "clinicalFile": "Clinical file",
     "sessions": "Sessions",
     "notes": "Notes",
     "payments": "Payments",
+    "loadingPatientFile": "Loading patient file...",
+    "patientCount": "{{count}} patient",
+    "patientCount_plural": "{{count}} patients",
+    "found": "found",
+    "found_plural": "found",
+    "registered": "registered",
+    "registered_plural": "registered",
     "fields": {
       "firstName": "First Name",
       "lastName": "Last Name",
       "email": "Email",
       "phone": "Phone",
+      "age": "Age",
+      "ageYears": "{{age}} years old",
       "dateOfBirth": "Date of birth",
       "address": "Address",
       "diagnosis": "Diagnosis",
       "notes": "Notes",
       "status": "Status",
       "active": "Active",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "healthInsurance": "Health Insurance",
+      "sessionType": "Session Type",
+      "frequency": "Frequency",
+      "currentTreatment": "Current Treatment",
+      "observations": "Observations"
+    },
+    "modality": {
+      "label": "Modality",
+      "all": "All",
+      "presential": "In-person",
+      "remote": "Remote",
+      "mixed": "Mixed"
+    },
+    "frequency": {
+      "label": "Frequency",
+      "all": "All",
+      "weekly": "Weekly",
+      "biweekly": "Biweekly",
+      "monthly": "Monthly",
+      "other": "Other"
+    },
+    "sort": {
+      "nameAsc": "Name A-Z",
+      "nameDesc": "Name Z-A",
+      "ageAsc": "Youngest",
+      "ageDesc": "Oldest",
+      "recent": "Most recent"
+    },
+    "view": {
+      "cards": "Cards",
+      "table": "Table"
+    },
+    "filters": {
+      "clearFilters": "Clear filters",
+      "onlyWithSessionsThisWeek": "Only with sessions this week"
+    },
+    "table": {
+      "patient": "Patient",
+      "age": "Age",
+      "healthInsurance": "Health Insurance",
+      "modality": "Modality",
+      "nextAppointment": "Next Appointment",
+      "actions": "Actions"
+    },
+    "nextAppointment": {
+      "label": "Next appointment",
+      "today": "Today",
+      "inOneDay": "In 1 day",
+      "inDays": "In {{days}} days",
+      "noAppointments": "No appointments",
+      "noUpcomingAppointments": "No upcoming appointments",
+      "nextIn": "Next appointment in",
+      "todayLower": "today",
+      "oneDayLower": "1 day",
+      "daysLower": "{{days}} days"
     },
     "messages": {
       "createSuccess": "Patient created successfully",
       "updateSuccess": "Patient updated successfully",
-      "deleteSuccess": "Patient deleted",
-      "deleteConfirmTitle": "Delete patient?",
-      "deleteConfirmDescription": "This action will permanently delete the patient and all associated data. This action cannot be undone."
+      "deleteSuccess": "Patient deleted successfully",
+      "deleteConfirmTitle": "Delete patient",
+      "deleteConfirmDescription": "Are you sure you want to delete patient {{name}}? This action cannot be undone.",
+      "saveError": "Error saving patient",
+      "deleteError": "Error deleting patient",
+      "loadError": "Error loading patient details"
+    },
+    "actions": {
+      "editPatient": "Edit patient",
+      "deletePatient": "Delete patient"
+    },
+    "drawer": {
+      "closePanel": "Close panel",
+      "requiredFieldsNote": "Fields marked with <1>*</1> are required.",
+      "sections": {
+        "personalInfo": "Personal Information",
+        "treatmentModality": "Treatment Modality",
+        "clinicalHistory": "Clinical History"
+      },
+      "placeholders": {
+        "firstName": "E.g.: John",
+        "lastName": "E.g.: Doe",
+        "age": "E.g.: 30",
+        "phone": "+1 555 123-4567",
+        "email": "example@email.com",
+        "healthInsurance": "E.g.: Blue Cross, Aetna, etc.",
+        "diagnosis": "Primary diagnosis...",
+        "currentTreatment": "Treatment plan...",
+        "observations": "Additional clinical observations...",
+        "customFrequency": "Specify frequency (e.g., every 3 weeks)"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "create": "Create Patient",
+        "update": "Update"
+      },
+      "validation": {
+        "firstNameRequired": "First name is required (minimum 2 characters)",
+        "lastNameRequired": "Last name is required",
+        "invalidEmail": "Invalid email",
+        "invalidPhone": "Invalid phone (minimum 8 digits)",
+        "invalidAge": "Invalid age (0-120)",
+        "specifyFrequency": "Specify the frequency"
+      }
     }
   },
   "agenda": {
     "title": "Schedule",
-    "subtitle": "Appointment management",
+    "subtitle": "Manage your appointments and sessions",
     "newSession": "New Appointment",
     "editSession": "Edit Appointment",
     "addSession": "Add Appointment",
-    "upcoming": "Upcoming appointments",
+    "upcoming": "Upcoming Appointments",
     "past": "Past appointments",
-    "today": "Today's appointments",
-    "noSessions": "No appointments scheduled",
-    "noSessionsDescription": "Schedule your first session to get started",
-    "addFirstSession": "Add first appointment",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "noSessions": "No scheduled appointments",
+    "noSessionsDescription": "You don't have any appointments scheduled yet. Start by creating a new appointment or sync with Google Calendar.",
+    "noResults": "No results",
+    "noResultsDescription": "No appointments found for \"{{search}}\"",
+    "addFirstSession": "Create first appointment",
     "loadingAgenda": "Loading schedule...",
     "loadingPatients": "Loading patients...",
+    "loadingPatientDetails": "Loading patient file...",
+    "loadingMore": "Loading more appointments...",
+    "clearSearch": "Clear search",
+    "searchPlaceholder": "Search by patient...",
+    "searchResults": "{{count}} appointment found",
+    "searchResults_plural": "{{count}} appointments found",
+    "searchResultsFor": "for \"{{search}}\"",
     "fields": {
       "patient": "Patient",
       "date": "Date",
       "time": "Time",
+      "startTime": "Start Time",
+      "endTime": "End Time",
       "duration": "Duration",
-      "type": "Session type",
+      "type": "Session Type",
       "status": "Status",
       "notes": "Notes",
-      "price": "Price"
+      "price": "Price",
+      "amount": "Amount (ARS)",
+      "reason": "Reason for consultation",
+      "reasonPlaceholder": "E.g.: Follow-up session",
+      "modality": "Modality",
+      "summary": "Summary",
+      "cost": "Cost",
+      "schedule": "Schedule"
     },
     "status": {
       "scheduled": "Scheduled",
       "confirmed": "Confirmed",
       "completed": "Completed",
       "cancelled": "Cancelled",
-      "noShow": "No show"
+      "noShow": "No show",
+      "unknown": "Unknown"
     },
     "sessionTypes": {
       "individual": "Individual",
       "couple": "Couple",
       "family": "Family",
-      "group": "Group"
+      "group": "Group",
+      "presential": "In-person",
+      "remote": "Remote"
     },
     "messages": {
       "createSuccess": "Appointment created successfully",
       "updateSuccess": "Appointment updated successfully",
-      "deleteSuccess": "Appointment deleted",
+      "deleteSuccess": "Appointment deleted successfully",
       "cancelSuccess": "Appointment cancelled",
-      "deleteConfirmTitle": "Delete appointment?",
-      "deleteConfirmDescription": "This action will permanently delete the appointment."
+      "deleteConfirmTitle": "Delete appointment",
+      "deleteConfirmDescription": "Are you sure you want to delete {{patientName}}'s appointment? This action cannot be undone.",
+      "saveError": "Error saving appointment",
+      "deleteError": "Error deleting appointment",
+      "rescheduleSuccess": "Appointment rescheduled successfully",
+      "rescheduleError": "Error rescheduling appointment",
+      "conflictError": "There is already a session at this time. Please choose another time.",
+      "scheduleConflict": "Schedule conflict. You already have a session scheduled at this time.",
+      "pastDateError": "Cannot schedule appointments in the past. Please select a future date.",
+      "patientNotFound": "Patient not found",
+      "patientNoPhone": "Patient does not have a registered phone number",
+      "patientNoEmail": "The selected patient does not have an email configured. Please update the patient information.",
+      "patientEmailRequired": "This patient does not have an email configured. Please update their information.",
+      "fetchPatientError": "Error fetching patient data",
+      "loadPatientError": "Error loading patient details",
+      "loadPatientDataError": "Error loading patient data",
+      "fetchingPatientData": "Fetching patient data..."
     },
     "calendar": {
       "today": "Today",
       "month": "Month",
       "week": "Week",
       "day": "Day",
-      "list": "List"
+      "list": "List",
+      "allDay": "Day Off",
+      "loadingSessions": "Loading appointments..."
+    },
+    "views": {
+      "list": "List",
+      "calendar": "Calendar",
+      "both": "Both"
+    },
+    "googleCalendar": {
+      "connected": "Google Calendar connected",
+      "lastSync": "Last sync",
+      "sync": "Sync",
+      "syncing": "Syncing...",
+      "connectTitle": "Connect your Google Calendar",
+      "connectDescription": "Sync your appointments with Google Calendar to receive reminders and have your patients receive automatic invitations.",
+      "connectNow": "Connect now"
+    },
+    "drawer": {
+      "selectPatient": "Select patient...",
+      "loadingPatientData": "Loading patient data...",
+      "emailLabel": "Email",
+      "required": "*",
+      "saveChanges": "Save changes",
+      "createAppointment": "Create appointment",
+      "saveConfirmTitle": "Save changes?",
+      "saveConfirmTitleCreate": "Create appointment?",
+      "saveConfirmDescription": "Changes will be applied to the selected appointment.",
+      "saveConfirmDescriptionCreate": "A new appointment will be created with the entered information.",
+      "saving": "Saving...",
+      "deleting": "Deleting...",
+      "deleteConfirmTitle": "Delete appointment?",
+      "deleteConfirmDescription": "This action cannot be undone. The appointment will be permanently deleted."
+    },
+    "card": {
+      "paid": "Paid",
+      "viewFile": "View file",
+      "editAppointment": "Edit appointment",
+      "sendWhatsApp": "Send WhatsApp",
+      "deleteAppointment": "Delete appointment",
+      "actions": "Actions",
+      "riskMedium": "Medium risk",
+      "riskHigh": "High risk"
+    },
+    "details": {
+      "title": "Session Details",
+      "patient": "Patient",
+      "noPatient": "No patient",
+      "editSession": "Edit Session"
+    },
+    "validation": {
+      "selectPatient": "Please select a patient",
+      "selectDate": "Please select a date",
+      "selectTime": "Please select start and end time",
+      "selectSessionType": "Please select a session type",
+      "selectStatus": "Please select a status",
+      "completeAllFields": "Please complete all required fields",
+      "userIdError": "Error: Could not get user ID. Please log in again."
+    },
+    "dayOff": {
+      "warning": "This time slot is marked as a day off",
+      "warningWithReason": "This time slot is marked as a day off: {{reason}}",
+      "nonWorkingDay": "This day is not configured as a working day",
+      "outsideWorkingHours": "The selected time is outside your working hours ({{start}} - {{end}})",
+      "cannotMoveToOff": "Cannot move appointment to a day off",
+      "cannotMoveToNonWorking": "Cannot move appointment to a non-working day",
+      "cannotMoveOutsideHours": "Cannot move appointment outside working hours ({{start}} - {{end}})",
+      "morning": "Morning",
+      "afternoon": "Afternoon"
+    },
+    "legend": {
+      "scheduled": "Scheduled",
+      "confirmed": "Confirmed",
+      "completed": "Completed"
     }
   },
   "payments": {
     "title": "Billing",
     "subtitle": "Payment management",
+    "managePayments": "Manage your session payments",
     "newPayment": "New Payment",
     "editPayment": "Edit Payment",
+    "registerPayment": "Register Payment",
+    "paymentDetail": "Payment Detail",
+    "paymentOf": "Payment from {{name}}",
+    "paymentForSession": "Payment for {{name}}'s session",
     "pending": "Pending",
     "paid": "Paid",
     "partial": "Partial",
     "overdue": "Overdue",
-    "noPayments": "No payments registered",
+    "noPayments": "No payments",
     "noPaymentsDescription": "Payments will appear here when you have completed sessions",
+    "noPendingPayments": "No pending payments or registered payments yet",
+    "noResults": "No results",
+    "noResultsDescription": "No payments match the filters",
+    "noPatient": "No patient",
+    "unknownPatient": "Unknown patient",
     "totalPending": "Total pending",
     "totalCollected": "Total collected",
     "collectionRate": "Collection rate",
@@ -244,11 +470,17 @@
       "patient": "Patient",
       "session": "Session",
       "amount": "Amount",
+      "amountARS": "Amount (ARS)",
       "status": "Status",
       "date": "Date",
-      "paymentDate": "Payment date",
+      "paymentDate": "Payment Date",
+      "paymentStatus": "Payment Status",
+      "paidDate": "Collection date",
       "method": "Payment method",
-      "notes": "Notes"
+      "notes": "Notes",
+      "description": "Description",
+      "descriptionOptional": "Description (optional)",
+      "descriptionPlaceholder": "Additional notes about the payment..."
     },
     "methods": {
       "cash": "Cash",
@@ -258,24 +490,107 @@
     },
     "messages": {
       "markAsPaid": "Mark as paid",
+      "markAsPaidShort": "Collect",
       "markAsPaidSuccess": "Payment recorded successfully",
+      "markedAsPaid": "Payment marked as collected",
       "sendReminder": "Send reminder",
+      "reminder": "Reminder",
       "reminderSent": "Reminder sent",
-      "deleteConfirmTitle": "Delete payment?",
-      "deleteConfirmDescription": "This action will delete the payment record."
+      "deleteConfirmTitle": "Delete Payment",
+      "deleteConfirmDescription": "Are you sure you want to delete the payment from {{name}} for {{amount}}? This action cannot be undone.",
+      "deleteConfirmDescriptionSimple": "Are you sure you want to delete this payment of {{amount}}? This action cannot be undone.",
+      "deleted": "Payment deleted successfully",
+      "created": "Payment registered successfully",
+      "updated": "Payment updated successfully",
+      "errorMarkAsPaid": "Could not mark payment as collected",
+      "errorDelete": "Could not delete payment",
+      "errorSave": "Could not save payment. Please try again.",
+      "errorUpdate": "Could not update payment. Please try again.",
+      "selectSession": "You must select a session",
+      "amountGreaterThanZero": "Amount must be greater than 0",
+      "processing": "Processing...",
+      "messageCopied": "Message copied to clipboard",
+      "noPhoneRegistered": "Patient does not have a registered phone number"
     },
     "filters": {
       "all": "All",
       "pending": "Pending",
       "paid": "Paid",
+      "thisWeek": "This week",
       "thisMonth": "This month",
-      "lastMonth": "Last month"
+      "lastMonth": "Last month",
+      "range": "Range",
+      "from": "From",
+      "to": "To",
+      "clearFilters": "Clear filters",
+      "searchByPatient": "Search by patient...",
+      "allStatuses": "All statuses",
+      "sortBy": "Sort by"
+    },
+    "sort": {
+      "dateDesc": "Most recent",
+      "dateAsc": "Oldest",
+      "priceDesc": "Highest price",
+      "priceAsc": "Lowest price"
     },
     "stats": {
+      "totalSessions": "Total Sessions",
+      "collected": "Collected",
+      "pending": "Pending",
+      "overdue": "Overdue",
       "monthlyIncome": "Monthly income",
       "sessionsCompleted": "Sessions completed",
       "activePatients": "Active patients",
-      "collectionRate": "Collection rate"
+      "collectionRate": "Collection rate",
+      "payment": "payment",
+      "payments": "payments"
+    },
+    "drawer": {
+      "closePanel": "Close panel",
+      "paymentType": "Payment type",
+      "singlePayment": "Single payment",
+      "monthlyPlan": "Monthly plan",
+      "selectSession": "Select session...",
+      "selectPatient": "Select patient...",
+      "sessionCount": "Number of sessions",
+      "pricePerSession": "Price per session",
+      "sessionsPerMonth": "4 sessions / month",
+      "monthlyDiscount": "Monthly plan discount (10%)",
+      "totalMonthlyPlan": "Total monthly plan",
+      "saveChanges": "Save Changes",
+      "saving": "Saving..."
+    },
+    "comingSoon": {
+      "title": "Coming Soon",
+      "description": "Monthly plans and advance payments will be available soon"
+    },
+    "virtual": {
+      "sessionUnpaid": "Unpaid session"
+    },
+    "reminderModal": {
+      "title": "Payment Reminder",
+      "message": "Message",
+      "loadingPatient": "Loading patient data...",
+      "phone": "Phone",
+      "noPhone": "Patient does not have a registered phone",
+      "copy": "Copy",
+      "whatsapp": "WhatsApp"
+    },
+    "table": {
+      "patient": "Patient",
+      "date": "Date",
+      "status": "Status",
+      "amount": "Amount",
+      "actions": "Actions"
+    },
+    "actions": {
+      "registerPayment": "Register payment",
+      "viewDetail": "View detail",
+      "sendReminder": "Send reminder",
+      "markAsCollected": "Mark as collected",
+      "deletePayment": "Delete payment",
+      "edit": "Edit",
+      "delete": "Delete"
     }
   },
   "settings": {
@@ -542,6 +857,29 @@
       "createSuccess": "Note created successfully",
       "updateSuccess": "Note updated successfully",
       "deleteSuccess": "Note deleted"
+    },
+    "drawer": {
+      "closePanel": "Close panel",
+      "noteDate": "Note date",
+      "noteContent": "Note content",
+      "placeholder": "Write your session observations here...",
+      "encryptionNote": "This note will be automatically encrypted to protect patient privacy",
+      "saving": "Saving...",
+      "save": "Save",
+      "update": "Update"
+    },
+    "card": {
+      "editNote": "Edit note",
+      "deleteNote": "Delete note",
+      "edited": "Edited"
+    },
+    "deleteConfirm": {
+      "title": "Delete note",
+      "description": "Are you sure you want to delete this note? This action cannot be undone."
+    },
+    "emptyState": {
+      "description": "Notes are displayed sorted by creation date",
+      "createFirst": "Create first note"
     }
   },
   "onboarding": {
