@@ -1,4 +1,5 @@
 import { useState, useEffect, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Menu, X } from 'lucide-react';
 
 interface AppLayoutProps {
@@ -17,6 +18,7 @@ interface AppLayoutProps {
  * and avoid hooks count issues during resize. CSS controls visibility.
  */
 export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayoutProps) {
+  const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => {
     // Initialize with actual value if window exists
@@ -56,7 +58,7 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
         <button
           onClick={() => setDrawerOpen(!drawerOpen)}
           className="p-2 hover:bg-indigo-800 rounded-lg transition-colors"
-          aria-label="Toggle menu"
+          aria-label={t('common.toggleMenu', 'Toggle menu')}
         >
           {drawerOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>

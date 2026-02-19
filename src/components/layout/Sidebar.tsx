@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Calendar, Users, DollarSign, LogOut, Settings, ChevronRight, HelpCircle, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { ConfirmDialog } from '@/components/shared';
@@ -12,6 +13,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentPath, onLogout, showHeader = true, onNavigate }: SidebarProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
@@ -29,10 +31,10 @@ export function Sidebar({ currentPath, onLogout, showHeader = true, onNavigate }
   };
 
   const menuItems = [
-    { path: '/dashboard/agenda', label: 'Agenda', icon: Calendar },
-    { path: '/dashboard/pacientes', label: 'Pacientes', icon: Users },
-    { path: '/dashboard/cobros', label: 'Cobros', icon: DollarSign },
-    { path: '/dashboard/analitica', label: 'Analítica', icon: BarChart3 },
+    { path: '/dashboard/agenda', labelKey: 'navigation.agenda', icon: Calendar },
+    { path: '/dashboard/pacientes', labelKey: 'navigation.patients', icon: Users },
+    { path: '/dashboard/cobros', labelKey: 'navigation.payments', icon: DollarSign },
+    { path: '/dashboard/analitica', labelKey: 'navigation.analytics', icon: BarChart3 },
   ];
 
   const getLinkClassName = ({ isActive }: { isActive: boolean }) => 
@@ -47,8 +49,8 @@ export function Sidebar({ currentPath, onLogout, showHeader = true, onNavigate }
       {/* Header - Only show on desktop */}
       {showHeader && (
         <div className="p-6 border-b border-indigo-800">
-          <h1 className="text-white text-2xl font-bold">Lavenius</h1>
-          <p className="text-indigo-300 text-sm mt-1">Gestión de Pacientes</p>
+          <h1 className="text-white text-2xl font-bold">{t('landing.brand')}</h1>
+          <p className="text-indigo-300 text-sm mt-1">{t('landing.tagline')}</p>
         </div>
       )}
 
@@ -64,7 +66,7 @@ export function Sidebar({ currentPath, onLogout, showHeader = true, onNavigate }
               className={getLinkClassName}
             >
               <Icon className="w-5 h-5" />
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
             </NavLink>
           );
         })}
@@ -76,7 +78,7 @@ export function Sidebar({ currentPath, onLogout, showHeader = true, onNavigate }
           className={getLinkClassName}
         >
           <Settings className="w-5 h-5" />
-          <span>Configuración</span>
+          <span>{t('navigation.settings')}</span>
         </NavLink>
 
         {/* Ayuda */}
@@ -86,7 +88,7 @@ export function Sidebar({ currentPath, onLogout, showHeader = true, onNavigate }
           className={getLinkClassName}
         >
           <HelpCircle className="w-5 h-5" />
-          <span>Ayuda</span>
+          <span>{t('navigation.help')}</span>
         </NavLink>
       </nav>
       
@@ -121,7 +123,7 @@ export function Sidebar({ currentPath, onLogout, showHeader = true, onNavigate }
           className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white transition-colors"
         >
           <LogOut className="w-4 h-4" />
-          <span className="text-sm">Cerrar sesión</span>
+          <span className="text-sm">{t('navigation.logout')}</span>
         </button>
       </div>
 
@@ -129,10 +131,10 @@ export function Sidebar({ currentPath, onLogout, showHeader = true, onNavigate }
       <ConfirmDialog
         open={showLogoutConfirm}
         onOpenChange={setShowLogoutConfirm}
-        title="¿Cerrar sesión?"
-        description="Estás a punto de cerrar tu sesión. Tendrás que volver a iniciar sesión para acceder a tu cuenta."
-        confirmLabel="Cerrar sesión"
-        cancelLabel="Cancelar"
+        title={t('logout.confirmTitle')}
+        description={t('logout.confirmDescription')}
+        confirmLabel={t('navigation.logout')}
+        cancelLabel={t('common.cancel')}
         variant="warning"
         icon={LogOut}
         onConfirm={handleLogoutConfirm}

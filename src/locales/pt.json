@@ -46,7 +46,11 @@
     "tomorrow": "Amanhã",
     "week": "Semana",
     "month": "Mês",
-    "year": "Ano"
+    "year": "Ano",
+    "toggleMenu": "Alternar menu",
+    "language": "Idioma",
+    "selectLanguage": "Selecionar idioma",
+    "switchTo": "Mudar para"
   },
   "navigation": {
     "dashboard": "Painel",

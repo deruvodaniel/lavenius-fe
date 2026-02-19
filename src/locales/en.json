@@ -46,7 +46,11 @@
     "tomorrow": "Tomorrow",
     "week": "Week",
     "month": "Month",
-    "year": "Year"
+    "year": "Year",
+    "toggleMenu": "Toggle menu",
+    "language": "Language",
+    "selectLanguage": "Select language",
+    "switchTo": "Switch to"
   },
   "navigation": {
     "dashboard": "Dashboard",
