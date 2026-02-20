@@ -181,6 +181,7 @@ function DateRangePicker({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          type="button"
           id={id}
           variant="outline"
           disabled={disabled}
