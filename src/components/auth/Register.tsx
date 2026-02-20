@@ -10,6 +10,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/lib/hooks';
+import { getErrorMessage } from '@/lib/utils/error';
 import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
 import type { TFunction } from 'i18next';
@@ -125,8 +126,8 @@ export function Register() {
         description: t('auth.loginToContinue')
       });
       navigate('/login?registered=true');
-    } catch (err: any) {
-      const errorMsg = err?.message || '';
+    } catch (err: unknown) {
+      const errorMsg = getErrorMessage(err, '');
       const errorMsgLower = errorMsg.toLowerCase();
       
       // Provide specific user-friendly messages

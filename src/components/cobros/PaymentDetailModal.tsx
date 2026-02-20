@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, DollarSign, Calendar, FileText, User, Clock, CheckCircle2, AlertCircle, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap';
 import type { Payment } from '@/lib/types/api.types';
 import { PaymentStatus } from '@/lib/types/api.types';
 
@@ -100,6 +102,16 @@ const DetailRow = ({ icon: Icon, label, value, className = '' }: DetailRowProps)
 // MAIN COMPONENT
 // ============================================================================
 
+/**
+ * PaymentDetailModal - Modal for displaying payment details
+ * 
+ * Features:
+ * - Focus trap for keyboard navigation
+ * - ESC key to close
+ * - Mark as paid functionality
+ * - Edit and delete actions
+ * - Accessible with proper ARIA attributes
+ */
 export const PaymentDetailModal = ({ 
   payment, 
   onClose, 
@@ -110,6 +122,23 @@ export const PaymentDetailModal = ({
 }: PaymentDetailModalProps) => {
   const { t } = useTranslation();
   
+  // Focus trap
+  const containerRef = useFocusTrap<HTMLDivElement>({
+    isActive: true,
+    onEscape: onClose,
+    restoreFocus: true,
+  });
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+  
   const patientName = payment.patient 
     ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
     : t('payments.noPatient');
@@ -119,15 +148,24 @@ export const PaymentDetailModal = ({
   const isPaid = payment.status === PaymentStatus.PAID;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div 
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="payment-detail-title"
+    >
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
         onClick={onClose}
+        aria-hidden="true"
       />
       
       {/* Modal/Bottom Sheet */}
-      <div className="relative bg-white w-full sm:max-w-md sm:rounded-xl rounded-t-xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div 
+        ref={containerRef}
+        className="relative bg-white w-full sm:max-w-md sm:rounded-xl rounded-t-xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col"
+      >
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 sm:p-5">
           <div className="flex items-center justify-between">
@@ -136,13 +174,15 @@ export const PaymentDetailModal = ({
                 <DollarSign className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">{t('payments.paymentDetail')}</h2>
+                <h2 id="payment-detail-title" className="text-lg font-semibold">
+                  {t('payments.paymentDetail')}
+                </h2>
                 <p className="text-indigo-200 text-sm">{formatShortDate(payment.paymentDate)}</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="text-indigo-200 hover:text-white transition-colors p-1"
+              className="text-indigo-200 hover:text-white transition-colors p-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               aria-label={t('common.close')}
             >
               <X className="w-6 h-6" />

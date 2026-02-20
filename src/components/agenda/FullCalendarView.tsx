@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo, useEffect } from 'react';
+import { useRef, useState, useMemo, useEffect, useCallback } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -14,6 +14,8 @@ import { Calendar, Grid3x3, Clock } from 'lucide-react';
 import { LoadingOverlay } from '../shared/Skeleton';
 import { toast } from 'sonner';
 import { useResponsive } from '@/lib/hooks';
+import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
+import type { DayOffSetting } from '@/lib/types/setting.types';
 
 // ============================================================================
 // SETTINGS TYPES & LOADER
@@ -22,7 +24,7 @@ import { useResponsive } from '@/lib/hooks';
 type DiaOffTipo = 'full' | 'morning' | 'afternoon' | 'custom';
 
 interface DiaOff {
-  id: number;
+  id: string; // Changed to string to match API setting id
   fecha: string;
   motivo: string;
   tipo?: DiaOffTipo; // Optional for backwards compatibility
@@ -37,7 +39,6 @@ interface WorkingHours {
 }
 
 interface CalendarSettings {
-  diasOff: DiaOff[];
   workingHours: WorkingHours;
 }
 
@@ -66,20 +67,51 @@ const getDiaOffTimeRange = (dia: DiaOff): { start: string; end: string } => {
   }
 };
 
+// Load working hours from localStorage (days off now come from API)
 const loadCalendarSettings = (): CalendarSettings => {
   try {
     const stored = localStorage.getItem(SETTINGS_KEY);
     if (stored) {
       const settings = JSON.parse(stored);
       return {
-        diasOff: settings.diasOff || [],
         workingHours: settings.workingHours || defaultWorkingHours,
       };
     }
   } catch (error) {
     console.error('Error loading calendar settings:', error);
   }
-  return { diasOff: [], workingHours: defaultWorkingHours };
+  return { workingHours: defaultWorkingHours };
+};
+
+/**
+ * Convert API DayOffSetting to calendar DiaOff format
+ * The API stores date ranges, but for the calendar we need individual dates
+ */
+const convertApiDayOffToCalendarFormat = (setting: DayOffSetting): DiaOff[] => {
+  const { config, description, id } = setting;
+  const result: DiaOff[] = [];
+  
+  // Parse dates - API returns ISO strings like "2026-12-25"
+  const fromDate = new Date(config.fromDate);
+  const toDate = new Date(config.toDate);
+  
+  // Generate a DiaOff for each date in the range
+  const currentDate = new Date(fromDate);
+  let dayIndex = 0;
+  
+  while (currentDate <= toDate) {
+    result.push({
+      id: `${id}-${dayIndex}`, // Unique id for each day in the range
+      fecha: currentDate.toISOString().split('T')[0],
+      motivo: description || '',
+      tipo: 'full', // API only supports full day off
+    });
+    
+    currentDate.setDate(currentDate.getDate() + 1);
+    dayIndex++;
+  }
+  
+  return result;
 };
 
 // ============================================================================
@@ -114,16 +146,55 @@ export function FullCalendarView({
   const defaultView = 'timeGridDay';
   const [currentView, setCurrentView] = useState(defaultView);
 
+  // Change calendar view function
+  const changeView = useCallback((view: string) => {
+    const calendarApi = calendarRef.current?.getApi();
+    if (calendarApi) {
+      calendarApi.changeView(view);
+      setCurrentView(view);
+    }
+  }, []);
+
   // Keep day view on mobile (week view not ideal for small screens)
+  // This effect only syncs with the external FullCalendar API, not React state directly
   useEffect(() => {
     if (isMobile && currentView === 'timeGridWeek') {
-      changeView('timeGridDay');
+      // Only call the calendar API - the state update happens in the callback
+      const calendarApi = calendarRef.current?.getApi();
+      if (calendarApi) {
+        calendarApi.changeView('timeGridDay');
+        // Use a microtask to batch with React's updates
+        queueMicrotask(() => setCurrentView('timeGridDay'));
+      }
     }
   }, [isMobile, currentView]);
 
-  // Load calendar settings (días off + working hours)
+  // Load working hours from localStorage
   const calendarSettings = useMemo(() => loadCalendarSettings(), []);
-  const { diasOff, workingHours } = calendarSettings;
+  const { workingHours } = calendarSettings;
+  
+  // Get days off from the settings store (API)
+  const allSettings = useSettingStore((state) => state.settings);
+  const fetchSettings = useSettingStore((state) => state.fetchSettings);
+  const fetchStatus = useSettingStore((state) => state.fetchStatus);
+  
+  // Fetch settings on mount if not already loaded
+  useEffect(() => {
+    if (fetchStatus === 'idle') {
+      fetchSettings().catch((error) => {
+        console.error('Failed to fetch settings for calendar:', error);
+      });
+    }
+  }, [fetchSettings, fetchStatus]);
+  
+  // Convert API day off settings to calendar format
+  const diasOff = useMemo(() => {
+    const dayOffSettings = settingSelectors.getDayOffSettings({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
+    // Flatten all day off ranges into individual days
+    return dayOffSettings
+      .filter(setting => setting.active) // Only active settings
+      .flatMap(convertApiDayOffToCalendarFormat);
+  }, [allSettings, fetchStatus]);
 
   // Generate a key based on sessions data to force FullCalendar to re-render when sessions change
   const calendarKey = useMemo(() => {
@@ -208,7 +279,7 @@ export function FullCalendarView({
           },
         };
       });
-  }, [sessions, isSessionPaid, getPatientNameFallback]);
+  }, [sessions, isSessionPaid, getPatientNameFallback, t]);
 
   // Create background events for días off
   const diaOffEvents = useMemo(() => {
@@ -406,14 +477,6 @@ export function FullCalendarView({
         <div className="fc-event-title truncate">{eventInfo.event.title}</div>
       </div>
     );
-  };
-
-  const changeView = (view: string) => {
-    const calendarApi = calendarRef.current?.getApi();
-    if (calendarApi) {
-      calendarApi.changeView(view);
-      setCurrentView(view);
-    }
   };
 
   return (

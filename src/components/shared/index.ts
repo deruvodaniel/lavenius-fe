@@ -8,3 +8,5 @@ export { ConfirmDialog, type ConfirmDialogVariant } from './ConfirmDialog';
 export { SimplePagination } from './SimplePagination';
 export { InfiniteScrollLoader } from './InfiniteScrollLoader';
 export { LanguageSwitcher, type LanguageSwitcherProps } from './LanguageSwitcher';
+export { BaseDrawer, DrawerBody, DrawerFooter, type BaseDrawerProps } from './BaseDrawer';
+export { LoadingSpinner } from './LoadingSpinner';

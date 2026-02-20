@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, FileText, Calendar as CalendarIcon, Save } from 'lucide-react';
+import { FileText, Calendar as CalendarIcon, Save } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
+import { BaseDrawer, DrawerBody, DrawerFooter } from '../shared/BaseDrawer';
 import { formatISODate } from '@/lib/utils/dateFormatters';
 import type { Note, CreateNoteDto, UpdateNoteDto } from '@/lib/types/api.types';
 
@@ -17,6 +18,11 @@ interface NoteDrawerProps {
 /**
  * NoteDrawer Component
  * Modal drawer for creating/editing notes
+ * 
+ * Features:
+ * - Focus trap for keyboard navigation
+ * - ESC key to close
+ * - Accessible with proper ARIA attributes
  */
 export function NoteDrawer({ 
   isOpen, 
@@ -47,8 +53,6 @@ export function NoteDrawer({
       });
     }
   }, [note, isOpen]);
-
-  if (!isOpen) return null;
 
   const handleSave = async () => {
     if (!formData.text.trim()) {
@@ -98,103 +102,83 @@ export function NoteDrawer({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex !top-0 !mt-0">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
-        onClick={handleClose}
-      />
-
-      {/* Drawer */}
-      <div className="relative ml-auto h-full w-full md:max-w-2xl bg-white shadow-2xl overflow-y-auto">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 md:p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              <h2 className="text-white text-xl">
-                {note ? t('notes.editNote') : t('notes.newNote')}
-              </h2>
-            </div>
-            <button
-              onClick={handleClose}
-              className="text-indigo-200 hover:text-white transition-colors"
-              disabled={isSaving}
-              aria-label={t('notes.drawer.closePanel')}
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-
-        {/* Form */}
-        <div className="p-4 md:p-6 space-y-6">
-          {/* Note Date */}
-          <div>
-            <label htmlFor="note-date" className="block text-gray-700 mb-2">
-              <CalendarIcon className="w-4 h-4 inline mr-1" />
-              {t('notes.drawer.noteDate')}
-            </label>
-            <input
-              id="note-date"
-              type="date"
-              value={formatISODate(new Date(formData.noteDate))}
-              onChange={(e) => {
-                // Combine the date from input with current time
-                const selectedDate = new Date(e.target.value);
-                const now = new Date();
-                selectedDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
-                setFormData({ ...formData, noteDate: selectedDate.toISOString() });
-              }}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              disabled={isSaving}
-            />
-          </div>
-
-          {/* Note Content */}
-          <div>
-            <label htmlFor="note-content" className="block text-gray-700 mb-2">
-              {t('notes.drawer.noteContent')}
-            </label>
-            <Textarea
-              id="note-content"
-              value={formData.text}
-              onChange={(e) => setFormData({ ...formData, text: e.target.value })}
-              placeholder={t('notes.drawer.placeholder')}
-              className="min-h-[300px] resize-none"
-              disabled={isSaving}
-            />
-            <p className="text-xs text-muted-foreground mt-2">
-              {t('notes.drawer.encryptionNote')}
-            </p>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="sticky bottom-0 bg-white border-t p-4 flex justify-end gap-3">
-          <Button
-            variant="outline"
-            onClick={handleClose}
+    <BaseDrawer
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={note ? t('notes.editNote') : t('notes.newNote')}
+      icon={FileText}
+      maxWidth="md:max-w-2xl"
+      closeLabel={t('notes.drawer.closePanel')}
+      disableClose={isSaving}
+      titleId="note-drawer-title"
+      initialFocus="#note-date"
+    >
+      <DrawerBody>
+        {/* Note Date */}
+        <div>
+          <label htmlFor="note-date" className="block text-gray-700 mb-2">
+            <CalendarIcon className="w-4 h-4 inline mr-1" />
+            {t('notes.drawer.noteDate')}
+          </label>
+          <input
+            id="note-date"
+            type="date"
+            value={formatISODate(new Date(formData.noteDate))}
+            onChange={(e) => {
+              // Combine the date from input with current time
+              const selectedDate = new Date(e.target.value);
+              const now = new Date();
+              selectedDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+              setFormData({ ...formData, noteDate: selectedDate.toISOString() });
+            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             disabled={isSaving}
-          >
-            {t('common.cancel')}
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={isSaving || !formData.text.trim()}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white"
-          >
-            {isSaving ? (
-              t('notes.drawer.saving')
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                {note ? t('notes.drawer.update') : t('notes.drawer.save')}
-              </>
-            )}
-          </Button>
+          />
         </div>
-      </div>
-    </div>
+
+        {/* Note Content */}
+        <div>
+          <label htmlFor="note-content" className="block text-gray-700 mb-2">
+            {t('notes.drawer.noteContent')}
+          </label>
+          <Textarea
+            id="note-content"
+            value={formData.text}
+            onChange={(e) => setFormData({ ...formData, text: e.target.value })}
+            placeholder={t('notes.drawer.placeholder')}
+            className="min-h-[300px] resize-none"
+            disabled={isSaving}
+          />
+          <p className="text-xs text-muted-foreground mt-2">
+            {t('notes.drawer.encryptionNote')}
+          </p>
+        </div>
+      </DrawerBody>
+
+      <DrawerFooter>
+        <Button
+          variant="outline"
+          onClick={handleClose}
+          disabled={isSaving}
+          className="flex-1 sm:flex-none"
+        >
+          {t('common.cancel')}
+        </Button>
+        <Button
+          onClick={handleSave}
+          disabled={isSaving || !formData.text.trim()}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white flex-1 sm:flex-none"
+        >
+          {isSaving ? (
+            t('notes.drawer.saving')
+          ) : (
+            <>
+              <Save className="w-4 h-4 mr-2" />
+              {note ? t('notes.drawer.update') : t('notes.drawer.save')}
+            </>
+          )}
+        </Button>
+      </DrawerFooter>
+    </BaseDrawer>
   );
 }

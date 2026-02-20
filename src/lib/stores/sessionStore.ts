@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { sessionService } from '../api/sessions';
+import { getErrorMessage, getErrorStatusCode } from '../utils/error';
 import type { CreateSessionDto, SessionResponse, SessionUI, UpdateSessionDto } from '../types/session';
 
 interface SessionState {
@@ -30,8 +31,8 @@ export const useSessionStore = create<SessionState>((set, _get) => ({
     try {
       const sessions = await sessionService.getUpcoming();
       set({ sessions: Array.isArray(sessions) ? sessions : [], isLoading: false });
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Error al cargar sesiones';
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error, 'Error al cargar sesiones');
       set({ error: errorMessage, isLoading: false, sessions: [] });
     }
   },
@@ -44,8 +45,8 @@ export const useSessionStore = create<SessionState>((set, _get) => ({
     try {
       const sessions = await sessionService.getMonthly(year, month);
       set({ sessions: Array.isArray(sessions) ? sessions : [], isLoading: false });
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Error al cargar sesiones del mes';
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error, 'Error al cargar sesiones del mes');
       set({ error: errorMessage, isLoading: false, sessions: [] });
     }
   },
@@ -67,9 +68,9 @@ export const useSessionStore = create<SessionState>((set, _get) => ({
       }));
       
       return newSession;
-    } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || error?.message || '';
-      const statusCode = error?.statusCode || error?.response?.status;
+    } catch (error: unknown) {
+      const backendMessage = getErrorMessage(error, '');
+      const statusCode = getErrorStatusCode(error);
       
       // Provide user-friendly error messages
       let errorMessage = 'Error al crear sesión';
@@ -102,8 +103,8 @@ export const useSessionStore = create<SessionState>((set, _get) => ({
       }));
       
       return updated;
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Error al actualizar sesión';
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error, 'Error al actualizar sesión');
       set({ error: errorMessage, isLoading: false });
       throw error;
     }
@@ -121,8 +122,8 @@ export const useSessionStore = create<SessionState>((set, _get) => ({
         sessions: state.sessions.filter((s) => s.id !== id),
         isLoading: false
       }));
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Error al eliminar sesión';
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error, 'Error al eliminar sesión');
       set({ error: errorMessage, isLoading: false });
       throw error;
     }
@@ -140,8 +141,8 @@ export const useSessionStore = create<SessionState>((set, _get) => ({
         sessions: state.sessions.map((s) => (s.id === id ? updated : s)),
         isLoading: false
       }));
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Error al completar sesión';
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error, 'Error al completar sesión');
       set({ error: errorMessage, isLoading: false });
       throw error;
     }

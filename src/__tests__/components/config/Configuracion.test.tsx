@@ -160,6 +160,55 @@ vi.mock('@/components/shared', () => ({
   ),
 }));
 
+// Mock setting store - must be inline because vi.mock is hoisted
+vi.mock('@/lib/stores/setting.store', () => {
+  // Create mock functions that return promises
+  const mockFetchSettings = () => Promise.resolve(undefined);
+  const mockCreateSetting = () => Promise.resolve(undefined);
+  const mockCreateDayOff = () => Promise.resolve(undefined);
+  const mockUpdateSetting = () => Promise.resolve(undefined);
+  const mockDeleteSetting = () => Promise.resolve(undefined);
+  const mockReset = () => {};
+
+  const mockState = {
+    settings: [],
+    fetchStatus: 'success' as const,
+    error: null,
+    lastFetchTime: Date.now(),
+    fetchSettings: mockFetchSettings,
+    createSetting: mockCreateSetting,
+    createDayOff: mockCreateDayOff,
+    updateSetting: mockUpdateSetting,
+    deleteSetting: mockDeleteSetting,
+    reset: mockReset,
+  };
+
+  // Create a mock that matches Zustand's store interface
+  const useSettingStoreMock = Object.assign(
+    (selector?: (state: typeof mockState) => unknown) => {
+      if (selector) {
+        return selector(mockState);
+      }
+      return mockState;
+    },
+    {
+      getState: () => mockState,
+      setState: () => {},
+      subscribe: () => () => {},
+    }
+  );
+
+  return {
+    useSettingStore: useSettingStoreMock,
+    settingSelectors: {
+      getDayOffSettings: () => [],
+      getDuePaymentReminderSetting: () => undefined,
+      getNextSessionReminderSetting: () => undefined,
+      isDateBlocked: () => false,
+    },
+  };
+});
+
 // Import component after mocks
 import { Configuracion } from '../../../components/config/Configuracion';
 

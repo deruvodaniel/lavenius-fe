@@ -8,6 +8,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/lib/hooks';
+import { getErrorMessage } from '@/lib/utils/error';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
 import type { LoginDto } from '@/lib/types/api.types';
@@ -46,8 +47,8 @@ export function Login() {
       await login(data);
       toast.success(t('auth.welcomeBack'));
       navigate('/dashboard');
-    } catch (err: any) {
-      const errorMsg = err?.message || t('auth.loginError');
+    } catch (err: unknown) {
+      const errorMsg = getErrorMessage(err, t('auth.loginError'));
       const errorMsgLower = errorMsg.toLowerCase();
       
       // Check if error indicates user doesn't exist or invalid credentials

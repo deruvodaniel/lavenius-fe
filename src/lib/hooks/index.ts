@@ -6,3 +6,5 @@ export { useMediaQuery, useBreakpoint, useResponsive } from './useMediaQuery';
 export { useOnboarding } from './useOnboarding';
 export { useLanguage } from './useLanguage';
 export type { UseLanguageReturn } from './useLanguage';
+export { useFocusTrap } from './useFocusTrap';
+export type { UseFocusTrapOptions } from './useFocusTrap';

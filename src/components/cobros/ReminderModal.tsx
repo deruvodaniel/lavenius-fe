@@ -4,6 +4,7 @@ import { Copy, MessageCircle, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { usePatientStore } from '@/lib/stores/patient.store';
 import { Button } from '@/components/ui/button';
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap';
 import { formatPaymentReminderMessage, openWhatsApp } from '@/lib/utils/whatsappTemplates';
 import { formatCurrency } from '@/lib/utils/dateFormatters';
 import type { Payment } from '@/lib/types/api.types';
@@ -32,13 +33,24 @@ interface ReminderModalProps {
 /**
  * ReminderModal - Modal for sending payment reminders via WhatsApp
  * 
- * Displays a customizable message that can be copied or sent via WhatsApp.
- * Automatically loads patient phone number if available.
+ * Features:
+ * - Focus trap for keyboard navigation
+ * - ESC key to close
+ * - Customizable message that can be copied or sent via WhatsApp
+ * - Automatically loads patient phone number if available
  */
 export function ReminderModal({ payment, onClose }: ReminderModalProps) {
   const { t } = useTranslation();
   const fetchPatientById = usePatientStore(state => state.fetchPatientById);
   const selectedPatient = usePatientStore(state => state.selectedPatient);
+  
+  // Focus trap
+  const containerRef = useFocusTrap<HTMLDivElement>({
+    isActive: true,
+    onEscape: onClose,
+    restoreFocus: true,
+    initialFocus: '#reminder-message',
+  });
   
   const [isLoadingPatient, setIsLoadingPatient] = useState(false);
   const [patientPhone, setPatientPhone] = useState<string | undefined>(undefined);
@@ -54,6 +66,16 @@ export function ReminderModal({ payment, onClose }: ReminderModalProps) {
   );
   
   const [message, setMessage] = useState(defaultMessage);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
 
   // Load full patient data to get phone
   useEffect(() => {
@@ -96,19 +118,30 @@ export function ReminderModal({ payment, onClose }: ReminderModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div 
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reminder-modal-title"
+    >
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
         onClick={onClose}
+        aria-hidden="true"
       />
       
       {/* Modal */}
-      <div className="relative bg-white rounded-t-xl sm:rounded-lg shadow-2xl p-4 sm:p-6 w-full sm:max-w-md">
+      <div 
+        ref={containerRef}
+        className="relative bg-white rounded-t-xl sm:rounded-lg shadow-2xl p-4 sm:p-6 w-full sm:max-w-md"
+      >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900">{t('payments.reminderModal.title')}</h3>
+          <h3 id="reminder-modal-title" className="text-base sm:text-lg font-semibold text-gray-900">
+            {t('payments.reminderModal.title')}
+          </h3>
           <button 
-            className="text-gray-500 hover:text-gray-700 p-1" 
+            className="text-gray-500 hover:text-gray-700 p-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500" 
             onClick={onClose}
             aria-label={t('common.close')}
           >

@@ -12,6 +12,9 @@ export { usePatientStore } from './patient.store';
 // Appointment Store
 export { useAppointmentStore } from './appointment.store';
 
+// Setting Store
+export { useSettingStore, settingSelectors } from './setting.store';
+
 // UI Store
 export { 
   useUIStore,

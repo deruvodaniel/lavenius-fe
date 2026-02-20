@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, DollarSign, Calendar, FileText, Sparkles, CalendarRange, Pencil, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { DollarSign, Calendar, FileText, Sparkles, CalendarRange, Pencil, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { BaseDrawer, DrawerBody, DrawerFooter } from '@/components/shared/BaseDrawer';
+import { Button } from '@/components/ui/button';
 import { formatISODate } from '@/lib/utils/dateFormatters';
 import type { CreatePaymentDto, Payment, UpdatePaymentDto } from '@/lib/types/api.types';
 import { PaymentStatus } from '@/lib/types/api.types';
@@ -193,6 +195,17 @@ interface PaymentDrawerProps {
   editPayment?: Payment | null;
 }
 
+/**
+ * PaymentDrawer Component
+ * Modal drawer for creating/editing payments
+ * 
+ * Features:
+ * - Focus trap for keyboard navigation
+ * - ESC key to close
+ * - Payment type selector (single/monthly)
+ * - Payment status selector
+ * - Accessible with proper ARIA attributes
+ */
 export const PaymentDrawer = ({
   isOpen,
   onClose,
@@ -257,8 +270,6 @@ export const PaymentDrawer = ({
       }
     }
   }, [formData.sessionId, sessions, preselectedSessionId, isEditMode]);
-
-  if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -336,49 +347,28 @@ export const PaymentDrawer = ({
 
   const isFormValid = formData.sessionId && formData.amount > 0;
 
+  // Determine subtitle for header
+  const subtitle = isEditMode && editPatientName 
+    ? t('payments.paymentOf', { name: editPatientName })
+    : (!isEditMode && preselectedSessionId && selectedSession)
+      ? t('payments.paymentForSession', { name: selectedSession.patientName || selectedSession.patient?.firstName })
+      : undefined;
+
   return (
-    <div className="fixed inset-0 z-50 flex !top-0 !mt-0">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
-        onClick={onClose}
-      />
-
-      {/* Drawer */}
-      <div className="relative ml-auto h-full w-full md:max-w-lg bg-white shadow-2xl overflow-y-auto">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 md:p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                {isEditMode ? <Pencil className="w-5 h-5" /> : <DollarSign className="w-5 h-5" />}
-              </div>
-              <h2 className="text-white text-xl">
-                {isEditMode ? t('payments.editPayment') : t('payments.registerPayment')}
-              </h2>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-indigo-200 hover:text-white transition-colors"
-              aria-label={t('payments.drawer.closePanel')}
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-          {isEditMode && editPatientName && (
-            <p className="text-indigo-200 text-sm mt-2">
-              {t('payments.paymentOf', { name: editPatientName })}
-            </p>
-          )}
-          {!isEditMode && preselectedSessionId && selectedSession && (
-            <p className="text-indigo-200 text-sm mt-2">
-              {t('payments.paymentForSession', { name: selectedSession.patientName || selectedSession.patient?.firstName })}
-            </p>
-          )}
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4 md:space-y-6">
+    <BaseDrawer
+      isOpen={isOpen}
+      onClose={onClose}
+      title={isEditMode ? t('payments.editPayment') : t('payments.registerPayment')}
+      subtitle={subtitle}
+      icon={isEditMode ? Pencil : DollarSign}
+      maxWidth="md:max-w-lg"
+      closeLabel={t('payments.drawer.closePanel')}
+      disableClose={isLoading || isSaving}
+      titleId="payment-drawer-title"
+      initialFocus="#payment-session"
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+        <DrawerBody>
           {/* Payment Type Selector - only show in create mode */}
           {!isEditMode && (
             <div>
@@ -512,38 +502,38 @@ export const PaymentDrawer = ({
               </div>
             </>
           )}
+        </DrawerBody>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              disabled={isLoading || isSaving}
+        <DrawerFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isLoading || isSaving}
+            className="flex-1"
+          >
+            {t('common.cancel')}
+          </Button>
+          {(isEditMode || paymentType === 'single') && (
+            <Button
+              type="submit"
+              disabled={!isFormValid || isLoading || isSaving}
+              className={`flex-1 ${
+                isFormValid && !isLoading && !isSaving
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
             >
-              {t('common.cancel')}
-            </button>
-            {(isEditMode || paymentType === 'single') && (
-              <button
-                type="submit"
-                disabled={!isFormValid || isLoading || isSaving}
-                className={`flex-1 py-3 rounded-lg transition-colors ${
-                  isFormValid && !isLoading && !isSaving
-                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                {isSaving 
-                  ? t('payments.drawer.saving')
-                  : isEditMode 
-                    ? t('payments.drawer.saveChanges') 
-                    : t('payments.registerPayment')
-                }
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
-    </div>
+              {isSaving 
+                ? t('payments.drawer.saving')
+                : isEditMode 
+                  ? t('payments.drawer.saveChanges') 
+                  : t('payments.registerPayment')
+              }
+            </Button>
+          )}
+        </DrawerFooter>
+      </form>
+    </BaseDrawer>
   );
 };

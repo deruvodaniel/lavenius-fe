@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { X, Calendar, Clock, User, Loader2 } from 'lucide-react';
+import { Calendar, Clock, User, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore, usePatientStore } from '@/lib/stores';
-import { ConfirmDialog } from '@/components/shared';
+import { ConfirmDialog, BaseDrawer, DrawerBody, DrawerFooter } from '@/components/shared';
+import { Button } from '@/components/ui/button';
 import type { Patient } from '@/lib/types/api.types';
 import { SessionType, SessionStatus } from '@/lib/types/session';
 import type { CreateSessionDto, SessionResponse } from '@/lib/types/session';
@@ -37,6 +38,16 @@ interface TurnoDrawerProps {
   onDelete?: (sessionId: string) => Promise<void>;
 }
 
+/**
+ * TurnoDrawer Component
+ * Modal drawer for creating/editing session appointments
+ * 
+ * Features:
+ * - Focus trap for keyboard navigation
+ * - ESC key to close
+ * - Confirmation dialogs for save/delete
+ * - Accessible with proper ARIA attributes
+ */
 export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, initialDate, onSave, onDelete }: TurnoDrawerProps) {
   const { t } = useTranslation();
   const user = useAuthStore(state => state.user);
@@ -134,7 +145,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     } finally {
       setIsLoadingPatient(false);
     }
-  }, [fetchPatientById]);
+  }, [fetchPatientById, t]);
 
   // Update fullPatientData when selectedPatientFromStore changes
   useEffect(() => {
@@ -151,8 +162,6 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       setFullPatientData(null);
     }
   }, [formData.pacienteId, loadFullPatientData]);
-
-  if (!isOpen) return null;
 
   const isEditing = !!session;
   
@@ -260,33 +269,18 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex !top-0 !mt-0">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
-        onClick={onClose}
-      />
-
-      {/* Drawer */}
-      <div className="relative ml-auto h-full w-full md:max-w-lg bg-white shadow-2xl overflow-y-auto">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 md:p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-white text-xl">
-              {isEditing ? t('agenda.editSession') : t('agenda.newSession')}
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-indigo-200 hover:text-white transition-colors"
-              aria-label={t('common.close')}
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-
-        {/* Form */}
-        <div className="p-4 md:p-6 space-y-4 md:space-y-6">
+    <>
+      <BaseDrawer
+        isOpen={isOpen}
+        onClose={onClose}
+        title={isEditing ? t('agenda.editSession') : t('agenda.newSession')}
+        icon={Calendar}
+        maxWidth="md:max-w-lg"
+        closeLabel={t('common.close')}
+        titleId="turno-drawer-title"
+        initialFocus="#turno-paciente"
+      >
+        <DrawerBody>
           {/* Paciente */}
           <div>
             <label htmlFor="turno-paciente" className="flex items-center gap-2 text-gray-700 mb-2">
@@ -397,7 +391,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
             />
           </div>
 
-          {/* Tipo de Sesión */}
+          {/* Tipo de Sesi\u00F3n */}
           <div>
             <label htmlFor="turno-tipo-sesion" className="block text-gray-700 mb-2">{t('agenda.fields.type')}</label>
             <select
@@ -440,31 +434,31 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
+        </DrawerBody>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button
-              onClick={handleSave}
-              disabled={!isFormValid}
-              className={`flex-1 py-3 rounded-lg transition-colors ${
-                isFormValid
-                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
+        <DrawerFooter>
+          <Button
+            onClick={handleSave}
+            disabled={!isFormValid}
+            className={`flex-1 ${
+              isFormValid
+                ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
+          >
+            {isEditing ? t('agenda.drawer.saveChanges') : t('agenda.drawer.createAppointment')}
+          </Button>
+          {isEditing && onDelete && (
+            <Button
+              variant="destructive"
+              onClick={() => setShowDeleteConfirm(true)}
+              className="px-6"
             >
-              {isEditing ? t('agenda.drawer.saveChanges') : t('agenda.drawer.createAppointment')}
-            </button>
-            {isEditing && onDelete && (
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="px-6 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors"
-              >
-                {t('common.delete')}
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+              {t('common.delete')}
+            </Button>
+          )}
+        </DrawerFooter>
+      </BaseDrawer>
 
       {/* Save Confirmation Dialog */}
       <ConfirmDialog
@@ -496,6 +490,6 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         onConfirm={confirmDelete}
         isLoading={isSaving}
       />
-    </div>
+    </>
   );
 }

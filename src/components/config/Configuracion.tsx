@@ -1,14 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, MessageCircle, Globe } from 'lucide-react';
+import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, MessageCircle, Globe, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
 import { LanguageSwitcher } from '@/components/shared';
+import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
+import { type DayOffSetting, type DayOffConfig } from '@/lib/types/setting.types';
 
 // ============================================================================
-// SETTINGS STORAGE
+// SETTINGS STORAGE (localStorage for non-API settings)
 // ============================================================================
 
 const SETTINGS_KEY = 'lavenius_settings';
@@ -25,7 +27,7 @@ const WEEKDAY_KEYS = [
   { id: 0, nameKey: 'settings.weekdays.sunday', shortKey: 'settings.weekdays.sun' },
 ];
 
-// Día Off types
+// Día Off types (UI representation)
 type DiaOffTipo = 'full' | 'morning' | 'afternoon' | 'custom';
 
 const DIA_OFF_TIPO_KEYS: { value: DiaOffTipo; labelKey: string; descriptionKey: string }[] = [
@@ -35,13 +37,13 @@ const DIA_OFF_TIPO_KEYS: { value: DiaOffTipo; labelKey: string; descriptionKey: 
   { value: 'custom', labelKey: 'settings.daysOff.customRange', descriptionKey: 'settings.daysOff.custom' },
 ];
 
-interface DiaOff {
-  id: number;
+// UI representation of a day off (for form state)
+interface DiaOffUI {
   fecha: string;
   motivo: string;
   tipo: DiaOffTipo;
-  startTime?: string; // Solo para tipo 'custom'
-  endTime?: string;   // Solo para tipo 'custom'
+  startTime?: string; // Only for 'custom' type
+  endTime?: string;   // Only for 'custom' type
 }
 
 interface WorkingHours {
@@ -55,13 +57,13 @@ interface WhatsAppTemplates {
   paymentReminder: string;
 }
 
-interface AppSettings {
+// LocalStorage settings (non-API settings)
+interface LocalSettings {
   recordatoriosCobros: boolean;
   frecuenciaRecordatorio: string;
   minimoTurnos: number;
   recordatoriosPacientes: boolean;
   horasAnticipacion: number;
-  diasOff: DiaOff[];
   workingHours: WorkingHours;
   whatsappTemplates: WhatsAppTemplates;
 }
@@ -70,16 +72,12 @@ interface AppSettings {
 const DEFAULT_TURNO_TEMPLATE = 'Hola {nombre}! Te recuerdo que tenes un turno agendado para el *{fecha}* a las *{hora}*. Podes confirmar tu asistencia? Responde *Si* para confirmar o *No* si necesitas cancelar. Gracias!';
 const DEFAULT_PAYMENT_TEMPLATE = 'Hola {nombre}! Te escribo para recordarte que tenes un pago pendiente del *{fecha}* por *{monto}*. Podes abonar por transferencia o en efectivo en tu proxima sesion. Gracias!';
 
-const defaultSettings: AppSettings = {
+const defaultLocalSettings: LocalSettings = {
   recordatoriosCobros: true,
   frecuenciaRecordatorio: 'semanal',
   minimoTurnos: 3,
   recordatoriosPacientes: true,
   horasAnticipacion: 24,
-  diasOff: [
-    { id: 1, fecha: '2025-12-25', motivo: 'Navidad', tipo: 'full' },
-    { id: 2, fecha: '2026-01-01', motivo: 'Año Nuevo', tipo: 'full' },
-  ],
   workingHours: {
     startTime: '09:00',
     endTime: '18:00',
@@ -91,19 +89,19 @@ const defaultSettings: AppSettings = {
   },
 };
 
-const loadSettings = (): AppSettings => {
+const loadLocalSettings = (): LocalSettings => {
   try {
     const stored = localStorage.getItem(SETTINGS_KEY);
     if (stored) {
-      return { ...defaultSettings, ...JSON.parse(stored) };
+      return { ...defaultLocalSettings, ...JSON.parse(stored) };
     }
   } catch (error) {
     console.error('Error loading settings:', error);
   }
-  return defaultSettings;
+  return defaultLocalSettings;
 };
 
-const saveSettings = (settings: AppSettings): void => {
+const saveLocalSettings = (settings: LocalSettings): void => {
   try {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   } catch (error) {
@@ -111,6 +109,107 @@ const saveSettings = (settings: AppSettings): void => {
     throw error;
   }
 };
+
+// ============================================================================
+// MAPPING FUNCTIONS: UI <-> API
+// ============================================================================
+
+/**
+ * Build a description for the day off based on type and time range
+ */
+function buildDayOffDescription(diaOff: DiaOffUI): string {
+  const parts: string[] = [];
+  
+  if (diaOff.motivo) {
+    parts.push(diaOff.motivo);
+  }
+  
+  switch (diaOff.tipo) {
+    case 'morning':
+      parts.push('Morning (00:00 - 12:00)');
+      break;
+    case 'afternoon':
+      parts.push('Afternoon (12:00 - 23:59)');
+      break;
+    case 'custom':
+      if (diaOff.startTime && diaOff.endTime) {
+        parts.push(`${diaOff.startTime} - ${diaOff.endTime}`);
+      }
+      break;
+    // 'full' doesn't need additional description
+  }
+  
+  return parts.join(' - ');
+}
+
+/**
+ * Convert UI day off to API format (DayOffConfig)
+ * BE uses fromDate/toDate, UI uses fecha with tipo
+ */
+function uiToApiDayOff(diaOff: DiaOffUI): { config: DayOffConfig; description: string } {
+  // For all types, we use the same date for fromDate and toDate
+  // The type information is stored in the description
+  const config: DayOffConfig = {
+    fromDate: diaOff.fecha,
+    toDate: diaOff.fecha,
+  };
+  
+  const description = buildDayOffDescription(diaOff);
+  
+  return { config, description };
+}
+
+/**
+ * Parse description to extract type and time range
+ */
+function parseDescriptionForType(description?: string): { tipo: DiaOffTipo; motivo: string; startTime?: string; endTime?: string } {
+  if (!description) {
+    return { tipo: 'full', motivo: '' };
+  }
+  
+  // Check for morning pattern
+  if (description.includes('Morning (00:00 - 12:00)')) {
+    const motivo = description.replace(' - Morning (00:00 - 12:00)', '').replace('Morning (00:00 - 12:00)', '').trim();
+    return { tipo: 'morning', motivo };
+  }
+  
+  // Check for afternoon pattern
+  if (description.includes('Afternoon (12:00 - 23:59)')) {
+    const motivo = description.replace(' - Afternoon (12:00 - 23:59)', '').replace('Afternoon (12:00 - 23:59)', '').trim();
+    return { tipo: 'afternoon', motivo };
+  }
+  
+  // Check for custom time range pattern (HH:MM - HH:MM)
+  const timeRangeMatch = description.match(/(\d{2}:\d{2}) - (\d{2}:\d{2})$/);
+  if (timeRangeMatch) {
+    const motivo = description.replace(` - ${timeRangeMatch[0]}`, '').replace(timeRangeMatch[0], '').trim();
+    return { 
+      tipo: 'custom', 
+      motivo, 
+      startTime: timeRangeMatch[1], 
+      endTime: timeRangeMatch[2] 
+    };
+  }
+  
+  // Default: full day with description as motivo
+  return { tipo: 'full', motivo: description };
+}
+
+/**
+ * Convert API day off (DayOffSetting) to UI display format
+ */
+function apiToUiDayOff(setting: DayOffSetting): { id: string; fecha: string; motivo: string; tipo: DiaOffTipo; startTime?: string; endTime?: string } {
+  const { tipo, motivo, startTime, endTime } = parseDescriptionForType(setting.description);
+  
+  return {
+    id: setting.id,
+    fecha: setting.config.fromDate,
+    motivo,
+    tipo,
+    startTime,
+    endTime,
+  };
+}
 
 // ============================================================================
 // SECTION WRAPPER COMPONENT
@@ -214,24 +313,52 @@ const ToggleRow = ({ checked, onChange, label, description }: ToggleRowProps) =>
 export function Configuracion() {
   const { t, i18n } = useTranslation();
   
-  // Load settings from localStorage on mount
-  const [settings, setSettings] = useState<AppSettings>(loadSettings);
+  // Load localStorage settings on mount (for working hours, templates, etc.)
+  const [localSettings, setLocalSettings] = useState<LocalSettings>(loadLocalSettings);
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   
+  // Day off API state from store
+  const { 
+    settings: allSettings,
+    fetchStatus,
+    createDayOff,
+    deleteSetting,
+  } = useSettingStore();
+  
+  // Get day off settings from the store
+  const dayOffSettings = settingSelectors.getDayOffSettings({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
+  const isLoadingSettings = fetchStatus === 'loading';
+  
+  // Convert API day off settings to UI format
+  const diasOffFromApi = dayOffSettings.map(apiToUiDayOff);
+  
+  // Track which day off is being deleted
+  const [deletingDayOffId, setDeletingDayOffId] = useState<string | null>(null);
+  // Track if we're adding a day off
+  const [isAddingDayOff, setIsAddingDayOff] = useState(false);
+  
   // UI state
   const [showAddDiaOff, setShowAddDiaOff] = useState(false);
-  const [newDiaOff, setNewDiaOff] = useState<Omit<DiaOff, 'id'>>({ 
+  const [newDiaOff, setNewDiaOff] = useState<DiaOffUI>({ 
     fecha: '', 
     motivo: '', 
     tipo: 'full',
     startTime: '12:00',
     endTime: '18:00',
   });
+  
+  // Fetch settings on mount
+  useEffect(() => {
+    useSettingStore.getState().fetchSettings().catch((error) => {
+      console.error('Failed to fetch settings:', error);
+      // Don't show toast on initial load failure - graceful degradation
+    });
+  }, []);
 
-  // Update a setting and mark as changed
-  const updateSetting = useCallback(<K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+  // Update a local setting and mark as changed
+  const updateLocalSetting = useCallback(<K extends keyof LocalSettings>(key: K, value: LocalSettings[K]) => {
+    setLocalSettings(prev => ({ ...prev, [key]: value }));
     setHasChanges(true);
   }, []);
 
@@ -250,7 +377,7 @@ export function Configuracion() {
   const handleSave = () => {
     setIsSaving(true);
     try {
-      saveSettings(settings);
+      saveLocalSettings(localSettings);
       setHasChanges(false);
       toast.success(t('settings.messages.saved'));
     } catch {
@@ -260,7 +387,7 @@ export function Configuracion() {
     }
   };
 
-  const handleAddDiaOff = () => {
+  const handleAddDiaOff = async () => {
     if (!newDiaOff.fecha) {
       toast.error(t('settings.messages.selectDate'));
       return;
@@ -276,26 +403,39 @@ export function Configuracion() {
       }
     }
     
-    const diaOffToAdd: DiaOff = {
-      id: Date.now(),
-      fecha: newDiaOff.fecha,
-      motivo: newDiaOff.motivo,
-      tipo: newDiaOff.tipo,
-      ...(newDiaOff.tipo === 'custom' && {
-        startTime: newDiaOff.startTime,
-        endTime: newDiaOff.endTime,
-      }),
-    };
+    setIsAddingDayOff(true);
     
-    updateSetting('diasOff', [...settings.diasOff, diaOffToAdd]);
-    setNewDiaOff({ fecha: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
-    setShowAddDiaOff(false);
-    toast.success(t('settings.daysOff.added'));
+    try {
+      // Convert UI format to API format
+      const { config, description } = uiToApiDayOff(newDiaOff);
+      
+      // Call the API to create the day off
+      await createDayOff(config, description);
+      
+      // Reset form and close
+      setNewDiaOff({ fecha: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
+      setShowAddDiaOff(false);
+      toast.success(t('settings.daysOff.added'));
+    } catch (error) {
+      console.error('Failed to add day off:', error);
+      toast.error(t('settings.messages.saveError'));
+    } finally {
+      setIsAddingDayOff(false);
+    }
   };
 
-  const handleRemoveDiaOff = (id: number) => {
-    updateSetting('diasOff', settings.diasOff.filter(d => d.id !== id));
-    toast.success(t('settings.daysOff.removed'));
+  const handleRemoveDiaOff = async (id: string) => {
+    setDeletingDayOffId(id);
+    
+    try {
+      await deleteSetting(id);
+      toast.success(t('settings.daysOff.removed'));
+    } catch (error) {
+      console.error('Failed to remove day off:', error);
+      toast.error(t('settings.messages.saveError'));
+    } finally {
+      setDeletingDayOffId(null);
+    }
   };
 
   const formatDateDisplay = (fecha: string) => {
@@ -308,7 +448,7 @@ export function Configuracion() {
     });
   };
 
-  const formatDiaOffTime = (dia: DiaOff): string => {
+  const formatDiaOffTime = (dia: { tipo: DiaOffTipo; startTime?: string; endTime?: string }): string => {
     switch (dia.tipo) {
       case 'full':
         return t('settings.daysOff.fullDay');
@@ -355,48 +495,62 @@ export function Configuracion() {
           description={t('settings.daysOff.description')}
         >
           <div className="space-y-4">
-            {/* Lista de días off */}
-            {settings.diasOff.length > 0 ? (
-              <div className="space-y-2">
-                {settings.diasOff.map(dia => (
-                  <div 
-                    key={dia.id} 
-                    className="flex items-center justify-between gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg group hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Calendar className="w-4 h-4 text-rose-600" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900">{formatDateDisplay(dia.fecha)}</p>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-xs text-rose-600 font-medium">{formatDiaOffTime(dia)}</span>
-                          {dia.motivo && (
-                            <>
-                              <span className="text-gray-300">•</span>
-                              <span className="text-xs text-gray-500 truncate">{dia.motivo}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveDiaOff(dia.id)}
-                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                      title={t('common.delete')}
-                      aria-label={t('common.delete')}
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+            {/* Loading state */}
+            {isLoadingSettings && diasOffFromApi.length === 0 ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 text-rose-600 animate-spin" />
               </div>
             ) : (
-              <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-200">
-                <Calendar className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">{t('settings.daysOff.noDaysOff')}</p>
-                <p className="text-xs text-gray-400 mt-1">{t('settings.daysOff.noDaysOffHint')}</p>
-              </div>
+              <>
+                {/* Lista de días off */}
+                {diasOffFromApi.length > 0 ? (
+                  <div className="space-y-2">
+                    {diasOffFromApi.map(dia => (
+                      <div 
+                        key={dia.id} 
+                        className={`flex items-center justify-between gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg group hover:bg-gray-100 transition-colors ${deletingDayOffId === dia.id ? 'opacity-50' : ''}`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Calendar className="w-4 h-4 text-rose-600" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-900">{formatDateDisplay(dia.fecha)}</p>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs text-rose-600 font-medium">{formatDiaOffTime(dia)}</span>
+                              {dia.motivo && (
+                                <>
+                                  <span className="text-gray-300">•</span>
+                                  <span className="text-xs text-gray-500 truncate">{dia.motivo}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveDiaOff(dia.id)}
+                          disabled={deletingDayOffId === dia.id}
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title={t('common.delete')}
+                          aria-label={t('common.delete')}
+                        >
+                          {deletingDayOffId === dia.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <X className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                    <Calendar className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">{t('settings.daysOff.noDaysOff')}</p>
+                    <p className="text-xs text-gray-400 mt-1">{t('settings.daysOff.noDaysOffHint')}</p>
+                  </div>
+                )}
+              </>
             )}
 
             {/* Formulario para agregar */}
@@ -487,15 +641,21 @@ export function Configuracion() {
                       setShowAddDiaOff(false);
                       setNewDiaOff({ fecha: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
                     }}
+                    disabled={isAddingDayOff}
                   >
                     {t('common.cancel')}
                   </Button>
                   <Button
                     size="sm"
                     onClick={handleAddDiaOff}
+                    disabled={isAddingDayOff}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white"
                   >
-                    <Plus className="w-4 h-4 mr-1" />
+                    {isAddingDayOff ? (
+                      <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    ) : (
+                      <Plus className="w-4 h-4 mr-1" />
+                    )}
                     {t('common.add')}
                   </Button>
                 </div>
@@ -534,9 +694,9 @@ export function Configuracion() {
                   <input
                     id="working-hours-start"
                     type="time"
-                    value={settings.workingHours.startTime}
-                    onChange={(e) => updateSetting('workingHours', {
-                      ...settings.workingHours,
+                    value={localSettings.workingHours.startTime}
+                    onChange={(e) => updateLocalSetting('workingHours', {
+                      ...localSettings.workingHours,
                       startTime: e.target.value,
                     })}
                     className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
@@ -547,9 +707,9 @@ export function Configuracion() {
                   <input
                     id="working-hours-end"
                     type="time"
-                    value={settings.workingHours.endTime}
-                    onChange={(e) => updateSetting('workingHours', {
-                      ...settings.workingHours,
+                    value={localSettings.workingHours.endTime}
+                    onChange={(e) => updateLocalSetting('workingHours', {
+                      ...localSettings.workingHours,
                       endTime: e.target.value,
                     })}
                     className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
@@ -565,17 +725,17 @@ export function Configuracion() {
               </legend>
               <div className="flex flex-wrap gap-2" role="group" aria-label={t('settings.workingHours.workingDays')}>
                 {WEEKDAY_KEYS.map((day) => {
-                  const isSelected = settings.workingHours.workingDays.includes(day.id);
+                  const isSelected = localSettings.workingHours.workingDays.includes(day.id);
                   return (
                     <button
                       key={day.id}
                       type="button"
                       onClick={() => {
                         const newDays = isSelected
-                          ? settings.workingHours.workingDays.filter(d => d !== day.id)
-                          : [...settings.workingHours.workingDays, day.id];
-                        updateSetting('workingHours', {
-                          ...settings.workingHours,
+                          ? localSettings.workingHours.workingDays.filter(d => d !== day.id)
+                          : [...localSettings.workingHours.workingDays, day.id];
+                        updateLocalSetting('workingHours', {
+                          ...localSettings.workingHours,
                           workingDays: newDays,
                         });
                       }}
@@ -604,12 +764,12 @@ export function Configuracion() {
             <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
               <p className="text-xs sm:text-sm text-indigo-800">
                 <span className="font-medium">{t('settings.workingHours.yourSchedule')}:</span>{' '}
-                {settings.workingHours.workingDays.length > 0 ? (
+                {localSettings.workingHours.workingDays.length > 0 ? (
                   <>
-                    {WEEKDAY_KEYS.filter(d => settings.workingHours.workingDays.includes(d.id))
+                    {WEEKDAY_KEYS.filter(d => localSettings.workingHours.workingDays.includes(d.id))
                       .map(d => t(d.nameKey))
                       .join(', ')}{' '}
-                    {t('common.from').toLowerCase()} {settings.workingHours.startTime} {t('common.to').toLowerCase()} {settings.workingHours.endTime}
+                    {t('common.from').toLowerCase()} {localSettings.workingHours.startTime} {t('common.to').toLowerCase()} {localSettings.workingHours.endTime}
                   </>
                 ) : (
                   t('settings.workingHours.noWorkingDays')
@@ -633,13 +793,13 @@ export function Configuracion() {
               <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">{t('settings.paymentReminders.automation')}</h3>
                 <ToggleRow
-                  checked={settings.recordatoriosCobros}
-                  onChange={(v) => updateSetting('recordatoriosCobros', v)}
+                  checked={localSettings.recordatoriosCobros}
+                  onChange={(v) => updateLocalSetting('recordatoriosCobros', v)}
                   label={t('settings.paymentReminders.enableAuto')}
                   description={t('settings.paymentReminders.enableAutoHint')}
                 />
 
-                {settings.recordatoriosCobros && (
+                {localSettings.recordatoriosCobros && (
                   <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
                     {/* Frecuencia */}
                     <div className="space-y-2">
@@ -648,8 +808,8 @@ export function Configuracion() {
                       </label>
                       <select
                         id="frecuencia-recordatorio"
-                        value={settings.frecuenciaRecordatorio}
-                        onChange={(e) => updateSetting('frecuenciaRecordatorio', e.target.value)}
+                        value={localSettings.frecuenciaRecordatorio}
+                        onChange={(e) => updateLocalSetting('frecuenciaRecordatorio', e.target.value)}
                         className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
                       >
                         <option value="diario">{t('settings.paymentReminders.daily')}</option>
@@ -669,12 +829,12 @@ export function Configuracion() {
                           type="number"
                           min="1"
                           max="20"
-                          value={settings.minimoTurnos}
-                          onChange={(e) => updateSetting('minimoTurnos', Number(e.target.value))}
+                          value={localSettings.minimoTurnos}
+                          onChange={(e) => updateLocalSetting('minimoTurnos', Number(e.target.value))}
                           className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
                         />
                         <span className="text-sm text-gray-600">
-                          {settings.minimoTurnos === 1 ? t('settings.paymentReminders.sessionsUnpaid') : t('settings.paymentReminders.sessionsUnpaidPlural')}
+                          {localSettings.minimoTurnos === 1 ? t('settings.paymentReminders.sessionsUnpaid') : t('settings.paymentReminders.sessionsUnpaidPlural')}
                         </span>
                       </div>
                     </div>
@@ -682,7 +842,7 @@ export function Configuracion() {
                     {/* Preview */}
                     <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
                       <p className="text-xs sm:text-sm text-orange-800">
-                        <span className="font-medium">{t('settings.paymentReminders.example')}:</span> {t('settings.paymentReminders.exampleText', { count: settings.minimoTurnos })}
+                        <span className="font-medium">{t('settings.paymentReminders.example')}:</span> {t('settings.paymentReminders.exampleText', { count: localSettings.minimoTurnos })}
                       </p>
                     </div>
                   </div>
@@ -704,9 +864,9 @@ export function Configuracion() {
               </p>
               <textarea
                 id="whatsapp-payment-template"
-                value={settings.whatsappTemplates.paymentReminder}
-                onChange={(e) => updateSetting('whatsappTemplates', {
-                  ...settings.whatsappTemplates,
+                value={localSettings.whatsappTemplates.paymentReminder}
+                onChange={(e) => updateLocalSetting('whatsappTemplates', {
+                  ...localSettings.whatsappTemplates,
                   paymentReminder: e.target.value
                 })}
                 rows={3}
@@ -715,8 +875,8 @@ export function Configuracion() {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={() => updateSetting('whatsappTemplates', {
-                    ...settings.whatsappTemplates,
+                  onClick={() => updateLocalSetting('whatsappTemplates', {
+                    ...localSettings.whatsappTemplates,
                     paymentReminder: DEFAULT_PAYMENT_TEMPLATE
                   })}
                   className="text-xs text-indigo-600 hover:text-indigo-800"
@@ -742,13 +902,13 @@ export function Configuracion() {
               <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">{t('settings.appointmentReminders.automation')}</h3>
                 <ToggleRow
-                  checked={settings.recordatoriosPacientes}
-                  onChange={(v) => updateSetting('recordatoriosPacientes', v)}
+                  checked={localSettings.recordatoriosPacientes}
+                  onChange={(v) => updateLocalSetting('recordatoriosPacientes', v)}
                   label={t('settings.appointmentReminders.enableAuto')}
                   description={t('settings.appointmentReminders.enableAutoHint')}
                 />
 
-                {settings.recordatoriosPacientes && (
+                {localSettings.recordatoriosPacientes && (
                   <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
                     {/* Horas de anticipación */}
                     <div className="space-y-2">
@@ -761,8 +921,8 @@ export function Configuracion() {
                           type="number"
                           min="1"
                           max="72"
-                          value={settings.horasAnticipacion}
-                          onChange={(e) => updateSetting('horasAnticipacion', Number(e.target.value))}
+                          value={localSettings.horasAnticipacion}
+                          onChange={(e) => updateLocalSetting('horasAnticipacion', Number(e.target.value))}
                           className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
                         />
                         <span className="text-sm text-gray-600">{t('settings.appointmentReminders.hoursBeforeAppointment')}</span>
@@ -772,7 +932,7 @@ export function Configuracion() {
                     {/* Preview */}
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <p className="text-xs sm:text-sm text-blue-800">
-                        <span className="font-medium">{t('settings.appointmentReminders.example')}:</span> {t('settings.appointmentReminders.exampleText', { hours: settings.horasAnticipacion })}
+                        <span className="font-medium">{t('settings.appointmentReminders.example')}:</span> {t('settings.appointmentReminders.exampleText', { hours: localSettings.horasAnticipacion })}
                       </p>
                     </div>
                   </div>
@@ -794,9 +954,9 @@ export function Configuracion() {
               </p>
               <textarea
                 id="whatsapp-turno-template"
-                value={settings.whatsappTemplates.turnoReminder}
-                onChange={(e) => updateSetting('whatsappTemplates', {
-                  ...settings.whatsappTemplates,
+                value={localSettings.whatsappTemplates.turnoReminder}
+                onChange={(e) => updateLocalSetting('whatsappTemplates', {
+                  ...localSettings.whatsappTemplates,
                   turnoReminder: e.target.value
                 })}
                 rows={3}
@@ -805,8 +965,8 @@ export function Configuracion() {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={() => updateSetting('whatsappTemplates', {
-                    ...settings.whatsappTemplates,
+                  onClick={() => updateLocalSetting('whatsappTemplates', {
+                    ...localSettings.whatsappTemplates,
                     turnoReminder: DEFAULT_TURNO_TEMPLATE
                   })}
                   className="text-xs text-indigo-600 hover:text-indigo-800"

@@ -1,16 +1,32 @@
-import { ArrowLeft, Mail, Phone, Heart, Calendar, FileText, User, Clock, Flag, Edit2, Save, X, Plus, MessageCircle, Pencil, RefreshCw } from 'lucide-react';
+/**
+ * FichaClinica Component
+ * Clinical file view for a single patient
+ * 
+ * Refactored to use sub-components:
+ * - PatientHeader
+ * - ContactInfoCard
+ * - UpcomingSessionsCard
+ * - ClinicalSectionCard
+ * - SessionNotesSection
+ */
+
+import { ArrowLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { TurnoDrawer } from '../agenda';
 import { NoteDrawer } from '../notes/NoteDrawer';
-import { NoteList } from '../notes/NoteList';
 import { PacienteDrawer } from '../pacientes/PacienteDrawer';
+import { PatientHeader } from './PatientHeader';
+import { ContactInfoCard } from './ContactInfoCard';
+import { UpcomingSessionsCard } from './UpcomingSessionsCard';
+import { ClinicalSectionCard } from './ClinicalSectionCard';
+import { SessionNotesSection } from './SessionNotesSection';
 import { usePatients } from '@/lib/hooks';
 import { useNotes } from '@/lib/hooks/useNotes';
 import { useSessions } from '@/lib/stores/sessionStore';
-import { SkeletonNotes, SkeletonSessionCard } from '../shared/Skeleton';
-import type { Patient, CreateNoteDto, UpdateNoteDto, Note, CreatePatientDto } from '@/lib/types/api.types';
+import { getErrorMessage } from '@/lib/utils/error';
+import type { Patient, CreatePatientDto, Note } from '@/lib/types/api.types';
 import type { CreateSessionDto } from '@/lib/types/session';
 
 interface FichaClinicaProps {
@@ -24,17 +40,15 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   const { sessionsUI, isLoading: isLoadingSessions, fetchUpcoming, createSession } = useSessions();
   const { notes, isLoading: isLoadingNotes, error: notesError, fetchNotesByPatient, createNote, updateNote, deleteNote, clearNotes, clearError: clearNotesError } = useNotes();
   
-  // Estado para gestionar flag (basado en riskLevel del paciente)
+  // Flag state
   const [isFlagged, setIsFlagged] = useState(patient?.riskLevel === 'high');
   const [isSavingFlag, setIsSavingFlag] = useState(false);
   
-  // Estado para modo edición inline (contacto)
+  // Edit state
   const [isEditing, setIsEditing] = useState(false);
-  
-  // Estado para drawer de edición completa del paciente
   const [isPacienteDrawerOpen, setIsPacienteDrawerOpen] = useState(false);
   
-  // Estado para datos editables
+  // Editable data
   const [editableData, setEditableData] = useState({
     telefono: patient?.phone || '',
     email: patient?.email || '',
@@ -43,23 +57,23 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     observaciones: patient?.observations || '',
   });
 
-  // Estado para drawer de turnos y notas
+  // Drawer state
   const [isTurnoDrawerOpen, setIsTurnoDrawerOpen] = useState(false);
   const [isNoteDrawerOpen, setIsNoteDrawerOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
-  // Update flag state when patient changes
+  // Update flag when patient changes
   useEffect(() => {
     if (patient) {
       setIsFlagged(patient.riskLevel === 'high');
     }
   }, [patient?.riskLevel]);
 
-  // Load notes when patient ID changes (not the whole patient object)
+  // Load data when patient changes
   useEffect(() => {
     if (patient?.id) {
       fetchNotesByPatient(patient.id);
-      fetchUpcoming(); // Load upcoming sessions
+      fetchUpcoming();
     }
     return () => {
       clearNotes();
@@ -68,20 +82,6 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   }, [patient?.id, fetchNotesByPatient, clearNotes, fetchUpcoming, clearNotesError]);
 
   if (!patient) return null;
-
-  // Helper to format frequency label
-  const getFrecuenciaLabel = (frecuencia?: string) => {
-    switch (frecuencia?.toLowerCase()) {
-      case 'semanal':
-        return t('clinicalFile.frequency.weekly');
-      case 'quincenal':
-        return t('clinicalFile.frequency.biweekly');
-      case 'mensual':
-        return t('clinicalFile.frequency.monthly');
-      default:
-        return frecuencia || t('clinicalFile.frequency.notSpecified');
-    }
-  };
 
   // Calculate age
   let edad = patient.age || 0;
@@ -104,7 +104,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     });
   };
 
-  // Toggle flag and persist to backend
+  // Event handlers
   const handleToggleFlag = async () => {
     const newFlagValue = !isFlagged;
     setIsFlagged(newFlagValue);
@@ -115,10 +115,8 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
         riskLevel: newFlagValue ? 'high' : 'low',
       });
       toast.success(newFlagValue ? t('clinicalFile.messages.riskMarked') : t('clinicalFile.messages.riskRemoved'));
-      // Refresh patients list to update other views
       await fetchPatients();
-    } catch (error) {
-      // Revert on error
+    } catch (error: unknown) {
       setIsFlagged(!newFlagValue);
       console.error('Error updating patient flag:', error);
       toast.error(t('clinicalFile.messages.riskUpdateError'));
@@ -138,14 +136,13 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
       });
       setIsEditing(false);
       toast.success(t('clinicalFile.messages.infoUpdateSuccess'));
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating patient:', error);
       toast.error(t('clinicalFile.messages.infoUpdateError'));
     }
   };
 
   const handleCancelEdit = () => {
-    // Restaurar datos originales
     setEditableData({
       telefono: patient.phone || '',
       email: patient.email || '',
@@ -162,25 +159,25 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
       toast.success(t('clinicalFile.messages.appointmentCreateSuccess'));
       await fetchUpcoming();
       setIsTurnoDrawerOpen(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating session:', error);
-      const errorMessage = error?.message || t('clinicalFile.messages.appointmentCreateError');
+      const errorMessage = getErrorMessage(error, t('clinicalFile.messages.appointmentCreateError'));
       toast.error(errorMessage);
     }
   };
 
-  const handleSaveNote = async (data: CreateNoteDto | UpdateNoteDto, noteId?: string) => {
+  const handleSaveNote = async (data: Parameters<typeof createNote>[0] | Parameters<typeof updateNote>[1], noteId?: string) => {
     try {
       if (noteId) {
-        await updateNote(noteId, data as UpdateNoteDto);
+        await updateNote(noteId, data);
         toast.success(t('clinicalFile.messages.noteUpdateSuccess'));
       } else {
-        await createNote(data as CreateNoteDto);
+        await createNote(data as Parameters<typeof createNote>[0]);
         toast.success(t('clinicalFile.messages.noteCreateSuccess'));
       }
       setIsNoteDrawerOpen(false);
       setSelectedNote(null);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving note:', error);
       toast.error(t('clinicalFile.messages.noteSaveError'));
     }
@@ -195,7 +192,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     try {
       await deleteNote(id);
       toast.success(t('clinicalFile.messages.noteDeleteSuccess'));
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error deleting note:', error);
       toast.error(t('clinicalFile.messages.noteDeleteError'));
     }
@@ -206,15 +203,12 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     setIsNoteDrawerOpen(true);
   };
 
-  // Handler para guardar paciente desde el drawer
   const handleSavePatientFromDrawer = async (patientData: CreatePatientDto) => {
     try {
       await updatePatient(patient.id, patientData);
       toast.success(t('clinicalFile.messages.patientUpdateSuccess'));
       setIsPacienteDrawerOpen(false);
-      // Refresh para actualizar la vista
       await fetchPatients();
-      // Actualizar datos locales editables
       setEditableData({
         telefono: patientData.phone || '',
         email: patientData.email || '',
@@ -222,13 +216,12 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
         tratamientoActual: patientData.currentTreatment || '',
         observaciones: patientData.observations || '',
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating patient:', error);
       toast.error(t('clinicalFile.messages.patientUpdateError'));
     }
   };
 
-  // Send WhatsApp message to patient
   const handleSendWhatsApp = (message?: string) => {
     if (!editableData.telefono) {
       toast.info(t('clinicalFile.messages.noPhone'));
@@ -250,14 +243,13 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     .filter((a) => new Date(a.scheduledFrom) >= today)
     .sort((a, b) => new Date(a.scheduledFrom).getTime() - new Date(b.scheduledFrom).getTime());
 
-  // Get last completed session (past sessions, sorted descending)
   const ultimaConsulta = turnosPaciente
     .filter((s) => new Date(s.scheduledFrom) < today && s.status === 'completed')
     .sort((a, b) => new Date(b.scheduledFrom).getTime() - new Date(a.scheduledFrom).getTime())[0];
 
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
-      {/* Header with Back Button */}
+      {/* Back Button */}
       <button
         onClick={onBack}
         className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 mb-6 transition-colors"
@@ -267,298 +259,85 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
       </button>
 
       {/* Patient Header */}
-      <div className={`bg-gradient-to-r ${isFlagged ? 'from-red-900 to-red-700' : 'from-indigo-900 to-indigo-700'} text-white rounded-lg p-4 md:p-6 lg:p-8 mb-6 transition-colors`}>
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-          <div className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 ${isFlagged ? 'bg-red-600' : 'bg-indigo-600'} rounded-full flex items-center justify-center flex-shrink-0 relative`}>
-            <span className="text-white text-xl sm:text-2xl md:text-3xl">
-              {`${patient.firstName} ${patient.lastName}`.split(' ').map((n) => n[0]).join('')}
-            </span>
-            {isFlagged && (
-              <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
-                <Flag className="w-3.5 h-3.5 text-red-900 fill-current" />
-              </div>
-            )}
-          </div>
-          <div className="flex-1 text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-              <h1 className="text-white text-2xl md:text-3xl">{patient.firstName} {patient.lastName}</h1>
-              {isFlagged && (
-                <span className="px-2 py-0.5 bg-yellow-400 text-red-900 text-xs font-bold rounded">
-                  {t('clinicalFile.highRisk')}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-indigo-200">
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                <span>{edad} años</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Heart className="w-4 h-4" />
-                <span>{patient.healthInsurance || t('clinicalFile.noHealthInsurance')}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <RefreshCw className="w-4 h-4" />
-                <span>{getFrecuenciaLabel(patient.frequency)}</span>
-              </div>
-            </div>
-          </div>
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsPacienteDrawerOpen(true)}
-              className={`p-3 rounded-lg ${isFlagged ? 'hover:bg-red-600' : 'hover:bg-indigo-600'} transition-colors`}
-              title={t('clinicalFile.actions.editPatient')}
-            >
-              <Pencil className={`w-6 h-6 ${isFlagged ? 'text-red-200 hover:text-white' : 'text-indigo-200 hover:text-white'}`} />
-            </button>
-            <button
-              onClick={handleToggleFlag}
-              disabled={isSavingFlag}
-              className={`p-3 rounded-lg ${isFlagged ? 'hover:bg-red-600' : 'hover:bg-indigo-600'} transition-colors disabled:opacity-50`}
-              title={isFlagged ? t('clinicalFile.actions.removeRisk') : t('clinicalFile.actions.markHighRisk')}
-            >
-              <Flag
-                className={`w-6 h-6 ${isFlagged ? 'fill-yellow-400 text-yellow-400' : 'text-indigo-200'}`}
-              />
-            </button>
-          </div>
-        </div>
-      </div>
+      <PatientHeader
+        patient={patient}
+        edad={edad}
+        isFlagged={isFlagged}
+        isSavingFlag={isSavingFlag}
+        onEditPatient={() => setIsPacienteDrawerOpen(true)}
+        onToggleFlag={handleToggleFlag}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Contact & Basic Info */}
+        {/* Left Column */}
         <div className="space-y-6">
-          {/* Contact Information */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-900 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-indigo-600" />
-                {t('clinicalFile.sections.contactInfo')}
-              </h3>
-              {!isEditing && (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="p-1 hover:bg-gray-100 rounded transition-colors"
-                  title={t('clinicalFile.actions.editInfo')}
-                >
-                  <Edit2 className="w-4 h-4 text-gray-600" />
-                </button>
-              )}
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-gray-500 text-sm block mb-1">{t('clinicalFile.fields.phone')}</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={editableData.telefono}
-                    onChange={(e) => setEditableData({ ...editableData, telefono: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                ) : (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-gray-900">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      <span>{editableData.telefono || t('clinicalFile.notRegistered')}</span>
-                    </div>
-                    {editableData.telefono && (
-                      <button
-                        onClick={() => handleSendWhatsApp()}
-                        className="p-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-                        title={t('clinicalFile.actions.sendWhatsApp')}
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-              <div>
-                <label className="text-gray-500 text-sm block mb-1">{t('clinicalFile.fields.email')}</label>
-                {isEditing ? (
-                  <input
-                    type="email"
-                    value={editableData.email}
-                    onChange={(e) => setEditableData({ ...editableData, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                ) : (
-                  <div className="flex items-center gap-2 text-gray-900">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">{editableData.email || t('clinicalFile.notRegistered')}</span>
-                  </div>
-                )}
-              </div>
-              {ultimaConsulta && (
-                <div>
-                  <label className="text-gray-500 text-sm block mb-1">{t('clinicalFile.fields.lastAppointment')}</label>
-                  <div className="flex items-center gap-2 text-gray-900">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span>{formatFecha(ultimaConsulta.scheduledFrom)}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            {isEditing && (
-              <div className="flex gap-2 mt-4">
-                <button
-                  onClick={handleSaveEdit}
-                  className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition-colors"
-                >
-                  <Save className="w-4 h-4" />
-                  <span>{t('common.save')}</span>
-                </button>
-                <button
-                  onClick={handleCancelEdit}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gray-200 text-gray-700 py-2 rounded hover:bg-gray-300 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                  <span>{t('common.cancel')}</span>
-                </button>
-              </div>
-            )}
-          </div>
+          {/* Contact Info */}
+          <ContactInfoCard
+            telefono={editableData.telefono}
+            email={editableData.email}
+            ultimaConsulta={ultimaConsulta?.scheduledFrom}
+            isEditing={isEditing}
+            onTelefonoChange={(value) => setEditableData({ ...editableData, telefono: value })}
+            onEmailChange={(value) => setEditableData({ ...editableData, email: value })}
+            onStartEdit={() => setIsEditing(true)}
+            onSaveEdit={handleSaveEdit}
+            onCancelEdit={handleCancelEdit}
+            onSendWhatsApp={() => handleSendWhatsApp()}
+            formatFecha={formatFecha}
+          />
 
-          {/* Próximos Turnos */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-gray-900 mb-4 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-indigo-600" />
-              {t('clinicalFile.sections.upcomingAppointments')}
-            </h3>
-            {isLoadingSessions ? (
-              <div className="space-y-3">
-                <SkeletonSessionCard />
-                <SkeletonSessionCard />
-              </div>
-            ) : proximosTurnos.length > 0 ? (
-              <div className="space-y-3">
-                {proximosTurnos.map((turno) => {
-                  const dateTime = new Date(turno.scheduledFrom);
-                  const fecha = dateTime.toISOString().split('T')[0];
-                  const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
-                  
-                    return (
-                    <div key={turno.id} className="p-3 bg-indigo-50 rounded border border-indigo-100">
-                      <p className="text-gray-900 text-sm mb-1">{formatFecha(fecha)}</p>
-                      <p className="text-gray-600 text-sm">{hora} - {turno.sessionSummary || t('clinicalFile.defaultSession')}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-sm">{t('clinicalFile.noUpcomingAppointments')}</p>
-            )}
-            
-            {/* Botón Agendar Turno - ahora debajo de Próximos Turnos */}
-            <button
-              onClick={() => setIsTurnoDrawerOpen(true)}
-              className="w-full mt-4 flex items-center justify-center gap-2 bg-indigo-600 text-white py-2.5 rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              {t('clinicalFile.scheduleAppointment')}
-            </button>
-          </div>
+          {/* Upcoming Sessions */}
+          <UpcomingSessionsCard
+            sessions={proximosTurnos}
+            isLoading={isLoadingSessions}
+            formatFecha={formatFecha}
+            onScheduleClick={() => setIsTurnoDrawerOpen(true)}
+          />
         </div>
 
-        {/* Middle & Right Columns - Clinical History */}
+        {/* Middle & Right Columns */}
         <div className="col-span-2 space-y-6">
-          {/* Diagnóstico */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-gray-900 mb-4">{t('clinicalFile.sections.diagnosis')}</h3>
-            {isEditing ? (
-              <textarea
-                value={editableData.diagnostico}
-                onChange={(e) => setEditableData({ ...editableData, diagnostico: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[80px]"
-              />
-            ) : (
-              <p className="text-gray-700 leading-relaxed">
-                {editableData.diagnostico || t('clinicalFile.noDiagnosis')}
-              </p>
-            )}
-          </div>
+          {/* Diagnosis */}
+          <ClinicalSectionCard
+            title={t('clinicalFile.sections.diagnosis')}
+            content={editableData.diagnostico}
+            emptyMessage={t('clinicalFile.noDiagnosis')}
+            isEditing={isEditing}
+            onContentChange={(value) => setEditableData({ ...editableData, diagnostico: value })}
+          />
 
-          {/* Tratamiento Actual */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-gray-900 mb-4">{t('clinicalFile.sections.currentTreatment')}</h3>
-            {isEditing ? (
-              <textarea
-                value={editableData.tratamientoActual}
-                onChange={(e) => setEditableData({ ...editableData, tratamientoActual: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[80px]"
-              />
-            ) : (
-              <p className="text-gray-700 leading-relaxed">
-                {editableData.tratamientoActual || t('clinicalFile.noTreatment')}
-              </p>
-            )}
-          </div>
+          {/* Current Treatment */}
+          <ClinicalSectionCard
+            title={t('clinicalFile.sections.currentTreatment')}
+            content={editableData.tratamientoActual}
+            emptyMessage={t('clinicalFile.noTreatment')}
+            isEditing={isEditing}
+            onContentChange={(value) => setEditableData({ ...editableData, tratamientoActual: value })}
+          />
 
-          {/* Observaciones */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-gray-900 mb-4">{t('clinicalFile.sections.observations')}</h3>
-            {isEditing ? (
-              <textarea
-                value={editableData.observaciones}
-                onChange={(e) => setEditableData({ ...editableData, observaciones: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[80px]"
-              />
-            ) : (
-              <p className="text-gray-700 leading-relaxed">
-                {editableData.observaciones || t('clinicalFile.noObservations')}
-              </p>
-            )}
-          </div>
+          {/* Observations */}
+          <ClinicalSectionCard
+            title={t('clinicalFile.sections.observations')}
+            content={editableData.observaciones}
+            emptyMessage={t('clinicalFile.noObservations')}
+            isEditing={isEditing}
+            onContentChange={(value) => setEditableData({ ...editableData, observaciones: value })}
+          />
 
-          {/* Notas de Sesión */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-900 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-indigo-600" />
-                {t('clinicalFile.sections.sessionNotes')}
-              </h3>
-              <button
-                onClick={handleCreateNote}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                {t('clinicalFile.newNote')}
-              </button>
-            </div>
-            
-            {isLoadingNotes ? (
-              <SkeletonNotes items={3} />
-            ) : notesError ? (
-              <div className="text-center py-8">
-                <FileText className="w-12 h-12 text-amber-400 mx-auto mb-3" />
-                <p className="text-gray-700 text-sm mb-1">{t('clinicalFile.notes.loadError')}</p>
-                <p className="text-gray-500 text-xs mb-3">
-                  {notesError.includes('validación') 
-                    ? t('clinicalFile.notes.canCreateNew')
-                    : t('clinicalFile.notes.tryAgainLater')}
-                </p>
-                <button
-                  onClick={() => patient?.id && fetchNotesByPatient(patient.id)}
-                  className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
-                >
-                  {t('clinicalFile.notes.retry')}
-                </button>
-              </div>
-            ) : (
-              <NoteList
-                notes={notes}
-                onEdit={handleEditNote}
-                onDelete={handleDeleteNote}
-                emptyMessage={t('clinicalFile.notes.noNotes')}
-              />
-            )}
-          </div>
+          {/* Session Notes */}
+          <SessionNotesSection
+            notes={notes}
+            isLoading={isLoadingNotes}
+            error={notesError}
+            onCreateNote={handleCreateNote}
+            onEditNote={handleEditNote}
+            onDeleteNote={handleDeleteNote}
+            onRetry={() => patient?.id && fetchNotesByPatient(patient.id)}
+          />
         </div>
       </div>
 
-      {/* Turno Drawer */}
+      {/* Drawers */}
       <TurnoDrawer
         isOpen={isTurnoDrawerOpen}
         onClose={() => setIsTurnoDrawerOpen(false)}
@@ -567,7 +346,6 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
         onSave={handleSaveTurno}
       />
 
-      {/* Note Drawer */}
       <NoteDrawer
         isOpen={isNoteDrawerOpen}
         onClose={() => {
@@ -579,7 +357,6 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
         patientId={patient.id}
       />
 
-      {/* Paciente Drawer - para edición completa */}
       <PacienteDrawer
         isOpen={isPacienteDrawerOpen}
         onClose={() => setIsPacienteDrawerOpen(false)}

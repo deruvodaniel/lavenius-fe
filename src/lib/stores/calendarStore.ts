@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { calendarService } from '../services/calendarService';
+import { getErrorMessage, getErrorStatusCode } from '../utils/error';
 import { toast } from 'sonner';
 
 interface CalendarInfo {
@@ -74,10 +75,11 @@ export const useCalendarStore = create<CalendarState>()(
         syncStatus,
         isCheckingConnection: false 
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Si el error es 400 "not connected", es normal - no está conectado aún
       // Solo logueamos otros errores
-      if (error?.statusCode !== 400) {
+      const statusCode = getErrorStatusCode(error);
+      if (statusCode !== 400) {
         console.error('Error checking calendar connection:', error);
       }
       set({ 
@@ -190,9 +192,9 @@ export const useCalendarStore = create<CalendarState>()(
       setTimeout(() => {
         clearInterval(checkPopupClosed);
         window.removeEventListener('message', handleMessage);
-      }, 5 * 60 * 1000);
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Error al conectar con Google Calendar';
+        }, 5 * 60 * 1000);
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error, 'Error al conectar con Google Calendar');
       toast.error(errorMessage);
       throw error;
     }
@@ -211,8 +213,8 @@ export const useCalendarStore = create<CalendarState>()(
       
       // Refresh connection to update syncStatus (calendar may have been created)
       useCalendarStore.getState().checkConnection();
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Error al sincronizar calendario';
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error, 'Error al sincronizar calendario');
       toast.error(errorMessage);
       set({ isSyncing: false });
       throw error;
@@ -235,8 +237,8 @@ export const useCalendarStore = create<CalendarState>()(
         },
         lastSyncAt: null 
       });
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Error al desconectar Google Calendar';
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error, 'Error al desconectar Google Calendar');
       toast.error(errorMessage);
       throw error;
     }
