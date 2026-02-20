@@ -4,6 +4,7 @@ import { DollarSign, Calendar, FileText, Sparkles, CalendarRange, Pencil, CheckC
 import { toast } from 'sonner';
 import { BaseDrawer, DrawerBody, DrawerFooter } from '@/components/shared/BaseDrawer';
 import { Button } from '@/components/ui/button';
+import { DatePicker } from '@/components/ui/date-picker';
 import { formatISODate } from '@/lib/utils/dateFormatters';
 import type { CreatePaymentDto, Payment, UpdatePaymentDto } from '@/lib/types/api.types';
 import { PaymentStatus } from '@/lib/types/api.types';
@@ -457,17 +458,14 @@ export const PaymentDrawer = ({
               {/* Payment Date */}
               <div>
                 <label htmlFor="payment-date" className="flex items-center gap-2 text-gray-700 mb-2">
-                  <Calendar className="w-4 h-4" />
                   {t('payments.fields.paymentDate')} <span className="text-red-500">*</span>
                 </label>
-                <input
+                <DatePicker
                   id="payment-date"
-                  type="date"
                   value={formData.paymentDate}
-                  onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  required
+                  onChange={(date) => setFormData({ ...formData, paymentDate: date || '' })}
                   disabled={isLoading || isSaving}
+                  className="w-full"
                 />
               </div>
 

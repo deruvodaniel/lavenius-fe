@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { FileText, Calendar as CalendarIcon, Save } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
+import { DatePicker } from '../ui/date-picker';
 import { BaseDrawer, DrawerBody, DrawerFooter } from '../shared/BaseDrawer';
 import { formatISODate } from '@/lib/utils/dateFormatters';
 import type { Note, CreateNoteDto, UpdateNoteDto } from '@/lib/types/api.types';
@@ -120,19 +121,20 @@ export function NoteDrawer({
             <CalendarIcon className="w-4 h-4 inline mr-1" />
             {t('notes.drawer.noteDate')}
           </label>
-          <input
+          <DatePicker
             id="note-date"
-            type="date"
             value={formatISODate(new Date(formData.noteDate))}
-            onChange={(e) => {
-              // Combine the date from input with current time
-              const selectedDate = new Date(e.target.value);
-              const now = new Date();
-              selectedDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
-              setFormData({ ...formData, noteDate: selectedDate.toISOString() });
+            onChange={(date) => {
+              if (date) {
+                // Combine the date from input with current time
+                const selectedDate = new Date(date);
+                const now = new Date();
+                selectedDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+                setFormData({ ...formData, noteDate: selectedDate.toISOString() });
+              }
             }}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             disabled={isSaving}
+            className="w-full"
           />
         </div>
 

@@ -4,6 +4,7 @@ import { Calendar, Search, ArrowUpDown, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { PaymentStatus } from '@/lib/types/api.types';
 
 // ============================================================================
@@ -168,28 +169,29 @@ export function DateFilters({
               <label htmlFor="date-from" className="text-xs text-gray-500 mb-1 block">
                 {t('payments.filters.from')}
               </label>
-              <Input
+              <DatePicker
                 id="date-from"
-                type="date"
                 value={dateFrom}
-                onChange={(e) => {
-                  onDateFromChange(e.target.value);
+                onChange={(date) => {
+                  onDateFromChange(date || '');
                   onQuickFilterChange('custom');
                 }}
+                className="w-full"
               />
             </div>
             <div>
               <label htmlFor="date-to" className="text-xs text-gray-500 mb-1 block">
                 {t('payments.filters.to')}
               </label>
-              <Input
+              <DatePicker
                 id="date-to"
-                type="date"
                 value={dateTo}
-                onChange={(e) => {
-                  onDateToChange(e.target.value);
+                onChange={(date) => {
+                  onDateToChange(date || '');
                   onQuickFilterChange('custom');
                 }}
+                fromDate={dateFrom ? new Date(dateFrom) : undefined}
+                className="w-full"
               />
             </div>
           </div>

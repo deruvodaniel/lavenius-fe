@@ -50,7 +50,12 @@
     "toggleMenu": "Alternar menu",
     "language": "Idioma",
     "selectLanguage": "Selecionar idioma",
-    "switchTo": "Mudar para"
+    "switchTo": "Mudar para",
+    "datePicker": {
+      "selectDate": "Selecionar data",
+      "selectRange": "Selecionar intervalo",
+      "clear": "Limpar"
+    }
   },
   "navigation": {
     "dashboard": "Painel",

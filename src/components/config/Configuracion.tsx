@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, MessageCircle, Globe, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { DatePicker } from '@/components/ui/date-picker';
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
 import { LanguageSwitcher } from '@/components/shared';
@@ -584,23 +585,21 @@ export function Configuracion() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="diaoff-fecha-inicio" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.startDate')}</label>
-                    <input
+                    <DatePicker
                       id="diaoff-fecha-inicio"
-                      type="date"
                       value={newDiaOff.fechaInicio}
-                      onChange={(e) => setNewDiaOff({ ...newDiaOff, fechaInicio: e.target.value, fechaFin: newDiaOff.fechaFin || e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                      onChange={(date) => setNewDiaOff({ ...newDiaOff, fechaInicio: date || '', fechaFin: newDiaOff.fechaFin || date || '' })}
+                      className="w-full"
                     />
                   </div>
                   <div>
                     <label htmlFor="diaoff-fecha-fin" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.endDate')}</label>
-                    <input
+                    <DatePicker
                       id="diaoff-fecha-fin"
-                      type="date"
                       value={newDiaOff.fechaFin}
-                      min={newDiaOff.fechaInicio}
-                      onChange={(e) => setNewDiaOff({ ...newDiaOff, fechaFin: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                      onChange={(date) => setNewDiaOff({ ...newDiaOff, fechaFin: date || '' })}
+                      fromDate={newDiaOff.fechaInicio ? new Date(newDiaOff.fechaInicio) : undefined}
+                      className="w-full"
                     />
                   </div>
                 </div>

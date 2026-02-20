@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore, usePatientStore } from '@/lib/stores';
 import { ConfirmDialog, BaseDrawer, DrawerBody, DrawerFooter } from '@/components/shared';
 import { Button } from '@/components/ui/button';
+import { DatePicker } from '@/components/ui/date-picker';
 import type { Patient } from '@/lib/types/api.types';
 import { SessionType, SessionStatus } from '@/lib/types/session';
 import type { CreateSessionDto, SessionResponse } from '@/lib/types/session';
@@ -328,15 +329,12 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               <Calendar className="w-4 h-4" />
               {t('agenda.fields.date')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
             </label>
-            <input
+            <DatePicker
               id="turno-fecha"
-              type="date"
               value={formData.fecha}
-              onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                !formData.fecha ? 'border-red-300 bg-red-50' : 'border-gray-300'
-              }`}
-              required
+              onChange={(date) => setFormData({ ...formData, fecha: date || '' })}
+              placeholder={t('common.datePicker.selectDate')}
+              aria-invalid={!formData.fecha}
             />
           </div>
 
