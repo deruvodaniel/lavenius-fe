@@ -55,9 +55,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // React core - always needed
+          // React core - MUST load first, includes scheduler
           if (id.includes('node_modules/react/') || 
               id.includes('node_modules/react-dom/') ||
+              id.includes('node_modules/scheduler/') ||
               id.includes('node_modules/react-router')) {
             return 'vendor-react';
           }
@@ -80,11 +81,8 @@ export default defineConfig({
               id.includes('node_modules/axios')) {
             return 'vendor-state';
           }
-          // i18n libraries
-          if (id.includes('i18next') || 
-              id.includes('node_modules/i18next')) {
-            return 'vendor-i18n';
-          }
+          // i18n libraries - depends on React, so don't separate
+          // Let them bundle with main chunk to ensure correct load order
           // Let other dependencies be handled automatically by Rollup
           return undefined;
         },
