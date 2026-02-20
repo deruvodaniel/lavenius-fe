@@ -3,6 +3,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useSessionStore, useSessions } from '../../lib/stores/sessionStore';
 import { sessionService } from '../../lib/api/sessions';
 import type { CreateSessionDto, SessionResponse, UpdateSessionDto } from '../../lib/types/session';
+import { SessionStatus, SessionType } from '../../lib/types/session';
 
 // Mock the session service
 vi.mock('../../lib/api/sessions', () => ({
@@ -28,29 +29,23 @@ describe('useSessionStore', () => {
   const mockSessions: SessionResponse[] = [
     {
       id: 'session-1',
-      patientId: 'patient-1',
-      patient: mockPatient,
-      therapistId: 'therapist-1',
       scheduledFrom: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
       scheduledTo: new Date(Date.now() + 86400000 + 3600000).toISOString(),
-      status: 'SCHEDULED',
-      sessionType: 'INDIVIDUAL',
-      modality: 'IN_PERSON',
+      status: SessionStatus.PENDING,
+      sessionType: SessionType.PRESENTIAL,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
+      patient: mockPatient,
     },
     {
       id: 'session-2',
-      patientId: 'patient-1',
-      patient: mockPatient,
-      therapistId: 'therapist-1',
       scheduledFrom: new Date(Date.now() + 172800000).toISOString(), // Day after tomorrow
       scheduledTo: new Date(Date.now() + 172800000 + 3600000).toISOString(),
-      status: 'SCHEDULED',
-      sessionType: 'INDIVIDUAL',
-      modality: 'REMOTE',
+      status: SessionStatus.PENDING,
+      sessionType: SessionType.REMOTE,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
+      patient: mockPatient,
     },
   ];
 
@@ -241,22 +236,19 @@ describe('useSessionStore', () => {
       patientId: 'patient-1',
       scheduledFrom: new Date(Date.now() + 86400000).toISOString(),
       scheduledTo: new Date(Date.now() + 86400000 + 3600000).toISOString(),
-      sessionType: 'INDIVIDUAL',
-      modality: 'IN_PERSON',
+      type: SessionType.PRESENTIAL,
+      attendeeEmail: 'patient@test.com',
     };
 
     const createdSession: SessionResponse = {
       id: 'session-3',
-      patientId: 'patient-1',
-      patient: mockPatient,
-      therapistId: 'therapist-1',
       scheduledFrom: newSessionData.scheduledFrom,
       scheduledTo: newSessionData.scheduledTo,
-      status: 'SCHEDULED',
-      sessionType: 'INDIVIDUAL',
-      modality: 'IN_PERSON',
+      status: SessionStatus.PENDING,
+      sessionType: SessionType.PRESENTIAL,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      patient: mockPatient,
     };
 
     it('should call sessionService.create with correct data', async () => {
@@ -368,12 +360,12 @@ describe('useSessionStore', () => {
   // ==================== updateSession Tests ====================
   describe('updateSession', () => {
     const updateData: UpdateSessionDto = {
-      notes: 'Updated notes',
+      sessionSummary: 'Updated notes',
     };
 
     const updatedSession: SessionResponse = {
       ...mockSessions[0],
-      notes: 'Updated notes',
+      sessionSummary: 'Updated notes',
       updatedAt: new Date().toISOString(),
     };
 
@@ -397,7 +389,7 @@ describe('useSessionStore', () => {
 
       const { sessions } = useSessionStore.getState();
       const session = sessions.find((s) => s.id === 'session-1');
-      expect(session?.notes).toBe('Updated notes');
+      expect(session?.sessionSummary).toBe('Updated notes');
     });
 
     it('should return updated session', async () => {
@@ -514,7 +506,7 @@ describe('useSessionStore', () => {
   describe('markAsCompleted', () => {
     const completedSession: SessionResponse = {
       ...mockSessions[0],
-      status: 'COMPLETED',
+      status: SessionStatus.COMPLETED,
       updatedAt: new Date().toISOString(),
     };
 
@@ -538,7 +530,7 @@ describe('useSessionStore', () => {
 
       const { sessions } = useSessionStore.getState();
       const session = sessions.find((s) => s.id === 'session-1');
-      expect(session?.status).toBe('COMPLETED');
+      expect(session?.status).toBe(SessionStatus.COMPLETED);
     });
 
     it('should set isLoading during request', async () => {
@@ -595,29 +587,23 @@ describe('useSessionStore', () => {
     const sessionsWithValidDates: SessionResponse[] = [
       {
         id: 'session-today',
-        patientId: 'patient-1',
-        patient: mockPatient,
-        therapistId: 'therapist-1',
         scheduledFrom: new Date().toISOString(), // Today
         scheduledTo: new Date(Date.now() + 3600000).toISOString(),
-        status: 'SCHEDULED',
-        sessionType: 'INDIVIDUAL',
-        modality: 'IN_PERSON',
+        status: SessionStatus.PENDING,
+        sessionType: SessionType.PRESENTIAL,
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',
+        patient: mockPatient,
       },
       {
         id: 'session-past',
-        patientId: 'patient-1',
-        patient: mockPatient,
-        therapistId: 'therapist-1',
         scheduledFrom: new Date(Date.now() - 86400000).toISOString(), // Yesterday
         scheduledTo: new Date(Date.now() - 86400000 + 3600000).toISOString(),
-        status: 'COMPLETED',
-        sessionType: 'INDIVIDUAL',
-        modality: 'REMOTE',
+        status: SessionStatus.COMPLETED,
+        sessionType: SessionType.REMOTE,
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',
+        patient: mockPatient,
       },
     ];
 
@@ -777,7 +763,7 @@ describe('useSessionStore', () => {
       vi.mocked(sessionService.update).mockResolvedValue(nonExistentSession);
 
       await act(async () => {
-        await useSessionStore.getState().updateSession('non-existent', { notes: 'test' });
+        await useSessionStore.getState().updateSession('non-existent', { sessionSummary: 'test' });
       });
 
       // Should not add new session, list should remain unchanged

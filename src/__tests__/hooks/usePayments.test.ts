@@ -76,7 +76,7 @@ describe('usePayments', () => {
     payments: mockPayments,
     totals: mockTotals,
     pagination: mockPagination,
-    fetchStatus: 'success' as const,
+    fetchStatus: 'success' as 'idle' | 'loading' | 'success' | 'error',
     error: null as Error | null,
     fetchPayments: mockFetchPayments,
     createPayment: mockCreatePayment,
@@ -291,7 +291,7 @@ describe('usePayments', () => {
       });
 
       it('fetchPayments passes filters parameter', async () => {
-        const filters = { status: PaymentStatus.PAID };
+        const filters = { search: 'test' };
         mockFetchPayments.mockResolvedValue(undefined);
         const { result } = renderHook(() => usePayments());
 

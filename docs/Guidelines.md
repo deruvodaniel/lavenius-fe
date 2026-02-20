@@ -1,6 +1,38 @@
 # Lavenius Frontend Guidelines
 
-> Última actualización: Febrero 14, 2026
+> Última actualización: Febrero 19, 2026
+
+## Pre-Commit Validation (MANDATORY)
+
+**All code MUST pass these checks before committing:**
+
+| Command | Requirement | Description |
+|---------|-------------|-------------|
+| `pnpm run type-check` | 0 errors | TypeScript compilation check |
+| `pnpm run lint` | No errors | ESLint (warnings allowed) |
+| `pnpm run test -- --run` | All pass | Vitest test suite |
+| `pnpm run build` | Success | Production build |
+
+**Quick validation (run from fe-lavenius/):**
+```bash
+pnpm run type-check && pnpm run lint && pnpm run test -- --run && pnpm run build
+```
+
+### Common TypeScript Errors in Tests
+
+| Error Pattern | Fix |
+|--------------|-----|
+| Mock missing properties | Add ALL required: `therapistId`, `createdAt`, `updatedAt` |
+| String literal for enum | Use `SessionStatus.PENDING` not `'SCHEDULED'` |
+| Mock returning undefined | Cast: `as unknown as ReturnType<typeof hook>` |
+| Wrong property name | Check: `limit` not `pageSize`, `type` not `sessionType` |
+| PaymentFilters wrong props | Uses `search`, `from`, `to` - NOT `status` |
+
+### Type Definition Reference
+
+- **Patient, Payment, PatientStatus, PaymentStatus** → `src/lib/types/api.types.ts`
+- **SessionResponse, SessionStatus, SessionType, CreateSessionDto** → `src/lib/types/session.ts`
+- **PaymentTotals, PaginationInfo, PaymentFilters** → `src/lib/services/payment.service.ts`
 
 ## General Guidelines
 

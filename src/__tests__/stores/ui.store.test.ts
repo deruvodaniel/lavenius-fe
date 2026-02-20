@@ -173,6 +173,7 @@ describe('useUIStore', () => {
       interface TestData {
         id: string;
         name: string;
+        [key: string]: unknown;
       }
       const testData: TestData = { id: '123', name: 'Test Patient' };
       useUIStore.getState().openDrawer('paciente', testData);

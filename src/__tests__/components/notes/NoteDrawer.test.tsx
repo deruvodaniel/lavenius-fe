@@ -732,10 +732,10 @@ describe('NoteDrawer', () => {
 
     it('does not close when saving is in progress', async () => {
       const user = userEvent.setup();
-      let resolvePromise: () => void;
+      let resolvePromise: () => void = () => {};
       mockOnSave.mockImplementation(
         () =>
-          new Promise((resolve) => {
+          new Promise<void>((resolve) => {
             resolvePromise = resolve;
           })
       );

@@ -187,7 +187,7 @@ describe('Sidebar', () => {
 
     it('does not render user section when user is null', () => {
       mockUseAuth.mockReturnValue({
-        user: null,
+        user: null as unknown as { id: string; firstName: string; lastName: string; email: string },
         isAuthenticated: false,
         isLoading: false,
         error: null,

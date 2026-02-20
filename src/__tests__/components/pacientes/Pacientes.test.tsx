@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Pacientes } from '../../../components/pacientes/Pacientes';
+import { PatientStatus, SessionType } from '@/lib/types/api.types';
+import type { Patient } from '@/lib/types/api.types';
 
 // ============================================================================
 // BROWSER API MOCKS
@@ -36,48 +38,51 @@ beforeAll(() => {
 // MOCK DATA
 // ============================================================================
 
-const mockPatients = [
+const mockPatients: Patient[] = [
   {
     id: 'patient-1',
+    therapistId: 'therapist-1',
     firstName: 'Juan',
     lastName: 'Perez',
     email: 'juan@test.com',
     phone: '+5491123456789',
-    status: 'ACTIVE' as const,
+    status: PatientStatus.ACTIVE,
     notes: '',
     healthInsurance: 'OSDE',
     birthDate: '1990-05-15',
-    sessionType: 'presential',
+    sessionType: SessionType.PRESENTIAL,
     frequency: 'semanal',
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
   },
   {
     id: 'patient-2',
+    therapistId: 'therapist-1',
     firstName: 'Maria',
     lastName: 'Garcia',
     email: 'maria@test.com',
     phone: '+5491198765432',
-    status: 'ACTIVE' as const,
+    status: PatientStatus.ACTIVE,
     notes: '',
     healthInsurance: 'Swiss Medical',
     birthDate: '1985-08-20',
-    sessionType: 'remote',
+    sessionType: SessionType.REMOTE,
     frequency: 'quincenal',
     createdAt: '2024-01-02T00:00:00.000Z',
     updatedAt: '2024-01-02T00:00:00.000Z',
   },
   {
     id: 'patient-3',
+    therapistId: 'therapist-1',
     firstName: 'Carlos',
     lastName: 'Lopez',
     email: 'carlos@test.com',
     phone: '+5491155555555',
-    status: 'ACTIVE' as const,
+    status: PatientStatus.ACTIVE,
     notes: '',
     healthInsurance: 'Galeno',
     birthDate: '1978-12-01',
-    sessionType: 'presential',
+    sessionType: SessionType.PRESENTIAL,
     frequency: 'mensual',
     createdAt: '2024-01-03T00:00:00.000Z',
     updatedAt: '2024-01-03T00:00:00.000Z',
@@ -351,8 +356,8 @@ describe('Pacientes', () => {
       fetchPatients: mockFetchPatients,
       fetchPatientById: mockFetchPatientById,
       setSelectedPatient: mockSetSelectedPatient,
-      createPatient: mockCreatePatient,
-      updatePatient: mockUpdatePatient,
+      createPatient: mockCreatePatient as unknown as ReturnType<typeof mockedUsePatients>['createPatient'],
+      updatePatient: mockUpdatePatient as unknown as ReturnType<typeof mockedUsePatients>['updatePatient'],
       deletePatient: mockDeletePatient,
       searchPatients: vi.fn(() => Promise.resolve([])),
       clearError: mockClearError,
@@ -492,8 +497,8 @@ describe('Pacientes', () => {
         fetchPatients: mockFetchPatients,
         fetchPatientById: mockFetchPatientById,
         setSelectedPatient: mockSetSelectedPatient,
-        createPatient: mockCreatePatient,
-        updatePatient: mockUpdatePatient,
+        createPatient: mockCreatePatient as unknown as ReturnType<typeof mockedUsePatients>['createPatient'],
+        updatePatient: mockUpdatePatient as unknown as ReturnType<typeof mockedUsePatients>['updatePatient'],
         deletePatient: mockDeletePatient,
         searchPatients: vi.fn(() => Promise.resolve([])),
         clearError: mockClearError,
@@ -521,8 +526,8 @@ describe('Pacientes', () => {
         fetchPatients: mockFetchPatients,
         fetchPatientById: mockFetchPatientById,
         setSelectedPatient: mockSetSelectedPatient,
-        createPatient: mockCreatePatient,
-        updatePatient: mockUpdatePatient,
+        createPatient: mockCreatePatient as unknown as ReturnType<typeof mockedUsePatients>['createPatient'],
+        updatePatient: mockUpdatePatient as unknown as ReturnType<typeof mockedUsePatients>['updatePatient'],
         deletePatient: mockDeletePatient,
         searchPatients: vi.fn(() => Promise.resolve([])),
         clearError: mockClearError,
@@ -545,8 +550,8 @@ describe('Pacientes', () => {
         fetchPatients: mockFetchPatients,
         fetchPatientById: mockFetchPatientById,
         setSelectedPatient: mockSetSelectedPatient,
-        createPatient: mockCreatePatient,
-        updatePatient: mockUpdatePatient,
+        createPatient: mockCreatePatient as unknown as ReturnType<typeof mockedUsePatients>['createPatient'],
+        updatePatient: mockUpdatePatient as unknown as ReturnType<typeof mockedUsePatients>['updatePatient'],
         deletePatient: mockDeletePatient,
         searchPatients: vi.fn(() => Promise.resolve([])),
         clearError: mockClearError,

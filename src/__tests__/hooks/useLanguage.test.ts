@@ -44,7 +44,7 @@ describe('useLanguage', () => {
       t: vi.fn((key: string) => key),
       i18n,
       ready: true,
-    } as ReturnType<typeof useTranslation>);
+    } as unknown as ReturnType<typeof useTranslation>);
     return i18n;
   };
 

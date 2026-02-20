@@ -5,6 +5,7 @@ import { TurnoDrawer } from '../../../components/agenda/TurnoDrawer';
 import { SessionStatus, SessionType } from '@/lib/types/session';
 import type { SessionResponse } from '@/lib/types/session';
 import type { Patient } from '@/lib/types/api.types';
+import { PatientStatus } from '@/lib/types/api.types';
 
 // ============================================================================
 // MOCKS
@@ -87,7 +88,8 @@ vi.mock('@/lib/stores', () => ({
     const state = { user: mockUser };
     return selector(state);
   }),
-  usePatientStore: vi.fn((selector) => {
+   
+  usePatientStore: vi.fn((selector: any) => {
     const state = {
       fetchPatientById: mockFetchPatientById,
       selectedPatient: mockSelectedPatient,
@@ -151,7 +153,7 @@ const mockPatients: Patient[] = [
     lastName: 'Pérez',
     email: 'juan@test.com',
     phone: '+5491112345678',
-    status: 'ACTIVE' as const,
+    status: PatientStatus.ACTIVE,
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
   },
@@ -162,7 +164,7 @@ const mockPatients: Patient[] = [
     lastName: 'García',
     email: 'maria@test.com',
     phone: '+5491198765432',
-    status: 'ACTIVE' as const,
+    status: PatientStatus.ACTIVE,
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
   },
@@ -173,7 +175,7 @@ const mockPatients: Patient[] = [
     lastName: 'López',
     // No email - for testing validation
     phone: '+5491111111111',
-    status: 'ACTIVE' as const,
+    status: PatientStatus.ACTIVE,
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
   },
@@ -223,8 +225,9 @@ describe('TurnoDrawer', () => {
         const state = {
           fetchPatientById: mockFetchPatientById,
           selectedPatient: patient || null,
-        };
-        return selector(state);
+        } as unknown;
+         
+        return (selector as any)(state);
       });
       return patient;
     });
@@ -558,8 +561,9 @@ describe('TurnoDrawer', () => {
         const state = {
           fetchPatientById: mockFetchPatientById,
           selectedPatient: patientWithEmail,
-        };
-        return selector(state);
+        } as unknown;
+         
+        return (selector as any)(state);
       });
 
       render(
@@ -644,8 +648,9 @@ describe('TurnoDrawer', () => {
         const state = {
           fetchPatientById: mockFetchPatientById,
           selectedPatient: patientWithoutEmail,
-        };
-        return selector(state);
+        } as unknown;
+         
+        return (selector as any)(state);
       });
 
       render(
@@ -684,8 +689,9 @@ describe('TurnoDrawer', () => {
         const state = {
           fetchPatientById: mockFetchPatientById,
           selectedPatient: patientWithEmail,
-        };
-        return selector(state);
+        } as unknown;
+         
+        return (selector as any)(state);
       });
 
       render(
@@ -723,8 +729,9 @@ describe('TurnoDrawer', () => {
         const state = {
           fetchPatientById: mockFetchPatientById,
           selectedPatient: patientWithEmail,
-        };
-        return selector(state);
+        } as unknown;
+         
+        return (selector as any)(state);
       });
 
       render(
@@ -765,8 +772,9 @@ describe('TurnoDrawer', () => {
         const state = {
           fetchPatientById: mockFetchPatientById,
           selectedPatient: patientWithEmail,
-        };
-        return selector(state);
+        } as unknown;
+         
+        return (selector as any)(state);
       });
 
       render(
@@ -826,8 +834,9 @@ describe('TurnoDrawer', () => {
         const state = {
           fetchPatientById: mockFetchPatientById,
           selectedPatient: patientWithEmail,
-        };
-        return selector(state);
+        } as unknown;
+         
+        return (selector as any)(state);
       });
 
       render(
@@ -871,8 +880,9 @@ describe('TurnoDrawer', () => {
         const state = {
           fetchPatientById: mockFetchPatientById,
           selectedPatient: patientWithEmail,
-        };
-        return selector(state);
+        } as unknown;
+         
+        return (selector as any)(state);
       });
 
       render(
@@ -1004,8 +1014,9 @@ describe('TurnoDrawer', () => {
         const state = {
           fetchPatientById: mockFetchPatientById,
           selectedPatient: patientWithEmail,
-        };
-        return selector(state);
+        } as unknown;
+         
+        return (selector as any)(state);
       });
 
       render(
@@ -1048,8 +1059,9 @@ describe('TurnoDrawer', () => {
         const state = {
           fetchPatientById: mockFetchPatientById,
           selectedPatient: patientWithEmail,
-        };
-        return selector(state);
+        } as unknown;
+         
+        return (selector as any)(state);
       });
 
       render(
@@ -1253,8 +1265,9 @@ describe('TurnoDrawer', () => {
         const state = {
           fetchPatientById: mockFetchPatientById,
           selectedPatient: patientWithEmail,
-        };
-        return selector(state);
+        } as unknown;
+         
+        return (selector as any)(state);
       });
 
       render(
