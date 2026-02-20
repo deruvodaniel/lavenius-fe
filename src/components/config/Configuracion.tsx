@@ -229,7 +229,7 @@ interface ConfigSectionProps {
 }
 
 const ConfigSection = ({ icon: Icon, iconColor, iconBg, title, description, children, comingSoon, comingSoonText = 'Coming soon' }: ConfigSectionProps) => (
-  <Card className={`overflow-hidden relative bg-white ${comingSoon ? 'select-none' : ''}`}>
+  <Card className={`relative bg-white ${comingSoon ? 'select-none' : ''}`}>
     {/* Coming Soon Overlay */}
     {comingSoon && (
       <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-[1px] z-10 flex items-center justify-center">
