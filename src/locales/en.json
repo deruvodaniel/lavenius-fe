@@ -1051,8 +1051,8 @@
     },
     "security": {
       "title": "Clinical-grade security",
-      "description": "All your patient data is encrypted end-to-end. We comply with the highest security standards to protect sensitive information.",
-      "encryption": "Encryption",
+      "description": "All your patient data is protected with AES-256-GCM encryption end-to-end. We comply with the highest security standards to protect sensitive information.",
+      "encryption": "AES-256-GCM encryption",
       "e2e": "End-to-end"
     },
     "cta": {

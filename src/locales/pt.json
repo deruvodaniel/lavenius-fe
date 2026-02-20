@@ -1051,8 +1051,8 @@
     },
     "security": {
       "title": "Segurança de nível clínico",
-      "description": "Todos os dados dos seus pacientes são criptografados de ponta a ponta. Cumprimos os mais altos padrões de segurança para proteger informações sensíveis.",
-      "encryption": "Criptografia",
+      "description": "Todos os dados dos seus pacientes são protegidos com criptografia AES-256-GCM de ponta a ponta. Cumprimos os mais altos padrões de segurança para proteger informações sensíveis.",
+      "encryption": "Criptografia AES-256-GCM",
       "e2e": "Ponta a ponta"
     },
     "cta": {

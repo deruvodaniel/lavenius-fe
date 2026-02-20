@@ -1051,8 +1051,8 @@
     },
     "security": {
       "title": "Seguridad de nivel clínico",
-      "description": "Todos los datos de tus pacientes están encriptados de extremo a extremo. Cumplimos con los más altos estándares de seguridad para proteger la información sensible.",
-      "encryption": "Encriptación",
+      "description": "Todos los datos de tus pacientes están protegidos con cifrado AES-256-GCM de extremo a extremo. Cumplimos con los más altos estándares de seguridad para proteger la información sensible.",
+      "encryption": "Cifrado AES-256-GCM",
       "e2e": "Extremo a extremo"
     },
     "cta": {
