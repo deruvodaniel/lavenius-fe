@@ -39,7 +39,8 @@ const DIA_OFF_TIPO_KEYS: { value: DiaOffTipo; labelKey: string; descriptionKey: 
 
 // UI representation of a day off (for form state)
 interface DiaOffUI {
-  fecha: string;
+  fechaInicio: string;
+  fechaFin: string;
   motivo: string;
   tipo: DiaOffTipo;
   startTime?: string; // Only for 'custom' type
@@ -144,14 +145,13 @@ function buildDayOffDescription(diaOff: DiaOffUI): string {
 
 /**
  * Convert UI day off to API format (DayOffConfig)
- * BE uses fromDate/toDate, UI uses fecha with tipo
+ * BE uses fromDate/toDate, UI uses fechaInicio/fechaFin with tipo
  */
 function uiToApiDayOff(diaOff: DiaOffUI): { config: DayOffConfig; description: string } {
-  // For all types, we use the same date for fromDate and toDate
-  // The type information is stored in the description
+  // Map UI dates to API format
   const config: DayOffConfig = {
-    fromDate: diaOff.fecha,
-    toDate: diaOff.fecha,
+    fromDate: diaOff.fechaInicio,
+    toDate: diaOff.fechaFin,
   };
   
   const description = buildDayOffDescription(diaOff);
@@ -198,12 +198,13 @@ function parseDescriptionForType(description?: string): { tipo: DiaOffTipo; moti
 /**
  * Convert API day off (DayOffSetting) to UI display format
  */
-function apiToUiDayOff(setting: DayOffSetting): { id: string; fecha: string; motivo: string; tipo: DiaOffTipo; startTime?: string; endTime?: string } {
+function apiToUiDayOff(setting: DayOffSetting): { id: string; fechaInicio: string; fechaFin: string; motivo: string; tipo: DiaOffTipo; startTime?: string; endTime?: string } {
   const { tipo, motivo, startTime, endTime } = parseDescriptionForType(setting.description);
   
   return {
     id: setting.id,
-    fecha: setting.config.fromDate,
+    fechaInicio: setting.config.fromDate,
+    fechaFin: setting.config.toDate,
     motivo,
     tipo,
     startTime,
@@ -341,7 +342,8 @@ export function Configuracion() {
   // UI state
   const [showAddDiaOff, setShowAddDiaOff] = useState(false);
   const [newDiaOff, setNewDiaOff] = useState<DiaOffUI>({ 
-    fecha: '', 
+    fechaInicio: '', 
+    fechaFin: '',
     motivo: '', 
     tipo: 'full',
     startTime: '12:00',
@@ -388,8 +390,12 @@ export function Configuracion() {
   };
 
   const handleAddDiaOff = async () => {
-    if (!newDiaOff.fecha) {
+    if (!newDiaOff.fechaInicio || !newDiaOff.fechaFin) {
       toast.error(t('settings.messages.selectDate'));
+      return;
+    }
+    if (newDiaOff.fechaFin < newDiaOff.fechaInicio) {
+      toast.error(t('settings.messages.endDateBeforeStart'));
       return;
     }
     if (newDiaOff.tipo === 'custom') {
@@ -413,7 +419,7 @@ export function Configuracion() {
       await createDayOff(config, description);
       
       // Reset form and close
-      setNewDiaOff({ fecha: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
+      setNewDiaOff({ fechaInicio: '', fechaFin: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
       setShowAddDiaOff(false);
       toast.success(t('settings.daysOff.added'));
     } catch (error) {
@@ -446,6 +452,24 @@ export function Configuracion() {
       month: 'short',
       year: 'numeric',
     });
+  };
+
+  const formatDateRangeDisplay = (fechaInicio: string, fechaFin: string) => {
+    if (fechaInicio === fechaFin) {
+      return formatDateDisplay(fechaInicio);
+    }
+    const locale = i18n.language === 'en' ? 'en-US' : i18n.language === 'pt' ? 'pt-BR' : 'es-AR';
+    const startDate = new Date(fechaInicio + 'T00:00:00').toLocaleDateString(locale, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+    const endDate = new Date(fechaFin + 'T00:00:00').toLocaleDateString(locale, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+    return `${startDate} - ${endDate}`;
   };
 
   const formatDiaOffTime = (dia: { tipo: DiaOffTipo; startTime?: string; endTime?: string }): string => {
@@ -515,7 +539,7 @@ export function Configuracion() {
                             <Calendar className="w-4 h-4 text-rose-600" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-medium text-gray-900">{formatDateDisplay(dia.fecha)}</p>
+                            <p className="text-sm font-medium text-gray-900">{formatDateRangeDisplay(dia.fechaInicio, dia.fechaFin)}</p>
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-xs text-rose-600 font-medium">{formatDiaOffTime(dia)}</span>
                               {dia.motivo && (
@@ -556,29 +580,42 @@ export function Configuracion() {
             {/* Formulario para agregar */}
             {showAddDiaOff ? (
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-4">
-                {/* Fecha y Motivo */}
+                {/* Fecha Inicio y Fecha Fin */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="diaoff-fecha" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.date')}</label>
+                    <label htmlFor="diaoff-fecha-inicio" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.startDate')}</label>
                     <input
-                      id="diaoff-fecha"
+                      id="diaoff-fecha-inicio"
                       type="date"
-                      value={newDiaOff.fecha}
-                      onChange={(e) => setNewDiaOff({ ...newDiaOff, fecha: e.target.value })}
+                      value={newDiaOff.fechaInicio}
+                      onChange={(e) => setNewDiaOff({ ...newDiaOff, fechaInicio: e.target.value, fechaFin: newDiaOff.fechaFin || e.target.value })}
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
                     />
                   </div>
                   <div>
-                    <label htmlFor="diaoff-motivo" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.reason')} ({t('common.optional')})</label>
+                    <label htmlFor="diaoff-fecha-fin" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.endDate')}</label>
                     <input
-                      id="diaoff-motivo"
-                      type="text"
-                      value={newDiaOff.motivo}
-                      onChange={(e) => setNewDiaOff({ ...newDiaOff, motivo: e.target.value })}
-                      placeholder={t('settings.daysOff.reasonPlaceholder')}
+                      id="diaoff-fecha-fin"
+                      type="date"
+                      value={newDiaOff.fechaFin}
+                      min={newDiaOff.fechaInicio}
+                      onChange={(e) => setNewDiaOff({ ...newDiaOff, fechaFin: e.target.value })}
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
                     />
                   </div>
+                </div>
+
+                {/* Motivo */}
+                <div>
+                  <label htmlFor="diaoff-motivo" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.reason')} ({t('common.optional')})</label>
+                  <input
+                    id="diaoff-motivo"
+                    type="text"
+                    value={newDiaOff.motivo}
+                    onChange={(e) => setNewDiaOff({ ...newDiaOff, motivo: e.target.value })}
+                    placeholder={t('settings.daysOff.reasonPlaceholder')}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                  />
                 </div>
 
                 {/* Tipo de día off */}
@@ -639,7 +676,7 @@ export function Configuracion() {
                     size="sm"
                     onClick={() => {
                       setShowAddDiaOff(false);
-                      setNewDiaOff({ fecha: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
+                      setNewDiaOff({ fechaInicio: '', fechaFin: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
                     }}
                     disabled={isAddingDayOff}
                   >

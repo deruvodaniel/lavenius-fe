@@ -644,6 +644,8 @@
       "noDaysOff": "Nenhum dia de folga configurado",
       "noDaysOffHint": "Adicione dias para bloqueá-los na sua agenda",
       "date": "Data",
+      "startDate": "Data início",
+      "endDate": "Data fim",
       "reason": "Motivo",
       "reasonPlaceholder": "Ex: Feriado, Férias...",
       "blockType": "Tipo de bloqueio",
@@ -703,7 +705,8 @@
       "saveError": "Erro ao salvar configurações",
       "selectDate": "Selecione uma data",
       "selectTimeRange": "Selecione o intervalo de horário",
-      "startBeforeEnd": "O horário de início deve ser anterior ao horário de término"
+      "startBeforeEnd": "O horário de início deve ser anterior ao horário de término",
+      "endDateBeforeStart": "A data de fim não pode ser anterior à data de início"
     },
     "weekdays": {
       "monday": "Segunda-feira",

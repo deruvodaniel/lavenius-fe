@@ -644,6 +644,8 @@
       "noDaysOff": "No days off configured",
       "noDaysOffHint": "Add days to block them in your schedule",
       "date": "Date",
+      "startDate": "Start date",
+      "endDate": "End date",
       "reason": "Reason",
       "reasonPlaceholder": "E.g.: Holiday, Vacation...",
       "blockType": "Block type",
@@ -703,7 +705,8 @@
       "saveError": "Error saving settings",
       "selectDate": "Select a date",
       "selectTimeRange": "Select time range",
-      "startBeforeEnd": "Start time must be before end time"
+      "startBeforeEnd": "Start time must be before end time",
+      "endDateBeforeStart": "End date cannot be before start date"
     },
     "weekdays": {
       "monday": "Monday",
