@@ -1,15 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, MessageCircle, Globe, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
 import { LanguageSwitcher } from '@/components/shared';
 import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
-import { type DayOffSetting, type DayOffConfig } from '@/lib/types/setting.types';
+import { type DayOffConfig, type DayOffSetting, PaymentReminderFrequency } from '@/lib/types/setting.types';
 import { cn } from '@/components/ui/utils';
 
 // ============================================================================
@@ -80,12 +83,9 @@ interface WhatsAppTemplates {
 }
 
 // LocalStorage settings (non-API settings)
+// Note: Reminder settings (recordatoriosCobros, recordatoriosPacientes, etc.) 
+// are now stored in the backend via the settings API
 interface LocalSettings {
-  recordatoriosCobros: boolean;
-  frecuenciaRecordatorio: string;
-  minimoTurnos: number;
-  recordatoriosPacientes: boolean;
-  horasAnticipacion: number;
   workingHours: WorkingHours;
   whatsappTemplates: WhatsAppTemplates;
 }
@@ -95,11 +95,6 @@ const DEFAULT_TURNO_TEMPLATE = 'Hola {nombre}! Te recuerdo que tenes un turno ag
 const DEFAULT_PAYMENT_TEMPLATE = 'Hola {nombre}! Te escribo para recordarte que tenes un pago pendiente del *{fecha}* por *{monto}*. Podes abonar por transferencia o en efectivo en tu proxima sesion. Gracias!';
 
 const defaultLocalSettings: LocalSettings = {
-  recordatoriosCobros: true,
-  frecuenciaRecordatorio: 'semanal',
-  minimoTurnos: 3,
-  recordatoriosPacientes: true,
-  horasAnticipacion: 24,
   workingHours: {
     startTime: '09:00',
     endTime: '18:00',
@@ -349,11 +344,29 @@ export function Configuracion() {
     fetchStatus,
     createDayOff,
     deleteSetting,
+    upsertNextSessionReminder,
+    upsertDuePaymentReminder,
   } = useSettingStore();
   
-  // Get day off settings from the store
+  // Get settings from the store using selectors
   const dayOffSettings = settingSelectors.getDayOffSettings({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
+  const paymentReminderSetting = settingSelectors.getDuePaymentReminderSetting({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
+  const sessionReminderSetting = settingSelectors.getNextSessionReminderSetting({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
   const isLoadingSettings = fetchStatus === 'loading';
+  
+  // Reminder state from backend settings (with local UI state for editing)
+  const [paymentReminderEnabled, setPaymentReminderEnabled] = useState(false);
+  const [paymentReminderFrequency, setPaymentReminderFrequency] = useState<'daily' | 'weekly' | 'biweekly'>('weekly');
+  const [paymentReminderLimit, setPaymentReminderLimit] = useState(3);
+  const [paymentReminderMessage, setPaymentReminderMessage] = useState('');
+  
+  const [sessionReminderEnabled, setSessionReminderEnabled] = useState(false);
+  const [sessionReminderHours, setSessionReminderHours] = useState(24);
+  const [sessionReminderMessage, setSessionReminderMessage] = useState('');
+  
+  // Track saving state for reminders
+  const [isSavingReminders, setIsSavingReminders] = useState(false);
+  const [hasReminderChanges, setHasReminderChanges] = useState(false);
   
   // Convert API day off settings to UI format
   const diasOffFromApi = dayOffSettings.map(apiToUiDayOff);
@@ -382,6 +395,24 @@ export function Configuracion() {
     });
   }, []);
 
+  // Sync reminder state from backend settings when they load
+  useEffect(() => {
+    if (paymentReminderSetting) {
+      setPaymentReminderEnabled(paymentReminderSetting.active);
+      setPaymentReminderFrequency(paymentReminderSetting.config.frequency as 'daily' | 'weekly' | 'biweekly');
+      setPaymentReminderLimit(paymentReminderSetting.config.remindDuePaymentLimit);
+      setPaymentReminderMessage(paymentReminderSetting.config.message);
+    }
+  }, [paymentReminderSetting]);
+
+  useEffect(() => {
+    if (sessionReminderSetting) {
+      setSessionReminderEnabled(sessionReminderSetting.active);
+      setSessionReminderHours(sessionReminderSetting.config.hoursBeforeSession);
+      setSessionReminderMessage(sessionReminderSetting.config.message);
+    }
+  }, [sessionReminderSetting]);
+
   // Update a local setting and mark as changed
   const updateLocalSetting = useCallback(<K extends keyof LocalSettings>(key: K, value: LocalSettings[K]) => {
     setLocalSettings(prev => ({ ...prev, [key]: value }));
@@ -391,14 +422,14 @@ export function Configuracion() {
   // Warn user about unsaved changes
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasChanges) {
+      if (hasChanges || hasReminderChanges) {
         e.preventDefault();
         e.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasChanges]);
+  }, [hasChanges, hasReminderChanges]);
 
   const handleSave = () => {
     setIsSaving(true);
@@ -412,6 +443,44 @@ export function Configuracion() {
       setIsSaving(false);
     }
   };
+
+  // Handle saving reminder settings to backend
+  const handleSaveReminders = async () => {
+    setIsSavingReminders(true);
+    try {
+      // Save both reminder settings in parallel
+      await Promise.all([
+        upsertDuePaymentReminder(
+          {
+            frequency: paymentReminderFrequency,
+            remindDuePaymentLimit: paymentReminderLimit,
+            message: paymentReminderMessage || localSettings.whatsappTemplates.paymentReminder,
+          },
+          paymentReminderEnabled
+        ),
+        upsertNextSessionReminder(
+          {
+            hoursBeforeSession: sessionReminderHours,
+            message: sessionReminderMessage || localSettings.whatsappTemplates.turnoReminder,
+          },
+          sessionReminderEnabled
+        ),
+      ]);
+      
+      setHasReminderChanges(false);
+      toast.success(t('settings.messages.saved'));
+    } catch (error) {
+      console.error('Failed to save reminder settings:', error);
+      toast.error(t('settings.messages.saveError'));
+    } finally {
+      setIsSavingReminders(false);
+    }
+  };
+
+  // Helper to mark reminder changes
+  const markReminderChanged = useCallback(() => {
+    setHasReminderChanges(true);
+  }, []);
 
   const handleAddDiaOff = async () => {
     if (!newDiaOff.fechaInicio || !newDiaOff.fechaFin) {
@@ -901,69 +970,79 @@ export function Configuracion() {
               description={t('settings.paymentReminders.description')}
             >
               <div className="space-y-6">
-                {/* Automatización - Coming Soon */}
-                <ComingSoonWrapper text={t('common.comingSoon')}>
-                  <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <h3 className="text-sm font-medium text-gray-700">{t('settings.paymentReminders.automation')}</h3>
-                    <ToggleRow
-                      checked={localSettings.recordatoriosCobros}
-                      onChange={(v) => updateLocalSetting('recordatoriosCobros', v)}
-                      label={t('settings.paymentReminders.enableAuto')}
-                      description={t('settings.paymentReminders.enableAutoHint')}
-                    />
+                {/* Automatización - Now connected to backend */}
+                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-700">{t('settings.paymentReminders.automation')}</h3>
+                  <ToggleRow
+                    checked={paymentReminderEnabled}
+                    onChange={(v) => {
+                      setPaymentReminderEnabled(v);
+                      markReminderChanged();
+                    }}
+                    label={t('settings.paymentReminders.enableAuto')}
+                    description={t('settings.paymentReminders.enableAutoHint')}
+                  />
 
-                    {localSettings.recordatoriosCobros && (
-                      <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
-                        {/* Frecuencia */}
-                        <div className="space-y-2">
-                          <label htmlFor="frecuencia-recordatorio" className="block text-sm font-medium text-gray-700">
-                            {t('settings.paymentReminders.frequency')}
-                          </label>
-                          <select
-                            id="frecuencia-recordatorio"
-                            value={localSettings.frecuenciaRecordatorio}
-                            onChange={(e) => updateLocalSetting('frecuenciaRecordatorio', e.target.value)}
-                            className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
-                          >
-                            <option value="diario">{t('settings.paymentReminders.daily')}</option>
-                            <option value="semanal">{t('settings.paymentReminders.weekly')}</option>
-                            <option value="quincenal">{t('settings.paymentReminders.biweekly')}</option>
-                          </select>
-                        </div>
+                  {paymentReminderEnabled && (
+                    <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
+                      {/* Frecuencia */}
+                      <div className="space-y-2">
+                        <label htmlFor="frecuencia-recordatorio" className="block text-sm font-medium text-gray-700">
+                          {t('settings.paymentReminders.frequency')}
+                        </label>
+                        <Select
+                          value={paymentReminderFrequency}
+                          onValueChange={(value: 'daily' | 'weekly' | 'biweekly') => {
+                            setPaymentReminderFrequency(value);
+                            markReminderChanged();
+                          }}
+                        >
+                          <SelectTrigger className="w-full sm:w-48">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="daily">{t('settings.paymentReminders.daily')}</SelectItem>
+                            <SelectItem value="weekly">{t('settings.paymentReminders.weekly')}</SelectItem>
+                            <SelectItem value="biweekly">{t('settings.paymentReminders.biweekly')}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                        {/* Mínimo de turnos */}
-                        <div className="space-y-2">
-                          <label htmlFor="minimo-turnos" className="block text-sm font-medium text-gray-700">
-                            {t('settings.paymentReminders.minimumSessions')}
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <input
-                              id="minimo-turnos"
-                              type="number"
-                              min="1"
-                              max="20"
-                              value={localSettings.minimoTurnos}
-                              onChange={(e) => updateLocalSetting('minimoTurnos', Number(e.target.value))}
-                              className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
-                            />
-                            <span className="text-sm text-gray-600">
-                              {localSettings.minimoTurnos === 1 ? t('settings.paymentReminders.sessionsUnpaid') : t('settings.paymentReminders.sessionsUnpaidPlural')}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Preview */}
-                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                          <p className="text-xs sm:text-sm text-orange-800">
-                            <span className="font-medium">{t('settings.paymentReminders.example')}:</span> {t('settings.paymentReminders.exampleText', { count: localSettings.minimoTurnos })}
-                          </p>
+                      {/* Mínimo de turnos */}
+                      <div className="space-y-2">
+                        <label htmlFor="minimo-turnos" className="block text-sm font-medium text-gray-700">
+                          {t('settings.paymentReminders.minimumSessions')}
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            id="minimo-turnos"
+                            type="number"
+                            min="1"
+                            max="20"
+                            value={paymentReminderLimit}
+                            onChange={(e) => {
+                              setPaymentReminderLimit(Number(e.target.value));
+                              markReminderChanged();
+                            }}
+                            className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                          />
+                          <span className="text-sm text-gray-600">
+                            {paymentReminderLimit === 1 ? t('settings.paymentReminders.sessionsUnpaid') : t('settings.paymentReminders.sessionsUnpaidPlural')}
+                          </span>
                         </div>
                       </div>
-                    )}
-                  </div>
-                </ComingSoonWrapper>
 
-                {/* Payment Reminder Template - ENABLED */}
+                      {/* Preview */}
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                        <p className="text-xs sm:text-sm text-orange-800">
+                          <span className="font-medium">{t('settings.paymentReminders.example')}:</span> {t('settings.paymentReminders.exampleText', { count: paymentReminderLimit })}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Payment Reminder Template */}
                 <div className="space-y-3 pt-2">
                   <div className="flex items-center gap-2">
                     <MessageCircle className="w-4 h-4 text-green-600" />
@@ -977,21 +1056,21 @@ export function Configuracion() {
                   </p>
                   <textarea
                     id="whatsapp-payment-template"
-                    value={localSettings.whatsappTemplates.paymentReminder}
-                    onChange={(e) => updateLocalSetting('whatsappTemplates', {
-                      ...localSettings.whatsappTemplates,
-                      paymentReminder: e.target.value
-                    })}
+                    value={paymentReminderMessage || localSettings.whatsappTemplates.paymentReminder}
+                    onChange={(e) => {
+                      setPaymentReminderMessage(e.target.value);
+                      markReminderChanged();
+                    }}
                     rows={3}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
                   />
                   <div className="flex justify-end">
                     <button
                       type="button"
-                      onClick={() => updateLocalSetting('whatsappTemplates', {
-                        ...localSettings.whatsappTemplates,
-                        paymentReminder: DEFAULT_PAYMENT_TEMPLATE
-                      })}
+                      onClick={() => {
+                        setPaymentReminderMessage(DEFAULT_PAYMENT_TEMPLATE);
+                        markReminderChanged();
+                      }}
                       className="text-xs text-indigo-600 hover:text-indigo-800"
                     >
                       {t('settings.paymentReminders.restoreDefault')}
@@ -1010,50 +1089,54 @@ export function Configuracion() {
               description={t('settings.appointmentReminders.description')}
             >
               <div className="space-y-6">
-                {/* Automatización - Coming Soon */}
-                <ComingSoonWrapper text={t('common.comingSoon')}>
-                  <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <h3 className="text-sm font-medium text-gray-700">{t('settings.appointmentReminders.automation')}</h3>
-                    <ToggleRow
-                      checked={localSettings.recordatoriosPacientes}
-                      onChange={(v) => updateLocalSetting('recordatoriosPacientes', v)}
-                      label={t('settings.appointmentReminders.enableAuto')}
-                      description={t('settings.appointmentReminders.enableAutoHint')}
-                    />
+                {/* Automatización - Now connected to backend */}
+                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-700">{t('settings.appointmentReminders.automation')}</h3>
+                  <ToggleRow
+                    checked={sessionReminderEnabled}
+                    onChange={(v) => {
+                      setSessionReminderEnabled(v);
+                      markReminderChanged();
+                    }}
+                    label={t('settings.appointmentReminders.enableAuto')}
+                    description={t('settings.appointmentReminders.enableAutoHint')}
+                  />
 
-                    {localSettings.recordatoriosPacientes && (
-                      <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
-                        {/* Horas de anticipación */}
-                        <div className="space-y-2">
-                          <label htmlFor="horas-anticipacion" className="block text-sm font-medium text-gray-700">
-                            {t('settings.appointmentReminders.hoursBeforeLabel')}
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <input
-                              id="horas-anticipacion"
-                              type="number"
-                              min="1"
-                              max="72"
-                              value={localSettings.horasAnticipacion}
-                              onChange={(e) => updateLocalSetting('horasAnticipacion', Number(e.target.value))}
-                              className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
-                            />
-                            <span className="text-sm text-gray-600">{t('settings.appointmentReminders.hoursBeforeAppointment')}</span>
-                          </div>
-                        </div>
-
-                        {/* Preview */}
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                          <p className="text-xs sm:text-sm text-blue-800">
-                            <span className="font-medium">{t('settings.appointmentReminders.example')}:</span> {t('settings.appointmentReminders.exampleText', { hours: localSettings.horasAnticipacion })}
-                          </p>
+                  {sessionReminderEnabled && (
+                    <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
+                      {/* Horas de anticipación */}
+                      <div className="space-y-2">
+                        <label htmlFor="horas-anticipacion" className="block text-sm font-medium text-gray-700">
+                          {t('settings.appointmentReminders.hoursBeforeLabel')}
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            id="horas-anticipacion"
+                            type="number"
+                            min="1"
+                            max="72"
+                            value={sessionReminderHours}
+                            onChange={(e) => {
+                              setSessionReminderHours(Number(e.target.value));
+                              markReminderChanged();
+                            }}
+                            className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                          />
+                          <span className="text-sm text-gray-600">{t('settings.appointmentReminders.hoursBeforeAppointment')}</span>
                         </div>
                       </div>
-                    )}
-                  </div>
-                </ComingSoonWrapper>
 
-                {/* Turno Reminder Template - ENABLED */}
+                      {/* Preview */}
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p className="text-xs sm:text-sm text-blue-800">
+                          <span className="font-medium">{t('settings.appointmentReminders.example')}:</span> {t('settings.appointmentReminders.exampleText', { hours: sessionReminderHours })}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Turno Reminder Template */}
                 <div className="space-y-3 pt-2">
                   <div className="flex items-center gap-2">
                     <MessageCircle className="w-4 h-4 text-green-600" />
@@ -1067,21 +1150,21 @@ export function Configuracion() {
                   </p>
                   <textarea
                     id="whatsapp-turno-template"
-                    value={localSettings.whatsappTemplates.turnoReminder}
-                    onChange={(e) => updateLocalSetting('whatsappTemplates', {
-                      ...localSettings.whatsappTemplates,
-                      turnoReminder: e.target.value
-                    })}
+                    value={sessionReminderMessage || localSettings.whatsappTemplates.turnoReminder}
+                    onChange={(e) => {
+                      setSessionReminderMessage(e.target.value);
+                      markReminderChanged();
+                    }}
                     rows={3}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
                   />
                   <div className="flex justify-end">
                     <button
                       type="button"
-                      onClick={() => updateLocalSetting('whatsappTemplates', {
-                        ...localSettings.whatsappTemplates,
-                        turnoReminder: DEFAULT_TURNO_TEMPLATE
-                      })}
+                      onClick={() => {
+                        setSessionReminderMessage(DEFAULT_TURNO_TEMPLATE);
+                        markReminderChanged();
+                      }}
                       className="text-xs text-indigo-600 hover:text-indigo-800"
                     >
                       {t('settings.paymentReminders.restoreDefault')}
@@ -1090,6 +1173,24 @@ export function Configuracion() {
                 </div>
               </div>
             </ConfigSection>
+
+            {/* Save Reminders Button */}
+            {hasReminderChanges && (
+              <div className="flex justify-end pt-4">
+                <Button 
+                  onClick={handleSaveReminders}
+                  disabled={isSavingReminders}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                >
+                  {isSavingReminders ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4 mr-2" />
+                  )}
+                  {t('settings.saveReminders')}
+                </Button>
+              </div>
+            )}
           </div>
           )}
 

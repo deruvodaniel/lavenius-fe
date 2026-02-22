@@ -119,6 +119,15 @@
     "passphraseWarning": "Don't forget it",
     "passphraseCannotRecover": "it cannot be recovered.",
     "createAccount": "Create Account",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "profile": "Profile",
+    "settings": "Settings",
+    "welcome": "Welcome",
+    "pleaseSignIn": "Please sign in to continue",
+    "notSignedIn": "You are not signed in",
+    "signedInAs": "Signed in as",
     "passwordRequirements": {
       "title": "Password requirements:",
       "minLength": "Minimum {{count}} characters",
@@ -738,7 +747,8 @@
       "fri": "F",
       "sat": "S",
       "sun": "S"
-    }
+    },
+    "saveReminders": "Save Reminders"
   },
   "profile": {
     "title": "My Profile",

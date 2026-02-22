@@ -738,7 +738,8 @@
       "fri": "S",
       "sat": "S",
       "sun": "D"
-    }
+    },
+    "saveReminders": "Salvar Lembretes"
   },
   "profile": {
     "title": "Meu Perfil",

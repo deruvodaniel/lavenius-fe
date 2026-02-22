@@ -119,6 +119,15 @@
     "passphraseWarning": "No la olvides",
     "passphraseCannotRecover": "no podrá ser recuperada.",
     "createAccount": "Crear Cuenta",
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar sesión",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "welcome": "Bienvenido",
+    "pleaseSignIn": "Por favor inicia sesión para continuar",
+    "notSignedIn": "No has iniciado sesión",
+    "signedInAs": "Sesión iniciada como",
     "passwordRequirements": {
       "title": "Requisitos de contraseña:",
       "minLength": "Mínimo {{count}} caracteres",
@@ -738,7 +747,8 @@
       "fri": "V",
       "sat": "S",
       "sun": "D"
-    }
+    },
+    "saveReminders": "Guardar Recordatorios"
   },
   "profile": {
     "title": "Mi Perfil",
