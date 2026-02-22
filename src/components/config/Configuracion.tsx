@@ -5,12 +5,30 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
 import { LanguageSwitcher } from '@/components/shared';
 import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
 import { type DayOffSetting, type DayOffConfig } from '@/lib/types/setting.types';
+import { cn } from '@/components/ui/utils';
+
+// ============================================================================
+// NAVIGATION SECTIONS
+// ============================================================================
+
+type SectionId = 'general' | 'calendar' | 'notifications';
+
+interface NavigationSection {
+  id: SectionId;
+  labelKey: string;
+  icon: React.ElementType;
+}
+
+const NAVIGATION_SECTIONS: NavigationSection[] = [
+  { id: 'general', labelKey: 'settings.sections.general', icon: Globe },
+  { id: 'calendar', labelKey: 'settings.sections.calendar', icon: Calendar },
+  { id: 'notifications', labelKey: 'settings.sections.notifications', icon: Bell },
+];
 
 // ============================================================================
 // SETTINGS STORAGE (localStorage for non-API settings)
@@ -317,6 +335,9 @@ const ToggleRow = ({ checked, onChange, label, description }: ToggleRowProps) =>
 export function Configuracion() {
   const { t, i18n } = useTranslation();
   
+  // Navigation state
+  const [activeSection, setActiveSection] = useState<SectionId>('general');
+  
   // Load localStorage settings on mount (for working hours, templates, etc.)
   const [localSettings, setLocalSettings] = useState<LocalSettings>(loadLocalSettings);
   const [hasChanges, setHasChanges] = useState(false);
@@ -493,43 +514,59 @@ export function Configuracion() {
   return (
     <div className="p-4 md:p-6 lg:p-8">
       {/* Header */}
-      <div className="mb-6 sm:mb-8">
+      <div className="mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{t('settings.title')}</h1>
         <p className="text-sm text-gray-500">{t('settings.subtitle')}</p>
       </div>
 
-      {/* Main Settings Container - constrained width for better readability */}
-      <div className="max-w-4xl">
-        <Tabs defaultValue="general" className="w-full">
-          {/* Tabs Navigation */}
-          <TabsList className="w-full sm:w-auto mb-6 bg-gray-100 p-1 rounded-xl overflow-x-auto flex-nowrap">
-            <TabsTrigger 
-              value="general"
-              className="flex-1 sm:flex-none data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-4 py-2 gap-2 rounded-lg transition-all"
-            >
-              <Globe className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('settings.sections.general')}</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="calendar"
-              className="flex-1 sm:flex-none data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-4 py-2 gap-2 rounded-lg transition-all"
-            >
-              <Calendar className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('settings.sections.calendar')}</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="notifications"
-              className="flex-1 sm:flex-none data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-4 py-2 gap-2 rounded-lg transition-all"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('settings.sections.notifications')}</span>
-            </TabsTrigger>
-          </TabsList>
+      {/* Main Settings Container - Notion-style side-by-side layout */}
+      <div className="flex flex-col md:flex-row gap-6 max-w-6xl">
+        {/* ============================================ */}
+        {/* Left Navigation Sidebar */}
+        {/* ============================================ */}
+        <nav 
+          className="md:w-56 flex-shrink-0"
+          aria-label={t('settings.title')}
+        >
+          {/* Mobile: Horizontal scroll */}
+          <div className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+            {NAVIGATION_SECTIONS.map((section) => {
+              const Icon = section.icon;
+              const isActive = activeSection === section.id;
+              return (
+                <button
+                  key={section.id}
+                  type="button"
+                  onClick={() => setActiveSection(section.id)}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
+                    "min-w-[120px] md:min-w-0 md:w-full text-left",
+                    isActive
+                      ? "bg-white shadow-sm border-l-2 border-indigo-600 text-gray-900"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-2 border-transparent"
+                  )}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <Icon className={cn(
+                    "w-4 h-4 flex-shrink-0",
+                    isActive ? "text-indigo-600" : "text-gray-400"
+                  )} />
+                  <span>{t(section.labelKey)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
 
+        {/* ============================================ */}
+        {/* Right Content Area */}
+        {/* ============================================ */}
+        <div className="flex-1 min-w-0">
           {/* ============================================ */}
-          {/* TAB: General Settings */}
+          {/* SECTION: General Settings */}
           {/* ============================================ */}
-          <TabsContent value="general" className="space-y-4">
+          {activeSection === 'general' && (
+            <div className="space-y-4">
             {/* Language Section */}
             <ConfigSection
               icon={Globe}
@@ -632,12 +669,14 @@ export function Configuracion() {
                 </fieldset>
               </div>
             </ConfigSection>
-          </TabsContent>
+          </div>
+          )}
 
           {/* ============================================ */}
-          {/* TAB: Calendar & Scheduling */}
+          {/* SECTION: Calendar & Scheduling */}
           {/* ============================================ */}
-          <TabsContent value="calendar" className="space-y-4">
+          {activeSection === 'calendar' && (
+            <div className="space-y-4">
             {/* Google Calendar Sync */}
             <CalendarSync />
 
@@ -843,12 +882,14 @@ export function Configuracion() {
                 )}
               </div>
             </ConfigSection>
-          </TabsContent>
+          </div>
+          )}
 
           {/* ============================================ */}
-          {/* TAB: Notifications & Reminders */}
+          {/* SECTION: Notifications & Reminders */}
           {/* ============================================ */}
-          <TabsContent value="notifications" className="space-y-4">
+          {activeSection === 'notifications' && (
+            <div className="space-y-4">
             {/* Recordatorios de Cobros */}
             <ConfigSection
               icon={DollarSign}
@@ -1047,24 +1088,25 @@ export function Configuracion() {
                 </div>
               </div>
             </ConfigSection>
-          </TabsContent>
-        </Tabs>
-
-        {/* ============================================ */}
-        {/* Save Button - Fixed at bottom, visible across all tabs */}
-        {/* ============================================ */}
-        <div className="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-gray-200">
-          {hasChanges && (
-            <span className="text-sm text-amber-600">{t('common.unsavedChanges')}</span>
+          </div>
           )}
-          <Button 
-            onClick={handleSave}
-            disabled={!hasChanges || isSaving}
-            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {isSaving ? t('common.saving') : t('common.save')}
-          </Button>
+
+          {/* ============================================ */}
+          {/* Save Button - In content area */}
+          {/* ============================================ */}
+          <div className="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-gray-200">
+            {hasChanges && (
+              <span className="text-sm text-amber-600">{t('common.unsavedChanges')}</span>
+            )}
+            <Button 
+              onClick={handleSave}
+              disabled={!hasChanges || isSaving}
+              className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {isSaving ? t('common.saving') : t('common.save')}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
