@@ -11,6 +11,7 @@ export interface User {
   lastName: string;
   phone?: string;
   licenseNumber?: string;
+  imageUrl?: string;
 }
 
 /**
@@ -37,6 +38,8 @@ export const useAuth = () => {
     phone: clerkUser.primaryPhoneNumber?.phoneNumber,
     // licenseNumber can be stored in Clerk's publicMetadata
     licenseNumber: clerkUser.publicMetadata?.licenseNumber as string | undefined,
+    // Avatar from Clerk (Google, GitHub, or uploaded)
+    imageUrl: clerkUser.imageUrl,
   } : null;
 
   return {

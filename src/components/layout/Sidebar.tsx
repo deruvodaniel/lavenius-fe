@@ -161,15 +161,23 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
                   }
                 >
                   <div className={cn(
-                    'bg-indigo-600 ring-2 ring-indigo-400 rounded-full flex items-center justify-center flex-shrink-0 group-hover:ring-indigo-300 transition-all duration-200',
+                    'bg-indigo-600 ring-2 ring-indigo-400 rounded-full flex items-center justify-center flex-shrink-0 group-hover:ring-indigo-300 transition-all duration-200 overflow-hidden',
                     collapsed ? 'w-5 h-5 ring-1' : 'w-10 h-10'
                   )}>
-                    <span className={cn(
-                      'text-white font-semibold',
-                      collapsed ? 'text-[10px]' : 'text-sm'
-                    )}>
-                      {user.firstName.charAt(0).toUpperCase()}{user.lastName.charAt(0).toUpperCase()}
-                    </span>
+                    {user.imageUrl ? (
+                      <img 
+                        src={user.imageUrl} 
+                        alt={`${user.firstName} ${user.lastName}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className={cn(
+                        'text-white font-semibold',
+                        collapsed ? 'text-[10px]' : 'text-sm'
+                      )}>
+                        {user.firstName.charAt(0).toUpperCase()}{user.lastName.charAt(0).toUpperCase()}
+                      </span>
+                    )}
                   </div>
                   <div className={cn(
                     'flex-1 min-w-0 text-left transition-opacity duration-200',
