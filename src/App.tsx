@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
-import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react';
 import { Landing } from './components/landing';
 import { Dashboard } from './components/dashboard';
 import { NotFound, LoadingOverlay } from './components/shared';
@@ -16,6 +16,13 @@ const HelpCenter = lazy(() => import('./components/help/HelpCenter').then(m => (
 
 // Protected route wrapper using Clerk
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isLoaded } = useAuth();
+
+  // Show loading while Clerk initializes
+  if (!isLoaded) {
+    return <LoadingOverlay message="Cargando..." />;
+  }
+
   return (
     <>
       <SignedIn>{children}</SignedIn>

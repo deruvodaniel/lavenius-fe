@@ -219,6 +219,12 @@ export function Perfil() {
                       alt="Avatar" 
                       className="w-full h-full object-cover"
                     />
+                  ) : user?.imageUrl ? (
+                    <img 
+                      src={user.imageUrl} 
+                      alt="Avatar" 
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <span className="text-3xl sm:text-4xl font-bold text-white">
                       {initials}
