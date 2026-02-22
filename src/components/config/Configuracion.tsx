@@ -512,15 +512,17 @@ export function Configuracion() {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{t('settings.title')}</h1>
-        <p className="text-sm text-gray-500">{t('settings.subtitle')}</p>
-      </div>
+    <div className="h-full flex flex-col">
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{t('settings.title')}</h1>
+          <p className="text-sm text-gray-500">{t('settings.subtitle')}</p>
+        </div>
 
-      {/* Main Settings Container - Notion-style side-by-side layout */}
-      <div className="flex flex-col md:flex-row gap-6 max-w-6xl">
+        {/* Main Settings Container - Notion-style side-by-side layout */}
+        <div className="flex flex-col md:flex-row gap-6 max-w-6xl">
         {/* ============================================ */}
         {/* Left Navigation Sidebar */}
         {/* ============================================ */}
@@ -1091,22 +1093,25 @@ export function Configuracion() {
           </div>
           )}
 
-          {/* ============================================ */}
-          {/* Save Button - In content area */}
-          {/* ============================================ */}
-          <div className="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-gray-200">
-            {hasChanges && (
-              <span className="text-sm text-amber-600">{t('common.unsavedChanges')}</span>
-            )}
-            <Button 
-              onClick={handleSave}
-              disabled={!hasChanges || isSaving}
-              className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              {isSaving ? t('common.saving') : t('common.save')}
-            </Button>
-          </div>
+        </div>
+        </div>
+      </div>
+      {/* ============================================ */}
+      {/* Fixed Footer - Save Button */}
+      {/* ============================================ */}
+      <div className="flex-shrink-0 bg-white border-t border-gray-200 px-4 md:px-6 lg:px-8 py-4">
+        <div className="max-w-6xl flex items-center justify-end gap-3">
+          {hasChanges && (
+            <span className="text-sm text-amber-600">{t('common.unsavedChanges')}</span>
+          )}
+          <Button 
+            onClick={handleSave}
+            disabled={!hasChanges || isSaving}
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {isSaving ? t('common.saving') : t('common.save')}
+          </Button>
         </div>
       </div>
     </div>
