@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useClerk } from '@clerk/clerk-react';
 import { AppLayout, Sidebar } from '../layout';
 import { OnboardingModal } from '../onboarding';
-import { useAuth } from '@/lib/hooks/useAuth';
 import { useOnboarding } from '@/lib/hooks/useOnboarding';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 
 export function Dashboard() {
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const { logout } = useAuth();
+  const { signOut } = useClerk();
   const { shouldShowOnboarding } = useOnboarding();
   const { connectCalendar } = useCalendarStore();
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export function Dashboard() {
         sidebar={(onNavigate?: () => void, collapsed?: boolean) => (
           <Sidebar
             currentPath={location.pathname}
-            onLogout={logout}
+            onLogout={() => signOut({ redirectUrl: '/' })}
             onNavigate={onNavigate}
             collapsed={collapsed}
           />

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 import { 
   Calendar, 
   DollarSign, 
@@ -49,7 +50,7 @@ function NavBar() {
   const { t } = useTranslation();
   
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
@@ -62,19 +63,45 @@ function NavBar() {
           </div>
           <div className="flex items-center gap-3">
             <LanguageSwitcher variant="buttons" />
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/login')}
-              className="text-gray-600 hover:text-gray-900"
-            >
-              {t('landing.cta.login')}
-            </Button>
-            <Button 
-              onClick={() => navigate('/register')}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
-            >
-              {t('landing.hero.cta')}
-            </Button>
+            
+            {/* Signed Out: Show Sign In + Sign Up buttons with Clerk */}
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button 
+                  variant="ghost" 
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  {t('landing.cta.login')}
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button 
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md transition-all"
+                >
+                  {t('landing.hero.cta')}
+                </Button>
+              </SignUpButton>
+            </SignedOut>
+            
+            {/* Signed In: Show Dashboard link + User avatar */}
+            <SignedIn>
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/dashboard')}
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                {t('landing.nav.dashboard', 'Dashboard')}
+              </Button>
+              <UserButton 
+                afterSignOutUrl="/"
+                appearance={{
+                  elements: {
+                    avatarBox: 'w-9 h-9 ring-2 ring-transparent hover:ring-indigo-500/50 transition-all',
+                    userButtonTrigger: 'focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none rounded-full',
+                  }
+                }}
+              />
+            </SignedIn>
           </div>
         </div>
       </div>

@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Calendar, Clock, User, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { useAuthStore, usePatientStore } from '@/lib/stores';
+import { usePatientStore } from '@/lib/stores';
+import { useAuth } from '@/lib/hooks';
 import { ConfirmDialog, BaseDrawer, DrawerBody, DrawerFooter } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -51,7 +52,7 @@ interface TurnoDrawerProps {
  */
 export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, initialDate, onSave, onDelete }: TurnoDrawerProps) {
   const { t } = useTranslation();
-  const user = useAuthStore(state => state.user);
+  const { user } = useAuth();
   const fetchPatientById = usePatientStore(state => state.fetchPatientById);
   const selectedPatientFromStore = usePatientStore(state => state.selectedPatient);
   

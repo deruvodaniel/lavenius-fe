@@ -1,476 +1,183 @@
-import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook } from '@testing-library/react';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { useAuthStore } from '@/lib/stores';
-import type { User, LoginDto, RegisterDto } from '@/lib/types/api.types';
 
-// Mock the auth store
-vi.mock('@/lib/stores', () => ({
-  useAuthStore: vi.fn(),
+// Mock Clerk hooks
+const mockSignOut = vi.fn();
+const mockClerkUser = {
+  id: 'user_123',
+  firstName: 'Test',
+  lastName: 'User',
+  primaryEmailAddress: { emailAddress: 'test@example.com' },
+  primaryPhoneNumber: { phoneNumber: '+1234567890' },
+  publicMetadata: { licenseNumber: 'LIC-001' },
+};
+
+vi.mock('@clerk/clerk-react', () => ({
+  useAuth: vi.fn(() => ({
+    isLoaded: true,
+    isSignedIn: true,
+    signOut: mockSignOut,
+  })),
+  useUser: vi.fn(() => ({
+    user: mockClerkUser,
+  })),
 }));
 
-// Mock user for testing
-const mockUser: User = {
-  id: '123',
-  email: 'test@example.com',
-  firstName: 'Juan',
-  lastName: 'Perez',
-  createdAt: '2024-01-01T00:00:00Z',
-  updatedAt: '2024-01-01T00:00:00Z',
-};
+// Import mocks after setting up vi.mock
+import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react';
 
-// Mock credentials
-const mockLoginCredentials: LoginDto = {
-  email: 'test@example.com',
-  password: 'password123',
-  passphrase: 'my-secret-passphrase',
-};
-
-// Mock registration data
-const mockRegisterData: RegisterDto = {
-  email: 'new@example.com',
-  password: 'password123',
-  passphrase: 'my-secret-passphrase',
-  firstName: 'Maria',
-  lastName: 'Garcia',
-};
-
-describe('useAuth', () => {
-  // Default mock implementation
-  const mockLogin = vi.fn();
-  const mockRegister = vi.fn();
-  const mockLogout = vi.fn();
-  const mockClearError = vi.fn();
-
-  const defaultMockState = {
-    user: null,
-    isAuthenticated: false,
-    isLoading: false,
-    error: null,
-    login: mockLogin,
-    register: mockRegister,
-    logout: mockLogout,
-    clearError: mockClearError,
-  };
-
+describe('useAuth (Clerk-based)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
-    // Setup default mock - useAuthStore is called multiple times with selectors
-    (useAuthStore as unknown as Mock).mockImplementation((selector: (state: typeof defaultMockState) => unknown) => {
-      if (typeof selector === 'function') {
-        return selector(defaultMockState);
-      }
-      return defaultMockState;
-    });
+    // Reset mocks to default authenticated state
+    vi.mocked(useClerkAuth).mockReturnValue({
+      isLoaded: true,
+      isSignedIn: true,
+      signOut: mockSignOut,
+    } as unknown as ReturnType<typeof useClerkAuth>);
+    vi.mocked(useUser).mockReturnValue({
+      user: mockClerkUser,
+    } as unknown as ReturnType<typeof useUser>);
   });
 
-  // ==================== Hook Return Values ====================
-
-  describe('Hook Return Values', () => {
-    it('returns user from store', () => {
+  describe('authenticated state', () => {
+    it('returns user data when authenticated', () => {
       const { result } = renderHook(() => useAuth());
-      expect(result.current.user).toBeNull();
-    });
 
-    it('returns authenticated user when logged in', () => {
-      const authenticatedState = {
-        ...defaultMockState,
-        user: mockUser,
-        isAuthenticated: true,
-      };
-
-      (useAuthStore as unknown as Mock).mockImplementation((selector: (state: typeof authenticatedState) => unknown) => {
-        if (typeof selector === 'function') {
-          return selector(authenticatedState);
-        }
-        return authenticatedState;
+      expect(result.current.user).toEqual({
+        id: 'user_123',
+        email: 'test@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+        phone: '+1234567890',
+        licenseNumber: 'LIC-001',
       });
-
-      const { result } = renderHook(() => useAuth());
-      
-      expect(result.current.user).toEqual(mockUser);
-      expect(result.current.user?.email).toBe('test@example.com');
-      expect(result.current.user?.firstName).toBe('Juan');
     });
 
-    it('returns isAuthenticated from store', () => {
+    it('returns isAuthenticated as true when signed in', () => {
       const { result } = renderHook(() => useAuth());
-      expect(result.current.isAuthenticated).toBe(false);
-    });
 
-    it('returns isAuthenticated as true when user is logged in', () => {
-      const authenticatedState = {
-        ...defaultMockState,
-        user: mockUser,
-        isAuthenticated: true,
-      };
-
-      (useAuthStore as unknown as Mock).mockImplementation((selector: (state: typeof authenticatedState) => unknown) => {
-        if (typeof selector === 'function') {
-          return selector(authenticatedState);
-        }
-        return authenticatedState;
-      });
-
-      const { result } = renderHook(() => useAuth());
       expect(result.current.isAuthenticated).toBe(true);
     });
 
-    it('returns isLoading from store', () => {
+    it('returns isLoading as false when loaded', () => {
       const { result } = renderHook(() => useAuth());
+
       expect(result.current.isLoading).toBe(false);
     });
 
-    it('returns isLoading as true during async operations', () => {
-      const loadingState = {
-        ...defaultMockState,
-        isLoading: true,
-      };
-
-      (useAuthStore as unknown as Mock).mockImplementation((selector: (state: typeof loadingState) => unknown) => {
-        if (typeof selector === 'function') {
-          return selector(loadingState);
-        }
-        return loadingState;
-      });
-
+    it('provides signOut function from Clerk', () => {
       const { result } = renderHook(() => useAuth());
+
+      expect(result.current.signOut).toBe(mockSignOut);
+      expect(result.current.logout).toBe(mockSignOut);
+    });
+  });
+
+  describe('unauthenticated state', () => {
+    beforeEach(() => {
+      vi.mocked(useClerkAuth).mockReturnValue({
+        isLoaded: true,
+        isSignedIn: false,
+        signOut: mockSignOut,
+      } as unknown as ReturnType<typeof useClerkAuth>);
+      vi.mocked(useUser).mockReturnValue({
+        user: null,
+      } as unknown as ReturnType<typeof useUser>);
+    });
+
+    it('returns null user when not authenticated', () => {
+      const { result } = renderHook(() => useAuth());
+
+      expect(result.current.user).toBeNull();
+    });
+
+    it('returns isAuthenticated as false when not signed in', () => {
+      const { result } = renderHook(() => useAuth());
+
+      expect(result.current.isAuthenticated).toBe(false);
+    });
+  });
+
+  describe('loading state', () => {
+    beforeEach(() => {
+      vi.mocked(useClerkAuth).mockReturnValue({
+        isLoaded: false,
+        isSignedIn: false,
+        signOut: mockSignOut,
+      } as unknown as ReturnType<typeof useClerkAuth>);
+      vi.mocked(useUser).mockReturnValue({
+        user: null,
+      } as unknown as ReturnType<typeof useUser>);
+    });
+
+    it('returns isLoading as true when not loaded', () => {
+      const { result } = renderHook(() => useAuth());
+
       expect(result.current.isLoading).toBe(true);
     });
 
-    it('returns error from store', () => {
+    it('returns isAuthenticated as false while loading', () => {
       const { result } = renderHook(() => useAuth());
-      expect(result.current.error).toBeNull();
-    });
 
-    it('returns error message when present', () => {
-      const errorState = {
-        ...defaultMockState,
-        error: 'Invalid credentials',
-      };
-
-      (useAuthStore as unknown as Mock).mockImplementation((selector: (state: typeof errorState) => unknown) => {
-        if (typeof selector === 'function') {
-          return selector(errorState);
-        }
-        return errorState;
-      });
-
-      const { result } = renderHook(() => useAuth());
-      expect(result.current.error).toBe('Invalid credentials');
+      expect(result.current.isAuthenticated).toBe(false);
     });
   });
 
-  // ==================== Login Function ====================
+  describe('edge cases', () => {
+    it('handles user without email', () => {
+      vi.mocked(useUser).mockReturnValue({
+        user: {
+          ...mockClerkUser,
+          primaryEmailAddress: null,
+        },
+      } as unknown as ReturnType<typeof useUser>);
 
-  describe('Login Function', () => {
-    it('returns login function from store', () => {
       const { result } = renderHook(() => useAuth());
-      expect(result.current.login).toBeDefined();
-      expect(typeof result.current.login).toBe('function');
+
+      expect(result.current.user?.email).toBe('');
     });
 
-    it('calls store login action with credentials', async () => {
+    it('handles user without phone', () => {
+      vi.mocked(useUser).mockReturnValue({
+        user: {
+          ...mockClerkUser,
+          primaryPhoneNumber: null,
+        },
+      } as unknown as ReturnType<typeof useUser>);
+
       const { result } = renderHook(() => useAuth());
 
-      await act(async () => {
-        await result.current.login(mockLoginCredentials);
-      });
-
-      expect(mockLogin).toHaveBeenCalledTimes(1);
-      expect(mockLogin).toHaveBeenCalledWith(mockLoginCredentials);
+      expect(result.current.user?.phone).toBeUndefined();
     });
 
-    it('passes email correctly to login', async () => {
+    it('handles user without license number in metadata', () => {
+      vi.mocked(useUser).mockReturnValue({
+        user: {
+          ...mockClerkUser,
+          publicMetadata: {},
+        },
+      } as unknown as ReturnType<typeof useUser>);
+
       const { result } = renderHook(() => useAuth());
 
-      await act(async () => {
-        await result.current.login(mockLoginCredentials);
-      });
-
-      expect(mockLogin).toHaveBeenCalledWith(
-        expect.objectContaining({ email: 'test@example.com' })
-      );
+      expect(result.current.user?.licenseNumber).toBeUndefined();
     });
 
-    it('passes password correctly to login', async () => {
-      const { result } = renderHook(() => useAuth());
-
-      await act(async () => {
-        await result.current.login(mockLoginCredentials);
-      });
-
-      expect(mockLogin).toHaveBeenCalledWith(
-        expect.objectContaining({ password: 'password123' })
-      );
-    });
-
-    it('passes passphrase correctly to login', async () => {
-      const { result } = renderHook(() => useAuth());
-
-      await act(async () => {
-        await result.current.login(mockLoginCredentials);
-      });
-
-      expect(mockLogin).toHaveBeenCalledWith(
-        expect.objectContaining({ passphrase: 'my-secret-passphrase' })
-      );
-    });
-  });
-
-  // ==================== Logout Function ====================
-
-  describe('Logout Function', () => {
-    it('returns logout function from store', () => {
-      const { result } = renderHook(() => useAuth());
-      expect(result.current.logout).toBeDefined();
-      expect(typeof result.current.logout).toBe('function');
-    });
-
-    it('calls store logout action', () => {
-      const { result } = renderHook(() => useAuth());
-
-      act(() => {
-        result.current.logout();
-      });
-
-      expect(mockLogout).toHaveBeenCalledTimes(1);
-    });
-
-    it('calls logout without arguments', () => {
-      const { result } = renderHook(() => useAuth());
-
-      act(() => {
-        result.current.logout();
-      });
-
-      expect(mockLogout).toHaveBeenCalledWith();
-    });
-  });
-
-  // ==================== Register Function ====================
-
-  describe('Register Function', () => {
-    it('returns register function from store', () => {
-      const { result } = renderHook(() => useAuth());
-      expect(result.current.register).toBeDefined();
-      expect(typeof result.current.register).toBe('function');
-    });
-
-    it('calls store register action with registration data', async () => {
-      const { result } = renderHook(() => useAuth());
-
-      await act(async () => {
-        await result.current.register(mockRegisterData);
-      });
-
-      expect(mockRegister).toHaveBeenCalledTimes(1);
-      expect(mockRegister).toHaveBeenCalledWith(mockRegisterData);
-    });
-
-    it('passes all required fields to register', async () => {
-      const { result } = renderHook(() => useAuth());
-
-      await act(async () => {
-        await result.current.register(mockRegisterData);
-      });
-
-      expect(mockRegister).toHaveBeenCalledWith(
-        expect.objectContaining({
-          email: 'new@example.com',
-          password: 'password123',
-          passphrase: 'my-secret-passphrase',
-          firstName: 'Maria',
-          lastName: 'Garcia',
-        })
-      );
-    });
-
-    it('passes optional fields to register when provided', async () => {
-      const registerDataWithOptional: RegisterDto = {
-        ...mockRegisterData,
-        phone: '+1234567890',
-        licenseNumber: 'LIC-123456',
-      };
+    it('handles user with null names', () => {
+      vi.mocked(useUser).mockReturnValue({
+        user: {
+          ...mockClerkUser,
+          firstName: null,
+          lastName: null,
+        },
+      } as unknown as ReturnType<typeof useUser>);
 
       const { result } = renderHook(() => useAuth());
 
-      await act(async () => {
-        await result.current.register(registerDataWithOptional);
-      });
-
-      expect(mockRegister).toHaveBeenCalledWith(
-        expect.objectContaining({
-          phone: '+1234567890',
-          licenseNumber: 'LIC-123456',
-        })
-      );
-    });
-  });
-
-  // ==================== Clear Error Function ====================
-
-  describe('clearError Function', () => {
-    it('returns clearError function from store', () => {
-      const { result } = renderHook(() => useAuth());
-      expect(result.current.clearError).toBeDefined();
-      expect(typeof result.current.clearError).toBe('function');
-    });
-
-    it('calls store clearError action', () => {
-      const { result } = renderHook(() => useAuth());
-
-      act(() => {
-        result.current.clearError();
-      });
-
-      expect(mockClearError).toHaveBeenCalledTimes(1);
-    });
-
-    it('calls clearError without arguments', () => {
-      const { result } = renderHook(() => useAuth());
-
-      act(() => {
-        result.current.clearError();
-      });
-
-      expect(mockClearError).toHaveBeenCalledWith();
-    });
-  });
-
-  // ==================== Combined State Scenarios ====================
-
-  describe('Combined State Scenarios', () => {
-    it('returns complete state for unauthenticated user', () => {
-      const { result } = renderHook(() => useAuth());
-
-      expect(result.current).toEqual(
-        expect.objectContaining({
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: null,
-        })
-      );
-    });
-
-    it('returns complete state for authenticated user', () => {
-      const authenticatedState = {
-        ...defaultMockState,
-        user: mockUser,
-        isAuthenticated: true,
-      };
-
-      (useAuthStore as unknown as Mock).mockImplementation((selector: (state: typeof authenticatedState) => unknown) => {
-        if (typeof selector === 'function') {
-          return selector(authenticatedState);
-        }
-        return authenticatedState;
-      });
-
-      const { result } = renderHook(() => useAuth());
-
-      expect(result.current).toEqual(
-        expect.objectContaining({
-          user: mockUser,
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-        })
-      );
-    });
-
-    it('returns state during login process', () => {
-      const loadingState = {
-        ...defaultMockState,
-        isLoading: true,
-      };
-
-      (useAuthStore as unknown as Mock).mockImplementation((selector: (state: typeof loadingState) => unknown) => {
-        if (typeof selector === 'function') {
-          return selector(loadingState);
-        }
-        return loadingState;
-      });
-
-      const { result } = renderHook(() => useAuth());
-
-      expect(result.current).toEqual(
-        expect.objectContaining({
-          user: null,
-          isAuthenticated: false,
-          isLoading: true,
-          error: null,
-        })
-      );
-    });
-
-    it('returns state after failed login', () => {
-      const errorState = {
-        ...defaultMockState,
-        error: 'Credenciales invalidas',
-        isLoading: false,
-      };
-
-      (useAuthStore as unknown as Mock).mockImplementation((selector: (state: typeof errorState) => unknown) => {
-        if (typeof selector === 'function') {
-          return selector(errorState);
-        }
-        return errorState;
-      });
-
-      const { result } = renderHook(() => useAuth());
-
-      expect(result.current).toEqual(
-        expect.objectContaining({
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: 'Credenciales invalidas',
-        })
-      );
-    });
-  });
-
-  // ==================== Hook Returns All Functions ====================
-
-  describe('Hook Returns All Required Properties', () => {
-    it('returns all state properties', () => {
-      const { result } = renderHook(() => useAuth());
-
-      expect(result.current).toHaveProperty('user');
-      expect(result.current).toHaveProperty('isAuthenticated');
-      expect(result.current).toHaveProperty('isLoading');
-      expect(result.current).toHaveProperty('error');
-    });
-
-    it('returns all action functions', () => {
-      const { result } = renderHook(() => useAuth());
-
-      expect(result.current).toHaveProperty('login');
-      expect(result.current).toHaveProperty('register');
-      expect(result.current).toHaveProperty('logout');
-      expect(result.current).toHaveProperty('clearError');
-    });
-
-    it('returns exactly 8 properties', () => {
-      const { result } = renderHook(() => useAuth());
-      const keys = Object.keys(result.current);
-      
-      expect(keys).toHaveLength(8);
-      expect(keys).toEqual(
-        expect.arrayContaining([
-          'user',
-          'isAuthenticated',
-          'isLoading',
-          'error',
-          'login',
-          'register',
-          'logout',
-          'clearError',
-        ])
-      );
+      expect(result.current.user?.firstName).toBe('');
+      expect(result.current.user?.lastName).toBe('');
     });
   });
 });

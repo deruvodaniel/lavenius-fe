@@ -283,3 +283,210 @@ body {
 .scrollbar-on-hover:hover::-webkit-scrollbar {
   width: 6px; /* Show on hover */
 }
+
+/* ==========================================================================
+   Clerk Authentication Component Overrides
+   ========================================================================== */
+
+/* 
+ * Clerk modal backdrop - match Lavenius overlay style 
+ * Uses !important to override Clerk's inline styles
+ */
+.cl-modalBackdrop {
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Clerk modal container - rounded corners and shadow */
+.cl-modalContent,
+.cl-card {
+  border-radius: var(--radius) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Clerk primary buttons - match Lavenius primary button style */
+.cl-formButtonPrimary {
+  background: linear-gradient(to right, #4f46e5, #7c3aed) !important;
+  border: none !important;
+  border-radius: calc(var(--radius) - 2px) !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-formButtonPrimary:hover {
+  background: linear-gradient(to right, #4338ca, #6d28d9) !important;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+}
+
+.cl-formButtonPrimary:focus-visible {
+  outline: 2px solid var(--ring) !important;
+  outline-offset: 2px !important;
+}
+
+/* Clerk secondary/social buttons */
+.cl-socialButtonsBlockButton,
+.cl-formButtonReset {
+  border-radius: calc(var(--radius) - 2px) !important;
+  border-color: var(--border) !important;
+  transition: all 0.15s ease !important;
+}
+
+.cl-socialButtonsBlockButton:hover,
+.cl-formButtonReset:hover {
+  background-color: var(--accent) !important;
+}
+
+/* Clerk input fields - match Lavenius input style */
+.cl-formFieldInput {
+  border-radius: calc(var(--radius) - 2px) !important;
+  border-color: var(--border) !important;
+  background-color: var(--background) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.cl-formFieldInput:focus {
+  border-color: var(--ring) !important;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1) !important;
+  outline: none !important;
+}
+
+/* Clerk labels */
+.cl-formFieldLabel {
+  color: var(--foreground) !important;
+  font-weight: 500 !important;
+}
+
+/* Clerk header/footer text */
+.cl-headerTitle,
+.cl-headerSubtitle {
+  color: var(--foreground) !important;
+}
+
+.cl-footerActionText,
+.cl-footerActionLink {
+  color: var(--muted-foreground) !important;
+}
+
+.cl-footerActionLink:hover {
+  color: #4f46e5 !important;
+}
+
+/* Clerk user button avatar */
+.cl-userButtonAvatarBox {
+  border-radius: 9999px !important;
+  transition: ring 0.2s ease, transform 0.15s ease !important;
+}
+
+.cl-userButtonTrigger:hover .cl-userButtonAvatarBox {
+  transform: scale(1.05);
+}
+
+/* Clerk user button popover/dropdown */
+.cl-userButtonPopoverCard {
+  border-radius: var(--radius) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 
+              0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.cl-userButtonPopoverActionButton {
+  border-radius: calc(var(--radius) - 4px) !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.cl-userButtonPopoverActionButton:hover {
+  background-color: var(--accent) !important;
+}
+
+/* Clerk divider */
+.cl-dividerLine {
+  background-color: var(--border) !important;
+}
+
+.cl-dividerText {
+  color: var(--muted-foreground) !important;
+}
+
+/* Clerk error states */
+.cl-formFieldErrorText {
+  color: var(--destructive) !important;
+}
+
+.cl-formFieldInput[data-invalid="true"] {
+  border-color: var(--destructive) !important;
+}
+
+/* ==========================================================================
+   Clerk Dark Mode Overrides
+   ========================================================================== */
+
+.dark .cl-modalContent,
+.dark .cl-card {
+  background-color: var(--card) !important;
+  border-color: var(--border) !important;
+}
+
+.dark .cl-formFieldInput {
+  background-color: var(--input-background) !important;
+  border-color: var(--border) !important;
+  color: var(--foreground) !important;
+}
+
+.dark .cl-formFieldInput::placeholder {
+  color: var(--muted-foreground) !important;
+}
+
+.dark .cl-socialButtonsBlockButton {
+  background-color: var(--secondary) !important;
+  border-color: var(--border) !important;
+  color: var(--foreground) !important;
+}
+
+.dark .cl-socialButtonsBlockButton:hover {
+  background-color: var(--accent) !important;
+}
+
+.dark .cl-headerTitle,
+.dark .cl-headerSubtitle,
+.dark .cl-formFieldLabel {
+  color: var(--foreground) !important;
+}
+
+.dark .cl-userButtonPopoverCard {
+  background-color: var(--card) !important;
+  border-color: var(--border) !important;
+}
+
+.dark .cl-userButtonPopoverActionButton {
+  color: var(--foreground) !important;
+}
+
+.dark .cl-userButtonPopoverActionButton:hover {
+  background-color: var(--accent) !important;
+}
+
+.dark .cl-dividerLine {
+  background-color: var(--border) !important;
+}
+
+/* Clerk internal text elements in dark mode */
+.dark .cl-internal-b3fm6y,
+.dark .cl-internal-1dauvpw {
+  color: var(--foreground) !important;
+}
+
+/* ==========================================================================
+   Clerk Reduced Motion Support
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .cl-modalContent,
+  .cl-card,
+  .cl-userButtonAvatarBox,
+  .cl-formFieldInput,
+  .cl-formButtonPrimary,
+  .cl-socialButtonsBlockButton {
+    transition: none !important;
+    animation: none !important;
+  }
+}

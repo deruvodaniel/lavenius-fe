@@ -1,11 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
+import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
 import { Landing } from './components/landing';
-import { Login, Register } from './components/auth';
 import { Dashboard } from './components/dashboard';
 import { NotFound, LoadingOverlay } from './components/shared';
-import { useAuth } from './lib/hooks';
-import { useAuthStore } from './lib/stores';
 
 // Lazy load dashboard views
 const Agenda = lazy(() => import('./components/agenda/Agenda').then(m => ({ default: m.Agenda })));
@@ -16,31 +14,66 @@ const Configuracion = lazy(() => import('./components/config/Configuracion').the
 const Perfil = lazy(() => import('./components/perfil/Perfil').then(m => ({ default: m.Perfil })));
 const HelpCenter = lazy(() => import('./components/help/HelpCenter').then(m => ({ default: m.HelpCenter })));
 
-// Protected route wrapper
+// Protected route wrapper using Clerk
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  return <>{children}</>;
+  return (
+    <>
+      <SignedIn>{children}</SignedIn>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+    </>
+  );
 }
 
+// TODO: Custom auth pages for future implementation
+// Uncomment these routes and imports when switching from Clerk Account Portal to custom pages
+// import { SignIn, SignUp } from '@clerk/clerk-react';
+// 
+// function AuthPageWrapper({ children }: { children: React.ReactNode }) {
+//   return (
+//     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+//       {children}
+//     </div>
+//   );
+// }
+
 export default function App() {
-  const checkAuth = useAuthStore(state => state.checkAuth);
-
-  // Verify auth state on mount (check if userKey exists)
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
   return (
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<Landing />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      
+      {/* TODO: Custom Clerk Auth routes for future implementation
+       * Uncomment when switching from Clerk Account Portal to custom pages
+       * Also uncomment the AuthPageWrapper and imports above
+       */}
+      {/* <Route 
+        path="/login/*" 
+        element={
+          <AuthPageWrapper>
+            <SignIn 
+              routing="path" 
+              path="/login" 
+              signUpUrl="/register"
+              afterSignInUrl="/dashboard"
+            />
+          </AuthPageWrapper>
+        } 
+      />
+      <Route 
+        path="/register/*" 
+        element={
+          <AuthPageWrapper>
+            <SignUp 
+              routing="path" 
+              path="/register" 
+              signInUrl="/login"
+              afterSignUpUrl="/dashboard"
+            />
+          </AuthPageWrapper>
+        } 
+      /> */}
       
       {/* Protected dashboard routes */}
       <Route 

@@ -1,35 +1,50 @@
-import { useAuthStore } from '@/lib/stores';
+import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react';
 
 /**
- * Custom hook for authentication
- * Provides simplified interface to auth store for components
+ * User type compatible with existing components
+ * Maps Clerk user data to our app's user shape
+ */
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  licenseNumber?: string;
+}
+
+/**
+ * Custom hook for authentication using Clerk
+ * Provides a simplified interface matching the previous auth implementation
  * 
  * @example
  * ```tsx
- * const { user, isAuthenticated, login, logout } = useAuth();
+ * const { user, isAuthenticated, isLoading, signOut } = useAuth();
  * 
  * if (!isAuthenticated) return <Navigate to="/login" />;
  * ```
  */
 export const useAuth = () => {
-  const user = useAuthStore(state => state.user);
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const isLoading = useAuthStore(state => state.isLoading);
-  const error = useAuthStore(state => state.error);
-  
-  const login = useAuthStore(state => state.login);
-  const register = useAuthStore(state => state.register);
-  const logout = useAuthStore(state => state.logout);
-  const clearError = useAuthStore(state => state.clearError);
+  const { isLoaded, isSignedIn, signOut } = useClerkAuth();
+  const { user: clerkUser } = useUser();
+
+  // Map Clerk user to our app's user shape
+  const user: User | null = clerkUser ? {
+    id: clerkUser.id,
+    email: clerkUser.primaryEmailAddress?.emailAddress || '',
+    firstName: clerkUser.firstName || '',
+    lastName: clerkUser.lastName || '',
+    phone: clerkUser.primaryPhoneNumber?.phoneNumber,
+    // licenseNumber can be stored in Clerk's publicMetadata
+    licenseNumber: clerkUser.publicMetadata?.licenseNumber as string | undefined,
+  } : null;
 
   return {
     user,
-    isAuthenticated,
-    isLoading,
-    error,
-    login,
-    register,
-    logout,
-    clearError,
+    isAuthenticated: isSignedIn ?? false,
+    isLoading: !isLoaded,
+    // Keep logout as an alias for backward compatibility
+    logout: signOut,
+    signOut,
   };
 };

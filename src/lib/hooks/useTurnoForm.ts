@@ -6,7 +6,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { useAuthStore, usePatientStore } from '@/lib/stores';
+import { usePatientStore } from '@/lib/stores';
+import { useAuth } from '@/lib/hooks';
 import { SessionType, SessionStatus } from '@/lib/types/session';
 import type { CreateSessionDto, SessionResponse } from '@/lib/types/session';
 import type { Patient } from '@/lib/types/api.types';
@@ -60,7 +61,7 @@ export function useTurnoForm({
   onClose,
 }: UseTurnoFormProps) {
   const { t } = useTranslation();
-  const user = useAuthStore(state => state.user);
+  const { user } = useAuth();
   const fetchPatientById = usePatientStore(state => state.fetchPatientById);
   const selectedPatientFromStore = usePatientStore(state => state.selectedPatient);
 
