@@ -4,6 +4,8 @@ import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, MessageCircle, Globe,
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
+import { TimePicker } from '@/components/ui/time-picker';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
 import { LanguageSwitcher } from '@/components/shared';
@@ -489,533 +491,569 @@ export function Configuracion() {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6">
+    <div className="p-4 md:p-6 lg:p-8">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{t('settings.title')}</h1>
         <p className="text-sm text-gray-500">{t('settings.subtitle')}</p>
       </div>
 
-      <div className="space-y-4 sm:space-y-6">
-        {/* Language Section */}
-        <ConfigSection
-          icon={Globe}
-          iconColor="text-purple-600"
-          iconBg="bg-purple-100"
-          title={t('settings.language')}
-          description={t('settings.selectLanguage')}
-        >
-          <LanguageSwitcher showLabel={false} variant="dropdown" className="max-w-xs" />
-        </ConfigSection>
+      {/* Main Settings Container - constrained width for better readability */}
+      <div className="max-w-4xl">
+        <Tabs defaultValue="general" className="w-full">
+          {/* Tabs Navigation */}
+          <TabsList className="w-full sm:w-auto mb-6 bg-gray-100 p-1 rounded-xl overflow-x-auto flex-nowrap">
+            <TabsTrigger 
+              value="general"
+              className="flex-1 sm:flex-none data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-4 py-2 gap-2 rounded-lg transition-all"
+            >
+              <Globe className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('settings.sections.general')}</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="calendar"
+              className="flex-1 sm:flex-none data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-4 py-2 gap-2 rounded-lg transition-all"
+            >
+              <Calendar className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('settings.sections.calendar')}</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="notifications"
+              className="flex-1 sm:flex-none data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-4 py-2 gap-2 rounded-lg transition-all"
+            >
+              <Bell className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('settings.sections.notifications')}</span>
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Google Calendar Sync */}
-        <CalendarSync />
+          {/* ============================================ */}
+          {/* TAB: General Settings */}
+          {/* ============================================ */}
+          <TabsContent value="general" className="space-y-4">
+            {/* Language Section */}
+            <ConfigSection
+              icon={Globe}
+              iconColor="text-purple-600"
+              iconBg="bg-purple-100"
+              title={t('settings.language')}
+              description={t('settings.selectLanguage')}
+            >
+              <LanguageSwitcher showLabel={false} variant="dropdown" className="max-w-xs" />
+            </ConfigSection>
 
-        {/* Días Off - Right after Calendar Sync */}
-        <ConfigSection
-          icon={Calendar}
-          iconColor="text-rose-600"
-          iconBg="bg-rose-100"
-          title={t('settings.daysOff.title')}
-          description={t('settings.daysOff.description')}
-        >
-          <div className="space-y-4">
-            {/* Loading state */}
-            {isLoadingSettings && diasOffFromApi.length === 0 ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 text-rose-600 animate-spin" />
-              </div>
-            ) : (
-              <>
-                {/* Lista de días off */}
-                {diasOffFromApi.length > 0 ? (
-                  <div className="space-y-2">
-                    {diasOffFromApi.map(dia => (
-                      <div 
-                        key={dia.id} 
-                        className={`flex items-center justify-between gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg group hover:bg-gray-100 transition-colors ${deletingDayOffId === dia.id ? 'opacity-50' : ''}`}
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Calendar className="w-4 h-4 text-rose-600" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-gray-900">{formatDateRangeDisplay(dia.fechaInicio, dia.fechaFin)}</p>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-xs text-rose-600 font-medium">{formatDiaOffTime(dia)}</span>
-                              {dia.motivo && (
-                                <>
-                                  <span className="text-gray-300">•</span>
-                                  <span className="text-xs text-gray-500 truncate">{dia.motivo}</span>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleRemoveDiaOff(dia.id)}
-                          disabled={deletingDayOffId === dia.id}
-                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                          title={t('common.delete')}
-                          aria-label={t('common.delete')}
-                        >
-                          {deletingDayOffId === dia.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <X className="w-4 h-4" />
-                          )}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-200">
-                    <Calendar className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">{t('settings.daysOff.noDaysOff')}</p>
-                    <p className="text-xs text-gray-400 mt-1">{t('settings.daysOff.noDaysOffHint')}</p>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Formulario para agregar */}
-            {showAddDiaOff ? (
-              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-4">
-                {/* Fecha Inicio y Fecha Fin */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label htmlFor="diaoff-fecha-inicio" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.startDate')}</label>
-                    <DatePicker
-                      id="diaoff-fecha-inicio"
-                      value={newDiaOff.fechaInicio}
-                      onChange={(date) => setNewDiaOff({ ...newDiaOff, fechaInicio: date || '', fechaFin: newDiaOff.fechaFin || date || '' })}
-                      className="w-full"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="diaoff-fecha-fin" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.endDate')}</label>
-                    <DatePicker
-                      id="diaoff-fecha-fin"
-                      value={newDiaOff.fechaFin}
-                      onChange={(date) => setNewDiaOff({ ...newDiaOff, fechaFin: date || '' })}
-                      fromDate={newDiaOff.fechaInicio ? new Date(newDiaOff.fechaInicio) : undefined}
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-
-                {/* Motivo */}
-                <div>
-                  <label htmlFor="diaoff-motivo" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.reason')} ({t('common.optional')})</label>
-                  <input
-                    id="diaoff-motivo"
-                    type="text"
-                    value={newDiaOff.motivo}
-                    onChange={(e) => setNewDiaOff({ ...newDiaOff, motivo: e.target.value })}
-                    placeholder={t('settings.daysOff.reasonPlaceholder')}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
-                  />
-                </div>
-
-                {/* Tipo de día off */}
-                <fieldset>
-                  <legend className="block text-xs font-medium text-gray-700 mb-2">{t('settings.daysOff.blockType')}</legend>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="radiogroup" aria-label={t('settings.daysOff.blockType')}>
-                    {DIA_OFF_TIPO_KEYS.map((tipo) => (
-                      <button
-                        key={tipo.value}
-                        type="button"
-                        onClick={() => setNewDiaOff({ ...newDiaOff, tipo: tipo.value })}
-                        className={`
-                          p-2 rounded-lg border text-left transition-all
-                          ${newDiaOff.tipo === tipo.value
-                            ? 'border-rose-500 bg-rose-50 ring-1 ring-rose-500'
-                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-100'
-                          }
-                        `}
-                      >
-                        <p className={`text-sm font-medium ${newDiaOff.tipo === tipo.value ? 'text-rose-700' : 'text-gray-900'}`}>
-                          {t(tipo.labelKey)}
-                        </p>
-                        <p className="text-xs text-gray-500">{tipo.descriptionKey.startsWith('settings.') ? t(tipo.descriptionKey) : tipo.descriptionKey}</p>
-                      </button>
-                    ))}
+            {/* Working Hours */}
+            <ConfigSection
+              icon={Clock}
+              iconColor="text-indigo-600"
+              iconBg="bg-indigo-100"
+              title={t('settings.workingHours.title')}
+              description={t('settings.workingHours.description')}
+            >
+              <div className="space-y-5">
+                {/* Horario de atención */}
+                <fieldset className="space-y-2">
+                  <legend className="block text-sm font-medium text-gray-700">
+                    {t('settings.workingHours.schedule')}
+                  </legend>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <label htmlFor="working-hours-start" className="text-sm text-gray-500">{t('common.from')}</label>
+                      <TimePicker
+                        id="working-hours-start"
+                        value={localSettings.workingHours.startTime}
+                        onChange={(time) => updateLocalSetting('workingHours', {
+                          ...localSettings.workingHours,
+                          startTime: time,
+                        })}
+                        className="w-28"
+                        minHour={5}
+                        maxHour={22}
+                        minuteStep={30}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label htmlFor="working-hours-end" className="text-sm text-gray-500">{t('common.to').toLowerCase()}</label>
+                      <TimePicker
+                        id="working-hours-end"
+                        value={localSettings.workingHours.endTime}
+                        onChange={(time) => updateLocalSetting('workingHours', {
+                          ...localSettings.workingHours,
+                          endTime: time,
+                        })}
+                        className="w-28"
+                        minHour={5}
+                        maxHour={23}
+                        minuteStep={30}
+                      />
+                    </div>
                   </div>
                 </fieldset>
 
-                {/* Rango horario personalizado */}
-                {newDiaOff.tipo === 'custom' && (
-                  <div className="flex flex-wrap items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
-                    <div className="flex items-center gap-2">
-                      <label htmlFor="diaoff-start-time" className="text-sm text-gray-500">{t('common.from')}</label>
-                      <input
-                        id="diaoff-start-time"
-                        type="time"
-                        value={newDiaOff.startTime}
-                        onChange={(e) => setNewDiaOff({ ...newDiaOff, startTime: e.target.value })}
-                        className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white"
-                      />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <label htmlFor="diaoff-end-time" className="text-sm text-gray-500">{t('common.to').toLowerCase()}</label>
-                      <input
-                        id="diaoff-end-time"
-                        type="time"
-                        value={newDiaOff.endTime}
-                        onChange={(e) => setNewDiaOff({ ...newDiaOff, endTime: e.target.value })}
-                        className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white"
-                      />
-                    </div>
+                {/* Días de trabajo */}
+                <fieldset className="space-y-2">
+                  <legend className="block text-sm font-medium text-gray-700">
+                    {t('settings.workingHours.workingDays')}
+                  </legend>
+                  <div className="flex flex-wrap gap-2" role="group" aria-label={t('settings.workingHours.workingDays')}>
+                    {WEEKDAY_KEYS.map((day) => {
+                      const isSelected = localSettings.workingHours.workingDays.includes(day.id);
+                      return (
+                        <button
+                          key={day.id}
+                          type="button"
+                          onClick={() => {
+                            const newDays = isSelected
+                              ? localSettings.workingHours.workingDays.filter(d => d !== day.id)
+                              : [...localSettings.workingHours.workingDays, day.id];
+                            updateLocalSetting('workingHours', {
+                              ...localSettings.workingHours,
+                              workingDays: newDays,
+                            });
+                          }}
+                          className={`
+                            w-9 h-9 rounded-full text-xs font-medium transition-all
+                            ${isSelected 
+                              ? 'bg-indigo-600 text-white shadow-sm' 
+                              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                            }
+                          `}
+                          title={t(day.nameKey)}
+                          aria-label={t(day.nameKey)}
+                          aria-pressed={isSelected}
+                        >
+                          {t(day.shortKey)}
+                        </button>
+                      );
+                    })}
                   </div>
-                )}
-
-                <div className="flex items-center gap-2 justify-end pt-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setShowAddDiaOff(false);
-                      setNewDiaOff({ fechaInicio: '', fechaFin: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
-                    }}
-                    disabled={isAddingDayOff}
-                  >
-                    {t('common.cancel')}
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleAddDiaOff}
-                    disabled={isAddingDayOff}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                  >
-                    {isAddingDayOff ? (
-                      <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                    ) : (
-                      <Plus className="w-4 h-4 mr-1" />
-                    )}
-                    {t('common.add')}
-                  </Button>
-                </div>
+                  <p className="text-xs text-gray-500">
+                    {t('settings.workingHours.nonWorkingDaysHint')}
+                  </p>
+                </fieldset>
               </div>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAddDiaOff(true)}
-                className="w-full sm:w-auto"
-              >
-                <Plus className="w-4 h-4 mr-2 text-rose-600" />
-                {t('settings.daysOff.addDayOff')}
-              </Button>
-            )}
-          </div>
-        </ConfigSection>
+            </ConfigSection>
+          </TabsContent>
 
-        {/* Horario Laboral */}
-        <ConfigSection
-          icon={Clock}
-          iconColor="text-indigo-600"
-          iconBg="bg-indigo-100"
-          title={t('settings.workingHours.title')}
-          description={t('settings.workingHours.description')}
-        >
-          <div className="space-y-6">
-            {/* Horario de atención */}
-            <fieldset className="space-y-3">
-              <legend className="block text-sm font-medium text-gray-700">
-                {t('settings.workingHours.schedule')}
-              </legend>
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <label htmlFor="working-hours-start" className="text-sm text-gray-500">{t('common.from')}</label>
-                  <input
-                    id="working-hours-start"
-                    type="time"
-                    value={localSettings.workingHours.startTime}
-                    onChange={(e) => updateLocalSetting('workingHours', {
-                      ...localSettings.workingHours,
-                      startTime: e.target.value,
-                    })}
-                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <label htmlFor="working-hours-end" className="text-sm text-gray-500">{t('common.to').toLowerCase()}</label>
-                  <input
-                    id="working-hours-end"
-                    type="time"
-                    value={localSettings.workingHours.endTime}
-                    onChange={(e) => updateLocalSetting('workingHours', {
-                      ...localSettings.workingHours,
-                      endTime: e.target.value,
-                    })}
-                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
-                  />
-                </div>
-              </div>
-            </fieldset>
+          {/* ============================================ */}
+          {/* TAB: Calendar & Scheduling */}
+          {/* ============================================ */}
+          <TabsContent value="calendar" className="space-y-4">
+            {/* Google Calendar Sync */}
+            <CalendarSync />
 
-            {/* Días de trabajo */}
-            <fieldset className="space-y-3">
-              <legend className="block text-sm font-medium text-gray-700">
-                {t('settings.workingHours.workingDays')}
-              </legend>
-              <div className="flex flex-wrap gap-2" role="group" aria-label={t('settings.workingHours.workingDays')}>
-                {WEEKDAY_KEYS.map((day) => {
-                  const isSelected = localSettings.workingHours.workingDays.includes(day.id);
-                  return (
-                    <button
-                      key={day.id}
-                      type="button"
-                      onClick={() => {
-                        const newDays = isSelected
-                          ? localSettings.workingHours.workingDays.filter(d => d !== day.id)
-                          : [...localSettings.workingHours.workingDays, day.id];
-                        updateLocalSetting('workingHours', {
-                          ...localSettings.workingHours,
-                          workingDays: newDays,
-                        });
-                      }}
-                      className={`
-                        w-10 h-10 rounded-full text-sm font-medium transition-all
-                        ${isSelected 
-                          ? 'bg-indigo-600 text-white shadow-sm' 
-                          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                        }
-                      `}
-                      title={t(day.nameKey)}
-                      aria-label={t(day.nameKey)}
-                      aria-pressed={isSelected}
-                    >
-                      {t(day.shortKey)}
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="text-xs text-gray-500">
-                {t('settings.workingHours.nonWorkingDaysHint')}
-              </p>
-            </fieldset>
-
-            {/* Preview */}
-            <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
-              <p className="text-xs sm:text-sm text-indigo-800">
-                <span className="font-medium">{t('settings.workingHours.yourSchedule')}:</span>{' '}
-                {localSettings.workingHours.workingDays.length > 0 ? (
-                  <>
-                    {WEEKDAY_KEYS.filter(d => localSettings.workingHours.workingDays.includes(d.id))
-                      .map(d => t(d.nameKey))
-                      .join(', ')}{' '}
-                    {t('common.from').toLowerCase()} {localSettings.workingHours.startTime} {t('common.to').toLowerCase()} {localSettings.workingHours.endTime}
-                  </>
+            {/* Días Off */}
+            <ConfigSection
+              icon={Calendar}
+              iconColor="text-rose-600"
+              iconBg="bg-rose-100"
+              title={t('settings.daysOff.title')}
+              description={t('settings.daysOff.description')}
+            >
+              <div className="space-y-4">
+                {/* Loading state */}
+                {isLoadingSettings && diasOffFromApi.length === 0 ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 text-rose-600 animate-spin" />
+                  </div>
                 ) : (
-                  t('settings.workingHours.noWorkingDays')
+                  <>
+                    {/* Lista de días off */}
+                    {diasOffFromApi.length > 0 ? (
+                      <div className="space-y-2">
+                        {diasOffFromApi.map(dia => (
+                          <div 
+                            key={dia.id} 
+                            className={`flex items-center justify-between gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg group hover:bg-gray-100 transition-colors ${deletingDayOffId === dia.id ? 'opacity-50' : ''}`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Calendar className="w-4 h-4 text-rose-600" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-gray-900">{formatDateRangeDisplay(dia.fechaInicio, dia.fechaFin)}</p>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-xs text-rose-600 font-medium">{formatDiaOffTime(dia)}</span>
+                                  {dia.motivo && (
+                                    <>
+                                      <span className="text-gray-300">•</span>
+                                      <span className="text-xs text-gray-500 truncate">{dia.motivo}</span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => handleRemoveDiaOff(dia.id)}
+                              disabled={deletingDayOffId === dia.id}
+                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                              title={t('common.delete')}
+                              aria-label={t('common.delete')}
+                            >
+                              {deletingDayOffId === dia.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <X className="w-4 h-4" />
+                              )}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                        <Calendar className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">{t('settings.daysOff.noDaysOff')}</p>
+                        <p className="text-xs text-gray-400 mt-1">{t('settings.daysOff.noDaysOffHint')}</p>
+                      </div>
+                    )}
+                  </>
                 )}
-              </p>
-            </div>
-          </div>
-        </ConfigSection>
 
-        {/* Recordatorios de Cobros */}
-        <ConfigSection
-          icon={DollarSign}
-          iconColor="text-orange-600"
-          iconBg="bg-orange-100"
-          title={t('settings.paymentReminders.title')}
-          description={t('settings.paymentReminders.description')}
-        >
-          <div className="space-y-6">
-            {/* Automatización - Coming Soon */}
-            <ComingSoonWrapper text={t('common.comingSoon')}>
-              <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700">{t('settings.paymentReminders.automation')}</h3>
-                <ToggleRow
-                  checked={localSettings.recordatoriosCobros}
-                  onChange={(v) => updateLocalSetting('recordatoriosCobros', v)}
-                  label={t('settings.paymentReminders.enableAuto')}
-                  description={t('settings.paymentReminders.enableAutoHint')}
-                />
+                {/* Formulario para agregar */}
+                {showAddDiaOff ? (
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-4">
+                    {/* Fecha Inicio y Fecha Fin */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label htmlFor="diaoff-fecha-inicio" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.startDate')}</label>
+                        <DatePicker
+                          id="diaoff-fecha-inicio"
+                          value={newDiaOff.fechaInicio}
+                          onChange={(date) => setNewDiaOff({ ...newDiaOff, fechaInicio: date || '', fechaFin: newDiaOff.fechaFin || date || '' })}
+                          className="w-full"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="diaoff-fecha-fin" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.endDate')}</label>
+                        <DatePicker
+                          id="diaoff-fecha-fin"
+                          value={newDiaOff.fechaFin}
+                          onChange={(date) => setNewDiaOff({ ...newDiaOff, fechaFin: date || '' })}
+                          fromDate={newDiaOff.fechaInicio ? new Date(newDiaOff.fechaInicio) : undefined}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
 
-                {localSettings.recordatoriosCobros && (
-                  <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
-                    {/* Frecuencia */}
-                    <div className="space-y-2">
-                      <label htmlFor="frecuencia-recordatorio" className="block text-sm font-medium text-gray-700">
-                        {t('settings.paymentReminders.frequency')}
-                      </label>
-                      <select
-                        id="frecuencia-recordatorio"
-                        value={localSettings.frecuenciaRecordatorio}
-                        onChange={(e) => updateLocalSetting('frecuenciaRecordatorio', e.target.value)}
-                        className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                    {/* Motivo */}
+                    <div>
+                      <label htmlFor="diaoff-motivo" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.reason')} ({t('common.optional')})</label>
+                      <input
+                        id="diaoff-motivo"
+                        type="text"
+                        value={newDiaOff.motivo}
+                        onChange={(e) => setNewDiaOff({ ...newDiaOff, motivo: e.target.value })}
+                        placeholder={t('settings.daysOff.reasonPlaceholder')}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                      />
+                    </div>
+
+                    {/* Tipo de día off */}
+                    <fieldset>
+                      <legend className="block text-xs font-medium text-gray-700 mb-2">{t('settings.daysOff.blockType')}</legend>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="radiogroup" aria-label={t('settings.daysOff.blockType')}>
+                        {DIA_OFF_TIPO_KEYS.map((tipo) => (
+                          <button
+                            key={tipo.value}
+                            type="button"
+                            onClick={() => setNewDiaOff({ ...newDiaOff, tipo: tipo.value })}
+                            className={`
+                              p-2 rounded-lg border text-left transition-all
+                              ${newDiaOff.tipo === tipo.value
+                                ? 'border-rose-500 bg-rose-50 ring-1 ring-rose-500'
+                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-100'
+                              }
+                            `}
+                          >
+                            <p className={`text-sm font-medium ${newDiaOff.tipo === tipo.value ? 'text-rose-700' : 'text-gray-900'}`}>
+                              {t(tipo.labelKey)}
+                            </p>
+                            <p className="text-xs text-gray-500">{tipo.descriptionKey.startsWith('settings.') ? t(tipo.descriptionKey) : tipo.descriptionKey}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </fieldset>
+
+                    {/* Rango horario personalizado */}
+                    {newDiaOff.tipo === 'custom' && (
+                      <div className="flex flex-wrap items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+                        <div className="flex items-center gap-2">
+                          <label htmlFor="diaoff-start-time" className="text-sm text-gray-500">{t('common.from')}</label>
+                          <TimePicker
+                            id="diaoff-start-time"
+                            value={newDiaOff.startTime}
+                            onChange={(time) => setNewDiaOff({ ...newDiaOff, startTime: time })}
+                            className="w-28"
+                            minHour={0}
+                            maxHour={23}
+                            minuteStep={15}
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label htmlFor="diaoff-end-time" className="text-sm text-gray-500">{t('common.to').toLowerCase()}</label>
+                          <TimePicker
+                            id="diaoff-end-time"
+                            value={newDiaOff.endTime}
+                            onChange={(time) => setNewDiaOff({ ...newDiaOff, endTime: time })}
+                            className="w-28"
+                            minHour={0}
+                            maxHour={23}
+                            minuteStep={15}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2 justify-end pt-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setShowAddDiaOff(false);
+                          setNewDiaOff({ fechaInicio: '', fechaFin: '', motivo: '', tipo: 'full', startTime: '12:00', endTime: '18:00' });
+                        }}
+                        disabled={isAddingDayOff}
                       >
-                        <option value="diario">{t('settings.paymentReminders.daily')}</option>
-                        <option value="semanal">{t('settings.paymentReminders.weekly')}</option>
-                        <option value="quincenal">{t('settings.paymentReminders.biweekly')}</option>
-                      </select>
-                    </div>
-
-                    {/* Mínimo de turnos */}
-                    <div className="space-y-2">
-                      <label htmlFor="minimo-turnos" className="block text-sm font-medium text-gray-700">
-                        {t('settings.paymentReminders.minimumSessions')}
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          id="minimo-turnos"
-                          type="number"
-                          min="1"
-                          max="20"
-                          value={localSettings.minimoTurnos}
-                          onChange={(e) => updateLocalSetting('minimoTurnos', Number(e.target.value))}
-                          className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
-                        />
-                        <span className="text-sm text-gray-600">
-                          {localSettings.minimoTurnos === 1 ? t('settings.paymentReminders.sessionsUnpaid') : t('settings.paymentReminders.sessionsUnpaidPlural')}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Preview */}
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                      <p className="text-xs sm:text-sm text-orange-800">
-                        <span className="font-medium">{t('settings.paymentReminders.example')}:</span> {t('settings.paymentReminders.exampleText', { count: localSettings.minimoTurnos })}
-                      </p>
+                        {t('common.cancel')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={handleAddDiaOff}
+                        disabled={isAddingDayOff}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                      >
+                        {isAddingDayOff ? (
+                          <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                        ) : (
+                          <Plus className="w-4 h-4 mr-1" />
+                        )}
+                        {t('common.add')}
+                      </Button>
                     </div>
                   </div>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAddDiaOff(true)}
+                    className="w-full sm:w-auto"
+                  >
+                    <Plus className="w-4 h-4 mr-2 text-rose-600" />
+                    {t('settings.daysOff.addDayOff')}
+                  </Button>
                 )}
               </div>
-            </ComingSoonWrapper>
+            </ConfigSection>
+          </TabsContent>
 
-            {/* Payment Reminder Template - ENABLED */}
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center gap-2">
-                <MessageCircle className="w-4 h-4 text-green-600" />
-                <label htmlFor="whatsapp-payment-template" className="block text-sm font-medium text-gray-700">
-                  {t('settings.paymentReminders.whatsappTemplate')}
-                </label>
-              </div>
-              <p className="text-xs text-gray-500">
-                {t('settings.paymentReminders.whatsappTemplateHint')}{' '}
-                {t('settings.paymentReminders.variablesAvailable')}: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{monto}'}</code>
-              </p>
-              <textarea
-                id="whatsapp-payment-template"
-                value={localSettings.whatsappTemplates.paymentReminder}
-                onChange={(e) => updateLocalSetting('whatsappTemplates', {
-                  ...localSettings.whatsappTemplates,
-                  paymentReminder: e.target.value
-                })}
-                rows={3}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-              />
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => updateLocalSetting('whatsappTemplates', {
-                    ...localSettings.whatsappTemplates,
-                    paymentReminder: DEFAULT_PAYMENT_TEMPLATE
-                  })}
-                  className="text-xs text-indigo-600 hover:text-indigo-800"
-                >
-                  {t('settings.paymentReminders.restoreDefault')}
-                </button>
-              </div>
-            </div>
-          </div>
-        </ConfigSection>
+          {/* ============================================ */}
+          {/* TAB: Notifications & Reminders */}
+          {/* ============================================ */}
+          <TabsContent value="notifications" className="space-y-4">
+            {/* Recordatorios de Cobros */}
+            <ConfigSection
+              icon={DollarSign}
+              iconColor="text-orange-600"
+              iconBg="bg-orange-100"
+              title={t('settings.paymentReminders.title')}
+              description={t('settings.paymentReminders.description')}
+            >
+              <div className="space-y-6">
+                {/* Automatización - Coming Soon */}
+                <ComingSoonWrapper text={t('common.comingSoon')}>
+                  <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-700">{t('settings.paymentReminders.automation')}</h3>
+                    <ToggleRow
+                      checked={localSettings.recordatoriosCobros}
+                      onChange={(v) => updateLocalSetting('recordatoriosCobros', v)}
+                      label={t('settings.paymentReminders.enableAuto')}
+                      description={t('settings.paymentReminders.enableAutoHint')}
+                    />
 
-        {/* Recordatorios de Turnos */}
-        <ConfigSection
-          icon={Bell}
-          iconColor="text-blue-600"
-          iconBg="bg-blue-100"
-          title={t('settings.appointmentReminders.title')}
-          description={t('settings.appointmentReminders.description')}
-        >
-          <div className="space-y-6">
-            {/* Automatización - Coming Soon */}
-            <ComingSoonWrapper text={t('common.comingSoon')}>
-              <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700">{t('settings.appointmentReminders.automation')}</h3>
-                <ToggleRow
-                  checked={localSettings.recordatoriosPacientes}
-                  onChange={(v) => updateLocalSetting('recordatoriosPacientes', v)}
-                  label={t('settings.appointmentReminders.enableAuto')}
-                  description={t('settings.appointmentReminders.enableAutoHint')}
-                />
+                    {localSettings.recordatoriosCobros && (
+                      <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
+                        {/* Frecuencia */}
+                        <div className="space-y-2">
+                          <label htmlFor="frecuencia-recordatorio" className="block text-sm font-medium text-gray-700">
+                            {t('settings.paymentReminders.frequency')}
+                          </label>
+                          <select
+                            id="frecuencia-recordatorio"
+                            value={localSettings.frecuenciaRecordatorio}
+                            onChange={(e) => updateLocalSetting('frecuenciaRecordatorio', e.target.value)}
+                            className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                          >
+                            <option value="diario">{t('settings.paymentReminders.daily')}</option>
+                            <option value="semanal">{t('settings.paymentReminders.weekly')}</option>
+                            <option value="quincenal">{t('settings.paymentReminders.biweekly')}</option>
+                          </select>
+                        </div>
 
-                {localSettings.recordatoriosPacientes && (
-                  <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
-                    {/* Horas de anticipación */}
-                    <div className="space-y-2">
-                      <label htmlFor="horas-anticipacion" className="block text-sm font-medium text-gray-700">
-                        {t('settings.appointmentReminders.hoursBeforeLabel')}
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          id="horas-anticipacion"
-                          type="number"
-                          min="1"
-                          max="72"
-                          value={localSettings.horasAnticipacion}
-                          onChange={(e) => updateLocalSetting('horasAnticipacion', Number(e.target.value))}
-                          className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
-                        />
-                        <span className="text-sm text-gray-600">{t('settings.appointmentReminders.hoursBeforeAppointment')}</span>
+                        {/* Mínimo de turnos */}
+                        <div className="space-y-2">
+                          <label htmlFor="minimo-turnos" className="block text-sm font-medium text-gray-700">
+                            {t('settings.paymentReminders.minimumSessions')}
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              id="minimo-turnos"
+                              type="number"
+                              min="1"
+                              max="20"
+                              value={localSettings.minimoTurnos}
+                              onChange={(e) => updateLocalSetting('minimoTurnos', Number(e.target.value))}
+                              className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                            />
+                            <span className="text-sm text-gray-600">
+                              {localSettings.minimoTurnos === 1 ? t('settings.paymentReminders.sessionsUnpaid') : t('settings.paymentReminders.sessionsUnpaidPlural')}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Preview */}
+                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                          <p className="text-xs sm:text-sm text-orange-800">
+                            <span className="font-medium">{t('settings.paymentReminders.example')}:</span> {t('settings.paymentReminders.exampleText', { count: localSettings.minimoTurnos })}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Preview */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                      <p className="text-xs sm:text-sm text-blue-800">
-                        <span className="font-medium">{t('settings.appointmentReminders.example')}:</span> {t('settings.appointmentReminders.exampleText', { hours: localSettings.horasAnticipacion })}
-                      </p>
-                    </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </ComingSoonWrapper>
+                </ComingSoonWrapper>
 
-            {/* Turno Reminder Template - ENABLED */}
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center gap-2">
-                <MessageCircle className="w-4 h-4 text-green-600" />
-                <label htmlFor="whatsapp-turno-template" className="block text-sm font-medium text-gray-700">
-                  {t('settings.appointmentReminders.whatsappTemplate')}
-                </label>
+                {/* Payment Reminder Template - ENABLED */}
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4 text-green-600" />
+                    <label htmlFor="whatsapp-payment-template" className="block text-sm font-medium text-gray-700">
+                      {t('settings.paymentReminders.whatsappTemplate')}
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    {t('settings.paymentReminders.whatsappTemplateHint')}{' '}
+                    {t('settings.paymentReminders.variablesAvailable')}: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{monto}'}</code>
+                  </p>
+                  <textarea
+                    id="whatsapp-payment-template"
+                    value={localSettings.whatsappTemplates.paymentReminder}
+                    onChange={(e) => updateLocalSetting('whatsappTemplates', {
+                      ...localSettings.whatsappTemplates,
+                      paymentReminder: e.target.value
+                    })}
+                    rows={3}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => updateLocalSetting('whatsappTemplates', {
+                        ...localSettings.whatsappTemplates,
+                        paymentReminder: DEFAULT_PAYMENT_TEMPLATE
+                      })}
+                      className="text-xs text-indigo-600 hover:text-indigo-800"
+                    >
+                      {t('settings.paymentReminders.restoreDefault')}
+                    </button>
+                  </div>
+                </div>
               </div>
-              <p className="text-xs text-gray-500">
-                {t('settings.appointmentReminders.whatsappTemplateHint')}{' '}
-                {t('settings.paymentReminders.variablesAvailable')}: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{hora}'}</code>
-              </p>
-              <textarea
-                id="whatsapp-turno-template"
-                value={localSettings.whatsappTemplates.turnoReminder}
-                onChange={(e) => updateLocalSetting('whatsappTemplates', {
-                  ...localSettings.whatsappTemplates,
-                  turnoReminder: e.target.value
-                })}
-                rows={3}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-              />
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => updateLocalSetting('whatsappTemplates', {
-                    ...localSettings.whatsappTemplates,
-                    turnoReminder: DEFAULT_TURNO_TEMPLATE
-                  })}
-                  className="text-xs text-indigo-600 hover:text-indigo-800"
-                >
-                  {t('settings.paymentReminders.restoreDefault')}
-                </button>
-              </div>
-            </div>
-          </div>
-        </ConfigSection>
+            </ConfigSection>
 
-        {/* Botón Guardar */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+            {/* Recordatorios de Turnos */}
+            <ConfigSection
+              icon={Bell}
+              iconColor="text-blue-600"
+              iconBg="bg-blue-100"
+              title={t('settings.appointmentReminders.title')}
+              description={t('settings.appointmentReminders.description')}
+            >
+              <div className="space-y-6">
+                {/* Automatización - Coming Soon */}
+                <ComingSoonWrapper text={t('common.comingSoon')}>
+                  <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-700">{t('settings.appointmentReminders.automation')}</h3>
+                    <ToggleRow
+                      checked={localSettings.recordatoriosPacientes}
+                      onChange={(v) => updateLocalSetting('recordatoriosPacientes', v)}
+                      label={t('settings.appointmentReminders.enableAuto')}
+                      description={t('settings.appointmentReminders.enableAutoHint')}
+                    />
+
+                    {localSettings.recordatoriosPacientes && (
+                      <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
+                        {/* Horas de anticipación */}
+                        <div className="space-y-2">
+                          <label htmlFor="horas-anticipacion" className="block text-sm font-medium text-gray-700">
+                            {t('settings.appointmentReminders.hoursBeforeLabel')}
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              id="horas-anticipacion"
+                              type="number"
+                              min="1"
+                              max="72"
+                              value={localSettings.horasAnticipacion}
+                              onChange={(e) => updateLocalSetting('horasAnticipacion', Number(e.target.value))}
+                              className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                            />
+                            <span className="text-sm text-gray-600">{t('settings.appointmentReminders.hoursBeforeAppointment')}</span>
+                          </div>
+                        </div>
+
+                        {/* Preview */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <p className="text-xs sm:text-sm text-blue-800">
+                            <span className="font-medium">{t('settings.appointmentReminders.example')}:</span> {t('settings.appointmentReminders.exampleText', { hours: localSettings.horasAnticipacion })}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </ComingSoonWrapper>
+
+                {/* Turno Reminder Template - ENABLED */}
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4 text-green-600" />
+                    <label htmlFor="whatsapp-turno-template" className="block text-sm font-medium text-gray-700">
+                      {t('settings.appointmentReminders.whatsappTemplate')}
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    {t('settings.appointmentReminders.whatsappTemplateHint')}{' '}
+                    {t('settings.paymentReminders.variablesAvailable')}: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{hora}'}</code>
+                  </p>
+                  <textarea
+                    id="whatsapp-turno-template"
+                    value={localSettings.whatsappTemplates.turnoReminder}
+                    onChange={(e) => updateLocalSetting('whatsappTemplates', {
+                      ...localSettings.whatsappTemplates,
+                      turnoReminder: e.target.value
+                    })}
+                    rows={3}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => updateLocalSetting('whatsappTemplates', {
+                        ...localSettings.whatsappTemplates,
+                        turnoReminder: DEFAULT_TURNO_TEMPLATE
+                      })}
+                      className="text-xs text-indigo-600 hover:text-indigo-800"
+                    >
+                      {t('settings.paymentReminders.restoreDefault')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </ConfigSection>
+          </TabsContent>
+        </Tabs>
+
+        {/* ============================================ */}
+        {/* Save Button - Fixed at bottom, visible across all tabs */}
+        {/* ============================================ */}
+        <div className="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-gray-200">
           {hasChanges && (
             <span className="text-sm text-amber-600">{t('common.unsavedChanges')}</span>
           )}
