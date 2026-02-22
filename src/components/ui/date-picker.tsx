@@ -154,21 +154,21 @@ function DatePicker({
           aria-label={ariaLabel || placeholderText}
           aria-invalid={ariaInvalid}
           className={cn(
-            "flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm",
-            "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+            "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm",
+            "hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring",
             "disabled:cursor-not-allowed disabled:opacity-50",
-            !date && "text-gray-400",
-            ariaInvalid && "border-red-300 bg-red-50",
+            !date && "text-muted-foreground",
+            ariaInvalid && "border-destructive bg-destructive/10",
             className
           )}
         >
           <span className="flex items-center gap-2">
-            <CalendarIcon className="h-4 w-4 text-gray-400" />
+            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
             <span className="truncate">{displayValue}</span>
           </span>
           {clearable && date && !disabled && (
             <X
-              className="h-4 w-4 text-gray-400 hover:text-gray-600 cursor-pointer"
+              className="h-4 w-4 text-muted-foreground hover:text-foreground cursor-pointer"
               onClick={handleClear}
               aria-label={t("common.clear")}
             />
@@ -179,7 +179,7 @@ function DatePicker({
         <PopoverPrimitive.Content
           align="start"
           sideOffset={4}
-          className="z-[9999] bg-white rounded-md border border-gray-200 shadow-lg p-0"
+          className="z-[9999] bg-popover text-popover-foreground rounded-md border shadow-lg p-0"
         >
           <Calendar
             mode="single"

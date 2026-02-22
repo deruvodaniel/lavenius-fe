@@ -4,11 +4,10 @@ import * as React from "react";
 import { CalendarIcon, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { DateRange } from "react-day-picker";
+import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 import { cn } from "./utils";
-import { Button } from "./button";
 import { Calendar } from "./calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 // ============================================================================
 // TYPES
@@ -178,51 +177,57 @@ function DateRangePicker({
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
+    <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+      <PopoverPrimitive.Trigger asChild>
+        <button
           type="button"
           id={id}
-          variant="outline"
           disabled={disabled}
           aria-label={ariaLabel || placeholderText}
           aria-invalid={ariaInvalid}
           className={cn(
-            "w-full justify-start text-left font-normal",
+            "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm",
+            "hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring",
+            "disabled:cursor-not-allowed disabled:opacity-50",
             !dateRange?.from && "text-muted-foreground",
-            ariaInvalid && "border-red-300 bg-red-50",
+            ariaInvalid && "border-destructive bg-destructive/10",
             className
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          <span className="flex-1 truncate">{displayValue}</span>
+          <span className="flex items-center gap-2">
+            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+            <span className="truncate">{displayValue}</span>
+          </span>
           {clearable && dateRange?.from && !disabled && (
             <X
-              className="ml-2 h-4 w-4 opacity-50 hover:opacity-100"
+              className="h-4 w-4 text-muted-foreground hover:text-foreground cursor-pointer"
               onClick={handleClear}
               aria-label={t("common.clear")}
             />
           )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent 
-        className={cn(
-          "w-auto p-0",
-          monthsToShow > 1 && "min-w-[540px]"
-        )} 
-        align="start"
-      >
-        <Calendar
-          mode="range"
-          selected={dateRange}
-          onSelect={handleSelect}
-          numberOfMonths={monthsToShow}
-          fromDate={fromDate}
-          toDate={toDate}
-          initialFocus
-        />
-      </PopoverContent>
-    </Popover>
+        </button>
+      </PopoverPrimitive.Trigger>
+      <PopoverPrimitive.Portal>
+        <PopoverPrimitive.Content
+          align="start"
+          sideOffset={4}
+          className={cn(
+            "z-[9999] bg-popover text-popover-foreground rounded-md border shadow-lg p-0",
+            monthsToShow > 1 && "min-w-[540px]"
+          )}
+        >
+          <Calendar
+            mode="range"
+            selected={dateRange}
+            onSelect={handleSelect}
+            numberOfMonths={monthsToShow}
+            fromDate={fromDate}
+            toDate={toDate}
+            initialFocus
+          />
+        </PopoverPrimitive.Content>
+      </PopoverPrimitive.Portal>
+    </PopoverPrimitive.Root>
   );
 }
 

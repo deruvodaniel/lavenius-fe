@@ -4,48 +4,105 @@
 
 @layer base {
   :root {
-    --background: hsl(0 0% 100%);
-    --foreground: hsl(222.2 84% 4.9%);
-    --card: hsl(0 0% 100%);
-    --card-foreground: hsl(222.2 84% 4.9%);
-    --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(222.2 84% 4.9%);
-    --primary: hsl(221.2 83.2% 53.3%);
-    --primary-foreground: hsl(210 40% 98%);
-    --secondary: hsl(210 40% 96.1%);
-    --secondary-foreground: hsl(222.2 47.4% 11.2%);
-    --muted: hsl(210 40% 96.1%);
-    --muted-foreground: hsl(215.4 16.3% 46.9%);
-    --accent: hsl(210 40% 96.1%);
-    --accent-foreground: hsl(222.2 47.4% 11.2%);
-    --destructive: hsl(0 84.2% 60.2%);
-    --destructive-foreground: hsl(210 40% 98%);
-    --border: hsl(214.3 31.8% 91.4%);
-    --input: hsl(214.3 31.8% 91.4%);
-    --ring: hsl(221.2 83.2% 53.3%);
+    /* Background & Foreground */
+    --background: #ffffff;
+    --foreground: #0f172a;
+    
+    /* Card */
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    
+    /* Popover */
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+    
+    /* Primary - Indigo 600 */
+    --primary: #4f46e5;
+    --primary-foreground: #ffffff;
+    
+    /* Secondary - Slate 100 */
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+    
+    /* Muted - Slate 100/500 */
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    
+    /* Accent - Slate 100 */
+    --accent: #f1f5f9;
+    --accent-foreground: #0f172a;
+    
+    /* Destructive - Red 500 */
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    
+    /* Border, Input, Ring */
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --input-background: #f3f4f6;
+    --ring: #4f46e5;
+    
+    /* Radius */
     --radius: 0.5rem;
+    
+    /* Chart colors */
+    --chart-1: #4f46e5;
+    --chart-2: #06b6d4;
+    --chart-3: #10b981;
+    --chart-4: #f59e0b;
+    --chart-5: #ef4444;
   }
 
   .dark {
-    --background: hsl(222.2 84% 4.9%);
-    --foreground: hsl(210 40% 98%);
-    --card: hsl(222.2 84% 4.9%);
-    --card-foreground: hsl(210 40% 98%);
-    --popover: hsl(222.2 84% 4.9%);
-    --popover-foreground: hsl(210 40% 98%);
-    --primary: hsl(217.2 91.2% 59.8%);
-    --primary-foreground: hsl(222.2 47.4% 11.2%);
-    --secondary: hsl(217.2 32.6% 17.5%);
-    --secondary-foreground: hsl(210 40% 98%);
-    --muted: hsl(217.2 32.6% 17.5%);
-    --muted-foreground: hsl(215 20.2% 65.1%);
-    --accent: hsl(217.2 32.6% 17.5%);
-    --accent-foreground: hsl(210 40% 98%);
-    --destructive: hsl(0 62.8% 30.6%);
-    --destructive-foreground: hsl(210 40% 98%);
-    --border: hsl(217.2 32.6% 17.5%);
-    --input: hsl(217.2 32.6% 17.5%);
-    --ring: hsl(224.3 76.3% 48%);
+    /* Background & Foreground */
+    --background: #0f172a;
+    --foreground: #f8fafc;
+    
+    /* Card */
+    --card: #1e293b;
+    --card-foreground: #f8fafc;
+    
+    /* Popover */
+    --popover: #1e293b;
+    --popover-foreground: #f8fafc;
+    
+    /* Primary - Indigo 400 */
+    --primary: #818cf8;
+    --primary-foreground: #0f172a;
+    
+    /* Secondary - Slate 800 */
+    --secondary: #1e293b;
+    --secondary-foreground: #f8fafc;
+    
+    /* Muted - Slate 800/400 */
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    
+    /* Accent - Slate 800 */
+    --accent: #1e293b;
+    --accent-foreground: #f8fafc;
+    
+    /* Destructive - Red 900/400 */
+    --destructive: #7f1d1d;
+    --destructive-foreground: #fca5a5;
+    
+    /* Border, Input, Ring */
+    --border: #334155;
+    --input: #334155;
+    --input-background: #1e293b;
+    --ring: #818cf8;
+    
+    /* Chart colors - brighter for dark mode */
+    --chart-1: #818cf8;
+    --chart-2: #22d3ee;
+    --chart-3: #34d399;
+    --chart-4: #fbbf24;
+    --chart-5: #f87171;
+  }
+
+  /* Apply theme colors to body */
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
@@ -108,7 +165,7 @@ body {
 
 [data-sonner-toast] [data-close-button]:focus-visible {
   opacity: 1 !important;
-  outline: 2px solid hsl(var(--ring)) !important;
+  outline: 2px solid var(--ring) !important;
   outline-offset: 2px !important;
 }
 

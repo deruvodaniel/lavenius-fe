@@ -10,6 +10,7 @@ export default {
       colors: {
         border: "var(--border)",
         input: "var(--input)",
+        "input-background": "var(--input-background)",
         ring: "var(--ring)",
         background: "var(--background)",
         foreground: "var(--foreground)",
@@ -40,6 +41,13 @@ export default {
         card: {
           DEFAULT: "var(--card)",
           foreground: "var(--card-foreground)",
+        },
+        chart: {
+          1: "var(--chart-1)",
+          2: "var(--chart-2)",
+          3: "var(--chart-3)",
+          4: "var(--chart-4)",
+          5: "var(--chart-5)",
         },
       },
       borderRadius: {
