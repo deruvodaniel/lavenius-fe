@@ -13,6 +13,7 @@
 import { ArrowLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { TurnoDrawer } from '../agenda';
 import { NoteDrawer } from '../notes/NoteDrawer';
@@ -31,11 +32,12 @@ import type { CreateSessionDto } from '@/lib/types/session';
 
 interface FichaClinicaProps {
   patient: Patient | null;
-  onBack: () => void;
+  onBack?: () => void; // Optional - defaults to browser history back
 }
 
 export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { updatePatient, fetchPatients } = usePatients();
   const { sessionsUI, isLoading: isLoadingSessions, fetchUpcoming, createSession } = useSessions();
   const { notes, isLoading: isLoadingNotes, error: notesError, fetchNotesByPatient, createNote, updateNote, deleteNote, clearNotes, clearError: clearNotesError } = useNotes();
@@ -251,11 +253,11 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
       {/* Back Button */}
       <button
-        onClick={onBack}
+        onClick={() => onBack ? onBack() : navigate(-1)}
         className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 mb-6 transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />
-        <span>{t('clinicalFile.backToPatients')}</span>
+        <span>{t('common.back')}</span>
       </button>
 
       {/* Patient Header */}
