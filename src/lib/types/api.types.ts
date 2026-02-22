@@ -99,6 +99,9 @@ export type Patient = {
   riskLevel?: 'low' | 'medium' | 'high';
   isMedicated?: boolean;
   status: PatientStatus;
+  // WhatsApp opt-in fields for reminder messages
+  whatsappOptIn?: boolean;
+  whatsappOptInDate?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -228,6 +231,8 @@ export type CreatePatientDto = {
   riskLevel?: 'low' | 'medium' | 'high';
   isMedicated?: boolean;
   status?: PatientStatus;
+  // WhatsApp opt-in fields for reminder messages
+  whatsappOptIn?: boolean;
 };
 
 export type UpdatePatientDto = Partial<CreatePatientDto>;

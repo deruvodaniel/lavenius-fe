@@ -27,12 +27,12 @@ export interface DayOffConfig {
 export interface DuePaymentReminderConfig {
   frequency: PaymentReminderFrequency;
   remindDuePaymentLimit: number; // Limit number of unpaid payments
-  message: string;
+  message?: string; // Optional - message templates are managed by backend (Meta API approved)
 }
 
 export interface NextSessionReminderConfig {
   hoursBeforeSession: number; // Hours before the session
-  message: string;
+  message?: string; // Optional - message templates are managed by backend (Meta API approved)
 }
 
 // ==================== Therapist Info ====================

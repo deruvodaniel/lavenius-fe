@@ -11,6 +11,7 @@ import type {
 } from '../types/setting.types';
 import {
   SettingType,
+  PaymentReminderFrequency,
   isDayOffSetting,
   isDuePaymentReminderSetting,
   isNextSessionReminderSetting,
@@ -47,6 +48,9 @@ interface SettingActions {
   createDayOff: (config: DayOffConfig, description?: string) => Promise<Setting>;
   updateSetting: (id: string, data: UpdateSettingDto) => Promise<Setting>;
   deleteSetting: (id: string) => Promise<void>;
+  // Reminder-specific actions (message templates managed by backend)
+  upsertNextSessionReminder: (config: { hoursBeforeSession: number; message?: string }, active: boolean) => Promise<Setting>;
+  upsertDuePaymentReminder: (config: { frequency: 'daily' | 'weekly' | 'biweekly'; remindDuePaymentLimit: number; message?: string }, active: boolean) => Promise<Setting>;
   reset: () => void;
 }
 
@@ -159,6 +163,70 @@ export const useSettingStore = create<SettingState & SettingActions>((set, get) 
         fetchStatus: 'error',
       });
       throw error;
+    }
+  },
+
+  upsertNextSessionReminder: async (config, active) => {
+    const { settings } = get();
+    const existing = settings.find(isNextSessionReminderSetting);
+    
+    // Build config object, only including message if provided
+    const reminderConfig: { hoursBeforeSession: number; message?: string } = {
+      hoursBeforeSession: config.hoursBeforeSession,
+    };
+    if (config.message !== undefined) {
+      reminderConfig.message = config.message;
+    }
+    
+    if (existing) {
+      // Update existing setting
+      return get().updateSetting(existing.id, {
+        active,
+        config: reminderConfig,
+      });
+    } else {
+      // Create new setting
+      return get().createSetting({
+        type: SettingType.NEXT_SESSION_REMINDER,
+        active,
+        config: reminderConfig,
+      });
+    }
+  },
+
+  upsertDuePaymentReminder: async (config, active) => {
+    const { settings } = get();
+    const existing = settings.find(isDuePaymentReminderSetting);
+    
+    // Map string frequency to enum
+    const frequencyMap: Record<string, PaymentReminderFrequency> = {
+      daily: PaymentReminderFrequency.DAILY,
+      weekly: PaymentReminderFrequency.WEEKLY,
+      biweekly: PaymentReminderFrequency.BIWEEKLY,
+    };
+    
+    // Build config object, only including message if provided
+    const reminderConfig: { frequency: PaymentReminderFrequency; remindDuePaymentLimit: number; message?: string } = {
+      frequency: frequencyMap[config.frequency],
+      remindDuePaymentLimit: config.remindDuePaymentLimit,
+    };
+    if (config.message !== undefined) {
+      reminderConfig.message = config.message;
+    }
+    
+    if (existing) {
+      // Update existing setting
+      return get().updateSetting(existing.id, {
+        active,
+        config: reminderConfig,
+      });
+    } else {
+      // Create new setting
+      return get().createSetting({
+        type: SettingType.DUE_PAYMENT_REMINDER,
+        active,
+        config: reminderConfig,
+      });
     }
   },
 

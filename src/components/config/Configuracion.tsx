@@ -1,18 +1,16 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, MessageCircle, Globe, Loader2 } from 'lucide-react';
+import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, Globe, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
-import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
 import { LanguageSwitcher } from '@/components/shared';
 import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
-import { type DayOffConfig, type DayOffSetting, PaymentReminderFrequency } from '@/lib/types/setting.types';
+import { type DayOffConfig, type DayOffSetting } from '@/lib/types/setting.types';
 import { cn } from '@/components/ui/utils';
 
 // ============================================================================
@@ -77,32 +75,17 @@ interface WorkingHours {
   workingDays: number[]; // [1, 2, 3, 4, 5] = Mon-Fri
 }
 
-interface WhatsAppTemplates {
-  turnoReminder: string;
-  paymentReminder: string;
-}
-
 // LocalStorage settings (non-API settings)
-// Note: Reminder settings (recordatoriosCobros, recordatoriosPacientes, etc.) 
-// are now stored in the backend via the settings API
+// Note: Reminder settings and WhatsApp templates are managed by the backend
 interface LocalSettings {
   workingHours: WorkingHours;
-  whatsappTemplates: WhatsAppTemplates;
 }
-
-// Default WhatsApp templates with placeholders
-const DEFAULT_TURNO_TEMPLATE = 'Hola {nombre}! Te recuerdo que tenes un turno agendado para el *{fecha}* a las *{hora}*. Podes confirmar tu asistencia? Responde *Si* para confirmar o *No* si necesitas cancelar. Gracias!';
-const DEFAULT_PAYMENT_TEMPLATE = 'Hola {nombre}! Te escribo para recordarte que tenes un pago pendiente del *{fecha}* por *{monto}*. Podes abonar por transferencia o en efectivo en tu proxima sesion. Gracias!';
 
 const defaultLocalSettings: LocalSettings = {
   workingHours: {
     startTime: '09:00',
     endTime: '18:00',
     workingDays: [1, 2, 3, 4, 5], // Monday to Friday
-  },
-  whatsappTemplates: {
-    turnoReminder: DEFAULT_TURNO_TEMPLATE,
-    paymentReminder: DEFAULT_PAYMENT_TEMPLATE,
   },
 };
 
@@ -355,14 +338,13 @@ export function Configuracion() {
   const isLoadingSettings = fetchStatus === 'loading';
   
   // Reminder state from backend settings (with local UI state for editing)
+  // Note: Message templates are managed by backend (Meta API approved templates)
   const [paymentReminderEnabled, setPaymentReminderEnabled] = useState(false);
   const [paymentReminderFrequency, setPaymentReminderFrequency] = useState<'daily' | 'weekly' | 'biweekly'>('weekly');
   const [paymentReminderLimit, setPaymentReminderLimit] = useState(3);
-  const [paymentReminderMessage, setPaymentReminderMessage] = useState('');
   
   const [sessionReminderEnabled, setSessionReminderEnabled] = useState(false);
   const [sessionReminderHours, setSessionReminderHours] = useState(24);
-  const [sessionReminderMessage, setSessionReminderMessage] = useState('');
   
   // Track saving state for reminders
   const [isSavingReminders, setIsSavingReminders] = useState(false);
@@ -401,7 +383,6 @@ export function Configuracion() {
       setPaymentReminderEnabled(paymentReminderSetting.active);
       setPaymentReminderFrequency(paymentReminderSetting.config.frequency as 'daily' | 'weekly' | 'biweekly');
       setPaymentReminderLimit(paymentReminderSetting.config.remindDuePaymentLimit);
-      setPaymentReminderMessage(paymentReminderSetting.config.message);
     }
   }, [paymentReminderSetting]);
 
@@ -409,7 +390,6 @@ export function Configuracion() {
     if (sessionReminderSetting) {
       setSessionReminderEnabled(sessionReminderSetting.active);
       setSessionReminderHours(sessionReminderSetting.config.hoursBeforeSession);
-      setSessionReminderMessage(sessionReminderSetting.config.message);
     }
   }, [sessionReminderSetting]);
 
@@ -445,6 +425,7 @@ export function Configuracion() {
   };
 
   // Handle saving reminder settings to backend
+  // Note: Message templates are managed by backend (Meta API approved templates)
   const handleSaveReminders = async () => {
     setIsSavingReminders(true);
     try {
@@ -454,14 +435,12 @@ export function Configuracion() {
           {
             frequency: paymentReminderFrequency,
             remindDuePaymentLimit: paymentReminderLimit,
-            message: paymentReminderMessage || localSettings.whatsappTemplates.paymentReminder,
           },
           paymentReminderEnabled
         ),
         upsertNextSessionReminder(
           {
             hoursBeforeSession: sessionReminderHours,
-            message: sessionReminderMessage || localSettings.whatsappTemplates.turnoReminder,
           },
           sessionReminderEnabled
         ),
@@ -1041,42 +1020,6 @@ export function Configuracion() {
                     </div>
                   )}
                 </div>
-
-                {/* Payment Reminder Template */}
-                <div className="space-y-3 pt-2">
-                  <div className="flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4 text-green-600" />
-                    <label htmlFor="whatsapp-payment-template" className="block text-sm font-medium text-gray-700">
-                      {t('settings.paymentReminders.whatsappTemplate')}
-                    </label>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    {t('settings.paymentReminders.whatsappTemplateHint')}{' '}
-                    {t('settings.paymentReminders.variablesAvailable')}: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{monto}'}</code>
-                  </p>
-                  <textarea
-                    id="whatsapp-payment-template"
-                    value={paymentReminderMessage || localSettings.whatsappTemplates.paymentReminder}
-                    onChange={(e) => {
-                      setPaymentReminderMessage(e.target.value);
-                      markReminderChanged();
-                    }}
-                    rows={3}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                  />
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPaymentReminderMessage(DEFAULT_PAYMENT_TEMPLATE);
-                        markReminderChanged();
-                      }}
-                      className="text-xs text-indigo-600 hover:text-indigo-800"
-                    >
-                      {t('settings.paymentReminders.restoreDefault')}
-                    </button>
-                  </div>
-                </div>
               </div>
             </ConfigSection>
 
@@ -1134,42 +1077,6 @@ export function Configuracion() {
                       </div>
                     </div>
                   )}
-                </div>
-
-                {/* Turno Reminder Template */}
-                <div className="space-y-3 pt-2">
-                  <div className="flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4 text-green-600" />
-                    <label htmlFor="whatsapp-turno-template" className="block text-sm font-medium text-gray-700">
-                      {t('settings.appointmentReminders.whatsappTemplate')}
-                    </label>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    {t('settings.appointmentReminders.whatsappTemplateHint')}{' '}
-                    {t('settings.paymentReminders.variablesAvailable')}: <code className="bg-gray-100 px-1 rounded">{'{nombre}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{hora}'}</code>
-                  </p>
-                  <textarea
-                    id="whatsapp-turno-template"
-                    value={sessionReminderMessage || localSettings.whatsappTemplates.turnoReminder}
-                    onChange={(e) => {
-                      setSessionReminderMessage(e.target.value);
-                      markReminderChanged();
-                    }}
-                    rows={3}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                  />
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSessionReminderMessage(DEFAULT_TURNO_TEMPLATE);
-                        markReminderChanged();
-                      }}
-                      className="text-xs text-indigo-600 hover:text-indigo-800"
-                    >
-                      {t('settings.paymentReminders.restoreDefault')}
-                    </button>
-                  </div>
                 </div>
               </div>
             </ConfigSection>
