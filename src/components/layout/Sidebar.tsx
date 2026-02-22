@@ -160,8 +160,14 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
                     )
                   }
                 >
-                  <div className="w-10 h-10 bg-indigo-600 ring-2 ring-indigo-400 rounded-full flex items-center justify-center flex-shrink-0 group-hover:ring-indigo-300 transition-colors">
-                    <span className="text-white text-sm font-semibold">
+                  <div className={cn(
+                    'bg-indigo-600 ring-2 ring-indigo-400 rounded-full flex items-center justify-center flex-shrink-0 group-hover:ring-indigo-300 transition-all duration-200',
+                    collapsed ? 'w-5 h-5 ring-1' : 'w-10 h-10'
+                  )}>
+                    <span className={cn(
+                      'text-white font-semibold',
+                      collapsed ? 'text-[10px]' : 'text-sm'
+                    )}>
                       {user.firstName.charAt(0).toUpperCase()}{user.lastName.charAt(0).toUpperCase()}
                     </span>
                   </div>

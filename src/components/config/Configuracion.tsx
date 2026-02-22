@@ -1100,14 +1100,14 @@ export function Configuracion() {
       {/* Fixed Footer - Save Button */}
       {/* ============================================ */}
       <div className="flex-shrink-0 bg-white border-t border-gray-200 px-4 md:px-6 lg:px-8 py-4">
-        <div className="max-w-6xl flex items-center justify-end gap-3">
+        <div className="max-w-6xl ml-auto flex items-center justify-end gap-3">
           {hasChanges && (
             <span className="text-sm text-amber-600">{t('common.unsavedChanges')}</span>
           )}
           <Button 
             onClick={handleSave}
             disabled={!hasChanges || isSaving}
-            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save className="w-4 h-4 mr-2" />
             {isSaving ? t('common.saving') : t('common.save')}
