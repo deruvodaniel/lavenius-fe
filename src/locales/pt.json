@@ -193,7 +193,10 @@
       "sessionType": "Tipo de Sessão",
       "frequency": "Frequência",
       "currentTreatment": "Tratamento Atual",
-      "observations": "Observações"
+      "observations": "Observações",
+      "whatsappOptIn": "Lembretes por WhatsApp",
+      "whatsappOptInDescription": "O paciente concorda em receber lembretes de consultas e pagamentos via WhatsApp",
+      "whatsappOptInDate": "Aceito em {{date}}"
     },
     "modality": {
       "label": "Modalidade",

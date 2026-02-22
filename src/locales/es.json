@@ -202,7 +202,10 @@
       "sessionType": "Tipo de Sesión",
       "frequency": "Frecuencia",
       "currentTreatment": "Tratamiento Actual",
-      "observations": "Observaciones"
+      "observations": "Observaciones",
+      "whatsappOptIn": "Recordatorios por WhatsApp",
+      "whatsappOptInDescription": "El paciente acepta recibir recordatorios de turnos y pagos por WhatsApp",
+      "whatsappOptInDate": "Aceptado el {{date}}"
     },
     "modality": {
       "label": "Modalidad",

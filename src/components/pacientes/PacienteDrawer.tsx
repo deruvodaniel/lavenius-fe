@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { User, Phone, Mail, Heart, Video, MapPin, Calendar, AlertCircle } from 'lucide-react';
+import { User, Phone, Mail, Heart, Video, MapPin, Calendar, AlertCircle, MessageCircle } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import { BaseDrawer, DrawerBody, DrawerFooter } from '../shared/BaseDrawer';
 import { Button } from '../ui/button';
@@ -86,6 +86,7 @@ const getInitialFormData = () => ({
   diagnostico: '',
   tratamientoActual: '',
   observaciones: '',
+  whatsappOptIn: false,
 });
 
 // ============================================================================
@@ -155,6 +156,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
       diagnostico: patient.diagnosis || '',
       tratamientoActual: patient.currentTreatment || '',
       observaciones: patient.observations || '',
+      whatsappOptIn: patient.whatsappOptIn || false,
     };
   }, [patient]);
   
@@ -244,6 +246,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
       diagnosis: formData.diagnostico.trim() || undefined,
       currentTreatment: formData.tratamientoActual.trim() || undefined,
       observations: formData.observaciones.trim() || undefined,
+      whatsappOptIn: formData.whatsappOptIn,
     };
 
     onSave(patientDto);
@@ -392,6 +395,44 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 placeholder={t('patients.drawer.placeholders.healthInsurance')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
+            </div>
+
+            {/* WhatsApp Opt-In */}
+            <div className="pt-2">
+              <label
+                htmlFor="paciente-whatsapp-optin"
+                className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                  formData.whatsappOptIn
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-gray-200 hover:border-green-300'
+                }`}
+              >
+                <input
+                  id="paciente-whatsapp-optin"
+                  type="checkbox"
+                  checked={formData.whatsappOptIn}
+                  onChange={(e) => setFormData({ ...formData, whatsappOptIn: e.target.checked })}
+                  className="mt-0.5 w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4 text-green-600" />
+                    <span className={`text-sm font-medium ${formData.whatsappOptIn ? 'text-green-700' : 'text-gray-700'}`}>
+                      {t('patients.fields.whatsappOptIn')}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {t('patients.fields.whatsappOptInDescription')}
+                  </p>
+                  {patient?.whatsappOptInDate && formData.whatsappOptIn && (
+                    <p className="text-xs text-green-600 mt-1">
+                      {t('patients.fields.whatsappOptInDate', {
+                        date: new Date(patient.whatsappOptInDate).toLocaleDateString()
+                      })}
+                    </p>
+                  )}
+                </div>
+              </label>
             </div>
           </div>
         </div>
