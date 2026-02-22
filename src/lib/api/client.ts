@@ -139,18 +139,20 @@ interface TokenStorage {
   setToken(token: string): void;
   removeToken(): void;
   getUserKey(): string | null;
-  setUserKey(key: string): void;
+  setUserKey(key: string, rememberMe?: boolean): void;
   removeUserKey(): void;
   clear(): void;
+  isRememberMeEnabled?(): boolean;
 }
 
 /**
  * Default Token Storage Implementation
- * Token persists across sessions, userKey only for current session
+ * Token persists across sessions, userKey persists based on "Remember Me" preference
  */
 class DefaultTokenStorage implements TokenStorage {
   private readonly TOKEN_KEY = 'access_token';
   private readonly USER_KEY = 'userKey';
+  private readonly REMEMBER_ME_KEY = 'rememberMe';
 
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
@@ -165,21 +167,48 @@ class DefaultTokenStorage implements TokenStorage {
   }
 
   getUserKey(): string | null {
-    // IMPORTANTE: Solo en sessionStorage por seguridad
+    // Check if "Remember Me" was enabled - if so, look in localStorage first
+    const rememberMe = localStorage.getItem(this.REMEMBER_ME_KEY) === 'true';
+    if (rememberMe) {
+      return localStorage.getItem(this.USER_KEY);
+    }
+    // Otherwise, only check sessionStorage (more secure, clears on browser close)
     return sessionStorage.getItem(this.USER_KEY);
   }
 
-  setUserKey(key: string): void {
-    sessionStorage.setItem(this.USER_KEY, key);
+  setUserKey(key: string, rememberMe: boolean = false): void {
+    // Store the preference
+    localStorage.setItem(this.REMEMBER_ME_KEY, String(rememberMe));
+    
+    if (rememberMe) {
+      // Persist in localStorage (survives browser close)
+      localStorage.setItem(this.USER_KEY, key);
+      // Clear from sessionStorage if it was there
+      sessionStorage.removeItem(this.USER_KEY);
+    } else {
+      // Store in sessionStorage only (clears on browser close)
+      sessionStorage.setItem(this.USER_KEY, key);
+      // Clear from localStorage if it was there
+      localStorage.removeItem(this.USER_KEY);
+    }
   }
 
   removeUserKey(): void {
     sessionStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem(this.REMEMBER_ME_KEY);
   }
 
   clear(): void {
     this.removeToken();
     this.removeUserKey();
+  }
+  
+  /**
+   * Check if "Remember Me" is enabled
+   */
+  isRememberMeEnabled(): boolean {
+    return localStorage.getItem(this.REMEMBER_ME_KEY) === 'true';
   }
 }
 
@@ -281,9 +310,14 @@ export class ApiClient {
   private handleResponseError(error: unknown): Promise<never> {
     if (axios.isAxiosError(error)) {
       const apiError = error.response?.data as ApiError | undefined;
+      const requestUrl = error.config?.url || '';
 
-      // Handle 401 Unauthorized
-      if (error.response?.status === 401) {
+      // Handle 401 Unauthorized - but NOT for auth endpoints (login/register)
+      // Those are expected to return 401 for invalid credentials
+      const isAuthEndpoint = requestUrl.includes('/auth/login') || 
+                             requestUrl.includes('/auth/register');
+      
+      if (error.response?.status === 401 && !isAuthEndpoint) {
         this.handleUnauthorized();
       }
 
@@ -331,17 +365,22 @@ export class ApiClient {
 
   /**
    * Set user encryption key
+   * @param userKey - The encryption key
+   * @param rememberMe - If true, persists in localStorage; if false, only in sessionStorage
    */
-  setUserKey(userKey: string): void {
-    this.tokenStorage.setUserKey(userKey);
+  setUserKey(userKey: string, rememberMe: boolean = false): void {
+    this.tokenStorage.setUserKey(userKey, rememberMe);
   }
 
   /**
    * Set both token and userKey
+   * @param token - The access token
+   * @param userKey - The encryption key  
+   * @param rememberMe - If true, persists userKey in localStorage
    */
-  setAuth(token: string, userKey: string): void {
+  setAuth(token: string, userKey: string, rememberMe: boolean = false): void {
     this.setToken(token);
-    this.setUserKey(userKey);
+    this.setUserKey(userKey, rememberMe);
   }
 
   /**

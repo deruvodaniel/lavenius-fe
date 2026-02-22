@@ -5,6 +5,7 @@ import { User, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/lib/hooks';
@@ -12,6 +13,10 @@ import { getErrorMessage } from '@/lib/utils/error';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
 import type { LoginDto } from '@/lib/types/api.types';
+
+interface LoginFormData extends LoginDto {
+  rememberMe: boolean;
+}
 
 export function Login() {
   const { t } = useTranslation();
@@ -29,22 +34,28 @@ export function Login() {
     }
   }, [searchParams, t]);
 
-  const form = useForm<LoginDto>({
+  const form = useForm<LoginFormData>({
     defaultValues: {
       email: '',
       password: '',
       passphrase: '',
+      rememberMe: false,
     },
   });
 
-  const onSubmit = async (data: LoginDto) => {
+  const onSubmit = async (data: LoginFormData) => {
     if (isLoading) return;
     
     clearError();
     setShowSignupPrompt(false);
     
     try {
-      await login(data);
+      await login({
+        email: data.email,
+        password: data.password,
+        passphrase: data.passphrase,
+        rememberMe: data.rememberMe,
+      });
       toast.success(t('auth.welcomeBack'));
       navigate('/dashboard');
     } catch (err: unknown) {
@@ -144,6 +155,35 @@ export function Login() {
                       />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Remember Me checkbox */}
+              <FormField
+                control={form.control}
+                name="rememberMe"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={isLoading}
+                        id="rememberMe"
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel 
+                        htmlFor="rememberMe"
+                        className="text-sm font-normal text-gray-700 cursor-pointer"
+                      >
+                        {t('auth.rememberMe')}
+                      </FormLabel>
+                      <p className="text-xs text-gray-500">
+                        {t('auth.rememberMeHint')}
+                      </p>
+                    </div>
                   </FormItem>
                 )}
               />

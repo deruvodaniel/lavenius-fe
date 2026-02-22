@@ -7,6 +7,13 @@ import type {
 } from '../types/api.types';
 
 /**
+ * Extended Login DTO with rememberMe option
+ */
+export interface LoginOptions extends LoginDto {
+  rememberMe?: boolean;
+}
+
+/**
  * Authentication Service
  * Maneja todas las operaciones de autenticación con el backend
  */
@@ -25,16 +32,18 @@ export class AuthService {
       data
     );
 
-    // Guardar token y userKey automáticamente
-    apiClient.setAuth(response.access_token, response.userKey);
+    // Guardar token y userKey automáticamente (no remember me on register)
+    apiClient.setAuth(response.access_token, response.userKey, false);
 
     return response;
   }
 
   /**
    * Login with credentials and passphrase
+   * @param data - Login credentials
+   * @param rememberMe - If true, persists session across browser restarts
    */
-  async login(data: LoginDto): Promise<AuthResponse> {
+  async login(data: LoginDto, rememberMe: boolean = false): Promise<AuthResponse> {
     // Clear any existing auth data before login
     apiClient.clearAuth();
     
@@ -43,8 +52,8 @@ export class AuthService {
       data
     );
 
-    // Guardar token y userKey automáticamente
-    apiClient.setAuth(response.access_token, response.userKey);
+    // Guardar token y userKey con la preferencia de "Remember Me"
+    apiClient.setAuth(response.access_token, response.userKey, rememberMe);
 
     return response;
   }

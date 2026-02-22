@@ -5,6 +5,13 @@ import type { User, LoginDto, RegisterDto, ChangePassphraseDto } from '../types/
 import { ApiClientError } from '../api/client';
 
 /**
+ * Extended Login options with rememberMe
+ */
+interface LoginOptions extends LoginDto {
+  rememberMe?: boolean;
+}
+
+/**
  * Auth Store State
  */
 interface AuthState {
@@ -18,7 +25,7 @@ interface AuthState {
  * Auth Store Actions
  */
 interface AuthActions {
-  login: (data: LoginDto) => Promise<void>;
+  login: (data: LoginOptions) => Promise<void>;
   register: (data: RegisterDto) => Promise<void>;
   logout: () => void;
   changePassphrase: (data: ChangePassphraseDto) => Promise<void>;
@@ -54,12 +61,14 @@ export const useAuthStore = create<AuthStore>()(
 
       /**
        * Login user with credentials and passphrase
+       * @param data - Login credentials including optional rememberMe flag
        */
-      login: async (data: LoginDto) => {
+      login: async (data: LoginOptions) => {
         set({ isLoading: true, error: null });
         
         try {
-          const response = await authService.login(data);
+          const { rememberMe, ...loginData } = data;
+          const response = await authService.login(loginData, rememberMe);
           set({
             user: response.user,
             isAuthenticated: true,
