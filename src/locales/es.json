@@ -55,7 +55,13 @@
       "selectDate": "Seleccionar fecha",
       "selectRange": "Seleccionar rango",
       "clear": "Limpiar"
-    }
+    },
+    "timePicker": {
+      "selectTime": "Seleccionar hora",
+      "hours": "Horas",
+      "minutes": "Minutos"
+    },
+    "done": "Listo"
   },
   "navigation": {
     "dashboard": "Panel",
@@ -66,7 +72,9 @@
     "settings": "Configuración",
     "profile": "Perfil",
     "help": "Ayuda",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "collapseSidebar": "Contraer menú",
+    "expandSidebar": "Expandir menú"
   },
   "auth": {
     "login": "Iniciar sesión",
@@ -99,6 +107,8 @@
     "loginError": "Error al iniciar sesión",
     "registerError": "Error al registrar",
     "platformDescription": "Plataforma de gestión psicológica",
+    "rememberMe": "Mantener sesión iniciada",
+    "rememberMeHint": "No uses esta opción en computadoras públicas",
     "phone": "Teléfono",
     "phoneOptional": "Teléfono (opcional)",
     "licenseNumber": "Matrícula",

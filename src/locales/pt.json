@@ -55,7 +55,13 @@
       "selectDate": "Selecionar data",
       "selectRange": "Selecionar intervalo",
       "clear": "Limpar"
-    }
+    },
+    "timePicker": {
+      "selectTime": "Selecionar hora",
+      "hours": "Horas",
+      "minutes": "Minutos"
+    },
+    "done": "Pronto"
   },
   "navigation": {
     "dashboard": "Painel",
@@ -66,7 +72,9 @@
     "settings": "Configurações",
     "profile": "Perfil",
     "help": "Ajuda",
-    "logout": "Sair"
+    "logout": "Sair",
+    "collapseSidebar": "Recolher menu",
+    "expandSidebar": "Expandir menu"
   },
   "auth": {
     "login": "Entrar",
@@ -99,6 +107,8 @@
     "loginError": "Erro ao entrar",
     "registerError": "Erro ao cadastrar",
     "platformDescription": "Plataforma de gestão psicológica",
+    "rememberMe": "Manter sessão iniciada",
+    "rememberMeHint": "Não use esta opção em computadores públicos",
     "phone": "Telefone",
     "phoneOptional": "Telefone (opcional)",
     "licenseNumber": "Número do Registro",

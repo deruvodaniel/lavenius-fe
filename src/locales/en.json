@@ -55,7 +55,13 @@
       "selectDate": "Select date",
       "selectRange": "Select range",
       "clear": "Clear"
-    }
+    },
+    "timePicker": {
+      "selectTime": "Select time",
+      "hours": "Hours",
+      "minutes": "Minutes"
+    },
+    "done": "Done"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -66,7 +72,9 @@
     "settings": "Settings",
     "profile": "Profile",
     "help": "Help",
-    "logout": "Log out"
+    "logout": "Log out",
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "auth": {
     "login": "Log in",
@@ -99,6 +107,8 @@
     "loginError": "Login error",
     "registerError": "Registration error",
     "platformDescription": "Psychological management platform",
+    "rememberMe": "Keep me logged in",
+    "rememberMeHint": "Don't use this option on public computers",
     "phone": "Phone",
     "phoneOptional": "Phone (optional)",
     "licenseNumber": "License Number",

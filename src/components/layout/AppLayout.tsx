@@ -1,17 +1,21 @@
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/components/ui/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+const SIDEBAR_COLLAPSED_KEY = 'lavenius_sidebar_collapsed';
 
 interface AppLayoutProps {
   children: ReactNode;
-  sidebar: (onNavigate?: () => void) => ReactNode;
+  sidebar: (onNavigate?: () => void, collapsed?: boolean) => ReactNode;
   appName?: string;
 }
 
 /**
  * AppLayout - Main application layout with responsive behavior
  *
- * Desktop (>=1024px): Fixed sidebar on the left
+ * Desktop (>=1024px): Fixed sidebar on the left (collapsible)
  * Mobile/Tablet (<1024px): Top header with hamburger menu and drawer navigation
  * 
  * Note: Both layouts are always rendered to maintain consistent React component tree
@@ -20,6 +24,14 @@ interface AppLayoutProps {
 export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayoutProps) {
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    // Initialize from localStorage, default to expanded (false)
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+      return stored === 'true';
+    }
+    return false;
+  });
   const [isMobile, setIsMobile] = useState(() => {
     // Initialize with actual value if window exists
     if (typeof window !== 'undefined') {
@@ -45,9 +57,18 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
     return () => window.removeEventListener('resize', checkViewport);
   }, []);
 
+  // Persist collapsed state to localStorage
+  useEffect(() => {
+    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed));
+  }, [sidebarCollapsed]);
+
   const handleDrawerClose = () => {
     setDrawerOpen(false);
   };
+
+  const handleToggleCollapse = useCallback(() => {
+    setSidebarCollapsed(prev => !prev);
+  }, []);
 
   // Single consistent structure - CSS handles responsive visibility
   return (
@@ -73,7 +94,7 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
             onClick={handleDrawerClose}
           />
 
-          {/* Drawer Content */}
+          {/* Drawer Content - never collapsed on mobile */}
           <aside className="relative ml-auto h-full w-64 bg-indigo-900 text-white shadow-2xl overflow-y-auto">
             {sidebar(handleDrawerClose)}
           </aside>
@@ -81,9 +102,38 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
       )}
 
       {/* Desktop Sidebar - hidden on mobile */}
-      <aside className="hidden lg:block w-64 bg-indigo-900 text-white flex-shrink-0">
-        {sidebar()}
-      </aside>
+      <div className="hidden lg:block relative flex-shrink-0">
+        <aside 
+          className={cn(
+            'h-full bg-indigo-900 text-white transition-all duration-300 ease-in-out',
+            sidebarCollapsed ? 'w-20' : 'w-64'
+          )}
+        >
+          {sidebar(undefined, sidebarCollapsed)}
+        </aside>
+        
+        {/* Floating Toggle Button - positioned on sidebar edge */}
+        <TooltipProvider>
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <button
+                onClick={handleToggleCollapse}
+                className="absolute top-1/2 -translate-y-1/2 -right-3 z-30 w-6 h-6 bg-white rounded-full shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:shadow-lg transition-all duration-200"
+                aria-label={sidebarCollapsed ? t('navigation.expandSidebar') : t('navigation.collapseSidebar')}
+              >
+                {sidebarCollapsed ? (
+                  <ChevronRight className="w-4 h-4" />
+                ) : (
+                  <ChevronLeft className="w-4 h-4" />
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="bg-gray-900 text-white border-0 shadow-lg rounded-md text-sm font-medium">
+              {sidebarCollapsed ? t('navigation.expandSidebar') : t('navigation.collapseSidebar')}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
 
       {/* Main Content - always rendered */}
       <main className="flex-1 overflow-y-auto overflow-x-hidden">

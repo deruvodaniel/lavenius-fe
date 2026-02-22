@@ -39,11 +39,12 @@ export function Dashboard() {
     <>
       <AppLayout
         appName="Lavenius"
-        sidebar={(onNavigate) => (
+        sidebar={(onNavigate?: () => void, collapsed?: boolean) => (
           <Sidebar
             currentPath={location.pathname}
             onLogout={logout}
             onNavigate={onNavigate}
+            collapsed={collapsed}
           />
         )}
       >
