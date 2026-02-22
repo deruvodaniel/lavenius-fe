@@ -184,3 +184,102 @@ body {
 .dark [data-sonner-toast] [data-close-button]:hover {
   background: rgba(255, 255, 255, 0.2) !important;
 }
+
+/* ==========================================================================
+   Custom Scrollbar Styles
+   ========================================================================== */
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3); /* indigo-500 with opacity */
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.5); /* indigo-500 with more opacity */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: rgba(79, 70, 229, 0.7); /* indigo-600 with opacity */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Hide scrollbar arrows/buttons */
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+}
+
+/* Dark mode scrollbar adjustments */
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(129, 140, 248, 0.3); /* indigo-400 with opacity */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(129, 140, 248, 0.5);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.dark ::-webkit-scrollbar-thumb:active {
+  background: rgba(129, 140, 248, 0.7);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.dark * {
+  scrollbar-color: rgba(129, 140, 248, 0.3) transparent;
+}
+
+/* Sidebar specific - thinner scrollbar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Make scrollbar visible only on hover for cleaner look */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-on-hover {
+  scrollbar-width: none; /* Firefox - hide by default */
+}
+
+.scrollbar-on-hover::-webkit-scrollbar {
+  width: 0; /* Hide by default */
+}
+
+.scrollbar-on-hover:hover {
+  scrollbar-width: thin; /* Firefox - show on hover */
+}
+
+.scrollbar-on-hover:hover::-webkit-scrollbar {
+  width: 6px; /* Show on hover */
+}

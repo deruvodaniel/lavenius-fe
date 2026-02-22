@@ -121,7 +121,7 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
         )}
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-2 overflow-y-auto p-4 transition-all duration-200">
+        <nav className="flex-1 space-y-2 overflow-y-auto overflow-x-hidden p-4 transition-all duration-200">
           {menuItems.map((item) => (
             <NavItemWithTooltip
               key={item.path}
