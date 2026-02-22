@@ -490,3 +490,129 @@ body {
     animation: none !important;
   }
 }
+
+/* ==========================================================================
+   Onboarding Stepper Animations
+   ========================================================================== */
+
+/* Slide in from right (forward navigation) */
+@keyframes stepper-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in from left (backward navigation) */
+@keyframes stepper-slide-in-reverse {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Checkmark pop animation */
+@keyframes stepper-check {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Celebration bounce animation */
+@keyframes stepper-celebration {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  50% {
+    transform: scale(1.15) rotate(5deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(-3deg);
+  }
+}
+
+/* Error shake animation */
+@keyframes stepper-error {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-5px);
+  }
+  40%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+/* Progress bar pulse */
+@keyframes stepper-progress-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Animation classes */
+.animate-stepper-slide-in {
+  animation: stepper-slide-in 0.35s ease-out forwards;
+}
+
+.animate-stepper-slide-in-reverse {
+  animation: stepper-slide-in-reverse 0.35s ease-out forwards;
+}
+
+.animate-stepper-check {
+  animation: stepper-check 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-stepper-celebration {
+  animation: stepper-celebration 0.8s ease-in-out infinite;
+}
+
+.animate-stepper-error {
+  animation: stepper-error 0.4s ease-in-out;
+}
+
+.animate-stepper-progress-pulse {
+  animation: stepper-progress-pulse 2s ease-in-out infinite;
+}
+
+/* Reduced motion support for stepper animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-stepper-slide-in,
+  .animate-stepper-slide-in-reverse,
+  .animate-stepper-check,
+  .animate-stepper-celebration,
+  .animate-stepper-error,
+  .animate-stepper-progress-pulse {
+    animation: none !important;
+  }
+  
+  /* Still show elements, just without animation */
+  .animate-stepper-slide-in,
+  .animate-stepper-slide-in-reverse {
+    opacity: 1;
+    transform: none;
+  }
+}

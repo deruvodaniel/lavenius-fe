@@ -915,6 +915,32 @@
     "notFound": "Didn't find what you were looking for?",
     "contactUs": "Contact us at",
     "categories": {
+      "gettingStarted": {
+        "title": "Getting Started",
+        "description": "First steps in Lavenius",
+        "articles": {
+          "welcome": {
+            "title": "Welcome to Lavenius",
+            "content": "**Welcome to Lavenius!**\n\nLavenius is your comprehensive platform to manage your therapeutic practice in a simple and organized way.\n\n**What can you do with Lavenius?**\n\n- **Manage patients:** Record contact information, clinical history, and session notes\n- **Schedule appointments:** Organize your calendar with in-person or remote sessions\n- **Track billing:** Keep a record of pending and completed payments\n- **Sync calendar:** Connect with Google Calendar to receive reminders\n- **Analyze metrics:** View statistics of your practice\n\n**Tip:** Use the sidebar to navigate between the different sections of the application.",
+            "tags": ["welcome", "start", "introduction", "begin"]
+          },
+          "createAccount": {
+            "title": "Create your account",
+            "content": "**Registration in Lavenius**\n\nCreating your account is quick and easy:\n\n1. Click **\"Start for free\"** on the homepage\n2. Enter your email address\n3. Create a secure password\n4. Verify your email (if required)\n5. Done! You can now log in\n\n**Account information:**\n\nYour account includes:\n- First and last name\n- Email address (for login)\n- Profile picture (optional)\n\n**Note:** Lavenius uses secure authentication to protect your account.",
+            "tags": ["account", "registration", "create", "login"]
+          },
+          "completeProfile": {
+            "title": "Complete your professional profile",
+            "content": "**Profile Setup**\n\nAfter creating your account, we'll guide you to complete your professional profile:\n\n**Step 1: Professional Information**\n- Professional license number (required)\n- Specialty\n\n**Step 2: Contact Information**\n- Primary phone\n- Alternative phone\n- Office address\n\n**Step 3: Online Presence**\n- Website\n- Instagram\n- LinkedIn\n- Professional bio\n\n**Tip:** You can edit this information at any time from the **Profile** section in the sidebar.\n\n**Why is this important?**\n\nYour professional license helps us verify your practice and personalize your experience on the platform.",
+            "tags": ["profile", "license", "setup", "professional data", "onboarding"]
+          },
+          "firstSteps": {
+            "title": "Recommended first steps",
+            "content": "**Where to start?**\n\nWe recommend following these steps to get the most out of Lavenius:\n\n**1. Register your first patient**\n- Go to **Patients** in the sidebar\n- Click **\"New Patient\"**\n- Fill in the basic data (name, phone, email)\n\n**2. Schedule your first session**\n- Go to **Schedule** in the sidebar\n- Click **\"New Appointment\"**\n- Select the patient and choose date/time\n\n**3. Connect Google Calendar (optional)**\n- Go to **Settings**\n- In the \"Calendar\" section, connect your Google account\n- Your appointments will sync automatically\n\n**4. Set up your working hours**\n- In **Settings**, define your working days and hours\n- This will help organize your schedule better\n\n**Need help?**\n\nExplore the other sections of the Help Center to learn about each feature in detail.",
+            "tags": ["first steps", "start", "tutorial", "guide"]
+          }
+        }
+      },
       "agenda": {
         "title": "Schedule",
         "description": "Learn how to manage your appointments",
@@ -984,8 +1010,8 @@
         "articles": {
           "profile": {
             "title": "Edit your profile",
-            "content": "To edit your profile:\n\n1. Click your name in the sidebar\n2. Or go to the **Profile** section\n3. Modify your personal data\n4. Save the changes\n\nYou can update: name, email, and password.",
-            "tags": ["profile", "edit", "data", "account"]
+            "content": "Your profile has two parts:\n\n**Account data (managed by Clerk)**\n- First and last name\n- Profile picture\n- Email and password\n\nTo edit this data, click your avatar and select **\"Manage account\"**.\n\n**Professional data**\n\nTo edit your professional information:\n\n1. Go to the **Profile** section from the sidebar\n2. Modify your data (license, specialty, phones, etc.)\n3. Click **\"Save Changes\"**\n\nProfessional data includes: license number, specialty, contact phones, office address, social media, and bio.",
+            "tags": ["profile", "edit", "data", "account", "clerk"]
           },
           "calendarConfig": {
             "title": "Configure calendar",
@@ -1144,6 +1170,47 @@
       "firstSession": "Schedule your first session",
       "calendarSync": "Sync your calendar"
     },
+    "profile": {
+      "title": "Complete your professional profile",
+      "description": "We need some professional information to set up your account correctly.",
+      "steps": {
+        "account": "Account created",
+        "professional": "Professional info"
+      },
+      "fields": {
+        "licenseNumber": "Professional license number",
+        "specialty": "Specialty",
+        "phone": "Contact phone"
+      },
+      "placeholders": {
+        "licenseNumber": "e.g.: LIC 12345 / PSY 67890",
+        "specialty": "Select your specialty",
+        "phone": "+1 555 123-4567"
+      },
+      "validation": {
+        "licenseRequired": "License number is required",
+        "licenseMinLength": "License number must have at least 3 characters",
+        "phoneInvalid": "Phone must have at least 8 digits"
+      },
+      "specialties": {
+        "clinical_psychology": "Clinical Psychology",
+        "cognitive_behavioral": "Cognitive-Behavioral Therapy",
+        "psychoanalysis": "Psychoanalysis",
+        "family_therapy": "Family Therapy",
+        "child_psychology": "Child Psychology",
+        "neuropsychology": "Neuropsychology",
+        "sports_psychology": "Sports Psychology",
+        "organizational_psychology": "Organizational Psychology",
+        "forensic_psychology": "Forensic Psychology",
+        "health_psychology": "Health Psychology",
+        "educational_psychology": "Educational Psychology",
+        "other": "Other specialty"
+      },
+      "submit": "Continue",
+      "success": "Profile completed successfully!",
+      "error": "Error saving data. Please try again.",
+      "infoText": "This information helps us personalize your experience and meet professional requirements."
+    },
     "calendar": {
       "title": "Connect your calendar",
       "description": "Sync with Google Calendar to automatically schedule appointments and receive reminders. Your patients will also receive invitations.",
@@ -1174,7 +1241,68 @@
       "dismiss": "Dismiss tip"
     },
     "skip": "Skip tutorial",
-    "finish": "Finish"
+    "finish": "Finish",
+    "stepper": {
+      "stepOf": "Step {{current}} of {{total}}",
+      "skip": "Skip this step",
+      "completeSetup": "Complete Setup",
+      "success": "Profile configured successfully!",
+      "error": "Error saving data. Please try again.",
+      "stepNames": {
+        "professional": "Professional",
+        "contact": "Contact",
+        "online": "Online",
+        "complete": "Done!"
+      },
+      "professional": {
+        "title": "Professional Information",
+        "description": "Let's start with your license and specialty"
+      },
+      "contact": {
+        "title": "Contact Information",
+        "description": "How can your patients reach you?"
+      },
+      "online": {
+        "title": "Online Presence",
+        "description": "Share your website and professional networks"
+      },
+      "complete": {
+        "title": "Setup Complete!",
+        "description": "Your profile is ready to use",
+        "ready": "Excellent! You've completed your professional profile setup.",
+        "summary": "Your profile summary:",
+        "tipText": "You can edit this information at any time from your profile."
+      },
+      "fields": {
+        "licenseNumber": "Professional License",
+        "specialty": "Specialty",
+        "phone": "Primary Phone",
+        "alternativePhone": "Alternative Phone",
+        "officeAddress": "Office Address",
+        "website": "Website",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "bio": "Bio / Description"
+      },
+      "placeholders": {
+        "licenseNumber": "e.g.: LIC 12345 / PSY 67890",
+        "specialty": "Select your specialty",
+        "phone": "+1 555 123-4567",
+        "alternativePhone": "+1 555 987-6543",
+        "officeAddress": "e.g.: 123 Main St, Suite 100",
+        "website": "https://www.your-site.com",
+        "instagram": "@your_username",
+        "linkedin": "linkedin.com/in/your-profile",
+        "bio": "Tell your patients about yourself, your therapeutic approach and experience..."
+      },
+      "validation": {
+        "licenseRequired": "Professional license is required",
+        "licenseMinLength": "License must have at least 3 characters",
+        "phoneInvalid": "Phone must have at least 8 digits",
+        "websiteInvalid": "Enter a valid URL (e.g.: https://example.com)",
+        "bioTooLong": "Bio cannot exceed 500 characters"
+      }
+    }
   },
   "errors": {
     "generic": "An error occurred. Please try again.",

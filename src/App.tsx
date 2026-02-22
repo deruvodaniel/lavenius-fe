@@ -1,8 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
-import { SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, RedirectToSignIn, useAuth as useClerkAuth, useUser } from '@clerk/clerk-react';
 import { Landing } from './components/landing';
 import { Dashboard } from './components/dashboard';
+import { Onboarding } from './components/onboarding';
 import { NotFound, LoadingOverlay } from './components/shared';
 
 // Lazy load dashboard views
@@ -14,18 +15,62 @@ const Configuracion = lazy(() => import('./components/config/Configuracion').the
 const Perfil = lazy(() => import('./components/perfil/Perfil').then(m => ({ default: m.Perfil })));
 const HelpCenter = lazy(() => import('./components/help/HelpCenter').then(m => ({ default: m.HelpCenter })));
 
-// Protected route wrapper using Clerk
+/**
+ * Protected route wrapper that also checks for onboarding completion
+ * Redirects to /onboarding if user hasn't completed professional info setup
+ */
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isLoaded } = useAuth();
+  const { isLoaded } = useClerkAuth();
+  const { user } = useUser();
 
   // Show loading while Clerk initializes
   if (!isLoaded) {
     return <LoadingOverlay message="Cargando..." />;
   }
 
+  // Check onboarding status for signed-in users
+  const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
+
   return (
     <>
-      <SignedIn>{children}</SignedIn>
+      <SignedIn>
+        {hasCompletedOnboarding ? (
+          children
+        ) : (
+          <Navigate to="/onboarding" replace />
+        )}
+      </SignedIn>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+    </>
+  );
+}
+
+/**
+ * Onboarding route wrapper - only accessible to signed-in users who haven't completed onboarding
+ */
+function OnboardingRoute({ children }: { children: React.ReactNode }) {
+  const { isLoaded } = useClerkAuth();
+  const { user } = useUser();
+
+  // Show loading while Clerk initializes
+  if (!isLoaded) {
+    return <LoadingOverlay message="Cargando..." />;
+  }
+
+  // If already completed onboarding, redirect to dashboard
+  const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
+
+  return (
+    <>
+      <SignedIn>
+        {hasCompletedOnboarding ? (
+          <Navigate to="/dashboard" replace />
+        ) : (
+          children
+        )}
+      </SignedIn>
       <SignedOut>
         <RedirectToSignIn />
       </SignedOut>
@@ -51,6 +96,16 @@ export default function App() {
       {/* Public routes */}
       <Route path="/" element={<Landing />} />
       
+      {/* Onboarding route - for new users to complete professional info */}
+      <Route
+        path="/onboarding"
+        element={
+          <OnboardingRoute>
+            <Onboarding />
+          </OnboardingRoute>
+        }
+      />
+      
       {/* TODO: Custom Clerk Auth routes for future implementation
        * Uncomment when switching from Clerk Account Portal to custom pages
        * Also uncomment the AuthPageWrapper and imports above
@@ -63,7 +118,7 @@ export default function App() {
               routing="path" 
               path="/login" 
               signUpUrl="/register"
-              afterSignInUrl="/dashboard"
+              afterSignInUrl="/onboarding"
             />
           </AuthPageWrapper>
         } 
@@ -76,7 +131,7 @@ export default function App() {
               routing="path" 
               path="/register" 
               signInUrl="/login"
-              afterSignUpUrl="/dashboard"
+              afterSignUpUrl="/onboarding"
             />
           </AuthPageWrapper>
         } 

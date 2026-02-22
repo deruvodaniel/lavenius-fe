@@ -915,6 +915,32 @@
     "notFound": "¿No encontraste lo que buscabas?",
     "contactUs": "Contáctanos en",
     "categories": {
+      "gettingStarted": {
+        "title": "Comenzar",
+        "description": "Primeros pasos en Lavenius",
+        "articles": {
+          "welcome": {
+            "title": "Bienvenido a Lavenius",
+            "content": "**¡Bienvenido a Lavenius!**\n\nLavenius es tu plataforma integral para gestionar tu práctica terapéutica de manera simple y organizada.\n\n**¿Qué puedes hacer con Lavenius?**\n\n- **Gestionar pacientes:** Registra información de contacto, historial clínico y notas de sesión\n- **Agendar turnos:** Organiza tu calendario con sesiones presenciales o remotas\n- **Controlar cobros:** Lleva un registro de pagos pendientes y realizados\n- **Sincronizar calendario:** Conecta con Google Calendar para recibir recordatorios\n- **Analizar métricas:** Visualiza estadísticas de tu consultorio\n\n**Tip:** Usa el menú lateral para navegar entre las diferentes secciones de la aplicación.",
+            "tags": ["bienvenido", "inicio", "introducción", "comenzar"]
+          },
+          "createAccount": {
+            "title": "Crear tu cuenta",
+            "content": "**Registro en Lavenius**\n\nCrear tu cuenta es rápido y sencillo:\n\n1. Haz clic en **\"Comenzar gratis\"** en la página de inicio\n2. Ingresa tu correo electrónico\n3. Crea una contraseña segura\n4. Verifica tu correo (si es necesario)\n5. ¡Listo! Ya puedes iniciar sesión\n\n**Datos de la cuenta:**\n\nTu cuenta incluye:\n- Nombre y apellido\n- Correo electrónico (para iniciar sesión)\n- Foto de perfil (opcional)\n\n**Nota:** Lavenius utiliza autenticación segura para proteger tu cuenta.",
+            "tags": ["cuenta", "registro", "crear", "iniciar sesión"]
+          },
+          "completeProfile": {
+            "title": "Completar tu perfil profesional",
+            "content": "**Configuración del Perfil**\n\nDespués de crear tu cuenta, te guiaremos para completar tu perfil profesional:\n\n**Paso 1: Información Profesional**\n- Matrícula profesional (requerida)\n- Especialidad\n\n**Paso 2: Información de Contacto**\n- Teléfono principal\n- Teléfono alternativo\n- Dirección del consultorio\n\n**Paso 3: Presencia Online**\n- Sitio web\n- Instagram\n- LinkedIn\n- Biografía profesional\n\n**Tip:** Puedes editar esta información en cualquier momento desde la sección **Perfil** en el menú lateral.\n\n**¿Por qué es importante?**\n\nTu matrícula profesional nos ayuda a verificar tu práctica y personalizar tu experiencia en la plataforma.",
+            "tags": ["perfil", "matrícula", "configurar", "datos profesionales", "onboarding"]
+          },
+          "firstSteps": {
+            "title": "Primeros pasos recomendados",
+            "content": "**¿Por dónde empezar?**\n\nTe recomendamos seguir estos pasos para aprovechar al máximo Lavenius:\n\n**1. Registra tu primer paciente**\n- Ve a **Pacientes** en el menú lateral\n- Haz clic en **\"Nuevo Paciente\"**\n- Completa los datos básicos (nombre, teléfono, email)\n\n**2. Agenda tu primera sesión**\n- Ve a **Agenda** en el menú lateral\n- Haz clic en **\"Nuevo Turno\"**\n- Selecciona el paciente y elige fecha/hora\n\n**3. Conecta Google Calendar (opcional)**\n- Ve a **Configuración**\n- En la sección \"Calendario\", conecta tu cuenta de Google\n- Tus turnos se sincronizarán automáticamente\n\n**4. Configura tu horario laboral**\n- En **Configuración**, define tus días y horarios de trabajo\n- Esto ayudará a organizar mejor tu agenda\n\n**¿Necesitas ayuda?**\n\nExplora las otras secciones del Centro de Ayuda para aprender sobre cada funcionalidad en detalle.",
+            "tags": ["primeros pasos", "empezar", "tutorial", "guía"]
+          }
+        }
+      },
       "agenda": {
         "title": "Agenda",
         "description": "Aprende a gestionar tus turnos y citas",
@@ -984,8 +1010,8 @@
         "articles": {
           "profile": {
             "title": "Editar tu perfil",
-            "content": "Para editar tu perfil:\n\n1. Haz clic en tu nombre en el menú lateral\n2. O ve a la sección **Perfil**\n3. Modifica tus datos personales\n4. Guarda los cambios\n\nPuedes actualizar: nombre, email y contraseña.",
-            "tags": ["perfil", "editar", "datos", "cuenta"]
+            "content": "Tu perfil tiene dos partes:\n\n**Datos de cuenta (gestionados por Clerk)**\n- Nombre y apellido\n- Foto de perfil\n- Email y contraseña\n\nPara editar estos datos, haz clic en tu avatar y selecciona **\"Administrar cuenta\"**.\n\n**Datos profesionales**\n\nPara editar tu información profesional:\n\n1. Ve a la sección **Perfil** desde el menú lateral\n2. Modifica tus datos (matrícula, especialidad, teléfonos, etc.)\n3. Haz clic en **\"Guardar Cambios\"**\n\nLos datos profesionales incluyen: matrícula, especialidad, teléfonos de contacto, dirección del consultorio, redes sociales y biografía.",
+            "tags": ["perfil", "editar", "datos", "cuenta", "clerk"]
           },
           "calendarConfig": {
             "title": "Configurar calendario",
@@ -1144,6 +1170,47 @@
       "firstSession": "Programa tu primera sesión",
       "calendarSync": "Sincroniza tu calendario"
     },
+    "profile": {
+      "title": "Completa tu perfil profesional",
+      "description": "Necesitamos algunos datos profesionales para configurar tu cuenta correctamente.",
+      "steps": {
+        "account": "Cuenta creada",
+        "professional": "Datos profesionales"
+      },
+      "fields": {
+        "licenseNumber": "Matrícula profesional",
+        "specialty": "Especialidad",
+        "phone": "Teléfono de contacto"
+      },
+      "placeholders": {
+        "licenseNumber": "Ej: MN 12345 / MP 67890",
+        "specialty": "Selecciona tu especialidad",
+        "phone": "+54 11 1234-5678"
+      },
+      "validation": {
+        "licenseRequired": "La matrícula es requerida",
+        "licenseMinLength": "La matrícula debe tener al menos 3 caracteres",
+        "phoneInvalid": "El teléfono debe tener al menos 8 dígitos"
+      },
+      "specialties": {
+        "clinical_psychology": "Psicología Clínica",
+        "cognitive_behavioral": "Terapia Cognitivo-Conductual",
+        "psychoanalysis": "Psicoanálisis",
+        "family_therapy": "Terapia Familiar",
+        "child_psychology": "Psicología Infantil",
+        "neuropsychology": "Neuropsicología",
+        "sports_psychology": "Psicología Deportiva",
+        "organizational_psychology": "Psicología Organizacional",
+        "forensic_psychology": "Psicología Forense",
+        "health_psychology": "Psicología de la Salud",
+        "educational_psychology": "Psicología Educativa",
+        "other": "Otra especialidad"
+      },
+      "submit": "Continuar",
+      "success": "¡Perfil completado correctamente!",
+      "error": "Error al guardar los datos. Por favor intenta nuevamente.",
+      "infoText": "Estos datos nos ayudan a personalizar tu experiencia y cumplir con requisitos profesionales."
+    },
     "calendar": {
       "title": "Conecta tu calendario",
       "description": "Sincroniza con Google Calendar para agendar turnos automáticamente y recibir recordatorios. Tus pacientes también recibirán invitaciones.",
@@ -1174,7 +1241,68 @@
       "dismiss": "Descartar tip"
     },
     "skip": "Saltar tutorial",
-    "finish": "Finalizar"
+    "finish": "Finalizar",
+    "stepper": {
+      "stepOf": "Paso {{current}} de {{total}}",
+      "skip": "Saltar este paso",
+      "completeSetup": "Completar Configuración",
+      "success": "¡Perfil configurado correctamente!",
+      "error": "Error al guardar los datos. Por favor intenta nuevamente.",
+      "stepNames": {
+        "professional": "Profesional",
+        "contact": "Contacto",
+        "online": "Presencia",
+        "complete": "¡Listo!"
+      },
+      "professional": {
+        "title": "Información Profesional",
+        "description": "Comencemos con tu matrícula y especialidad"
+      },
+      "contact": {
+        "title": "Información de Contacto",
+        "description": "¿Cómo pueden contactarte tus pacientes?"
+      },
+      "online": {
+        "title": "Presencia Online",
+        "description": "Comparte tu sitio web y redes profesionales"
+      },
+      "complete": {
+        "title": "¡Configuración Completa!",
+        "description": "Tu perfil está listo para usar",
+        "ready": "¡Excelente! Has completado la configuración de tu perfil profesional.",
+        "summary": "Resumen de tu perfil:",
+        "tipText": "Puedes editar esta información en cualquier momento desde tu perfil."
+      },
+      "fields": {
+        "licenseNumber": "Matrícula Profesional",
+        "specialty": "Especialidad",
+        "phone": "Teléfono Principal",
+        "alternativePhone": "Teléfono Alternativo",
+        "officeAddress": "Dirección del Consultorio",
+        "website": "Sitio Web",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "bio": "Biografía / Descripción"
+      },
+      "placeholders": {
+        "licenseNumber": "Ej: MN 12345 / MP 67890",
+        "specialty": "Selecciona tu especialidad",
+        "phone": "+54 11 1234-5678",
+        "alternativePhone": "+54 11 8765-4321",
+        "officeAddress": "Ej: Av. Corrientes 1234, CABA",
+        "website": "https://www.tu-sitio.com",
+        "instagram": "@tu_usuario",
+        "linkedin": "linkedin.com/in/tu-perfil",
+        "bio": "Cuéntale a tus pacientes sobre ti, tu enfoque terapéutico y experiencia..."
+      },
+      "validation": {
+        "licenseRequired": "La matrícula profesional es requerida",
+        "licenseMinLength": "La matrícula debe tener al menos 3 caracteres",
+        "phoneInvalid": "El teléfono debe tener al menos 8 dígitos",
+        "websiteInvalid": "Ingresa una URL válida (ej: https://ejemplo.com)",
+        "bioTooLong": "La biografía no puede superar los 500 caracteres"
+      }
+    }
   },
   "errors": {
     "generic": "Ocurrió un error. Intente nuevamente.",

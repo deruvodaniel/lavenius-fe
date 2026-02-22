@@ -9,7 +9,8 @@ import {
   ChevronRight,
   FileText,
   HelpCircle,
-  ArrowLeft
+  ArrowLeft,
+  Rocket
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -38,6 +39,38 @@ interface HelpCategory {
 // ============================================================================
 
 const HELP_CATEGORIES: HelpCategory[] = [
+  {
+    id: 'getting-started',
+    titleKey: 'help.categories.gettingStarted.title',
+    descriptionKey: 'help.categories.gettingStarted.description',
+    icon: Rocket,
+    articles: [
+      {
+        id: 'welcome',
+        titleKey: 'help.categories.gettingStarted.articles.welcome.title',
+        contentKey: 'help.categories.gettingStarted.articles.welcome.content',
+        tagsKey: 'help.categories.gettingStarted.articles.welcome.tags',
+      },
+      {
+        id: 'create-account',
+        titleKey: 'help.categories.gettingStarted.articles.createAccount.title',
+        contentKey: 'help.categories.gettingStarted.articles.createAccount.content',
+        tagsKey: 'help.categories.gettingStarted.articles.createAccount.tags',
+      },
+      {
+        id: 'complete-profile',
+        titleKey: 'help.categories.gettingStarted.articles.completeProfile.title',
+        contentKey: 'help.categories.gettingStarted.articles.completeProfile.content',
+        tagsKey: 'help.categories.gettingStarted.articles.completeProfile.tags',
+      },
+      {
+        id: 'first-steps',
+        titleKey: 'help.categories.gettingStarted.articles.firstSteps.title',
+        contentKey: 'help.categories.gettingStarted.articles.firstSteps.content',
+        tagsKey: 'help.categories.gettingStarted.articles.firstSteps.tags',
+      },
+    ],
+  },
   {
     id: 'agenda',
     titleKey: 'help.categories.agenda.title',
