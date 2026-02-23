@@ -107,7 +107,7 @@ describe('ErrorBoundary', () => {
         </ErrorBoundary>
       );
 
-      expect(screen.getByText('Ha ocurrido un error inesperado.')).toBeInTheDocument();
+      expect(screen.getByText('Ha ocurrido un error inesperado. Por favor intenta de nuevo.')).toBeInTheDocument();
     });
 
     it('logs error to console via componentDidCatch', () => {
