@@ -26,7 +26,12 @@ import {
   Lock,
   CreditCard,
   Infinity as InfinityIcon,
-  Menu
+  Menu,
+  Instagram,
+  Twitter,
+  Linkedin,
+  Mail,
+  Phone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -1284,20 +1289,79 @@ function CTASection() {
 function Footer() {
   const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
+
+  const socialLinks = [
+    { icon: Instagram, href: 'https://instagram.com/lavenius', label: t('landing.footer.social.instagram') },
+    { icon: Twitter, href: 'https://twitter.com/lavenius', label: t('landing.footer.social.twitter') },
+    { icon: Linkedin, href: 'https://linkedin.com/company/lavenius', label: t('landing.footer.social.linkedin') },
+  ];
   
   return (
     <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-900 text-gray-400">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+        {/* Main footer content */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-gray-800">
+          {/* Brand section */}
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-lg font-bold text-white">{t('landing.brand')}</span>
             </div>
-            <span className="text-lg font-bold text-white">{t('landing.brand')}</span>
+            <p className="text-sm text-gray-500 text-center md:text-left max-w-xs">
+              {t('landing.footer.tagline')}
+            </p>
           </div>
-          <div className="text-sm">
-            © {currentYear} {t('landing.brand')}. {t('landing.footer.rights')}
+
+          {/* Contact section */}
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
+              {t('landing.footer.contact.title')}
+            </h3>
+            <div className="flex flex-col gap-3">
+              <a 
+                href="tel:+5411123456789" 
+                className="flex items-center gap-2 text-sm transition-colors hover:text-indigo-400"
+              >
+                <Phone className="w-4 h-4" />
+                <span>+54 11 1234-5678</span>
+              </a>
+              <a 
+                href="mailto:contacto@lavenius.com" 
+                className="flex items-center gap-2 text-sm transition-colors hover:text-indigo-400"
+              >
+                <Mail className="w-4 h-4" />
+                <span>contacto@lavenius.com</span>
+              </a>
+            </div>
           </div>
+
+          {/* Social section */}
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
+              {t('landing.footer.social.title')}
+            </h3>
+            <div className="flex items-center gap-4">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.href}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center transition-all hover:bg-gradient-to-br hover:from-indigo-600 hover:to-purple-600 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+                >
+                  <social.icon className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Copyright */}
+        <div className="pt-8 text-center text-sm">
+          © {currentYear} {t('landing.brand')}. {t('landing.footer.rights')}
         </div>
       </div>
     </footer>

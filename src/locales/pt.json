@@ -1272,7 +1272,17 @@
       "login": "Entrar"
     },
     "footer": {
-      "rights": "Todos os direitos reservados."
+      "rights": "Todos os direitos reservados.",
+      "tagline": "Simplificando a gestão da sua prática terapêutica.",
+      "contact": {
+        "title": "Contato"
+      },
+      "social": {
+        "title": "Siga-nos",
+        "instagram": "Siga-nos no Instagram",
+        "twitter": "Siga-nos no Twitter",
+        "linkedin": "Conecte-se no LinkedIn"
+      }
     },
     "pricing": {
       "badge": "Preços Transparentes",

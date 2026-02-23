@@ -1307,7 +1307,17 @@
       "login": "Ya tengo cuenta"
     },
     "footer": {
-      "rights": "Todos los derechos reservados."
+      "rights": "Todos los derechos reservados.",
+      "tagline": "Simplificando la gestión de tu práctica terapéutica.",
+      "contact": {
+        "title": "Contacto"
+      },
+      "social": {
+        "title": "Síguenos",
+        "instagram": "Síguenos en Instagram",
+        "twitter": "Síguenos en Twitter",
+        "linkedin": "Conéctate en LinkedIn"
+      }
     },
     "pricing": {
       "badge": "Precios claros",
