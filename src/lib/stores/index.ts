@@ -12,6 +12,16 @@ export { useAppointmentStore } from './appointment.store';
 // Setting Store
 export { useSettingStore, settingSelectors } from './setting.store';
 
+// Dashboard Settings Store
+export { 
+  useDashboardSettingsStore,
+  dashboardSelectors,
+  useSectionVisibility,
+  useIsSectionVisible,
+  useVisibleSections,
+} from './dashboard.store';
+export type { DashboardSectionId } from './dashboard.store';
+
 // UI Store
 export { 
   useUIStore,

@@ -24,9 +24,24 @@ import {
   CheckCircle2,
   ChevronDown,
   RefreshCw,
+  Plus,
+  UserPlus,
+  Receipt,
+  Gift,
+  UserX,
+  Clock,
+  Settings2,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { SkeletonList } from '@/components/shared/Skeleton';
 import { usePayments } from '@/lib/hooks/usePayments';
 import { usePatients, useResponsive } from '@/lib/hooks';
@@ -35,6 +50,11 @@ import { SessionStatus } from '@/lib/types/session';
 import { PaymentStatus } from '@/lib/types/api.types';
 import { sessionService } from '@/lib/api/sessions';
 import type { SessionResponse } from '@/lib/types/session';
+import { 
+  useDashboardSettingsStore, 
+  useIsSectionVisible,
+  type DashboardSectionId 
+} from '@/lib/stores';
 
 // ============================================================================
 // CONSTANTS & TYPES
@@ -205,6 +225,82 @@ const CustomTooltip = ({ active, payload, label, formatter }: TooltipProps) => {
 };
 
 // ============================================================================
+// DASHBOARD SETTINGS POPOVER
+// ============================================================================
+
+interface DashboardSettingsPopoverProps {
+  t: (key: string) => string;
+}
+
+const SECTION_LABELS: Record<DashboardSectionId, string> = {
+  todaySummary: 'dashboard.settings.sections.todaySummary',
+  quickActions: 'dashboard.settings.sections.quickActions',
+  statCards: 'dashboard.settings.sections.statCards',
+  pendingPayments: 'dashboard.settings.sections.pendingPayments',
+  birthdays: 'dashboard.settings.sections.birthdays',
+  patientsWithoutSession: 'dashboard.settings.sections.patientsWithoutSession',
+  charts: 'dashboard.settings.sections.charts',
+};
+
+const DashboardSettingsPopover = ({ t }: DashboardSettingsPopoverProps) => {
+  const { sections, toggleSectionVisibility, resetToDefaults } = 
+    useDashboardSettingsStore();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="secondary"
+          size="icon"
+          title={t('dashboard.settings.title')}
+          aria-label={t('dashboard.settings.title')}
+          className="bg-white/20 hover:bg-white/30 border-0 text-white"
+        >
+          <Settings2 className="w-4 h-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent 
+        className="w-72 bg-white border border-gray-200 shadow-lg p-4" 
+        align="end" 
+        sideOffset={8}
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium text-gray-900">{t('dashboard.settings.title')}</h4>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetToDefaults}
+              className="text-xs text-gray-500 hover:text-gray-700"
+            >
+              {t('dashboard.settings.reset')}
+            </Button>
+          </div>
+          <p className="text-xs text-gray-500">{t('dashboard.settings.description')}</p>
+          <div className="space-y-3">
+            {sections.map((section) => (
+              <div key={section.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`section-${section.id}`}
+                  checked={section.visible}
+                  onCheckedChange={() => toggleSectionVisibility(section.id)}
+                />
+                <Label
+                  htmlFor={`section-${section.id}`}
+                  className="text-sm font-normal cursor-pointer text-gray-700"
+                >
+                  {t(SECTION_LABELS[section.id])}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
@@ -215,6 +311,9 @@ export function Analitica() {
   const { patients, fetchPatients } = usePatients();
   const { isMobile } = useResponsive();
   const { user } = useAuth();
+  
+  // Dashboard section visibility
+  const isSectionVisible = useIsSectionVisible();
   
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>('month');
@@ -561,6 +660,139 @@ export function Analitica() {
       .map(p => ({ name: p.name, sesiones: p.count }));
   }, [filteredSessions]);
 
+  // ==================== NEW DASHBOARD SECTIONS DATA ====================
+
+  // Today's upcoming sessions (sessions today that haven't happened yet)
+  const todayUpcomingSessions = useMemo(() => {
+    const now = new Date();
+    const today = now.toDateString();
+    return sessionsUI
+      .filter(s => {
+        const sessionDate = new Date(s.scheduledFrom);
+        return sessionDate.toDateString() === today && sessionDate > now;
+      })
+      .sort((a, b) => new Date(a.scheduledFrom).getTime() - new Date(b.scheduledFrom).getTime())
+      .slice(0, 5);
+  }, [sessionsUI]);
+
+  // Pending/overdue payments
+  const pendingPayments = useMemo(() => {
+    return payments
+      .filter(p => p.status === PaymentStatus.PENDING || p.status === PaymentStatus.OVERDUE)
+      .sort((a, b) => {
+        // Overdue first, then by date
+        if (a.status === PaymentStatus.OVERDUE && b.status !== PaymentStatus.OVERDUE) return -1;
+        if (b.status === PaymentStatus.OVERDUE && a.status !== PaymentStatus.OVERDUE) return 1;
+        return new Date(a.paymentDate).getTime() - new Date(b.paymentDate).getTime();
+      })
+      .slice(0, 5);
+  }, [payments]);
+
+  // Upcoming birthdays (next 7 days)
+  const upcomingBirthdays = useMemo(() => {
+    const now = new Date();
+    // Reset time to start of day for accurate comparison
+    now.setHours(0, 0, 0, 0);
+    const in7Days = new Date(now);
+    in7Days.setDate(now.getDate() + 7);
+    
+    return patients
+      .filter(p => {
+        if (!p.birthDate) return false;
+        const birth = new Date(p.birthDate);
+        const thisYearBday = new Date(now.getFullYear(), birth.getMonth(), birth.getDate());
+        // If birthday already passed this year, check next year
+        if (thisYearBday < now) {
+          thisYearBday.setFullYear(now.getFullYear() + 1);
+        }
+        // Check if birthday is between now and 7 days from now
+        return thisYearBday >= now && thisYearBday <= in7Days;
+      })
+      .map(p => {
+        const birth = new Date(p.birthDate!);
+        const thisYearBday = new Date(now.getFullYear(), birth.getMonth(), birth.getDate());
+        if (thisYearBday < now) {
+          thisYearBday.setFullYear(now.getFullYear() + 1);
+        }
+        return { ...p, nextBirthday: thisYearBday };
+      })
+      .sort((a, b) => a.nextBirthday.getTime() - b.nextBirthday.getTime())
+      .slice(0, 5);
+  }, [patients]);
+
+  // Patients without upcoming sessions
+  const patientsWithoutNextSession = useMemo(() => {
+    const now = new Date();
+    const patientsWithFutureSessions = new Set(
+      sessionsUI
+        .filter(s => {
+          const sessionDate = new Date(s.scheduledFrom);
+          return sessionDate > now && 
+            (s.status === SessionStatus.PENDING || s.status === SessionStatus.CONFIRMED);
+        })
+        .map(s => s.patient?.id)
+        .filter(Boolean)
+    );
+    
+    // Get patients who have had sessions but don't have future ones
+    const patientsWithPastSessions = new Set(
+      sessionsUI
+        .filter(s => s.patient?.id)
+        .map(s => s.patient!.id)
+    );
+    
+    // Find the last session for each patient without future sessions
+    const patientLastSession: Record<string, Date> = {};
+    sessionsUI.forEach(s => {
+      if (s.patient?.id && patientsWithPastSessions.has(s.patient.id) && !patientsWithFutureSessions.has(s.patient.id)) {
+        const sessionDate = new Date(s.scheduledFrom);
+        if (!patientLastSession[s.patient.id] || sessionDate > patientLastSession[s.patient.id]) {
+          patientLastSession[s.patient.id] = sessionDate;
+        }
+      }
+    });
+    
+    return patients
+      .filter(p => patientsWithPastSessions.has(p.id) && !patientsWithFutureSessions.has(p.id))
+      .map(p => ({ ...p, lastSessionDate: patientLastSession[p.id] }))
+      .sort((a, b) => (b.lastSessionDate?.getTime() || 0) - (a.lastSessionDate?.getTime() || 0))
+      .slice(0, 5);
+  }, [patients, sessionsUI]);
+
+  // Today's stats
+  const todayStats = useMemo(() => {
+    const today = new Date().toDateString();
+    const todaySessions = sessionsUI.filter(s => 
+      new Date(s.scheduledFrom).toDateString() === today
+    );
+    const completedToday = todaySessions.filter(s => s.status === SessionStatus.COMPLETED).length;
+    
+    const todayPayments = payments.filter(p => 
+      new Date(p.paymentDate).toDateString() === today && p.status === PaymentStatus.PAID
+    );
+    const incomeToday = todayPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    
+    return {
+      sessionsTotal: todaySessions.length,
+      sessionsCompleted: completedToday,
+      incomeToday
+    };
+  }, [sessionsUI, payments]);
+
+  // Helper function to format birthday relative day
+  const formatBirthdayDay = (date: Date): string => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const diff = Math.floor((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diff === 0) return t('dashboard.birthdays.today');
+    if (diff === 1) return t('dashboard.birthdays.tomorrow');
+    
+    // Return day name
+    const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    return dayNames[date.getDay()];
+  };
+
   if (isLoading) {
     return (
       <div className="p-4 md:p-6 lg:p-8 space-y-6">
@@ -580,313 +812,594 @@ export function Analitica() {
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6">
       {/* Welcome Header */}
-      <div className="mb-2">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          {greeting}, {user?.firstName || t('auth.welcome')}
-        </h1>
-        <p className="text-gray-500 mt-1">
-          {t('dashboard.welcomeSubtitle')}
-        </p>
+      <div className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 rounded-2xl p-6 sm:p-8 text-white shadow-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="text-indigo-200 text-sm font-medium mb-1">
+              {t('dashboard.welcomeSubtitle')}
+            </p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+              {greeting}, {user?.firstName || t('auth.welcome')}
+            </h1>
+          </div>
+          
+          {/* Settings only - filter moved to stats section */}
+          <DashboardSettingsPopover t={t} />
+        </div>
       </div>
 
-      {/* Time Range Selector */}
-      <div className="flex justify-end">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setRefreshKey(k => k + 1)}
-            disabled={isLoading}
-            title={t('analytics.refresh')}
-            aria-label={t('analytics.refresh')}
-          >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          </Button>
+      {/* Today's Summary Card - Merged with upcoming sessions */}
+      {isSectionVisible('todaySummary') && (
+        <Card className="p-4 bg-white">
+          <div className="flex items-center gap-2 mb-4">
+            <Calendar className="w-5 h-5 text-slate-600" />
+            <h3 className="font-semibold text-gray-900">{t('dashboard.todaySummary.title')}</h3>
+          </div>
           
-          <div className="relative">
-            <Button
-              variant="outline"
-              onClick={() => setShowRangeDropdown(!showRangeDropdown)}
-              className="w-full sm:w-auto justify-between"
-            >
-              <Calendar className="w-4 h-4 mr-2" />
-              {t(TIME_RANGE_KEYS.find(o => o.value === timeRange)?.key || '')}
-              <ChevronDown className="w-4 h-4 ml-2" />
-            </Button>
-            
-            {showRangeDropdown && (
-              <>
-                <div 
-                  className="fixed inset-0 z-10" 
-                  onClick={() => setShowRangeDropdown(false)} 
-                />
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                  {TIME_RANGE_KEYS.map(option => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setTimeRange(option.value);
-                        setShowRangeDropdown(false);
-                      }}
-                      className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
-                        timeRange === option.value ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-700'
-                      }`}
+          {/* Stats row */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">{t('dashboard.todaySummary.sessions')}</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {todayStats.sessionsCompleted} / {todayStats.sessionsTotal}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">{t('dashboard.todaySummary.income')}</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {formatCurrency(todayStats.incomeToday)}
+                </p>
+              </div>
+            </div>
+            {/* Next upcoming session */}
+            {todayUpcomingSessions.length > 0 && (
+              <div className="flex items-center gap-3 col-span-2 sm:col-span-1">
+                <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">{t('dashboard.todaySummary.nextSession')}</p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {new Date(todayUpcomingSessions[0].scheduledFrom).toLocaleTimeString('es-AR', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })} - {todayUpcomingSessions[0].patientName}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Upcoming sessions list */}
+          {todayUpcomingSessions.length > 1 && (
+            <div className="border-t border-slate-200 pt-3">
+              <p className="text-xs text-gray-500 mb-2">{t('dashboard.todaySummary.moreUpcoming')}</p>
+              <div className="space-y-2">
+                {todayUpcomingSessions.slice(1, 4).map(session => (
+                  <button
+                    key={session.id}
+                    onClick={() => navigate('/dashboard/agenda')}
+                    className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-white transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="text-sm font-medium text-indigo-600">
+                        {new Date(session.scheduledFrom).toLocaleTimeString('es-AR', { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </div>
+                      <p className="text-sm text-gray-700">{session.patientName}</p>
+                    </div>
+                    <Badge 
+                      variant={session.status === SessionStatus.CONFIRMED ? 'default' : 'secondary'}
+                      className={session.status === SessionStatus.CONFIRMED ? 'bg-green-100 text-green-700 border-green-200 text-xs' : 'bg-amber-100 text-amber-700 border-amber-200 text-xs'}
                     >
-                      {t(option.key)}
+                      {session.status === SessionStatus.CONFIRMED ? t('analytics.labels.confirmed') : t('analytics.labels.pendingStatus')}
+                    </Badge>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Quick Actions */}
+      {isSectionVisible('quickActions') && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/dashboard/agenda?action=new')}
+            className="h-auto py-3 flex flex-col sm:flex-row items-center gap-2 hover:bg-indigo-50 hover:border-indigo-300"
+          >
+            <Plus className="w-5 h-5 text-indigo-600" />
+            <span className="text-sm">{t('dashboard.quickActions.newSession')}</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/dashboard/pacientes?action=new')}
+            className="h-auto py-3 flex flex-col sm:flex-row items-center gap-2 hover:bg-blue-50 hover:border-blue-300"
+          >
+            <UserPlus className="w-5 h-5 text-blue-600" />
+            <span className="text-sm">{t('dashboard.quickActions.newPatient')}</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/dashboard/cobros?action=new')}
+            className="h-auto py-3 flex flex-col sm:flex-row items-center gap-2 hover:bg-green-50 hover:border-green-300"
+          >
+            <Receipt className="w-5 h-5 text-green-600" />
+            <span className="text-sm">{t('dashboard.quickActions.newPayment')}</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/dashboard/agenda')}
+            className="h-auto py-3 flex flex-col sm:flex-row items-center gap-2 hover:bg-purple-50 hover:border-purple-300"
+          >
+            <Calendar className="w-5 h-5 text-purple-600" />
+            <span className="text-sm">{t('dashboard.quickActions.viewAgenda')}</span>
+          </Button>
+        </div>
+      )}
+
+      {/* Stats Grid */}
+      {isSectionVisible('statCards') && (
+        <>
+          {/* Time Range Filter - applies to stats and charts */}
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">{t('analytics.title')}</h2>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setRefreshKey(k => k + 1)}
+                disabled={isLoading}
+                title={t('analytics.refresh')}
+                aria-label={t('analytics.refresh')}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              </Button>
+              
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowRangeDropdown(!showRangeDropdown)}
+                  className="justify-between"
+                >
+                  <Calendar className="w-4 h-4 mr-2" />
+                  {t(TIME_RANGE_KEYS.find(o => o.value === timeRange)?.key || '')}
+                  <ChevronDown className="w-4 h-4 ml-2" />
+                </Button>
+                
+                {showRangeDropdown && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-10" 
+                      onClick={() => setShowRangeDropdown(false)} 
+                    />
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+                      {TIME_RANGE_KEYS.map(option => (
+                        <button
+                          key={option.value}
+                          onClick={() => {
+                            setTimeRange(option.value);
+                            setShowRangeDropdown(false);
+                          }}
+                          className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                            timeRange === option.value ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-700'
+                          }`}
+                        >
+                          {t(option.key)}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            title={t('analytics.stats.sessions')}
+            value={stats.totalSessions}
+            subtitle={`${stats.completedSessions} ${t('analytics.stats.completed')}`}
+            icon={Calendar}
+            iconBg="bg-indigo-100"
+            iconColor="text-indigo-600"
+            trendLabel={t('analytics.stats.vsPrevious')}
+            onClick={() => navigate('/dashboard/agenda')}
+          />
+          <StatCard
+            title={t('analytics.stats.income')}
+            value={formatCurrency(stats.totalIncome)}
+            subtitle={`${formatCurrency(stats.pendingIncome)} ${t('analytics.stats.pending')}`}
+            icon={DollarSign}
+            iconBg="bg-green-100"
+            iconColor="text-green-600"
+            trendLabel={t('analytics.stats.vsPrevious')}
+            onClick={() => navigate('/dashboard/cobros')}
+          />
+          <StatCard
+            title={t('analytics.stats.patientsAttended')}
+            value={stats.activePatients}
+            subtitle={`${stats.newPatients} ${t('analytics.stats.newInPeriod')}`}
+            icon={Users}
+            iconBg="bg-blue-100"
+            iconColor="text-blue-600"
+            trendLabel={t('analytics.stats.vsPrevious')}
+            onClick={() => navigate('/dashboard/pacientes')}
+          />
+          <StatCard
+            title={t('analytics.stats.attendanceRate')}
+            value={`${stats.completionRate}%`}
+            subtitle={`${stats.cancelledSessions} ${t('analytics.stats.cancellations')}`}
+            icon={CheckCircle2}
+            iconBg="bg-amber-100"
+            iconColor="text-amber-600"
+            trendLabel={t('analytics.stats.vsPrevious')}
+            onClick={() => navigate('/dashboard/agenda')}
+          />
+          </div>
+        </>
+      )}
+
+      {/* Pending Payments */}
+      {isSectionVisible('pendingPayments') && (
+        <Card className="p-4 bg-white">
+          <div className="flex items-center gap-2 mb-4">
+            <DollarSign className="w-5 h-5 text-green-600" />
+            <h3 className="font-semibold text-gray-900">{t('dashboard.pendingPayments.title')}</h3>
+          </div>
+          {pendingPayments.length > 0 ? (
+            <div className="space-y-3">
+              {pendingPayments.map(payment => (
+                <button
+                  key={payment.id}
+                  onClick={() => navigate('/dashboard/cobros')}
+                  className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {payment.patient ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim() : 'Sin paciente'}
+                    </p>
+                    <p className="text-sm text-gray-500">{formatCurrency(Number(payment.amount) || 0)}</p>
+                  </div>
+                  <Badge 
+                    variant={payment.status === PaymentStatus.OVERDUE ? 'destructive' : 'secondary'}
+                    className={payment.status === PaymentStatus.OVERDUE ? '' : 'bg-amber-100 text-amber-700 border-amber-200'}
+                  >
+                    {payment.status === PaymentStatus.OVERDUE ? t('analytics.labels.overdue') : t('analytics.labels.pendingStatus')}
+                  </Badge>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+              <CheckCircle2 className="w-10 h-10 mb-2 text-green-300" />
+              <p className="text-sm">{t('dashboard.pendingPayments.empty')}</p>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Insights Row: Birthdays and Patients without session */}
+      {(isSectionVisible('birthdays') || isSectionVisible('patientsWithoutSession')) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Cumpleaños próximos */}
+          {isSectionVisible('birthdays') && (
+            <Card className="p-4 bg-white">
+              <div className="flex items-center gap-2 mb-4">
+                <Gift className="w-5 h-5 text-pink-600" />
+                <h3 className="font-semibold text-gray-900">{t('dashboard.birthdays.title')}</h3>
+              </div>
+              {upcomingBirthdays.length > 0 ? (
+                <div className="space-y-3">
+                  {upcomingBirthdays.map(patient => (
+                    <button
+                      key={patient.id}
+                      onClick={() => navigate(`/dashboard/pacientes/${patient.id}`)}
+                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center">
+                          <Gift className="w-4 h-4 text-pink-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{patient.firstName} {patient.lastName}</p>
+                          <p className="text-xs text-gray-500">
+                            {patient.nextBirthday.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge 
+                        variant="secondary"
+                        className={
+                          formatBirthdayDay(patient.nextBirthday) === t('dashboard.birthdays.today') 
+                            ? 'bg-pink-100 text-pink-700 border-pink-200' 
+                            : 'bg-gray-100 text-gray-700'
+                        }
+                      >
+                        {formatBirthdayDay(patient.nextBirthday)}
+                      </Badge>
                     </button>
                   ))}
                 </div>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+                  <Gift className="w-10 h-10 mb-2 text-gray-300" />
+                  <p className="text-sm">{t('dashboard.birthdays.empty')}</p>
+                </div>
+              )}
+            </Card>
+          )}
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title={t('analytics.stats.sessions')}
-          value={stats.totalSessions}
-          subtitle={`${stats.completedSessions} ${t('analytics.stats.completed')}`}
-          icon={Calendar}
-          iconBg="bg-indigo-100"
-          iconColor="text-indigo-600"
-          trendLabel={t('analytics.stats.vsPrevious')}
-          onClick={() => navigate('/dashboard/agenda')}
-        />
-        <StatCard
-          title={t('analytics.stats.income')}
-          value={formatCurrency(stats.totalIncome)}
-          subtitle={`${formatCurrency(stats.pendingIncome)} ${t('analytics.stats.pending')}`}
-          icon={DollarSign}
-          iconBg="bg-green-100"
-          iconColor="text-green-600"
-          trendLabel={t('analytics.stats.vsPrevious')}
-          onClick={() => navigate('/dashboard/cobros')}
-        />
-        <StatCard
-          title={t('analytics.stats.patientsAttended')}
-          value={stats.activePatients}
-          subtitle={`${stats.newPatients} ${t('analytics.stats.newInPeriod')}`}
-          icon={Users}
-          iconBg="bg-blue-100"
-          iconColor="text-blue-600"
-          trendLabel={t('analytics.stats.vsPrevious')}
-          onClick={() => navigate('/dashboard/pacientes')}
-        />
-        <StatCard
-          title={t('analytics.stats.attendanceRate')}
-          value={`${stats.completionRate}%`}
-          subtitle={`${stats.cancelledSessions} ${t('analytics.stats.cancellations')}`}
-          icon={CheckCircle2}
-          iconBg="bg-amber-100"
-          iconColor="text-amber-600"
-          trendLabel={t('analytics.stats.vsPrevious')}
-          onClick={() => navigate('/dashboard/agenda')}
-        />
-      </div>
-
-      {/* Charts Grid - Row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Sessions Over Time */}
-        <ChartCard 
-          title={t('analytics.charts.sessionsOverTime.title')} 
-          subtitle={t('analytics.charts.sessionsOverTime.subtitle')}
-          onClick={() => navigate('/dashboard/agenda')}
-        >
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={sessionsOverTime}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9ca3af" />
-                <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" allowDecimals={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="total" 
-                  name={t('analytics.labels.total')}
-                  stroke={COLORS.primary} 
-                  strokeWidth={2}
-                  dot={{ fill: COLORS.primary }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="completadas" 
-                  name={t('analytics.labels.completed')}
-                  stroke={COLORS.success} 
-                  strokeWidth={2}
-                  dot={{ fill: COLORS.success }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </ChartCard>
-
-        {/* Sessions by Status */}
-        <ChartCard 
-          title={t('analytics.charts.sessionStatus.title')} 
-          subtitle={t('analytics.charts.sessionStatus.subtitle')}
-          onClick={() => navigate('/dashboard/agenda')}
-        >
-          <div className="h-64 flex items-center justify-center">
-            {sessionsByStatus.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={sessionsByStatus}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
-                  >
-                    {sessionsByStatus.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-gray-500 text-sm">{t('analytics.noData')}</p>
-            )}
-          </div>
-        </ChartCard>
-      </div>
-
-      {/* Charts Grid - Row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Income Over Time */}
-        <ChartCard 
-          title={t('analytics.charts.incomeOverTime.title')} 
-          subtitle={t('analytics.charts.incomeOverTime.subtitle')}
-          onClick={() => navigate('/dashboard/cobros')}
-        >
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={incomeOverTime}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9ca3af" />
-                <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" tickFormatter={(v) => `$${v/1000}k`} />
-                <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
-                <Legend />
-                <Bar dataKey="cobrado" name={t('analytics.labels.collected')} fill={COLORS.success} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="pendiente" name={t('analytics.labels.pendingAmount')} fill={COLORS.warning} radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </ChartCard>
-
-        {/* Payments by Status */}
-        <ChartCard 
-          title={t('analytics.charts.paymentStatus.title')} 
-          subtitle={t('analytics.charts.paymentStatus.subtitle')}
-          onClick={() => navigate('/dashboard/cobros')}
-        >
-          <div className="h-64 flex items-center justify-center">
-            {paymentsByStatus.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={paymentsByStatus}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
-                  >
-                    {paymentsByStatus.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-gray-500 text-sm">{t('analytics.noData')}</p>
-            )}
-          </div>
-        </ChartCard>
-      </div>
-
-      {/* Charts Grid - Row 3: Occupancy */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Sessions by Hour */}
-        <ChartCard 
-          title={t('analytics.charts.hourlyOccupancy.title')} 
-          subtitle={t('analytics.charts.hourlyOccupancy.subtitle')}
-          onClick={() => navigate('/dashboard/agenda')}
-        >
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={sessionsByHour}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="#9ca3af" interval={0} angle={-45} textAnchor="end" height={50} />
-                <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" allowDecimals={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="sesiones" name={t('analytics.labels.sessions')} fill={COLORS.primary} radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </ChartCard>
-
-        {/* Sessions by Weekday */}
-        <ChartCard 
-          title={t('analytics.charts.dailyOccupancy.title')} 
-          subtitle={t('analytics.charts.dailyOccupancy.subtitle')}
-          onClick={() => navigate('/dashboard/agenda')}
-        >
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={sessionsByWeekday}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9ca3af" />
-                <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" allowDecimals={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="sesiones" name={t('analytics.labels.sessions')} fill={COLORS.blue} radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </ChartCard>
-      </div>
-
-      {/* Top Patients */}
-      <ChartCard 
-        title={t('analytics.charts.topPatients.title')} 
-        subtitle={t('analytics.charts.topPatients.subtitle')}
-        onClick={() => navigate('/dashboard/pacientes')}
-      >
-        <div className="h-64">
-          {topPatientsBySessions.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={topPatientsBySessions} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9ca3af" allowDecimals={false} />
-                <YAxis 
-                  type="category" 
-                  dataKey="name" 
-                  tick={{ fontSize: 12 }} 
-                  stroke="#9ca3af" 
-                  width={120}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="sesiones" name={t('analytics.labels.sessions')} fill={COLORS.purple} radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-full flex items-center justify-center">
-              <p className="text-gray-500 text-sm">{t('analytics.noData')}</p>
-            </div>
+          {/* Pacientes sin próxima cita */}
+          {isSectionVisible('patientsWithoutSession') && (
+            <Card className="p-4 bg-white">
+              <div className="flex items-center gap-2 mb-4">
+                <UserX className="w-5 h-5 text-orange-600" />
+                <h3 className="font-semibold text-gray-900">{t('dashboard.noUpcomingSession.title')}</h3>
+              </div>
+              {patientsWithoutNextSession.length > 0 ? (
+                <div className="space-y-3">
+                  {patientsWithoutNextSession.map(patient => (
+                    <button
+                      key={patient.id}
+                      onClick={() => navigate(`/dashboard/pacientes/${patient.id}`)}
+                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{patient.firstName} {patient.lastName}</p>
+                        {patient.lastSessionDate && (
+                          <p className="text-xs text-gray-500">
+                            {t('dashboard.noUpcomingSession.lastSession')}: {patient.lastSessionDate.toLocaleDateString('es-AR')}
+                          </p>
+                        )}
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/dashboard/agenda?action=new&patientId=${patient.id}`);
+                        }}
+                        className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        {t('dashboard.quickActions.newSession')}
+                      </Button>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+                  <CheckCircle2 className="w-10 h-10 mb-2 text-green-300" />
+                  <p className="text-sm text-center">{t('dashboard.noUpcomingSession.empty')}</p>
+                </div>
+              )}
+            </Card>
           )}
         </div>
-      </ChartCard>
+      )}
+
+      {/* Charts Section */}
+      {isSectionVisible('charts') && (
+        <>
+          {/* Charts Grid - Row 1 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Sessions Over Time */}
+            <ChartCard 
+              title={t('analytics.charts.sessionsOverTime.title')} 
+              subtitle={t('analytics.charts.sessionsOverTime.subtitle')}
+              onClick={() => navigate('/dashboard/agenda')}
+            >
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={sessionsOverTime}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9ca3af" />
+                    <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" allowDecimals={false} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="total" 
+                      name={t('analytics.labels.total')}
+                      stroke={COLORS.primary} 
+                      strokeWidth={2}
+                      dot={{ fill: COLORS.primary }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="completadas" 
+                      name={t('analytics.labels.completed')}
+                      stroke={COLORS.success} 
+                      strokeWidth={2}
+                      dot={{ fill: COLORS.success }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </ChartCard>
+
+            {/* Sessions by Status */}
+            <ChartCard 
+              title={t('analytics.charts.sessionStatus.title')} 
+              subtitle={t('analytics.charts.sessionStatus.subtitle')}
+              onClick={() => navigate('/dashboard/agenda')}
+            >
+              <div className="h-64 flex items-center justify-center">
+                {sessionsByStatus.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={sessionsByStatus}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        labelLine={false}
+                      >
+                        {sessionsByStatus.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="text-gray-500 text-sm">{t('analytics.noData')}</p>
+                )}
+              </div>
+            </ChartCard>
+          </div>
+
+          {/* Charts Grid - Row 2 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Income Over Time */}
+            <ChartCard 
+              title={t('analytics.charts.incomeOverTime.title')} 
+              subtitle={t('analytics.charts.incomeOverTime.subtitle')}
+              onClick={() => navigate('/dashboard/cobros')}
+            >
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={incomeOverTime}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9ca3af" />
+                    <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" tickFormatter={(v) => `$${v/1000}k`} />
+                    <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
+                    <Legend />
+                    <Bar dataKey="cobrado" name={t('analytics.labels.collected')} fill={COLORS.success} radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="pendiente" name={t('analytics.labels.pendingAmount')} fill={COLORS.warning} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </ChartCard>
+
+            {/* Payments by Status */}
+            <ChartCard 
+              title={t('analytics.charts.paymentStatus.title')} 
+              subtitle={t('analytics.charts.paymentStatus.subtitle')}
+              onClick={() => navigate('/dashboard/cobros')}
+            >
+              <div className="h-64 flex items-center justify-center">
+                {paymentsByStatus.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={paymentsByStatus}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        labelLine={false}
+                      >
+                        {paymentsByStatus.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="text-gray-500 text-sm">{t('analytics.noData')}</p>
+                )}
+              </div>
+            </ChartCard>
+          </div>
+
+          {/* Charts Grid - Row 3: Occupancy */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Sessions by Hour */}
+            <ChartCard 
+              title={t('analytics.charts.hourlyOccupancy.title')} 
+              subtitle={t('analytics.charts.hourlyOccupancy.subtitle')}
+              onClick={() => navigate('/dashboard/agenda')}
+            >
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={sessionsByHour}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="#9ca3af" interval={0} angle={-45} textAnchor="end" height={50} />
+                    <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" allowDecimals={false} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Bar dataKey="sesiones" name={t('analytics.labels.sessions')} fill={COLORS.primary} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </ChartCard>
+
+            {/* Sessions by Weekday */}
+            <ChartCard 
+              title={t('analytics.charts.dailyOccupancy.title')} 
+              subtitle={t('analytics.charts.dailyOccupancy.subtitle')}
+              onClick={() => navigate('/dashboard/agenda')}
+            >
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={sessionsByWeekday}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9ca3af" />
+                    <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" allowDecimals={false} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Bar dataKey="sesiones" name={t('analytics.labels.sessions')} fill={COLORS.blue} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </ChartCard>
+          </div>
+
+          {/* Top Patients */}
+          <ChartCard 
+            title={t('analytics.charts.topPatients.title')} 
+            subtitle={t('analytics.charts.topPatients.subtitle')}
+            onClick={() => navigate('/dashboard/pacientes')}
+          >
+            <div className="h-64">
+              {topPatientsBySessions.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={topPatientsBySessions} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9ca3af" allowDecimals={false} />
+                    <YAxis 
+                      type="category" 
+                      dataKey="name" 
+                      tick={{ fontSize: 12 }} 
+                      stroke="#9ca3af" 
+                      width={120}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Bar dataKey="sesiones" name={t('analytics.labels.sessions')} fill={COLORS.purple} radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center">
+                  <p className="text-gray-500 text-sm">{t('analytics.noData')}</p>
+                </div>
+              )}
+            </div>
+          </ChartCard>
+        </>
+      )}
     </div>
   );
 }
