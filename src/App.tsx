@@ -182,8 +182,12 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        {/* Default redirect to agenda */}
-        <Route index element={<Navigate to="agenda" replace />} />
+        {/* Default: Dashboard (Analitica) */}
+        <Route index element={
+          <Suspense fallback={<LoadingOverlay message="Cargando dashboard..." />}>
+            <Analitica />
+          </Suspense>
+        } />
         
         {/* Dashboard child routes */}
         <Route path="agenda" element={
@@ -201,11 +205,8 @@ export default function App() {
             <Cobros />
           </Suspense>
         } />
-        <Route path="analitica" element={
-          <Suspense fallback={<LoadingOverlay message="Cargando analítica..." />}>
-            <Analitica />
-          </Suspense>
-        } />
+        {/* Legacy route for backwards compatibility */}
+        <Route path="analitica" element={<Navigate to="/dashboard" replace />} />
         <Route path="configuracion" element={
           <Suspense fallback={<LoadingOverlay message="Cargando configuración..." />}>
             <Configuracion />

@@ -1016,6 +1016,9 @@
   "landing": {
     "brand": "Lavenius",
     "tagline": "Gestão de Pacientes",
+    "nav": {
+      "dashboard": "Painel"
+    },
     "hero": {
       "badge": "Gestão inteligente para profissionais de saúde mental",
       "title": "Controle total do seu consultório",
@@ -1099,6 +1102,93 @@
       "description": "Todos os dados dos seus pacientes são protegidos com criptografia AES-256-GCM de ponta a ponta. Cumprimos os mais altos padrões de segurança para proteger informações sensíveis.",
       "encryption": "Criptografia AES-256-GCM",
       "e2e": "Ponta a ponta"
+    },
+    "socialProof": {
+      "badge": "Comunidade crescendo",
+      "title": "Terapeutas que já organizaram seu consultório",
+      "stats": {
+        "professionals": "+500",
+        "professionalsLabel": "Profissionais",
+        "sessions": "+10K",
+        "sessionsLabel": "Sessões gerenciadas",
+        "collected": "+R$5M",
+        "collectedLabel": "Recebidos"
+      },
+      "testimonials": {
+        "1": {
+          "quote": "Finalmente posso focar nos meus pacientes e não em cobrar pagamentos. Mudou minha vida profissional.",
+          "name": "Dra. Maria Santos",
+          "role": "Psicóloga Clínica, São Paulo"
+        },
+        "2": {
+          "quote": "Testei vários apps mas nenhum entendia como um terapeuta trabalha. Este entende.",
+          "name": "Dr. João Oliveira",
+          "role": "Psicanalista, Rio de Janeiro"
+        },
+        "3": {
+          "quote": "A sincronização com Google Calendar e os lembretes por WhatsApp são incríveis. Meus pacientes sempre comparecem.",
+          "name": "Dra. Ana Costa",
+          "role": "Terapeuta Cognitivo-Comportamental, Belo Horizonte"
+        }
+      }
+    },
+    "whyLavenius": {
+      "badge": "Por que Lavenius?",
+      "title": "O que outros apps não te dão",
+      "subtitle": "Veja como nos comparamos com o mercado",
+      "features": {
+        "unlimited": {
+          "title": "Pacientes ilimitados",
+          "description": "Diferente de outros apps que limitam a 5 pacientes no plano básico. Aqui, quantos quiser desde o dia 1.",
+          "highlight": "Sem limites"
+        },
+        "encryption": {
+          "title": "Criptografia de verdade",
+          "description": "AES-256-GCM de ponta a ponta. Não é só um logo de HIPAA no rodapé, é proteção real.",
+          "highlight": "AES-256-GCM"
+        },
+        "localPricing": {
+          "title": "Preços transparentes",
+          "description": "Preços claros e previsíveis. Sem surpresas, sem taxas ocultas, sem cálculos complicados.",
+          "highlight": "Sem surpresas"
+        },
+        "noContracts": {
+          "title": "Sem contratos nem complicação",
+          "description": "Cancele quando quiser. Sem permanência mínima, sem letras miúdas, sem amarras.",
+          "highlight": "Cancele já"
+        }
+      }
+    },
+    "faq": {
+      "badge": "Perguntas Frequentes",
+      "title": "Tem dúvidas?",
+      "subtitle": "Aqui respondemos as mais comuns",
+      "questions": {
+        "security": {
+          "question": "Meus dados e dos meus pacientes estão seguros?",
+          "answer": "Sim, 100%. Usamos criptografia AES-256-GCM de ponta a ponta. Isso significa que nem nós podemos ler suas anotações clínicas. Só você com sua passphrase pode acessar as informações sensíveis."
+        },
+        "cancel": {
+          "question": "Posso cancelar quando quiser?",
+          "answer": "Sim, sem complicação. Não há permanência mínima nem contratos. Cancele do seu perfil em 2 cliques e pronto."
+        },
+        "modality": {
+          "question": "Funciona para terapia presencial e online?",
+          "answer": "Sim, para as duas. Você pode marcar cada sessão como presencial ou remota, e o sistema se adapta para lembretes e organização."
+        },
+        "patientLimit": {
+          "question": "Existe limite de pacientes?",
+          "answer": "Não, pacientes ilimitados desde o plano mais básico. Não cobramos mais para você crescer."
+        },
+        "trial": {
+          "question": "Posso testar grátis antes de pagar?",
+          "answer": "Claro! Você tem 14 dias de teste grátis com todas as funcionalidades. Sem cartão de crédito."
+        },
+        "support": {
+          "question": "E se eu tiver problemas ou dúvidas?",
+          "answer": "É só nos escrever e respondemos. Suporte real de pessoas que entendem do seu trabalho."
+        }
+      }
     },
     "cta": {
       "title": "Comece a gerenciar seu consultório de forma inteligente",

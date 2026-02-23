@@ -10,7 +10,8 @@ import {
   FileText,
   HelpCircle,
   ArrowLeft,
-  Rocket
+  Rocket,
+  LayoutDashboard
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -68,6 +69,38 @@ const HELP_CATEGORIES: HelpCategory[] = [
         titleKey: 'help.categories.gettingStarted.articles.firstSteps.title',
         contentKey: 'help.categories.gettingStarted.articles.firstSteps.content',
         tagsKey: 'help.categories.gettingStarted.articles.firstSteps.tags',
+      },
+    ],
+  },
+  {
+    id: 'dashboard',
+    titleKey: 'help.categories.dashboard.title',
+    descriptionKey: 'help.categories.dashboard.description',
+    icon: LayoutDashboard,
+    articles: [
+      {
+        id: 'overview',
+        titleKey: 'help.categories.dashboard.articles.overview.title',
+        contentKey: 'help.categories.dashboard.articles.overview.content',
+        tagsKey: 'help.categories.dashboard.articles.overview.tags',
+      },
+      {
+        id: 'statistics',
+        titleKey: 'help.categories.dashboard.articles.statistics.title',
+        contentKey: 'help.categories.dashboard.articles.statistics.content',
+        tagsKey: 'help.categories.dashboard.articles.statistics.tags',
+      },
+      {
+        id: 'charts',
+        titleKey: 'help.categories.dashboard.articles.charts.title',
+        contentKey: 'help.categories.dashboard.articles.charts.content',
+        tagsKey: 'help.categories.dashboard.articles.charts.tags',
+      },
+      {
+        id: 'time-filter',
+        titleKey: 'help.categories.dashboard.articles.timeFilter.title',
+        contentKey: 'help.categories.dashboard.articles.timeFilter.content',
+        tagsKey: 'help.categories.dashboard.articles.timeFilter.tags',
       },
     ],
   },

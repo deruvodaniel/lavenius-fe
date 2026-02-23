@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Calendar, Users, DollarSign, LogOut, Settings, ChevronRight, HelpCircle, BarChart3 } from 'lucide-react';
+import { Calendar, Users, DollarSign, LogOut, Settings, ChevronRight, HelpCircle, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { ConfirmDialog } from '@/components/shared';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -34,10 +34,10 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
   };
 
   const menuItems = [
+    { path: '/dashboard', labelKey: 'navigation.dashboard', icon: LayoutDashboard, end: true },
     { path: '/dashboard/agenda', labelKey: 'navigation.agenda', icon: Calendar },
     { path: '/dashboard/pacientes', labelKey: 'navigation.patients', icon: Users },
     { path: '/dashboard/cobros', labelKey: 'navigation.payments', icon: DollarSign },
-    { path: '/dashboard/analitica', labelKey: 'navigation.analytics', icon: BarChart3 },
   ];
 
   const settingsItems = [
@@ -59,16 +59,19 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
     to, 
     icon: Icon, 
     labelKey, 
-    onClick 
+    onClick,
+    end 
   }: { 
     to: string; 
     icon: typeof Calendar; 
     labelKey: string; 
     onClick?: () => void;
+    end?: boolean;
   }) => {
     const content = (
       <NavLink
         to={to}
+        end={end}
         onClick={onClick}
         className={getLinkClassName}
       >
@@ -129,6 +132,7 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
               icon={item.icon}
               labelKey={item.labelKey}
               onClick={handleNavClick}
+              end={item.end}
             />
           ))}
           

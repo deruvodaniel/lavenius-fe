@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { 
   BarChart, 
   Bar, 
@@ -29,6 +30,7 @@ import { Button } from '@/components/ui/button';
 import { SkeletonList } from '@/components/shared/Skeleton';
 import { usePayments } from '@/lib/hooks/usePayments';
 import { usePatients, useResponsive } from '@/lib/hooks';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { SessionStatus } from '@/lib/types/session';
 import { PaymentStatus } from '@/lib/types/api.types';
 import { sessionService } from '@/lib/api/sessions';
@@ -124,10 +126,14 @@ interface StatCardProps {
   iconBg: string;
   iconColor: string;
   trend?: { value: number; isPositive: boolean };
+  onClick?: () => void;
 }
 
-const StatCard = ({ title, value, subtitle, icon: Icon, iconBg, iconColor, trend, trendLabel }: StatCardProps & { trendLabel?: string }) => (
-  <Card className="p-3 sm:p-4 lg:p-6 bg-white">
+const StatCard = ({ title, value, subtitle, icon: Icon, iconBg, iconColor, trend, trendLabel, onClick }: StatCardProps & { trendLabel?: string }) => (
+  <Card 
+    className={`p-3 sm:p-4 lg:p-6 bg-white ${onClick ? 'cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all' : ''}`}
+    onClick={onClick}
+  >
     <div className="flex items-start justify-between gap-2">
       <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
         <p className="text-xs sm:text-sm text-gray-500 truncate">{title}</p>
@@ -156,10 +162,14 @@ interface ChartCardProps {
   subtitle?: string;
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
-const ChartCard = ({ title, subtitle, children, className = '' }: ChartCardProps) => (
-  <Card className={`p-3 sm:p-4 lg:p-6 bg-white ${className}`}>
+const ChartCard = ({ title, subtitle, children, className = '', onClick }: ChartCardProps) => (
+  <Card 
+    className={`p-3 sm:p-4 lg:p-6 bg-white ${className} ${onClick ? 'cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all' : ''}`}
+    onClick={onClick}
+  >
     <div className="mb-3 sm:mb-4">
       <h3 className="text-sm sm:text-base font-semibold text-gray-900">{title}</h3>
       {subtitle && <p className="text-xs sm:text-sm text-gray-500">{subtitle}</p>}
@@ -200,9 +210,11 @@ const CustomTooltip = ({ active, payload, label, formatter }: TooltipProps) => {
 
 export function Analitica() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { payments, fetchPayments } = usePayments();
   const { patients, fetchPatients } = usePatients();
   const { isMobile } = useResponsive();
+  const { user } = useAuth();
   
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>('month');
@@ -211,6 +223,18 @@ export function Analitica() {
 
   // Track component mount to force refresh on initial load
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Get time-based greeting
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      return t('dashboard.greeting.morning');
+    } else if (hour >= 12 && hour < 19) {
+      return t('dashboard.greeting.afternoon');
+    } else {
+      return t('dashboard.greeting.evening');
+    }
+  }, [t]);
 
   // Fetch all data on mount and when time range changes
   useEffect(() => {
@@ -541,8 +565,12 @@ export function Analitica() {
     return (
       <div className="p-4 md:p-6 lg:p-8 space-y-6">
         <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('analytics.title')}</h1>
-          <p className="text-sm text-gray-500">{t('analytics.loading')}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            {greeting}, {user?.firstName || t('auth.welcome')}
+          </h1>
+          <p className="text-gray-500 mt-1">
+            {t('dashboard.welcomeSubtitle')}
+          </p>
         </div>
         <SkeletonList items={4} />
       </div>
@@ -551,10 +579,20 @@ export function Analitica() {
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6">
-      {/* Header */}
+      {/* Welcome Header */}
+      <div className="mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          {greeting}, {user?.firstName || t('auth.welcome')}
+        </h1>
+        <p className="text-gray-500 mt-1">
+          {t('dashboard.welcomeSubtitle')}
+        </p>
+      </div>
+
+      {/* Header with Time Range Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('analytics.title')}</h1>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">{t('analytics.title')}</h2>
           <p className="text-sm text-gray-500">{t('analytics.subtitle')}</p>
         </div>
         
@@ -620,6 +658,7 @@ export function Analitica() {
           iconBg="bg-indigo-100"
           iconColor="text-indigo-600"
           trendLabel={t('analytics.stats.vsPrevious')}
+          onClick={() => navigate('/dashboard/agenda')}
         />
         <StatCard
           title={t('analytics.stats.income')}
@@ -629,6 +668,7 @@ export function Analitica() {
           iconBg="bg-green-100"
           iconColor="text-green-600"
           trendLabel={t('analytics.stats.vsPrevious')}
+          onClick={() => navigate('/dashboard/cobros')}
         />
         <StatCard
           title={t('analytics.stats.patientsAttended')}
@@ -638,6 +678,7 @@ export function Analitica() {
           iconBg="bg-blue-100"
           iconColor="text-blue-600"
           trendLabel={t('analytics.stats.vsPrevious')}
+          onClick={() => navigate('/dashboard/pacientes')}
         />
         <StatCard
           title={t('analytics.stats.attendanceRate')}
@@ -647,13 +688,18 @@ export function Analitica() {
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
           trendLabel={t('analytics.stats.vsPrevious')}
+          onClick={() => navigate('/dashboard/agenda')}
         />
       </div>
 
       {/* Charts Grid - Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sessions Over Time */}
-        <ChartCard title={t('analytics.charts.sessionsOverTime.title')} subtitle={t('analytics.charts.sessionsOverTime.subtitle')}>
+        <ChartCard 
+          title={t('analytics.charts.sessionsOverTime.title')} 
+          subtitle={t('analytics.charts.sessionsOverTime.subtitle')}
+          onClick={() => navigate('/dashboard/agenda')}
+        >
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={sessionsOverTime}>
@@ -684,7 +730,11 @@ export function Analitica() {
         </ChartCard>
 
         {/* Sessions by Status */}
-        <ChartCard title={t('analytics.charts.sessionStatus.title')} subtitle={t('analytics.charts.sessionStatus.subtitle')}>
+        <ChartCard 
+          title={t('analytics.charts.sessionStatus.title')} 
+          subtitle={t('analytics.charts.sessionStatus.subtitle')}
+          onClick={() => navigate('/dashboard/agenda')}
+        >
           <div className="h-64 flex items-center justify-center">
             {sessionsByStatus.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -717,7 +767,11 @@ export function Analitica() {
       {/* Charts Grid - Row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Income Over Time */}
-        <ChartCard title={t('analytics.charts.incomeOverTime.title')} subtitle={t('analytics.charts.incomeOverTime.subtitle')}>
+        <ChartCard 
+          title={t('analytics.charts.incomeOverTime.title')} 
+          subtitle={t('analytics.charts.incomeOverTime.subtitle')}
+          onClick={() => navigate('/dashboard/cobros')}
+        >
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={incomeOverTime}>
@@ -734,7 +788,11 @@ export function Analitica() {
         </ChartCard>
 
         {/* Payments by Status */}
-        <ChartCard title={t('analytics.charts.paymentStatus.title')} subtitle={t('analytics.charts.paymentStatus.subtitle')}>
+        <ChartCard 
+          title={t('analytics.charts.paymentStatus.title')} 
+          subtitle={t('analytics.charts.paymentStatus.subtitle')}
+          onClick={() => navigate('/dashboard/cobros')}
+        >
           <div className="h-64 flex items-center justify-center">
             {paymentsByStatus.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -767,7 +825,11 @@ export function Analitica() {
       {/* Charts Grid - Row 3: Occupancy */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sessions by Hour */}
-        <ChartCard title={t('analytics.charts.hourlyOccupancy.title')} subtitle={t('analytics.charts.hourlyOccupancy.subtitle')}>
+        <ChartCard 
+          title={t('analytics.charts.hourlyOccupancy.title')} 
+          subtitle={t('analytics.charts.hourlyOccupancy.subtitle')}
+          onClick={() => navigate('/dashboard/agenda')}
+        >
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={sessionsByHour}>
@@ -782,7 +844,11 @@ export function Analitica() {
         </ChartCard>
 
         {/* Sessions by Weekday */}
-        <ChartCard title={t('analytics.charts.dailyOccupancy.title')} subtitle={t('analytics.charts.dailyOccupancy.subtitle')}>
+        <ChartCard 
+          title={t('analytics.charts.dailyOccupancy.title')} 
+          subtitle={t('analytics.charts.dailyOccupancy.subtitle')}
+          onClick={() => navigate('/dashboard/agenda')}
+        >
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={sessionsByWeekday}>
@@ -798,7 +864,11 @@ export function Analitica() {
       </div>
 
       {/* Top Patients */}
-      <ChartCard title={t('analytics.charts.topPatients.title')} subtitle={t('analytics.charts.topPatients.subtitle')}>
+      <ChartCard 
+        title={t('analytics.charts.topPatients.title')} 
+        subtitle={t('analytics.charts.topPatients.subtitle')}
+        onClick={() => navigate('/dashboard/pacientes')}
+      >
         <div className="h-64">
           {topPatientsBySessions.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">

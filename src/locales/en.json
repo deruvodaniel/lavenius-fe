@@ -1025,6 +1025,9 @@
   "landing": {
     "brand": "Lavenius",
     "tagline": "Patient Management",
+    "nav": {
+      "dashboard": "Dashboard"
+    },
     "hero": {
       "badge": "Smart management for mental health professionals",
       "title": "Complete control of your practice",
@@ -1108,6 +1111,93 @@
       "description": "All your patient data is protected with AES-256-GCM encryption end-to-end. We comply with the highest security standards to protect sensitive information.",
       "encryption": "AES-256-GCM encryption",
       "e2e": "End-to-end"
+    },
+    "socialProof": {
+      "badge": "Growing community",
+      "title": "Therapists who already organized their practice",
+      "stats": {
+        "professionals": "+500",
+        "professionalsLabel": "Professionals",
+        "sessions": "+10K",
+        "sessionsLabel": "Sessions managed",
+        "collected": "+$5M",
+        "collectedLabel": "Collected"
+      },
+      "testimonials": {
+        "1": {
+          "quote": "I can finally focus on my patients instead of chasing payments. It changed my work life.",
+          "name": "Dr. Sarah Johnson",
+          "role": "Clinical Psychologist, New York"
+        },
+        "2": {
+          "quote": "I tried several apps but none understood how a therapist works. This one does.",
+          "name": "Dr. Michael Chen",
+          "role": "Psychoanalyst, Los Angeles"
+        },
+        "3": {
+          "quote": "The Google Calendar sync and WhatsApp reminders are amazing. My patients always show up.",
+          "name": "Dr. Emily Davis",
+          "role": "CBT Therapist, Chicago"
+        }
+      }
+    },
+    "whyLavenius": {
+      "badge": "Why Lavenius?",
+      "title": "What other apps don't give you",
+      "subtitle": "See how we compare to the market",
+      "features": {
+        "unlimited": {
+          "title": "Unlimited patients",
+          "description": "Unlike other apps that limit you to 5 patients on the basic plan. Here, as many as you want from day 1.",
+          "highlight": "No limits"
+        },
+        "encryption": {
+          "title": "Real encryption",
+          "description": "AES-256-GCM end-to-end. Not just a HIPAA logo at the bottom of the page, but real protection.",
+          "highlight": "AES-256-GCM"
+        },
+        "localPricing": {
+          "title": "Transparent pricing",
+          "description": "Clear, predictable pricing. No surprises, no hidden fees, no complicated calculations.",
+          "highlight": "No surprises"
+        },
+        "noContracts": {
+          "title": "No contracts, no hassle",
+          "description": "Cancel whenever you want. No minimum commitment, no fine print, no strings attached.",
+          "highlight": "Cancel anytime"
+        }
+      }
+    },
+    "faq": {
+      "badge": "FAQ",
+      "title": "Got questions?",
+      "subtitle": "Here are the most common ones answered",
+      "questions": {
+        "security": {
+          "question": "Is my data and my patients' data secure?",
+          "answer": "Yes, 100%. We use AES-256-GCM end-to-end encryption. That means even we can't read your clinical notes. Only you with your passphrase can access sensitive information."
+        },
+        "cancel": {
+          "question": "Can I cancel anytime?",
+          "answer": "Yes, no hassle. No minimum commitment, no contracts. Cancel from your profile in 2 clicks and you're done."
+        },
+        "modality": {
+          "question": "Does it work for in-person and online therapy?",
+          "answer": "Yes, for both. You can mark each session as in-person or remote, and the system adapts for reminders and organization."
+        },
+        "patientLimit": {
+          "question": "Is there a patient limit?",
+          "answer": "No, unlimited patients from the most basic plan. We don't charge you more to grow."
+        },
+        "trial": {
+          "question": "Can I try it for free before paying?",
+          "answer": "Of course! You get 14 days free trial with all features. No credit card required."
+        },
+        "support": {
+          "question": "What if I have problems or questions?",
+          "answer": "Just reach out and we'll respond. Real human support from people who understand your work."
+        }
+      }
     },
     "cta": {
       "title": "Start managing your practice smartly",
