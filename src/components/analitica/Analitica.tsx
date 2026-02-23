@@ -929,26 +929,22 @@ export function Analitica() {
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6">
-      {/* Welcome Header - Compact when scrolled */}
-      <AnimatedSection delay={0}>
-        <CompactHeader
-          greeting={greeting}
-          userName={user?.firstName || t('auth.welcome')}
-          subtitle={t('dashboard.welcomeSubtitle')}
-          isScrolled={isScrolled}
-          actions={<DashboardSettingsPopover t={t} isMobile={isMobile} />}
-        />
-      </AnimatedSection>
+      {/* Welcome Header - Sticky when scrolled (no AnimatedSection to preserve sticky behavior) */}
+      <CompactHeader
+        greeting={greeting}
+        userName={user?.firstName || t('auth.welcome')}
+        subtitle={t('dashboard.welcomeSubtitle')}
+        isScrolled={isScrolled}
+        actions={<DashboardSettingsPopover t={t} isMobile={isMobile} />}
+      />
 
-      {/* Quick Actions - Sticky when scrolled */}
+      {/* Quick Actions - Sticky when scrolled (no AnimatedSection to preserve sticky behavior) */}
       {isSectionVisible('quickActions') && (
-        <AnimatedSection delay={0.1}>
-          <QuickActionsBar
-            actions={quickActions}
-            isScrolled={isScrolled}
-            isMobile={isMobile}
-          />
-        </AnimatedSection>
+        <QuickActionsBar
+          actions={quickActions}
+          isScrolled={isScrolled}
+          isMobile={isMobile}
+        />
       )}
 
       {/* Today's Summary Card - Enhanced */}

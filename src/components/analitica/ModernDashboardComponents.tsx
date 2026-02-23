@@ -1,34 +1,49 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/components/ui/utils';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { TrendingUp, TrendingDown, Clock } from 'lucide-react';
 
-// Lazy load framer-motion
-const MotionDiv = lazy(() => 
-  import('framer-motion').then(mod => ({ 
-    default: mod.motion.div 
-  }))
-);
-
 // ============================================================================
 // useScrollPosition Hook - Detect scroll for sticky header behavior
+// Works with both window scroll and scrollable containers (overflow-y: auto)
 // ============================================================================
 
 export function useScrollPosition(threshold = 50): boolean {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
+    // Find the scrollable container - in AppLayout it's the <main> element
+    // We look for the closest scrollable parent or fall back to window
+    const findScrollableParent = (): HTMLElement | Window => {
+      // Look for main element with overflow-y-auto (AppLayout's main content)
+      const mainElement = document.querySelector('main');
+      if (mainElement) {
+        const style = window.getComputedStyle(mainElement);
+        if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
+          return mainElement;
+        }
+      }
+      return window;
+    };
+
+    const scrollTarget = findScrollableParent();
+    
     const handleScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      let scrollY: number;
+      if (scrollTarget instanceof Window) {
+        scrollY = window.scrollY || document.documentElement.scrollTop;
+      } else {
+        scrollY = scrollTarget.scrollTop;
+      }
       setIsScrolled(scrollY > threshold);
     };
 
     // Initial check
     handleScroll();
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    scrollTarget.addEventListener('scroll', handleScroll, { passive: true });
+    return () => scrollTarget.removeEventListener('scroll', handleScroll);
   }, [threshold]);
 
   return isScrolled;
@@ -195,7 +210,6 @@ export function MiniStatCard({
   iconBg,
   iconColor,
   trend,
-  trendLabel,
   sparklineData,
   sparklineColor = '#4f46e5',
   onClick,
@@ -321,6 +335,8 @@ interface CompactHeaderProps {
   userName?: string;
   subtitle: string;
   isScrolled: boolean;
+  isMobile?: boolean;
+  sidebarCollapsed?: boolean;
   actions?: React.ReactNode;
   className?: string;
 }
@@ -333,12 +349,15 @@ export function CompactHeader({
   actions,
   className,
 }: CompactHeaderProps) {
+  // Use sticky positioning - works with overflow-y: auto containers
+  // The header is always sticky at top-0, but changes appearance based on scroll position
+  // When scrolled: compact, full-width | When not scrolled: larger, rounded
   return (
     <div 
       className={cn(
-        'bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white shadow-lg transition-all duration-300',
+        'sticky top-0 z-50 bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white shadow-lg transition-all duration-300',
         isScrolled 
-          ? 'sticky top-0 z-40 rounded-none py-3 px-4 sm:px-6' 
+          ? 'rounded-none py-3 px-4 sm:px-6 -mx-4 md:-mx-6 lg:-mx-8 w-[calc(100%+2rem)] md:w-[calc(100%+3rem)] lg:w-[calc(100%+4rem)]' 
           : 'rounded-2xl p-6 sm:p-8',
         className
       )}
@@ -389,6 +408,7 @@ interface QuickActionsBarProps {
   actions: QuickAction[];
   isScrolled: boolean;
   isMobile: boolean;
+  sidebarCollapsed?: boolean;
   className?: string;
 }
 
@@ -398,12 +418,19 @@ export function QuickActionsBar({
   isMobile,
   className,
 }: QuickActionsBarProps) {
+  // Use sticky positioning - sticks below the header when scrolling
+  // The top value accounts for the CompactHeader height:
+  // - When scrolled: header is ~52px
+  // - When not scrolled: header is larger but we still want quick actions to stick below it
+  // Using CSS calc to handle this dynamically
   return (
     <div 
       className={cn(
-        'grid gap-2 sm:gap-3 transition-all duration-300',
+        'sticky z-40 grid gap-2 sm:gap-3 transition-all duration-300',
+        // When scrolled, header is ~52px, otherwise it's larger
+        isScrolled ? 'top-[52px]' : 'top-0',
         isScrolled 
-          ? 'sticky top-[52px] sm:top-[60px] z-30 bg-gray-50 dark:bg-gray-900 py-3 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 border-b border-gray-200 dark:border-gray-700' 
+          ? 'bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-sm py-3 -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8 w-[calc(100%+2rem)] md:w-[calc(100%+3rem)] lg:w-[calc(100%+4rem)] border-b border-gray-200 dark:border-gray-700 shadow-sm' 
           : '',
         isMobile ? 'grid-cols-4' : 'grid-cols-4',
         className
