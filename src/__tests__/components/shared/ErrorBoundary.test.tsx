@@ -132,6 +132,137 @@ describe('ErrorBoundary', () => {
     });
   });
 
+  describe('Chunk Load Error Detection', () => {
+    // Helper to create chunk-like errors
+    const createChunkError = (message: string, name?: string) => {
+      const error = new Error(message);
+      if (name) error.name = name;
+      return error;
+    };
+
+    const ThrowChunkError = ({ message, errorName }: { message: string; errorName?: string }) => {
+      throw createChunkError(message, errorName);
+    };
+
+    it('shows "Nueva versión disponible" for dynamically imported module errors', () => {
+      render(
+        <ErrorBoundary>
+          <ThrowChunkError message="Failed to fetch dynamically imported module: /assets/Component-abc123.js" />
+        </ErrorBoundary>
+      );
+
+      expect(screen.getByText('Nueva versión disponible')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /recargar página/i })).toBeInTheDocument();
+      expect(screen.queryByText('Algo salió mal')).not.toBeInTheDocument();
+    });
+
+    it('shows chunk error UI for "failed to fetch" errors', () => {
+      render(
+        <ErrorBoundary>
+          <ThrowChunkError message="Failed to fetch" />
+        </ErrorBoundary>
+      );
+
+      expect(screen.getByText('Nueva versión disponible')).toBeInTheDocument();
+    });
+
+    it('shows chunk error UI for "loading chunk" errors', () => {
+      render(
+        <ErrorBoundary>
+          <ThrowChunkError message="Loading chunk 123 failed" />
+        </ErrorBoundary>
+      );
+
+      expect(screen.getByText('Nueva versión disponible')).toBeInTheDocument();
+    });
+
+    it('shows chunk error UI for "loading css chunk" errors', () => {
+      render(
+        <ErrorBoundary>
+          <ThrowChunkError message="Loading CSS chunk styles-abc123 failed" />
+        </ErrorBoundary>
+      );
+
+      expect(screen.getByText('Nueva versión disponible')).toBeInTheDocument();
+    });
+
+    it('shows chunk error UI for ChunkLoadError name', () => {
+      render(
+        <ErrorBoundary>
+          <ThrowChunkError message="Chunk failed to load" errorName="ChunkLoadError" />
+        </ErrorBoundary>
+      );
+
+      expect(screen.getByText('Nueva versión disponible')).toBeInTheDocument();
+    });
+
+    it('shows friendly message instead of technical details', () => {
+      render(
+        <ErrorBoundary>
+          <ThrowChunkError message="Failed to fetch dynamically imported module: https://example.com/assets/Component-QK7xxTTs.js" />
+        </ErrorBoundary>
+      );
+
+      // Should NOT show the technical URL/path
+      expect(screen.queryByText(/QK7xxTTs/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/assets/)).not.toBeInTheDocument();
+      
+      // Should show friendly message
+      expect(screen.getByText(/actualización disponible/i)).toBeInTheDocument();
+    });
+
+    it('calls window.location.reload when reload button is clicked', async () => {
+      const user = userEvent.setup();
+      const originalLocation = window.location;
+      const reloadMock = vi.fn();
+      
+      // Mock window.location.reload
+      Object.defineProperty(window, 'location', {
+        value: { ...originalLocation, reload: reloadMock },
+        writable: true,
+      });
+
+      render(
+        <ErrorBoundary>
+          <ThrowChunkError message="Failed to fetch dynamically imported module" />
+        </ErrorBoundary>
+      );
+
+      await user.click(screen.getByRole('button', { name: /recargar página/i }));
+      expect(reloadMock).toHaveBeenCalledTimes(1);
+
+      // Restore original location
+      Object.defineProperty(window, 'location', {
+        value: originalLocation,
+        writable: true,
+      });
+    });
+
+    it('chunk error alert does not have destructive variant', () => {
+      render(
+        <ErrorBoundary>
+          <ThrowChunkError message="Failed to fetch dynamically imported module" />
+        </ErrorBoundary>
+      );
+
+      const alert = screen.getByRole('alert');
+      // Destructive variant adds 'text-destructive' class
+      expect(alert).not.toHaveClass('text-destructive');
+    });
+
+    it('shows normal error UI for non-chunk errors', () => {
+      render(
+        <ErrorBoundary>
+          <ThrowError shouldThrow={true} />
+        </ErrorBoundary>
+      );
+
+      // Should show normal error, not chunk error UI
+      expect(screen.getByText('Algo salió mal')).toBeInTheDocument();
+      expect(screen.queryByText('Nueva versión disponible')).not.toBeInTheDocument();
+    });
+  });
+
   describe('Custom Fallback', () => {
     it('renders custom fallback when provided', () => {
       const customFallback = <div>Custom error fallback</div>;
