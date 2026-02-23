@@ -31,28 +31,8 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { cn } from '@/components/ui/utils';
-import { apiClient } from '@/lib/api/client';
-
-/**
- * LocalStorage key for storing onboarding data not accepted by the backend
- */
-const ONBOARDING_EXTRA_DATA_KEY = 'lavenius_onboarding_extra';
-
-/**
- * Data structure for fields that the backend doesn't accept
- * These are stored in localStorage for later use
- */
-interface OnboardingExtraData {
-  specialty?: string;
-  alternativePhone?: string;
-  officeAddress?: string;
-  website?: string;
-  socialMedia?: {
-    instagram?: string;
-    linkedin?: string;
-  };
-  bio?: string;
-}
+import { onboardingService } from '@/lib/services';
+import type { ClerkUserSyncDto, OnboardingExtraData } from '@/lib/types/api.types';
 
 /**
  * List of common therapy specialties
@@ -260,17 +240,25 @@ export function Onboarding() {
     setIsSubmitting(true);
 
     try {
-      // 1. Prepare data for backend (only fields it accepts)
-      // Note: We don't send password/passphrase as Clerk handles authentication
-      const backendData = {
-        email: user.primaryEmailAddress?.emailAddress || '',
+      // 1. Validate required data from Clerk
+      const email = user.primaryEmailAddress?.emailAddress;
+      if (!email) {
+        console.warn('Cannot sync with backend: missing email from Clerk');
+        toast.error(t('onboarding.stepper.error'));
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 2. Prepare data for backend (only fields it accepts)
+      const backendData: ClerkUserSyncDto = {
+        email,
         firstName: user.firstName || '',
         lastName: user.lastName || '',
         phone: formData.phone.trim() || undefined,
         licenseNumber: formData.licenseNumber.trim() || undefined,
       };
 
-      // 2. Prepare extra data for localStorage (fields backend doesn't accept)
+      // 3. Prepare extra data for localStorage (fields backend doesn't accept)
       const extraData: OnboardingExtraData = {
         specialty: formData.specialty || undefined,
         alternativePhone: formData.alternativePhone.trim() || undefined,
@@ -283,20 +271,22 @@ export function Onboarding() {
         bio: formData.bio.trim() || undefined,
       };
 
-      // 3. Try to register with backend (may fail if password/passphrase required)
-      try {
-        await apiClient.post('/auth/register', backendData);
-        console.log('User registered with backend successfully');
-      } catch (backendError) {
-        // Log the error but continue - backend sync can happen later via webhook
-        console.warn('Backend registration failed (will sync later):', backendError);
+      // 4. Sync with backend using the service layer
+      const syncResult = await onboardingService.syncUserWithBackend(backendData);
+      if (syncResult.success) {
+        if (import.meta.env.DEV) {
+          console.log(syncResult.alreadyExists 
+            ? 'User already registered in backend' 
+            : 'User registered with backend successfully'
+          );
+        }
       }
+      // Note: We continue even if sync fails - data is saved to Clerk and localStorage
 
-      // 4. Save extra data to localStorage
-      localStorage.setItem(ONBOARDING_EXTRA_DATA_KEY, JSON.stringify(extraData));
-      console.log('Extra onboarding data saved to localStorage');
+      // 5. Save extra data to localStorage (user-scoped)
+      onboardingService.saveExtraData(user.id, extraData);
 
-      // 5. Update Clerk user metadata with all profile data
+      // 6. Update Clerk user metadata with all profile data
       await user.update({
         unsafeMetadata: {
           ...user.unsafeMetadata,

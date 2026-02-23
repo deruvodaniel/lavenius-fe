@@ -8,3 +8,5 @@ export { appointmentService, AppointmentService } from './appointment.service';
 export { noteService, NoteService } from './note.service';
 export { paymentService } from './payment.service';
 export { settingService, SettingService } from './setting.service';
+export { onboardingService, OnboardingService } from './onboarding.service';
+export type { SyncResult } from './onboarding.service';

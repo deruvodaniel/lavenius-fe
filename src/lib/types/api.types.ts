@@ -207,6 +207,35 @@ export type RegisterDto = {
   licenseNumber?: string;
 };
 
+/**
+ * DTO for syncing Clerk users with the backend
+ * Unlike RegisterDto, this doesn't require password/passphrase
+ * as authentication is handled by Clerk
+ */
+export type ClerkUserSyncDto = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  licenseNumber?: string;
+};
+
+/**
+ * Data structure for onboarding fields that the backend doesn't accept yet
+ * These are stored in localStorage for later sync via webhook
+ */
+export type OnboardingExtraData = {
+  specialty?: string;
+  alternativePhone?: string;
+  officeAddress?: string;
+  website?: string;
+  socialMedia?: {
+    instagram?: string;
+    linkedin?: string;
+  };
+  bio?: string;
+};
+
 export type ChangePassphraseDto = {
   currentPassphrase: string;
   newPassphrase: string;
