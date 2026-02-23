@@ -849,7 +849,8 @@
       "newInPeriod": "nuevos en el período",
       "attendanceRate": "Tasa de Asistencia",
       "cancellations": "cancelaciones",
-      "vsPrevious": "vs anterior"
+      "vsPrevious": "vs anterior",
+      "rate": "tasa"
     },
     "charts": {
       "sessionsOverTime": {
@@ -908,7 +909,11 @@
       "newSession": "Nuevo Turno",
       "newPatient": "Nuevo Paciente",
       "newPayment": "Registrar Pago",
-      "viewAgenda": "Ver Agenda"
+      "viewAgenda": "Ver Agenda",
+      "session": "Turno",
+      "patient": "Paciente",
+      "payment": "Pago",
+      "agenda": "Agenda"
     },
     "todaySessions": {
       "title": "Próximas citas de hoy",
@@ -940,7 +945,9 @@
       "of": "de",
       "income": "Ingresos de hoy",
       "nextSession": "Próxima sesión",
-      "moreUpcoming": "Más sesiones hoy"
+      "moreUpcoming": "Más sesiones hoy",
+      "inMinutes": "En {{minutes}} min",
+      "noMoreSessions": "Sin más sesiones hoy"
     },
     "settings": {
       "title": "Personalizar Dashboard",

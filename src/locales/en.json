@@ -849,7 +849,8 @@
       "newInPeriod": "new in period",
       "attendanceRate": "Attendance Rate",
       "cancellations": "cancellations",
-      "vsPrevious": "vs previous"
+      "vsPrevious": "vs previous",
+      "rate": "rate"
     },
     "charts": {
       "sessionsOverTime": {
@@ -908,7 +909,11 @@
       "newSession": "New Session",
       "newPatient": "New Patient",
       "newPayment": "Record Payment",
-      "viewAgenda": "View Agenda"
+      "viewAgenda": "View Agenda",
+      "session": "Session",
+      "patient": "Patient",
+      "payment": "Payment",
+      "agenda": "Agenda"
     },
     "todaySessions": {
       "title": "Today's upcoming sessions",
@@ -940,7 +945,9 @@
       "of": "of",
       "income": "Today's income",
       "nextSession": "Next session",
-      "moreUpcoming": "More sessions today"
+      "moreUpcoming": "More sessions today",
+      "inMinutes": "In {{minutes}} min",
+      "noMoreSessions": "No more sessions today"
     },
     "settings": {
       "title": "Customize Dashboard",

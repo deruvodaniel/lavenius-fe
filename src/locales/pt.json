@@ -840,7 +840,8 @@
       "newInPeriod": "novos no período",
       "attendanceRate": "Taxa de Comparecimento",
       "cancellations": "cancelamentos",
-      "vsPrevious": "vs anterior"
+      "vsPrevious": "vs anterior",
+      "rate": "taxa"
     },
     "charts": {
       "sessionsOverTime": {
@@ -899,7 +900,11 @@
       "newSession": "Nova Sessão",
       "newPatient": "Novo Paciente",
       "newPayment": "Registrar Pagamento",
-      "viewAgenda": "Ver Agenda"
+      "viewAgenda": "Ver Agenda",
+      "session": "Sessão",
+      "patient": "Paciente",
+      "payment": "Pagamento",
+      "agenda": "Agenda"
     },
     "todaySessions": {
       "title": "Próximas sessões de hoje",
@@ -931,7 +936,9 @@
       "of": "de",
       "income": "Receita de hoje",
       "nextSession": "Próxima sessão",
-      "moreUpcoming": "Mais sessões hoje"
+      "moreUpcoming": "Mais sessões hoje",
+      "inMinutes": "Em {{minutes}} min",
+      "noMoreSessions": "Sem mais sessões hoje"
     },
     "settings": {
       "title": "Personalizar Dashboard",
