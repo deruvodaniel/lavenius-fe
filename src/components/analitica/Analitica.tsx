@@ -38,6 +38,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { SkeletonList } from '@/components/shared/Skeleton';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+} from '@/components/ui/drawer';
 import { EmptyState, SwipeableCards, DashboardSkeleton, AnimatedSection } from './DashboardComponents';
 import { usePayments } from '@/lib/hooks/usePayments';
 import { usePatients, useResponsive } from '@/lib/hooks';
@@ -221,11 +228,12 @@ const CustomTooltip = ({ active, payload, label, formatter }: TooltipProps) => {
 };
 
 // ============================================================================
-// DASHBOARD SETTINGS POPOVER
+// DASHBOARD SETTINGS POPOVER / DRAWER
 // ============================================================================
 
 interface DashboardSettingsPopoverProps {
   t: (key: string) => string;
+  isMobile: boolean;
 }
 
 const SECTION_LABELS: Record<DashboardSectionId, string> = {
@@ -238,11 +246,127 @@ const SECTION_LABELS: Record<DashboardSectionId, string> = {
   charts: 'dashboard.settings.sections.charts',
 };
 
-const DashboardSettingsPopover = ({ t }: DashboardSettingsPopoverProps) => {
+/**
+ * Settings content component - shared between Popover (desktop) and Drawer (mobile)
+ */
+const SettingsContent = ({ 
+  t, 
+  sections, 
+  toggleSectionVisibility, 
+  resetToDefaults,
+  showHeader = true,
+}: { 
+  t: (key: string) => string;
+  sections: { id: DashboardSectionId; visible: boolean }[];
+  toggleSectionVisibility: (id: DashboardSectionId) => void;
+  resetToDefaults: () => void;
+  showHeader?: boolean;
+}) => (
+  <div className="space-y-4">
+    {showHeader && (
+      <>
+        <div className="flex items-center justify-between">
+          <h4 className="font-medium text-gray-900 dark:text-gray-100">{t('dashboard.settings.title')}</h4>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={resetToDefaults}
+            className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            {t('dashboard.settings.reset')}
+          </Button>
+        </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard.settings.description')}</p>
+      </>
+    )}
+    <div className="space-y-3">
+      {sections.map((section) => (
+        <div key={section.id} className="flex items-center justify-between py-1">
+          <Label
+            htmlFor={`section-${section.id}`}
+            className="text-sm font-normal cursor-pointer text-gray-700 dark:text-gray-300"
+          >
+            {t(SECTION_LABELS[section.id])}
+          </Label>
+          <button
+            id={`section-${section.id}`}
+            role="switch"
+            aria-checked={section.visible}
+            onClick={() => toggleSectionVisibility(section.id)}
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 ${
+              section.visible 
+                ? 'bg-indigo-600 dark:bg-indigo-500' 
+                : 'bg-gray-200 dark:bg-gray-600'
+            }`}
+          >
+            <span
+              className={`pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out ${
+                section.visible ? 'translate-x-5' : 'translate-x-0'
+              }`}
+            />
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const DashboardSettingsPopover = ({ t, isMobile }: DashboardSettingsPopoverProps) => {
   const { sections, toggleSectionVisibility, resetToDefaults } = 
     useDashboardSettingsStore();
   const [isOpen, setIsOpen] = useState(false);
 
+  // Mobile: Bottom sheet drawer
+  if (isMobile) {
+    return (
+      <>
+        <Button
+          variant="secondary"
+          size="icon"
+          title={t('dashboard.settings.title')}
+          aria-label={t('dashboard.settings.title')}
+          className="bg-white/20 hover:bg-white/30 border-0 text-white"
+          onClick={() => setIsOpen(true)}
+        >
+          <Settings2 className="w-4 h-4" />
+        </Button>
+
+        <Drawer open={isOpen} onOpenChange={setIsOpen}>
+          <DrawerContent className="max-h-[85vh]">
+            <DrawerHeader className="text-left border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center justify-between">
+                <DrawerTitle className="text-lg">{t('dashboard.settings.title')}</DrawerTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetToDefaults}
+                  className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 -mr-2"
+                >
+                  {t('dashboard.settings.reset')}
+                </Button>
+              </div>
+              <DrawerDescription className="text-sm">
+                {t('dashboard.settings.description')}
+              </DrawerDescription>
+            </DrawerHeader>
+            <div className="px-4 py-4 pb-8 overflow-y-auto">
+              <SettingsContent
+                t={t}
+                sections={sections}
+                toggleSectionVisibility={toggleSectionVisibility}
+                resetToDefaults={resetToDefaults}
+                showHeader={false}
+              />
+            </div>
+            {/* Safe area padding for devices with home indicator */}
+            <div className="h-[env(safe-area-inset-bottom,0px)]" />
+          </DrawerContent>
+        </Drawer>
+      </>
+    );
+  }
+
+  // Desktop: Popover dropdown
   return (
     <div className="relative">
       <Button
@@ -265,48 +389,13 @@ const DashboardSettingsPopover = ({ t }: DashboardSettingsPopoverProps) => {
           />
           
           {/* Dropdown */}
-          <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="font-medium text-gray-900">{t('dashboard.settings.title')}</h4>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={resetToDefaults}
-                  className="text-xs text-gray-500 hover:text-gray-700"
-                >
-                  {t('dashboard.settings.reset')}
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500">{t('dashboard.settings.description')}</p>
-              <div className="space-y-3">
-                {sections.map((section) => (
-                  <div key={section.id} className="flex items-center justify-between">
-                    <Label
-                      htmlFor={`section-${section.id}`}
-                      className="text-sm font-normal cursor-pointer text-gray-700"
-                    >
-                      {t(SECTION_LABELS[section.id])}
-                    </Label>
-                    <button
-                      id={`section-${section.id}`}
-                      role="switch"
-                      aria-checked={section.visible}
-                      onClick={() => toggleSectionVisibility(section.id)}
-                      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
-                        section.visible ? 'bg-indigo-600' : 'bg-gray-200'
-                      }`}
-                    >
-                      <span
-                        className={`pointer-events-none block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform ${
-                          section.visible ? 'translate-x-4' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 z-50">
+            <SettingsContent
+              t={t}
+              sections={sections}
+              toggleSectionVisibility={toggleSectionVisibility}
+              resetToDefaults={resetToDefaults}
+            />
           </div>
         </>
       )}
@@ -827,7 +916,7 @@ export function Analitica() {
             </div>
             
             {/* Settings only - filter moved to stats section */}
-            <DashboardSettingsPopover t={t} />
+            <DashboardSettingsPopover t={t} isMobile={isMobile} />
           </div>
         </div>
       </AnimatedSection>

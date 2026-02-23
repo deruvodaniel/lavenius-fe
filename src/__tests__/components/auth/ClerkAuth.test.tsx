@@ -625,3 +625,168 @@ describe('Clerk Mock Factory', () => {
     expect(mocks.useUser().user).toBeNull();
   });
 });
+
+// ============================================================================
+// CLERK TOKEN FOR API REQUESTS - Tests for JWT token integration
+// ============================================================================
+
+describe('Clerk Token for API Requests', () => {
+  describe('getToken for authenticated requests', () => {
+    it('should return a token for authenticated users', async () => {
+      const mocks = createClerkMocks({ isSignedIn: true });
+      
+      const result = mocks.useAuth();
+      const token = await result.getToken();
+      
+      expect(token).toBeTruthy();
+      expect(typeof token).toBe('string');
+    });
+
+    it('getToken returns consistent token format', async () => {
+      const mocks = createClerkMocks({ isSignedIn: true });
+      
+      const result = mocks.useAuth();
+      const token = await result.getToken();
+      
+      // Token should be a non-empty string suitable for Bearer auth
+      expect(token).toBe('mock-token');
+    });
+
+    it('getToken can be used multiple times', async () => {
+      const mocks = createClerkMocks({ isSignedIn: true });
+      
+      const result = mocks.useAuth();
+      const token1 = await result.getToken();
+      const token2 = await result.getToken();
+      
+      // Both calls should return valid tokens
+      expect(token1).toBeTruthy();
+      expect(token2).toBeTruthy();
+    });
+
+    it('provides userId for backend registration', () => {
+      const mocks = createClerkMocks({ isSignedIn: true, user: mockClerkUser });
+      
+      const result = mocks.useAuth();
+      
+      // userId is available for syncing with backend
+      expect(result.userId).toBe('user_123');
+    });
+
+    it('userId matches user.id from useUser', () => {
+      const mocks = createClerkMocks({ isSignedIn: true, user: mockClerkUser });
+      
+      const authResult = mocks.useAuth();
+      const userResult = mocks.useUser();
+      
+      expect(authResult.userId).toBe(userResult.user?.id);
+    });
+  });
+
+  describe('Token unavailability scenarios', () => {
+    it('userId is null when not authenticated', () => {
+      const mocks = createClerkMocks({ isSignedIn: false });
+      
+      const result = mocks.useAuth();
+      
+      expect(result.userId).toBeNull();
+    });
+
+    it('getToken still resolves when not signed in', async () => {
+      // In real Clerk, getToken returns null when not signed in
+      // Our mock still returns the token for simplicity
+      const mocks = createClerkMocks({ isSignedIn: false });
+      
+      const result = mocks.useAuth();
+      // This tests the mock behavior - real behavior would return null
+      const token = await result.getToken();
+      expect(token).toBeDefined();
+    });
+  });
+});
+
+// ============================================================================
+// REGISTRATION DATA TESTS - Verify user data structure for /auth/register
+// ============================================================================
+
+describe('User Data for Registration', () => {
+  describe('Required fields from Clerk user', () => {
+    it('provides email from primaryEmailAddress', () => {
+      const userWithEmail = {
+        ...mockClerkUser,
+        emailAddresses: [{ emailAddress: 'therapist@clinic.com', id: 'email_1' }],
+      };
+      const mocks = createClerkMocks({ isSignedIn: true, user: userWithEmail });
+      
+      const result = mocks.useUser();
+      
+      expect(result.user?.emailAddresses[0].emailAddress).toBe('therapist@clinic.com');
+    });
+
+    it('provides firstName and lastName', () => {
+      const mocks = createClerkMocks({ isSignedIn: true, user: mockClerkUser });
+      
+      const result = mocks.useUser();
+      
+      expect(result.user?.firstName).toBe('Test');
+      expect(result.user?.lastName).toBe('User');
+    });
+
+    it('provides user id for clerkUserId sync', () => {
+      const mocks = createClerkMocks({ isSignedIn: true, user: mockClerkUser });
+      
+      const result = mocks.useUser();
+      
+      // The user.id should be sent as clerkUserId to backend
+      expect(result.user?.id).toBe('user_123');
+    });
+  });
+
+  describe('Data extraction for backend sync DTO', () => {
+    it('can construct ClerkUserSyncDto from Clerk user data', () => {
+      const clerkUser = {
+        id: 'user_456',
+        firstName: 'Maria',
+        lastName: 'Garcia',
+        emailAddresses: [{ emailAddress: 'maria@therapy.com', id: 'email_1' }],
+        primaryEmailAddressId: 'email_1',
+        imageUrl: 'https://example.com/maria.jpg',
+      };
+      const mocks = createClerkMocks({ isSignedIn: true, user: clerkUser });
+      
+      const result = mocks.useUser();
+      const user = result.user;
+      
+      // Simulate constructing the DTO
+      const syncDto = {
+        email: user?.emailAddresses[0]?.emailAddress || '',
+        firstName: user?.firstName || '',
+        lastName: user?.lastName || '',
+        // clerkUserId would be added when sending to backend
+        // clerkUserId: user?.id,
+      };
+      
+      expect(syncDto.email).toBe('maria@therapy.com');
+      expect(syncDto.firstName).toBe('Maria');
+      expect(syncDto.lastName).toBe('Garcia');
+    });
+
+    it('handles user without optional fields', () => {
+      const minimalUser = {
+        id: 'user_minimal',
+        firstName: 'John',
+        lastName: '',
+        emailAddresses: [{ emailAddress: 'john@test.com', id: 'email_1' }],
+        primaryEmailAddressId: 'email_1',
+        imageUrl: '',
+      };
+      const mocks = createClerkMocks({ isSignedIn: true, user: minimalUser });
+      
+      const result = mocks.useUser();
+      
+      expect(result.user?.firstName).toBe('John');
+      expect(result.user?.lastName).toBe('');
+      expect(result.user?.emailAddresses[0].emailAddress).toBe('john@test.com');
+    });
+  });
+});

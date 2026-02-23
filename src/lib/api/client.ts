@@ -14,6 +14,11 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001
 const API_TIMEOUT = Number(import.meta.env.VITE_API_TIMEOUT) || 30000;
 
 /**
+ * Type for token getter function (provided by Clerk)
+ */
+type TokenGetter = () => Promise<string | null>;
+
+/**
  * Error message translations from English to Spanish
  */
 const ERROR_TRANSLATIONS: Record<string, string> = {
@@ -215,11 +220,13 @@ class DefaultTokenStorage implements TokenStorage {
 /**
  * API Client Class
  * Singleton instance for managing HTTP requests
+ * Supports Clerk JWT authentication
  */
 export class ApiClient {
   private static instance: ApiClient;
   private client: AxiosInstance;
   private tokenStorage: TokenStorage;
+  private tokenGetter: TokenGetter | null = null;
   private onUnauthorizedCallback?: () => void;
 
   private constructor(tokenStorage?: TokenStorage) {
@@ -248,12 +255,22 @@ export class ApiClient {
   }
 
   /**
+   * Set the token getter function (from Clerk's useAuth().getToken)
+   * This should be called once when the app initializes with Clerk
+   */
+  setTokenGetter(getter: TokenGetter): void {
+    this.tokenGetter = getter;
+  }
+
+  /**
    * Setup request and response interceptors
    */
   private setupInterceptors(): void {
-    // Request interceptor
+    // Request interceptor - now async to support Clerk token
     this.client.interceptors.request.use(
-      this.handleRequest.bind(this),
+      async (config: InternalAxiosRequestConfig) => {
+        return this.handleRequest(config);
+      },
       this.handleRequestError.bind(this)
     );
 
@@ -266,17 +283,38 @@ export class ApiClient {
 
   /**
    * Handle outgoing requests - add auth headers
+   * Prioritizes Clerk token over stored token
    */
-  private handleRequest(
+  private async handleRequest(
     config: InternalAxiosRequestConfig
-  ): InternalAxiosRequestConfig {
-    const token = this.tokenStorage.getToken();
-    const userKey = this.tokenStorage.getUserKey();
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  ): Promise<InternalAxiosRequestConfig> {
+    // Try to get token from Clerk first (preferred method)
+    if (this.tokenGetter) {
+      try {
+        const clerkToken = await this.tokenGetter();
+        if (clerkToken) {
+          config.headers.Authorization = `Bearer ${clerkToken}`;
+        }
+      } catch (error) {
+        // If Clerk token fetch fails, fall back to stored token
+        if (import.meta.env.DEV) {
+          console.warn('Failed to get Clerk token, falling back to stored token:', error);
+        }
+        const storedToken = this.tokenStorage.getToken();
+        if (storedToken) {
+          config.headers.Authorization = `Bearer ${storedToken}`;
+        }
+      }
+    } else {
+      // Fallback to stored token if no Clerk getter is set
+      const storedToken = this.tokenStorage.getToken();
+      if (storedToken) {
+        config.headers.Authorization = `Bearer ${storedToken}`;
+      }
     }
 
+    // Add user key header if present
+    const userKey = this.tokenStorage.getUserKey();
     if (userKey) {
       config.headers['x-user-key'] = userKey;
     }

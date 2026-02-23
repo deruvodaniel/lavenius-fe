@@ -213,6 +213,8 @@ export type RegisterDto = {
  * as authentication is handled by Clerk
  */
 export type ClerkUserSyncDto = {
+  /** Clerk's user ID (external ID for our backend) */
+  clerkUserId: string;
   email: string;
   firstName: string;
   lastName: string;

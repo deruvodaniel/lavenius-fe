@@ -251,6 +251,7 @@ export function Onboarding() {
 
       // 2. Prepare data for backend (only fields it accepts)
       const backendData: ClerkUserSyncDto = {
+        clerkUserId: user.id,
         email,
         firstName: user.firstName || '',
         lastName: user.lastName || '',
