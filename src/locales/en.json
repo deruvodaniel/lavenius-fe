@@ -896,6 +896,67 @@
       "weekNumber": "Week {{number}}"
     }
   },
+  "dashboard": {
+    "welcomeSubtitle": "Here's a summary of your activity",
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "newSession": "New Session",
+      "newPatient": "New Patient",
+      "newPayment": "Record Payment",
+      "viewAgenda": "View Agenda"
+    },
+    "todaySessions": {
+      "title": "Today's upcoming sessions",
+      "empty": "No more sessions for today",
+      "at": "at"
+    },
+    "pendingPayments": {
+      "title": "Pending payments",
+      "empty": "No pending payments",
+      "overdue": "Overdue",
+      "pending": "Pending"
+    },
+    "birthdays": {
+      "title": "Upcoming birthdays",
+      "empty": "No birthdays this week",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "years": "years old"
+    },
+    "noUpcomingSession": {
+      "title": "Patients without upcoming session",
+      "empty": "All your patients have scheduled sessions",
+      "lastSession": "Last session"
+    },
+    "todaySummary": {
+      "title": "Today's Summary",
+      "sessions": "Sessions",
+      "completed": "completed",
+      "of": "of",
+      "income": "Today's income",
+      "nextSession": "Next session",
+      "moreUpcoming": "More sessions today"
+    },
+    "settings": {
+      "title": "Customize Dashboard",
+      "description": "Choose which sections to display",
+      "reset": "Reset",
+      "sections": {
+        "todaySummary": "Today's Summary",
+        "quickActions": "Quick Actions",
+        "statCards": "Statistics Cards",
+        "pendingPayments": "Pending Payments",
+        "birthdays": "Upcoming Birthdays",
+        "patientsWithoutSession": "Patients without upcoming session",
+        "charts": "Charts & Analytics"
+      }
+    }
+  },
   "help": {
     "title": "Help Center",
     "subtitle": "Find answers to your questions about Lavenius",
@@ -1026,7 +1087,11 @@
     "brand": "Lavenius",
     "tagline": "Patient Management",
     "nav": {
-      "dashboard": "Dashboard"
+      "dashboard": "Dashboard",
+      "features": "Features",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "contact": "Contact"
     },
     "hero": {
       "badge": "Smart management for mental health professionals",
@@ -1037,7 +1102,17 @@
       "hasAccount": "I already have an account",
       "noCreditCard": "No credit card required",
       "dataEncrypted": "Encrypted data",
-      "supportIncluded": "Support included"
+      "supportIncluded": "Support included",
+      "preview": {
+        "income": "Revenue",
+        "sessions": "Sessions",
+        "patients": "Patients",
+        "thisMonth": "this month",
+        "active": "active",
+        "todayAgenda": "Today's schedule",
+        "appointments": "appointments",
+        "pendingPayment": "2 pending payments for $240"
+      }
     },
     "features": {
       "title": "Everything you need in one place",

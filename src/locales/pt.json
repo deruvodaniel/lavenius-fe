@@ -887,6 +887,67 @@
       "weekNumber": "Semana {{number}}"
     }
   },
+  "dashboard": {
+    "welcomeSubtitle": "Aqui está um resumo da sua atividade",
+    "greeting": {
+      "morning": "Bom dia",
+      "afternoon": "Boa tarde",
+      "evening": "Boa noite"
+    },
+    "quickActions": {
+      "title": "Ações rápidas",
+      "newSession": "Nova Sessão",
+      "newPatient": "Novo Paciente",
+      "newPayment": "Registrar Pagamento",
+      "viewAgenda": "Ver Agenda"
+    },
+    "todaySessions": {
+      "title": "Próximas sessões de hoje",
+      "empty": "Não há mais sessões para hoje",
+      "at": "às"
+    },
+    "pendingPayments": {
+      "title": "Pagamentos pendentes",
+      "empty": "Não há pagamentos pendentes",
+      "overdue": "Vencido",
+      "pending": "Pendente"
+    },
+    "birthdays": {
+      "title": "Aniversários próximos",
+      "empty": "Não há aniversários esta semana",
+      "today": "Hoje",
+      "tomorrow": "Amanhã",
+      "years": "anos"
+    },
+    "noUpcomingSession": {
+      "title": "Pacientes sem próxima sessão",
+      "empty": "Todos os seus pacientes têm sessões agendadas",
+      "lastSession": "Última sessão"
+    },
+    "todaySummary": {
+      "title": "Resumo de hoje",
+      "sessions": "Sessões",
+      "completed": "completadas",
+      "of": "de",
+      "income": "Receita de hoje",
+      "nextSession": "Próxima sessão",
+      "moreUpcoming": "Mais sessões hoje"
+    },
+    "settings": {
+      "title": "Personalizar Dashboard",
+      "description": "Escolha quais seções exibir",
+      "reset": "Redefinir",
+      "sections": {
+        "todaySummary": "Resumo de hoje",
+        "quickActions": "Ações rápidas",
+        "statCards": "Cartões de estatísticas",
+        "pendingPayments": "Pagamentos pendentes",
+        "birthdays": "Aniversários próximos",
+        "patientsWithoutSession": "Pacientes sem próxima sessão",
+        "charts": "Gráficos e análises"
+      }
+    }
+  },
   "help": {
     "title": "Central de Ajuda",
     "subtitle": "Encontre respostas para suas perguntas sobre o Lavenius",
@@ -1017,7 +1078,11 @@
     "brand": "Lavenius",
     "tagline": "Gestão de Pacientes",
     "nav": {
-      "dashboard": "Painel"
+      "dashboard": "Painel",
+      "features": "Funcionalidades",
+      "pricing": "Planos",
+      "faq": "Dúvidas",
+      "contact": "Contato"
     },
     "hero": {
       "badge": "Gestão inteligente para profissionais de saúde mental",
@@ -1028,7 +1093,17 @@
       "hasAccount": "Já tenho conta",
       "noCreditCard": "Sem cartão de crédito",
       "dataEncrypted": "Dados criptografados",
-      "supportIncluded": "Suporte incluído"
+      "supportIncluded": "Suporte incluído",
+      "preview": {
+        "income": "Receita",
+        "sessions": "Sessões",
+        "patients": "Pacientes",
+        "thisMonth": "este mês",
+        "active": "ativos",
+        "todayAgenda": "Agenda de hoje",
+        "appointments": "consultas",
+        "pendingPayment": "2 cobranças pendentes de R$ 2.400"
+      }
     },
     "features": {
       "title": "Tudo que você precisa em um só lugar",

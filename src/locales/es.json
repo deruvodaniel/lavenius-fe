@@ -902,6 +902,59 @@
       "morning": "Buenos días",
       "afternoon": "Buenas tardes",
       "evening": "Buenas noches"
+    },
+    "quickActions": {
+      "title": "Acciones rápidas",
+      "newSession": "Nuevo Turno",
+      "newPatient": "Nuevo Paciente",
+      "newPayment": "Registrar Pago",
+      "viewAgenda": "Ver Agenda"
+    },
+    "todaySessions": {
+      "title": "Próximas citas de hoy",
+      "empty": "No hay más citas para hoy",
+      "at": "a las"
+    },
+    "pendingPayments": {
+      "title": "Pagos pendientes",
+      "empty": "No hay pagos pendientes",
+      "overdue": "Vencido",
+      "pending": "Pendiente"
+    },
+    "birthdays": {
+      "title": "Cumpleaños próximos",
+      "empty": "No hay cumpleaños esta semana",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "years": "años"
+    },
+    "noUpcomingSession": {
+      "title": "Pacientes sin próxima cita",
+      "empty": "Todos tus pacientes tienen citas agendadas",
+      "lastSession": "Última sesión"
+    },
+    "todaySummary": {
+      "title": "Resumen de hoy",
+      "sessions": "Sesiones",
+      "completed": "completadas",
+      "of": "de",
+      "income": "Ingresos de hoy",
+      "nextSession": "Próxima sesión",
+      "moreUpcoming": "Más sesiones hoy"
+    },
+    "settings": {
+      "title": "Personalizar Dashboard",
+      "description": "Elige qué secciones mostrar",
+      "reset": "Restablecer",
+      "sections": {
+        "todaySummary": "Resumen de hoy",
+        "quickActions": "Acciones rápidas",
+        "statCards": "Tarjetas de estadísticas",
+        "pendingPayments": "Pagos pendientes",
+        "birthdays": "Cumpleaños próximos",
+        "patientsWithoutSession": "Pacientes sin próxima cita",
+        "charts": "Gráficos y analíticas"
+      }
     }
   },
   "help": {
@@ -1060,46 +1113,60 @@
     "brand": "Lavenius",
     "tagline": "Gestión de Pacientes",
     "nav": {
-      "dashboard": "Dashboard"
+      "dashboard": "Dashboard",
+      "features": "Funciones",
+      "pricing": "Planes",
+      "faq": "Preguntas",
+      "contact": "Contacto"
     },
     "hero": {
-      "badge": "🔒 Tus pacientes, 100% protegidos",
-      "title": "Organizá tu consultorio",
-      "titleHighlight": "y dejá de perder plata",
-      "description": "Chau Excel, chau papeles, chau quilombo. Agendá turnos, cobrá sin perseguir pacientes y tené toda la info de tu práctica en un solo lugar.",
-      "cta": "Probalo gratis",
+      "badge": "🔒 Tus datos, 100% protegidos",
+      "title": "Organiza tu consultorio",
+      "titleHighlight": "sin complicaciones",
+      "description": "Deja atrás las planillas y el desorden. Agenda turnos, gestiona cobros y centraliza toda la información de tu práctica en un solo lugar seguro.",
+      "cta": "Comenzar gratis",
       "hasAccount": "Ya tengo cuenta",
       "noCreditCard": "Sin tarjeta de crédito",
-      "dataEncrypted": "Cifrado de verdad (AES-256)",
-      "supportIncluded": "Soporte en español"
+      "dataEncrypted": "Cifrado real (AES-256)",
+      "supportIncluded": "Soporte en español",
+      "preview": {
+        "income": "Ingresos",
+        "sessions": "Sesiones",
+        "patients": "Pacientes",
+        "thisMonth": "este mes",
+        "active": "activos",
+        "todayAgenda": "Agenda de hoy",
+        "appointments": "turnos",
+        "pendingPayment": "2 cobros pendientes por $24.000"
+      }
     },
     "features": {
-      "title": "Todo lo que necesitás, sin vueltas",
-      "subtitle": "Diseñado por y para terapeutas que laburan de verdad",
+      "title": "Todo lo que necesitas para tu práctica",
+      "subtitle": "Diseñado especialmente para profesionales de la salud mental",
       "scheduler": {
         "title": "Agenda Inteligente",
-        "description": "Armá tus horarios, configurá recurrencias y sincronizá con Google Calendar. Tus pacientes reciben recordatorios automáticos."
+        "description": "Configura tus horarios, recurrencias y sincroniza con Google Calendar. Tus pacientes reciben recordatorios automáticos."
       },
       "payments": {
-        "title": "Que no se te escape ni un peso",
-        "description": "Seguimiento de cobros con recordatorios por WhatsApp. Dejá de perseguir pagos y cobrá lo que te corresponde."
+        "title": "Control total de cobros",
+        "description": "Seguimiento de pagos con recordatorios por WhatsApp. No pierdas de vista ningún cobro pendiente."
       },
       "records": {
         "title": "Fichas Clínicas Seguras",
-        "description": "Historias clínicas digitales con cifrado de verdad. Tus notas, protegidas como corresponde."
+        "description": "Historias clínicas digitales con cifrado de extremo a extremo. Tus notas, siempre protegidas."
       },
       "calendar": {
         "title": "Sincronización Total",
-        "description": "Conectá tu Google Calendar y olvidate de los turnos superpuestos o de anotar en dos lados."
+        "description": "Conecta tu Google Calendar y olvídate de turnos superpuestos o anotaciones duplicadas."
       }
     },
     "analytics": {
-      "badge": "Panel de Analytics",
-      "title": "Sabé exactamente cómo te va",
-      "description": "Mirá tus ingresos, sesiones realizadas y crecimiento mes a mes. Datos claros para tomar mejores decisiones.",
+      "badge": "Panel de Analíticas",
+      "title": "Conoce el estado real de tu práctica",
+      "description": "Visualiza tus ingresos, sesiones realizadas y crecimiento mes a mes. Información clara para tomar mejores decisiones.",
       "features": {
         "income": "Ingresos mensuales y proyecciones",
-        "sessions": "Sesiones por cobrar y cobradas",
+        "sessions": "Sesiones cobradas y pendientes",
         "patients": "Pacientes activos vs nuevos",
         "attendance": "Tasa de asistencia y cancelación"
       },
@@ -1115,13 +1182,13 @@
     },
     "reminders": {
       "badge": "Recordatorios Automáticos",
-      "title": "Cobrá más, perseguí menos",
-      "description": "El sistema le manda recordatorios a tus pacientes por WhatsApp o Email. Vos no tenés que hacer nada.",
+      "title": "Cobra más, con menos esfuerzo",
+      "description": "El sistema envía recordatorios automáticos a tus pacientes por WhatsApp o Email. Tú no tienes que hacer nada.",
       "features": {
         "whatsapp": "Recordatorios de turno por WhatsApp",
         "payments": "Avisos de cobro automáticos",
         "confirmations": "Confirmaciones de asistencia",
-        "scheduling": "Vos elegís cuándo se envían"
+        "scheduling": "Tú eliges cuándo se envían"
       },
       "notifications": "Notificaciones automáticas",
       "types": {
@@ -1141,14 +1208,14 @@
       }
     },
     "security": {
-      "title": "Tus datos, cifrados de verdad",
-      "description": "Todos los datos de tus pacientes están protegidos con cifrado AES-256-GCM de extremo a extremo. No es solo HIPAA en el footer, es seguridad real en cada nota que escribís.",
+      "title": "Tus datos, realmente protegidos",
+      "description": "Todos los datos de tus pacientes están protegidos con cifrado AES-256-GCM de extremo a extremo. No es solo un cumplimiento normativo, es seguridad real en cada nota que escribes.",
       "encryption": "Cifrado AES-256-GCM",
       "e2e": "Extremo a extremo"
     },
     "socialProof": {
-      "badge": "La comunidad crece",
-      "title": "Terapeutas que ya organizaron su consultorio",
+      "badge": "Nuestra comunidad",
+      "title": "Profesionales que ya organizaron su práctica",
       "stats": {
         "professionals": "+500",
         "professionalsLabel": "Profesionales",
@@ -1159,17 +1226,17 @@
       },
       "testimonials": {
         "1": {
-          "quote": "Por fin puedo enfocarme en mis pacientes y no en perseguir cobros. Me cambió la vida laboral.",
+          "quote": "Por fin puedo enfocarme en mis pacientes sin preocuparme por el seguimiento de cobros. Transformó mi práctica.",
           "name": "Lic. María García",
           "role": "Psicóloga Clínica, CABA"
         },
         "2": {
-          "quote": "Probé varias apps pero ninguna entendía cómo trabaja un terapeuta. Esta sí.",
+          "quote": "Probé varias aplicaciones pero ninguna entendía cómo trabaja un terapeuta. Esta realmente lo hace.",
           "name": "Lic. Martín Rodríguez",
           "role": "Psicoanalista, Córdoba"
         },
         "3": {
-          "quote": "La sincronización con Google Calendar y los recordatorios por WhatsApp son geniales. Mis pacientes siempre llegan.",
+          "quote": "La sincronización con Google Calendar y los recordatorios por WhatsApp funcionan perfectamente. Mis pacientes siempre llegan.",
           "name": "Lic. Laura Fernández",
           "role": "Terapeuta Cognitivo-Conductual, Rosario"
         }
@@ -1177,95 +1244,95 @@
     },
     "whyLavenius": {
       "badge": "¿Por qué Lavenius?",
-      "title": "Lo que otras apps no te dan",
-      "subtitle": "Comparamos con lo que hay en el mercado",
+      "title": "Lo que nos diferencia",
+      "subtitle": "Diseñado pensando en lo que realmente necesitas",
       "features": {
         "unlimited": {
           "title": "Pacientes ilimitados",
-          "description": "No como otras apps que te limitan a 5 pacientes en el plan básico. Acá, todos los que quieras desde el día 1.",
+          "description": "Sin restricciones artificiales. Gestiona todos los pacientes que necesites desde el primer día, sin costos adicionales.",
           "highlight": "Sin límites"
         },
         "encryption": {
-          "title": "Cifrado de verdad",
-          "description": "AES-256-GCM de extremo a extremo. No es solo un logo de HIPAA al final de la página, es protección real.",
+          "title": "Cifrado real",
+          "description": "AES-256-GCM de extremo a extremo. No es solo un cumplimiento normativo, es protección genuina para tus datos sensibles.",
           "highlight": "AES-256-GCM"
         },
         "localPricing": {
-          "title": "Precios en pesos",
-          "description": "Pensado para Argentina. Sin sorpresas con el dólar, sin tener que calcular el tipo de cambio cada mes.",
-          "highlight": "ARS $"
+          "title": "Precios en moneda local",
+          "description": "Pensado para Latinoamérica. Sin sorpresas con el tipo de cambio, precios claros y predecibles cada mes.",
+          "highlight": "Precio local"
         },
         "noContracts": {
-          "title": "Sin contratos ni vueltas",
-          "description": "Cancelás cuando quieras. Sin permanencia mínima, sin letra chica, sin ataduras.",
-          "highlight": "Cancelá ya"
+          "title": "Sin compromisos",
+          "description": "Cancela cuando lo necesites. Sin permanencia mínima, sin letra chica, total flexibilidad.",
+          "highlight": "Flexible"
         }
       }
     },
     "faq": {
       "badge": "Preguntas Frecuentes",
-      "title": "¿Tenés dudas?",
-      "subtitle": "Acá te respondemos las más comunes",
+      "title": "¿Tienes dudas?",
+      "subtitle": "Aquí respondemos las más comunes",
       "questions": {
         "security": {
           "question": "¿Mis datos y los de mis pacientes están seguros?",
-          "answer": "Sí, 100%. Usamos cifrado AES-256-GCM de extremo a extremo. Eso significa que ni nosotros podemos leer tus notas clínicas. Solo vos con tu passphrase podés acceder a la información sensible."
+          "answer": "Absolutamente. Usamos cifrado AES-256-GCM de extremo a extremo. Esto significa que ni siquiera nosotros podemos leer tus notas clínicas. Solo tú con tu passphrase puedes acceder a la información sensible."
         },
         "cancel": {
           "question": "¿Puedo cancelar cuando quiera?",
-          "answer": "Sí, sin vueltas. No hay permanencia mínima ni contratos. Cancelás desde tu perfil en 2 clicks y listo."
+          "answer": "Sí, sin ningún problema. No hay permanencia mínima ni contratos de largo plazo. Puedes cancelar desde tu perfil en cualquier momento."
         },
         "modality": {
           "question": "¿Funciona para terapia presencial y online?",
-          "answer": "Sí, para las dos. Podés marcar cada sesión como presencial o remota, y el sistema se adapta para recordatorios y organización."
+          "answer": "Sí, para ambas modalidades. Puedes marcar cada sesión como presencial o remota, y el sistema se adapta automáticamente para recordatorios y organización."
         },
         "patientLimit": {
           "question": "¿Hay límite de pacientes?",
-          "answer": "No, pacientes ilimitados desde el plan más básico. No te cobramos más por crecer."
+          "answer": "No, pacientes ilimitados desde el plan más básico. Tu crecimiento profesional no debería tener restricciones artificiales."
         },
         "trial": {
           "question": "¿Puedo probar gratis antes de pagar?",
-          "answer": "¡Obvio! Tenés 14 días de prueba gratis con todas las funciones. Sin tarjeta de crédito."
+          "answer": "Por supuesto. Tienes 14 días de prueba gratis con todas las funciones habilitadas. Sin necesidad de tarjeta de crédito."
         },
         "support": {
           "question": "¿Qué pasa si tengo problemas o dudas?",
-          "answer": "Nos escribís y te respondemos. Soporte en español, por gente que entiende de qué va tu trabajo."
+          "answer": "Escríbenos y te respondemos. Ofrecemos soporte en español, con personas que realmente entienden las necesidades de tu profesión."
         }
       }
     },
     "cta": {
-      "title": "¿Listo para ordenar tu consultorio?",
-      "subtitle": "Unite a los terapeutas que ya dejaron de perder tiempo (y plata) con el Excel",
-      "createAccount": "Empezar gratis",
+      "title": "¿Listo para organizar tu consultorio?",
+      "subtitle": "Únete a los profesionales que ya optimizaron su gestión administrativa",
+      "createAccount": "Comenzar gratis",
       "login": "Ya tengo cuenta"
     },
     "footer": {
       "rights": "Todos los derechos reservados."
     },
     "pricing": {
-      "badge": "Precios en Pesos",
-      "title": "Simple, transparente, en ARS",
-      "subtitle": "Sin costos ocultos. Cancelás cuando quieras. Probá gratis 14 días.",
+      "badge": "Precios claros",
+      "title": "Simple, transparente, sin sorpresas",
+      "subtitle": "Sin costos ocultos. Cancela cuando quieras. Prueba gratis 14 días.",
       "period": "/mes",
       "popular": "Más elegido",
-      "cta": "Empezar ahora",
+      "cta": "Comenzar ahora",
       "trustBadges": {
         "encryption": "Cifrado AES-256",
-        "cancelAnytime": "Cancelás cuando quieras",
+        "cancelAnytime": "Cancela cuando quieras",
         "freeTrial": "14 días gratis"
       },
       "plans": {
         "basic": {
           "name": "Básico",
           "price": "$7.000",
-          "description": "Para arrancar a ordenar tu práctica",
+          "description": "Para comenzar a organizar tu práctica",
           "features": {
-            "patients": "Pacientes ilimitados (no 5 como otros)",
+            "patients": "Pacientes ilimitados",
             "agenda": "Agenda inteligente",
             "clinicalFiles": "Fichas clínicas digitales",
             "payments": "Control de cobros",
             "googleCalendar": "Sincronización con Google Calendar",
-            "encryption": "Cifrado E2E de verdad"
+            "encryption": "Cifrado E2E incluido"
           },
           "notIncluded": {
             "whatsapp": "Recordatorios por WhatsApp",
@@ -1276,7 +1343,7 @@
         "professional": {
           "name": "Profesional",
           "price": "$12.000",
-          "description": "Para quienes quieren crecer sin vueltas",
+          "description": "Para profesionales que buscan crecer",
           "features": {
             "allBasic": "Todo lo del plan Básico",
             "whatsapp": "Recordatorios automáticos por WhatsApp",
@@ -1292,12 +1359,12 @@
         "premium": {
           "name": "Premium",
           "price": "$20.000",
-          "description": "Productividad máxima con IA",
+          "description": "Máxima productividad con IA",
           "features": {
             "allProfessional": "Todo lo del plan Profesional",
             "aiNotes": "Notas clínicas asistidas con IA",
             "aiSummaries": "Resúmenes automáticos de sesión",
-            "customBranding": "Tu marca, tu estilo",
+            "customBranding": "Personalización de marca",
             "apiAccess": "API para integraciones",
             "dedicatedSupport": "Soporte dedicado 24/7"
           }

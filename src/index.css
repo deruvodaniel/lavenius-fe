@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Enable smooth scrolling for anchor navigation */
+html {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   :root {
     /* Background & Foreground */
@@ -613,6 +618,153 @@ body {
   .animate-stepper-slide-in,
   .animate-stepper-slide-in-reverse {
     opacity: 1;
+    transform: none;
+  }
+}
+
+/* Landing page gradient text animation */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  animation: gradient 3s ease infinite;
+}
+
+/* ==========================================================================
+   Dashboard UI Animations
+   ========================================================================== */
+
+/* Collapsible section animations */
+@keyframes collapsible-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes collapsible-up {
+  from {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+.animate-collapsible-down {
+  animation: collapsible-down 0.2s ease-out;
+}
+
+.animate-collapsible-up {
+  animation: collapsible-up 0.2s ease-out;
+}
+
+/* Fade in animation for widgets */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Staggered fade in for grid items */
+.animate-fade-in-stagger > * {
+  opacity: 0;
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.animate-fade-in-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.animate-fade-in-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.animate-fade-in-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.animate-fade-in-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.animate-fade-in-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.animate-fade-in-stagger > *:nth-child(6) { animation-delay: 250ms; }
+
+/* Card hover lift effect */
+.card-hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 
+              0 4px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+/* Enhanced card with gradient border on hover */
+.card-gradient-border {
+  position: relative;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.card-gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, transparent, transparent);
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.card-gradient-border:hover::before {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed, #ec4899);
+  opacity: 1;
+}
+
+/* Dark mode card gradient border */
+.dark .card-gradient-border {
+  background: var(--card);
+}
+
+/* Reduced motion support for dashboard animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-collapsible-down,
+  .animate-collapsible-up {
+    animation: none !important;
+  }
+  
+  .animate-fade-in,
+  .animate-fade-in-stagger > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  
+  .card-hover-lift:hover {
     transform: none;
   }
 }
