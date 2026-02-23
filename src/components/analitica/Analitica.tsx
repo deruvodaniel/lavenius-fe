@@ -589,11 +589,8 @@ export function Analitica() {
         </p>
       </div>
 
-      {/* Header with Time Range Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">{t('analytics.title')}</h2>
-        
-        {/* Time Range Selector and Refresh */}
+      {/* Time Range Selector */}
+      <div className="flex justify-end">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
