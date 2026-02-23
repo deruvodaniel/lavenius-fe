@@ -84,6 +84,7 @@ function NavBar() {
     { key: 'features', sectionId: 'features' },
     { key: 'pricing', sectionId: 'pricing' },
     { key: 'faq', sectionId: 'faq' },
+    { key: 'contact', sectionId: 'contact' },
   ];
   
   return (
@@ -1297,7 +1298,7 @@ function Footer() {
   ];
   
   return (
-    <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-900 text-gray-400">
+    <footer id="contact" className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-900 text-gray-400">
       <div className="max-w-7xl mx-auto">
         {/* Main footer content */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-gray-800">
