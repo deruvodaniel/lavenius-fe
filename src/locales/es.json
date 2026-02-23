@@ -1117,6 +1117,68 @@
     },
     "footer": {
       "rights": "Todos los derechos reservados."
+    },
+    "pricing": {
+      "badge": "Precios Transparentes",
+      "title": "Elige el plan ideal para tu práctica",
+      "subtitle": "Sin costos ocultos. Cancela cuando quieras. Comienza gratis y escala según crezcas.",
+      "period": "/mes",
+      "popular": "Más Popular",
+      "cta": "Comenzar ahora",
+      "trustBadges": {
+        "encryption": "Cifrado AES-256",
+        "cancelAnytime": "Cancela cuando quieras",
+        "freeTrial": "14 días de prueba gratis"
+      },
+      "plans": {
+        "basic": {
+          "name": "Básico",
+          "price": "$8",
+          "description": "Ideal para comenzar a organizar tu práctica",
+          "features": {
+            "patients": "Pacientes ilimitados",
+            "agenda": "Agenda inteligente",
+            "clinicalFiles": "Fichas clínicas digitales",
+            "payments": "Control básico de cobros",
+            "googleCalendar": "Sincronización con Google Calendar",
+            "encryption": "Cifrado de datos E2E"
+          },
+          "notIncluded": {
+            "whatsapp": "Recordatorios por WhatsApp",
+            "analytics": "Panel de analíticas avanzado",
+            "ai": "Notas con IA"
+          }
+        },
+        "professional": {
+          "name": "Profesional",
+          "price": "$15",
+          "description": "Para profesionales que quieren crecer",
+          "features": {
+            "allBasic": "Todo lo del plan Básico",
+            "whatsapp": "Recordatorios automáticos por WhatsApp",
+            "analytics": "Panel de analíticas avanzado",
+            "paymentTracking": "Seguimiento detallado de cobros",
+            "reports": "Reportes mensuales descargables",
+            "prioritySupport": "Soporte prioritario"
+          },
+          "notIncluded": {
+            "ai": "Notas asistidas con IA"
+          }
+        },
+        "premium": {
+          "name": "Premium",
+          "price": "$25",
+          "description": "Maximiza tu productividad con IA",
+          "features": {
+            "allProfessional": "Todo lo del plan Profesional",
+            "aiNotes": "Notas clínicas asistidas con IA",
+            "aiSummaries": "Resúmenes automáticos de sesión",
+            "customBranding": "Personalización de marca",
+            "apiAccess": "Acceso a API para integraciones",
+            "dedicatedSupport": "Soporte dedicado 24/7"
+          }
+        }
+      }
     }
   },
   "notes": {

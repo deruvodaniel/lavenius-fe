@@ -15,7 +15,11 @@ import {
   BarChart3,
   CheckCircle2,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Check,
+  X,
+  Zap,
+  Crown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -86,9 +90,8 @@ function NavBar() {
             {/* Signed In: Show Dashboard link + User avatar */}
             <SignedIn>
               <Button
-                variant="ghost"
                 onClick={() => navigate('/dashboard')}
-                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md transition-all"
               >
                 {t('landing.nav.dashboard', 'Dashboard')}
               </Button>
@@ -509,6 +512,202 @@ function SecuritySection() {
   );
 }
 
+function PricingSection() {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  
+  const plans = [
+    {
+      id: 'basic',
+      nameKey: 'landing.pricing.plans.basic.name',
+      priceKey: 'landing.pricing.plans.basic.price',
+      periodKey: 'landing.pricing.period',
+      descriptionKey: 'landing.pricing.plans.basic.description',
+      featuresKeys: [
+        'landing.pricing.plans.basic.features.patients',
+        'landing.pricing.plans.basic.features.agenda',
+        'landing.pricing.plans.basic.features.clinicalFiles',
+        'landing.pricing.plans.basic.features.payments',
+        'landing.pricing.plans.basic.features.googleCalendar',
+        'landing.pricing.plans.basic.features.encryption',
+      ],
+      notIncludedKeys: [
+        'landing.pricing.plans.basic.notIncluded.whatsapp',
+        'landing.pricing.plans.basic.notIncluded.analytics',
+        'landing.pricing.plans.basic.notIncluded.ai',
+      ],
+      popular: false,
+      icon: Users,
+      color: 'indigo',
+    },
+    {
+      id: 'professional',
+      nameKey: 'landing.pricing.plans.professional.name',
+      priceKey: 'landing.pricing.plans.professional.price',
+      periodKey: 'landing.pricing.period',
+      descriptionKey: 'landing.pricing.plans.professional.description',
+      featuresKeys: [
+        'landing.pricing.plans.professional.features.allBasic',
+        'landing.pricing.plans.professional.features.whatsapp',
+        'landing.pricing.plans.professional.features.analytics',
+        'landing.pricing.plans.professional.features.paymentTracking',
+        'landing.pricing.plans.professional.features.reports',
+        'landing.pricing.plans.professional.features.prioritySupport',
+      ],
+      notIncludedKeys: [
+        'landing.pricing.plans.professional.notIncluded.ai',
+      ],
+      popular: true,
+      icon: Zap,
+      color: 'purple',
+    },
+    {
+      id: 'premium',
+      nameKey: 'landing.pricing.plans.premium.name',
+      priceKey: 'landing.pricing.plans.premium.price',
+      periodKey: 'landing.pricing.period',
+      descriptionKey: 'landing.pricing.plans.premium.description',
+      featuresKeys: [
+        'landing.pricing.plans.premium.features.allProfessional',
+        'landing.pricing.plans.premium.features.aiNotes',
+        'landing.pricing.plans.premium.features.aiSummaries',
+        'landing.pricing.plans.premium.features.customBranding',
+        'landing.pricing.plans.premium.features.apiAccess',
+        'landing.pricing.plans.premium.features.dedicatedSupport',
+      ],
+      notIncludedKeys: [],
+      popular: false,
+      icon: Crown,
+      color: 'amber',
+    },
+  ];
+  
+  return (
+    <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30">
+      <div className="max-w-7xl mx-auto">
+        <AnimatedSection animation="slide-up" duration={500}>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mb-6">
+              <DollarSign className="w-4 h-4" />
+              {t('landing.pricing.badge')}
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              {t('landing.pricing.title')}
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              {t('landing.pricing.subtitle')}
+            </p>
+          </div>
+        </AnimatedSection>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {plans.map((plan, index) => (
+            <AnimatedSection 
+              key={plan.id} 
+              animation="slide-up" 
+              delay={index * 150} 
+              duration={500}
+            >
+              <Card className={`relative border-0 shadow-lg hover:shadow-xl transition-all h-full flex flex-col ${
+                plan.popular 
+                  ? 'ring-2 ring-purple-500 bg-white scale-[1.02]' 
+                  : 'bg-white'
+              }`}>
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-medium px-4 py-1 rounded-full shadow-lg">
+                      {t('landing.pricing.popular')}
+                    </span>
+                  </div>
+                )}
+                <CardContent className="p-6 flex flex-col h-full">
+                  {/* Header */}
+                  <div className="text-center mb-6">
+                    <div className={`w-12 h-12 mx-auto rounded-xl flex items-center justify-center mb-4 ${
+                      plan.color === 'indigo' ? 'bg-indigo-100 text-indigo-600' :
+                      plan.color === 'purple' ? 'bg-purple-100 text-purple-600' :
+                      'bg-amber-100 text-amber-600'
+                    }`}>
+                      <plan.icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      {t(plan.nameKey)}
+                    </h3>
+                    <p className="text-gray-500 text-sm mb-4">
+                      {t(plan.descriptionKey)}
+                    </p>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-4xl font-bold text-gray-900">
+                        {t(plan.priceKey)}
+                      </span>
+                      <span className="text-gray-500 text-sm">
+                        {t(plan.periodKey)}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Features */}
+                  <div className="flex-1">
+                    <ul className="space-y-3 mb-6">
+                      {plan.featuresKeys.map((featureKey, featureIndex) => (
+                        <li key={featureIndex} className="flex items-start gap-3">
+                          <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check className="w-3 h-3 text-green-600" />
+                          </div>
+                          <span className="text-gray-600 text-sm">{t(featureKey)}</span>
+                        </li>
+                      ))}
+                      {plan.notIncludedKeys.map((featureKey, featureIndex) => (
+                        <li key={`not-${featureIndex}`} className="flex items-start gap-3 opacity-50">
+                          <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <X className="w-3 h-3 text-gray-400" />
+                          </div>
+                          <span className="text-gray-400 text-sm">{t(featureKey)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  {/* CTA Button */}
+                  <Button
+                    onClick={() => navigate('/register')}
+                    className={`w-full py-6 ${
+                      plan.popular
+                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                    }`}
+                  >
+                    {t('landing.pricing.cta')}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </AnimatedSection>
+          ))}
+        </div>
+        
+        {/* Trust badges */}
+        <AnimatedSection animation="fade" delay={500} duration={600}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-12 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-indigo-500" />
+              {t('landing.pricing.trustBadges.encryption')}
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-green-500" />
+              {t('landing.pricing.trustBadges.cancelAnytime')}
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-500" />
+              {t('landing.pricing.trustBadges.freeTrial')}
+            </div>
+          </div>
+        </AnimatedSection>
+      </div>
+    </section>
+  );
+}
+
 function CTASection() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -530,8 +729,9 @@ function CTASection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button 
               size="lg"
+              variant="secondary"
               onClick={() => navigate('/register')}
-              className="w-full sm:w-auto bg-white text-indigo-600 hover:bg-indigo-50 px-8 py-6 text-lg shadow-lg"
+              className="w-full sm:w-auto !bg-white !text-indigo-600 hover:!bg-indigo-50 px-8 py-6 text-lg shadow-lg"
             >
               {t('landing.cta.createAccount')}
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -540,7 +740,7 @@ function CTASection() {
               size="lg"
               variant="outline"
               onClick={() => navigate('/login')}
-              className="w-full sm:w-auto px-8 py-6 text-lg border-white/30 text-white hover:bg-white/10"
+              className="w-full sm:w-auto px-8 py-6 text-lg !border-white/30 !text-white hover:!bg-white/10 !bg-transparent"
             >
               {t('landing.cta.login')}
             </Button>
@@ -587,6 +787,7 @@ export function Landing() {
       <AnalyticsSection />
       <RemindersSection />
       <SecuritySection />
+      <PricingSection />
       <CTASection />
       <Footer />
     </div>

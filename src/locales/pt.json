@@ -1108,6 +1108,68 @@
     },
     "footer": {
       "rights": "Todos os direitos reservados."
+    },
+    "pricing": {
+      "badge": "Preços Transparentes",
+      "title": "Escolha o plano ideal para sua prática",
+      "subtitle": "Sem custos ocultos. Cancele quando quiser. Comece grátis e escale conforme cresce.",
+      "period": "/mês",
+      "popular": "Mais Popular",
+      "cta": "Começar agora",
+      "trustBadges": {
+        "encryption": "Criptografia AES-256",
+        "cancelAnytime": "Cancele quando quiser",
+        "freeTrial": "14 dias de teste grátis"
+      },
+      "plans": {
+        "basic": {
+          "name": "Básico",
+          "price": "R$40",
+          "description": "Ideal para começar a organizar sua prática",
+          "features": {
+            "patients": "Pacientes ilimitados",
+            "agenda": "Agendamento inteligente",
+            "clinicalFiles": "Prontuários digitais",
+            "payments": "Controle básico de cobranças",
+            "googleCalendar": "Sincronização com Google Calendar",
+            "encryption": "Criptografia de dados E2E"
+          },
+          "notIncluded": {
+            "whatsapp": "Lembretes por WhatsApp",
+            "analytics": "Painel de análises avançado",
+            "ai": "Notas com IA"
+          }
+        },
+        "professional": {
+          "name": "Profissional",
+          "price": "R$75",
+          "description": "Para profissionais que querem crescer",
+          "features": {
+            "allBasic": "Tudo do plano Básico",
+            "whatsapp": "Lembretes automáticos por WhatsApp",
+            "analytics": "Painel de análises avançado",
+            "paymentTracking": "Acompanhamento detalhado de cobranças",
+            "reports": "Relatórios mensais para download",
+            "prioritySupport": "Suporte prioritário"
+          },
+          "notIncluded": {
+            "ai": "Notas assistidas por IA"
+          }
+        },
+        "premium": {
+          "name": "Premium",
+          "price": "R$125",
+          "description": "Maximize sua produtividade com IA",
+          "features": {
+            "allProfessional": "Tudo do plano Profissional",
+            "aiNotes": "Notas clínicas assistidas por IA",
+            "aiSummaries": "Resumos automáticos de sessão",
+            "customBranding": "Personalização de marca",
+            "apiAccess": "Acesso à API para integrações",
+            "dedicatedSupport": "Suporte dedicado 24/7"
+          }
+        }
+      }
     }
   },
   "notes": {

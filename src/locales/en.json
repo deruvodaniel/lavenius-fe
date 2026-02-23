@@ -1117,6 +1117,68 @@
     },
     "footer": {
       "rights": "All rights reserved."
+    },
+    "pricing": {
+      "badge": "Transparent Pricing",
+      "title": "Choose the ideal plan for your practice",
+      "subtitle": "No hidden costs. Cancel anytime. Start free and scale as you grow.",
+      "period": "/month",
+      "popular": "Most Popular",
+      "cta": "Get started",
+      "trustBadges": {
+        "encryption": "AES-256 Encryption",
+        "cancelAnytime": "Cancel anytime",
+        "freeTrial": "14-day free trial"
+      },
+      "plans": {
+        "basic": {
+          "name": "Basic",
+          "price": "$8",
+          "description": "Ideal to start organizing your practice",
+          "features": {
+            "patients": "Unlimited patients",
+            "agenda": "Smart scheduling",
+            "clinicalFiles": "Digital clinical files",
+            "payments": "Basic billing tracking",
+            "googleCalendar": "Google Calendar sync",
+            "encryption": "E2E data encryption"
+          },
+          "notIncluded": {
+            "whatsapp": "WhatsApp reminders",
+            "analytics": "Advanced analytics dashboard",
+            "ai": "AI-powered notes"
+          }
+        },
+        "professional": {
+          "name": "Professional",
+          "price": "$15",
+          "description": "For professionals who want to grow",
+          "features": {
+            "allBasic": "Everything in Basic",
+            "whatsapp": "Automatic WhatsApp reminders",
+            "analytics": "Advanced analytics dashboard",
+            "paymentTracking": "Detailed payment tracking",
+            "reports": "Downloadable monthly reports",
+            "prioritySupport": "Priority support"
+          },
+          "notIncluded": {
+            "ai": "AI-assisted notes"
+          }
+        },
+        "premium": {
+          "name": "Premium",
+          "price": "$25",
+          "description": "Maximize your productivity with AI",
+          "features": {
+            "allProfessional": "Everything in Professional",
+            "aiNotes": "AI-assisted clinical notes",
+            "aiSummaries": "Automatic session summaries",
+            "customBranding": "Custom branding",
+            "apiAccess": "API access for integrations",
+            "dedicatedSupport": "Dedicated 24/7 support"
+          }
+        }
+      }
     }
   },
   "notes": {

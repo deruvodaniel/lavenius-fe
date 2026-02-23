@@ -17,7 +17,8 @@ const HelpCenter = lazy(() => import('./components/help/HelpCenter').then(m => (
 
 /**
  * Landing page wrapper that redirects authenticated users to dashboard
- * This improves UX by not requiring logged-in users to click "Dashboard" manually
+ * Only redirects ONCE after login - subsequent visits to landing are allowed
+ * This improves UX by not requiring users to click "Dashboard" after login
  */
 function LandingRoute() {
   const { isLoaded, isSignedIn } = useClerkAuth();
@@ -28,18 +29,25 @@ function LandingRoute() {
     return <LoadingOverlay message="Cargando..." />;
   }
 
-  // If user is signed in, redirect appropriately
+  // If user is signed in, check if we should redirect
   if (isSignedIn) {
     const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
-    
-    // Redirect to onboarding if not completed, otherwise to dashboard
-    if (!hasCompletedOnboarding) {
-      return <Navigate to="/onboarding" replace />;
+    const redirectKey = `lavenius_redirected_${user?.id}`;
+    const hasRedirected = sessionStorage.getItem(redirectKey);
+
+    // Only redirect once per session (after login)
+    // If user manually navigates to landing later, they can see it
+    if (!hasRedirected) {
+      sessionStorage.setItem(redirectKey, 'true');
+      
+      if (!hasCompletedOnboarding) {
+        return <Navigate to="/onboarding" replace />;
+      }
+      return <Navigate to="/dashboard" replace />;
     }
-    return <Navigate to="/dashboard" replace />;
   }
 
-  // Show landing page for non-authenticated users
+  // Show landing page for non-authenticated users OR logged-in users who already redirected
   return <Landing />;
 }
 
