@@ -16,6 +16,34 @@ const Perfil = lazy(() => import('./components/perfil/Perfil').then(m => ({ defa
 const HelpCenter = lazy(() => import('./components/help/HelpCenter').then(m => ({ default: m.HelpCenter })));
 
 /**
+ * Landing page wrapper that redirects authenticated users to dashboard
+ * This improves UX by not requiring logged-in users to click "Dashboard" manually
+ */
+function LandingRoute() {
+  const { isLoaded, isSignedIn } = useClerkAuth();
+  const { user } = useUser();
+
+  // Show loading while Clerk initializes
+  if (!isLoaded) {
+    return <LoadingOverlay message="Cargando..." />;
+  }
+
+  // If user is signed in, redirect appropriately
+  if (isSignedIn) {
+    const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
+    
+    // Redirect to onboarding if not completed, otherwise to dashboard
+    if (!hasCompletedOnboarding) {
+      return <Navigate to="/onboarding" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Show landing page for non-authenticated users
+  return <Landing />;
+}
+
+/**
  * Protected route wrapper that also checks for onboarding completion
  * Redirects to /onboarding if user hasn't completed professional info setup
  */
@@ -93,8 +121,8 @@ function OnboardingRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <Routes>
-      {/* Public routes */}
-      <Route path="/" element={<Landing />} />
+      {/* Landing page - redirects to dashboard if already logged in */}
+      <Route path="/" element={<LandingRoute />} />
       
       {/* Onboarding route - for new users to complete professional info */}
       <Route
