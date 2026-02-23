@@ -31,18 +31,14 @@ import {
   UserX,
   Clock,
   Settings2,
+  BarChart3,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { SkeletonList } from '@/components/shared/Skeleton';
+import { EmptyState, SwipeableCards, DashboardSkeleton, AnimatedSection } from './DashboardComponents';
 import { usePayments } from '@/lib/hooks/usePayments';
 import { usePatients, useResponsive } from '@/lib/hooks';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -245,58 +241,76 @@ const SECTION_LABELS: Record<DashboardSectionId, string> = {
 const DashboardSettingsPopover = ({ t }: DashboardSettingsPopoverProps) => {
   const { sections, toggleSectionVisibility, resetToDefaults } = 
     useDashboardSettingsStore();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="secondary"
-          size="icon"
-          title={t('dashboard.settings.title')}
-          aria-label={t('dashboard.settings.title')}
-          className="bg-white/20 hover:bg-white/30 border-0 text-white"
-        >
-          <Settings2 className="w-4 h-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        className="w-72 bg-white border border-gray-200 shadow-lg p-4" 
-        align="end" 
-        sideOffset={8}
+    <div className="relative">
+      <Button
+        variant="secondary"
+        size="icon"
+        title={t('dashboard.settings.title')}
+        aria-label={t('dashboard.settings.title')}
+        className="bg-white/20 hover:bg-white/30 border-0 text-white"
+        onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="font-medium text-gray-900">{t('dashboard.settings.title')}</h4>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={resetToDefaults}
-              className="text-xs text-gray-500 hover:text-gray-700"
-            >
-              {t('dashboard.settings.reset')}
-            </Button>
-          </div>
-          <p className="text-xs text-gray-500">{t('dashboard.settings.description')}</p>
-          <div className="space-y-3">
-            {sections.map((section) => (
-              <div key={section.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`section-${section.id}`}
-                  checked={section.visible}
-                  onCheckedChange={() => toggleSectionVisibility(section.id)}
-                />
-                <Label
-                  htmlFor={`section-${section.id}`}
-                  className="text-sm font-normal cursor-pointer text-gray-700"
+        <Settings2 className="w-4 h-4" />
+      </Button>
+      
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setIsOpen(false)} 
+          />
+          
+          {/* Dropdown */}
+          <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium text-gray-900">{t('dashboard.settings.title')}</h4>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetToDefaults}
+                  className="text-xs text-gray-500 hover:text-gray-700"
                 >
-                  {t(SECTION_LABELS[section.id])}
-                </Label>
+                  {t('dashboard.settings.reset')}
+                </Button>
               </div>
-            ))}
+              <p className="text-xs text-gray-500">{t('dashboard.settings.description')}</p>
+              <div className="space-y-3">
+                {sections.map((section) => (
+                  <div key={section.id} className="flex items-center justify-between">
+                    <Label
+                      htmlFor={`section-${section.id}`}
+                      className="text-sm font-normal cursor-pointer text-gray-700"
+                    >
+                      {t(SECTION_LABELS[section.id])}
+                    </Label>
+                    <button
+                      id={`section-${section.id}`}
+                      role="switch"
+                      aria-checked={section.visible}
+                      onClick={() => toggleSectionVisibility(section.id)}
+                      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
+                        section.visible ? 'bg-indigo-600' : 'bg-gray-200'
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform ${
+                          section.visible ? 'translate-x-4' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </>
+      )}
+    </div>
   );
 };
 
@@ -794,43 +808,34 @@ export function Analitica() {
   };
 
   if (isLoading) {
-    return (
-      <div className="p-4 md:p-6 lg:p-8 space-y-6">
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            {greeting}, {user?.firstName || t('auth.welcome')}
-          </h1>
-          <p className="text-gray-500 mt-1">
-            {t('dashboard.welcomeSubtitle')}
-          </p>
-        </div>
-        <SkeletonList items={4} />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 rounded-2xl p-6 sm:p-8 text-white shadow-lg">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <p className="text-indigo-200 text-sm font-medium mb-1">
-              {t('dashboard.welcomeSubtitle')}
-            </p>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
-              {greeting}, {user?.firstName || t('auth.welcome')}
-            </h1>
+      <AnimatedSection delay={0}>
+        <div className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 rounded-2xl p-6 sm:p-8 text-white shadow-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <p className="text-indigo-200 text-sm font-medium mb-1">
+                {t('dashboard.welcomeSubtitle')}
+              </p>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+                {greeting}, {user?.firstName || t('auth.welcome')}
+              </h1>
+            </div>
+            
+            {/* Settings only - filter moved to stats section */}
+            <DashboardSettingsPopover t={t} />
           </div>
-          
-          {/* Settings only - filter moved to stats section */}
-          <DashboardSettingsPopover t={t} />
         </div>
-      </div>
+      </AnimatedSection>
 
       {/* Today's Summary Card - Merged with upcoming sessions */}
       {isSectionVisible('todaySummary') && (
-        <Card className="p-4 bg-white">
+        <AnimatedSection delay={0.1}>
+          <Card className="p-4 bg-white">
           <div className="flex items-center gap-2 mb-4">
             <Calendar className="w-5 h-5 text-slate-600" />
             <h3 className="font-semibold text-gray-900">{t('dashboard.todaySummary.title')}</h3>
@@ -911,11 +916,13 @@ export function Analitica() {
             </div>
           )}
         </Card>
+        </AnimatedSection>
       )}
 
       {/* Quick Actions */}
       {isSectionVisible('quickActions') && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <AnimatedSection delay={0.15}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <Button 
             variant="outline" 
             onClick={() => navigate('/dashboard/agenda?action=new')}
@@ -948,14 +955,16 @@ export function Analitica() {
             <Calendar className="w-5 h-5 text-purple-600" />
             <span className="text-sm">{t('dashboard.quickActions.viewAgenda')}</span>
           </Button>
-        </div>
+          </div>
+        </AnimatedSection>
       )}
 
       {/* Stats Grid */}
       {isSectionVisible('statCards') && (
-        <>
-          {/* Time Range Filter - applies to stats and charts */}
-          <div className="flex items-center justify-between">
+        <AnimatedSection delay={0.2}>
+          <>
+            {/* Time Range Filter - applies to stats and charts */}
+            <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">{t('analytics.title')}</h2>
             <div className="flex items-center gap-2">
               <Button
@@ -1052,12 +1061,14 @@ export function Analitica() {
             onClick={() => navigate('/dashboard/agenda')}
           />
           </div>
-        </>
+          </>
+        </AnimatedSection>
       )}
 
       {/* Pending Payments */}
       {isSectionVisible('pendingPayments') && (
-        <Card className="p-4 bg-white">
+        <AnimatedSection delay={0.25}>
+          <Card className="p-4 bg-white">
           <div className="flex items-center gap-2 mb-4">
             <DollarSign className="w-5 h-5 text-green-600" />
             <h3 className="font-semibold text-gray-900">{t('dashboard.pendingPayments.title')}</h3>
@@ -1086,17 +1097,123 @@ export function Analitica() {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-              <CheckCircle2 className="w-10 h-10 mb-2 text-green-300" />
-              <p className="text-sm">{t('dashboard.pendingPayments.empty')}</p>
-            </div>
+            <EmptyState
+              icon={CheckCircle2}
+              title={t('dashboard.pendingPayments.empty')}
+              variant="success"
+            />
           )}
-        </Card>
+          </Card>
+        </AnimatedSection>
       )}
 
       {/* Insights Row: Birthdays and Patients without session */}
       {(isSectionVisible('birthdays') || isSectionVisible('patientsWithoutSession')) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AnimatedSection delay={0.3}>
+          <>
+            {/* Mobile: Swipeable Cards */}
+            <div className="lg:hidden">
+              <SwipeableCards>
+                {/* Cumpleaños próximos - Mobile */}
+                {isSectionVisible('birthdays') && (
+                  <Card className="p-4 bg-white">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Gift className="w-5 h-5 text-pink-600" />
+                    <h3 className="font-semibold text-gray-900">{t('dashboard.birthdays.title')}</h3>
+                  </div>
+                  {upcomingBirthdays.length > 0 ? (
+                    <div className="space-y-3">
+                      {upcomingBirthdays.slice(0, 4).map(patient => (
+                        <button
+                          key={patient.id}
+                          onClick={() => navigate(`/dashboard/pacientes/${patient.id}`)}
+                          className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center">
+                              <Gift className="w-4 h-4 text-pink-600" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{patient.firstName} {patient.lastName}</p>
+                              <p className="text-xs text-gray-500">
+                                {patient.nextBirthday.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
+                              </p>
+                            </div>
+                          </div>
+                          <Badge 
+                            variant="secondary"
+                            className={
+                              formatBirthdayDay(patient.nextBirthday) === t('dashboard.birthdays.today') 
+                                ? 'bg-pink-100 text-pink-700 border-pink-200' 
+                                : 'bg-gray-100 text-gray-700'
+                            }
+                          >
+                            {formatBirthdayDay(patient.nextBirthday)}
+                          </Badge>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon={Gift}
+                      title={t('dashboard.birthdays.empty')}
+                      variant="neutral"
+                    />
+                  )}
+                </Card>
+              )}
+
+              {/* Pacientes sin próxima cita - Mobile */}
+              {isSectionVisible('patientsWithoutSession') && (
+                <Card className="p-4 bg-white">
+                  <div className="flex items-center gap-2 mb-4">
+                    <UserX className="w-5 h-5 text-orange-600" />
+                    <h3 className="font-semibold text-gray-900">{t('dashboard.noUpcomingSession.title')}</h3>
+                  </div>
+                  {patientsWithoutNextSession.length > 0 ? (
+                    <div className="space-y-3">
+                      {patientsWithoutNextSession.slice(0, 4).map(patient => (
+                        <button
+                          key={patient.id}
+                          onClick={() => navigate(`/dashboard/pacientes/${patient.id}`)}
+                          className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                        >
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{patient.firstName} {patient.lastName}</p>
+                            {patient.lastSessionDate && (
+                              <p className="text-xs text-gray-500">
+                                {t('dashboard.noUpcomingSession.lastSession')}: {patient.lastSessionDate.toLocaleDateString('es-AR')}
+                              </p>
+                            )}
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/dashboard/agenda?action=new&patientId=${patient.id}`);
+                            }}
+                            className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon={CheckCircle2}
+                      title={t('dashboard.noUpcomingSession.empty')}
+                      variant="success"
+                    />
+                  )}
+                </Card>
+              )}
+            </SwipeableCards>
+          </div>
+
+          {/* Desktop: Grid Layout */}
+          <div className="hidden lg:grid lg:grid-cols-2 gap-6">
           {/* Cumpleaños próximos */}
           {isSectionVisible('birthdays') && (
             <Card className="p-4 bg-white">
@@ -1137,10 +1254,11 @@ export function Analitica() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                  <Gift className="w-10 h-10 mb-2 text-gray-300" />
-                  <p className="text-sm">{t('dashboard.birthdays.empty')}</p>
-                </div>
+                <EmptyState
+                  icon={Gift}
+                  title={t('dashboard.birthdays.empty')}
+                  variant="neutral"
+                />
               )}
             </Card>
           )}
@@ -1184,21 +1302,25 @@ export function Analitica() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                  <CheckCircle2 className="w-10 h-10 mb-2 text-green-300" />
-                  <p className="text-sm text-center">{t('dashboard.noUpcomingSession.empty')}</p>
-                </div>
+                <EmptyState
+                  icon={CheckCircle2}
+                  title={t('dashboard.noUpcomingSession.empty')}
+                  variant="success"
+                />
               )}
             </Card>
           )}
-        </div>
+          </div>
+          </>
+        </AnimatedSection>
       )}
 
       {/* Charts Section */}
       {isSectionVisible('charts') && (
-        <>
-          {/* Charts Grid - Row 1 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AnimatedSection delay={0.35}>
+          <div className="space-y-6">
+            {/* Charts Grid - Row 1 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Sessions Over Time */}
             <ChartCard 
               title={t('analytics.charts.sessionsOverTime.title')} 
@@ -1263,7 +1385,11 @@ export function Analitica() {
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <p className="text-gray-500 text-sm">{t('analytics.noData')}</p>
+                  <EmptyState
+                    icon={BarChart3}
+                    title={t('analytics.noData')}
+                    variant="neutral"
+                  />
                 )}
               </div>
             </ChartCard>
@@ -1321,7 +1447,11 @@ export function Analitica() {
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <p className="text-gray-500 text-sm">{t('analytics.noData')}</p>
+                  <EmptyState
+                    icon={BarChart3}
+                    title={t('analytics.noData')}
+                    variant="neutral"
+                  />
                 )}
               </div>
             </ChartCard>
@@ -1392,13 +1522,17 @@ export function Analitica() {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-full flex items-center justify-center">
-                  <p className="text-gray-500 text-sm">{t('analytics.noData')}</p>
-                </div>
+                <EmptyState
+                  icon={Users}
+                  title={t('analytics.noData')}
+                  variant="neutral"
+                  className="h-full"
+                />
               )}
             </div>
           </ChartCard>
-        </>
+          </div>
+        </AnimatedSection>
       )}
     </div>
   );
