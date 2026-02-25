@@ -12,6 +12,7 @@ import { LanguageSwitcher } from '@/components/shared';
 import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
 import { type DayOffConfig, type DayOffSetting } from '@/lib/types/setting.types';
 import { cn } from '@/components/ui/utils';
+import { apiClient } from '@/lib/api/client';
 
 // ============================================================================
 // NAVIGATION SECTIONS
@@ -371,10 +372,34 @@ export function Configuracion() {
   
   // Fetch settings on mount
   useEffect(() => {
-    useSettingStore.getState().fetchSettings().catch((error) => {
-      console.error('Failed to fetch settings:', error);
-      // Don't show toast on initial load failure - graceful degradation
-    });
+    let cancelled = false;
+    const maxAttempts = 30; // ~9s
+    let attempts = 0;
+
+    const tryFetchSettings = () => {
+      if (cancelled) return;
+
+      if (!apiClient.hasUserKey()) {
+        attempts += 1;
+        if (attempts < maxAttempts) {
+          setTimeout(tryFetchSettings, 300);
+        } else {
+          console.warn('[Configuracion] Skipping /settings fetch: userKey not initialized');
+        }
+        return;
+      }
+
+      useSettingStore.getState().fetchSettings().catch((error) => {
+        console.error('Failed to fetch settings:', error);
+        // Don't show toast on initial load failure - graceful degradation
+      });
+    };
+
+    tryFetchSettings();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Sync reminder state from backend settings when they load
@@ -435,12 +460,14 @@ export function Configuracion() {
           {
             frequency: paymentReminderFrequency,
             remindDuePaymentLimit: paymentReminderLimit,
+            message: 'Recordatorio: tienes pagos pendientes por registrar.',
           },
           paymentReminderEnabled
         ),
         upsertNextSessionReminder(
           {
             hoursBeforeSession: sessionReminderHours,
+            message: 'Recordatorio: tienes una sesión agendada próximamente.',
           },
           sessionReminderEnabled
         ),

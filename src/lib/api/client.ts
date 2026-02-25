@@ -288,6 +288,8 @@ export class ApiClient {
   private async handleRequest(
     config: InternalAxiosRequestConfig
   ): Promise<InternalAxiosRequestConfig> {
+    const requestUrl = config.url || '';
+
     // Try to get token from Clerk first (preferred method)
     if (this.tokenGetter) {
       try {
@@ -317,6 +319,17 @@ export class ApiClient {
     const userKey = this.tokenStorage.getUserKey();
     if (userKey) {
       config.headers['x-user-key'] = userKey;
+    } else {
+      const isPublicEndpoint =
+        requestUrl.includes('/auth/login') ||
+        requestUrl.includes('/auth/register') ||
+        requestUrl.endsWith('/auth') ||
+        requestUrl.includes('/auth?') ||
+        requestUrl.includes('/health');
+
+      if (!isPublicEndpoint && import.meta.env.DEV) {
+        console.warn('[ApiClient] Missing x-user-key for protected request:', requestUrl);
+      }
     }
 
     // Disable caching for GET requests to always fetch fresh data
