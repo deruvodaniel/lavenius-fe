@@ -74,7 +74,7 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
   return (
     <div className="h-screen flex flex-col lg:flex-row overflow-hidden bg-gray-50">
       {/* Mobile Header - hidden on desktop */}
-      <header className="bg-indigo-900 text-white p-4 flex items-center justify-between shadow-lg z-20 lg:hidden">
+      <header className="bg-indigo-900 text-white p-4 flex items-center justify-between shadow-lg z-40 lg:hidden">
         <h1 className="text-xl font-bold">{appName}</h1>
         <button
           onClick={() => setDrawerOpen(!drawerOpen)}
@@ -87,15 +87,15 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
 
       {/* Mobile Drawer - only visible on mobile when open */}
       {isMobile && drawerOpen && (
-        <div className="fixed inset-0 z-50 flex top-[56px] lg:hidden">
+        <div className="fixed inset-0 z-[80] flex top-[56px] lg:hidden">
           {/* Backdrop/Overlay */}
           <div
-            className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
+            className="absolute inset-0 z-[80] bg-black/30 backdrop-blur-[2px]"
             onClick={handleDrawerClose}
           />
 
           {/* Drawer Content - never collapsed on mobile */}
-          <aside className="relative ml-auto h-full w-64 bg-indigo-900 text-white shadow-2xl overflow-y-auto">
+          <aside className="relative z-[81] ml-auto h-full w-64 bg-indigo-900 text-white shadow-2xl overflow-y-auto">
             {sidebar(handleDrawerClose)}
           </aside>
         </div>

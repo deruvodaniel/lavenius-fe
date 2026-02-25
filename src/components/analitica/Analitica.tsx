@@ -58,6 +58,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { SessionStatus } from '@/lib/types/session';
 import { PaymentStatus } from '@/lib/types/api.types';
 import { sessionService } from '@/lib/api/sessions';
+import { apiClient } from '@/lib/api/client';
 import type { SessionResponse } from '@/lib/types/session';
 import { 
   useDashboardSettingsStore, 
@@ -104,6 +105,13 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
+const formatDateYmdLocal = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const getDateRange = (range: TimeRange): { start: Date; end: Date } => {
   const now = new Date();
   const end = new Date(now);
@@ -111,22 +119,33 @@ const getDateRange = (range: TimeRange): { start: Date; end: Date } => {
   
   switch (range) {
     case 'week':
-      // Last 7 days
-      start.setDate(now.getDate() - 7);
+      // Last 7 days including today
+      start.setDate(now.getDate() - 6);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
       break;
     case 'month':
-      // Current calendar month (1st to today)
+      // Current calendar month (1st to end of month)
       start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+      end.setMonth(now.getMonth() + 1, 0);
+      end.setHours(23, 59, 59, 999);
       break;
     case 'quarter':
       // Last 3 calendar months
       start.setMonth(now.getMonth() - 2);
       start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+      end.setMonth(now.getMonth() + 1, 0);
+      end.setHours(23, 59, 59, 999);
       break;
     case 'year':
-      // Current calendar year (Jan 1st to today)
+      // Current calendar year (Jan 1st to Dec 31st)
       start.setMonth(0);
       start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+      end.setMonth(11, 31);
+      end.setHours(23, 59, 59, 999);
       break;
   }
   
@@ -415,11 +434,20 @@ export function Analitica() {
     const loadData = async () => {
       setIsLoading(true);
       try {
+        // Ensure encryption key is initialized before protected endpoints.
+        // Without userKey, backend guards can return 401 and the dashboard stays in zero state.
+        const maxAttempts = 30; // ~9 seconds
+        let attempts = 0;
+        while (isMounted && !apiClient.hasUserKey() && attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+          attempts += 1;
+        }
+
         const { start, end } = getDateRange(timeRange);
         
-        // Format dates for API (YYYY-MM-DD)
-        const fromDate = start.toISOString().split('T')[0];
-        const toDate = end.toISOString().split('T')[0];
+        // Format dates for API (YYYY-MM-DD) in local time to avoid timezone day shifts
+        const fromDate = formatDateYmdLocal(start);
+        const toDate = formatDateYmdLocal(end);
         
         // Get unique months needed for the date range
         const monthsToFetch = new Set<string>();
@@ -437,14 +465,27 @@ export function Analitica() {
           return sessionService.getMonthly(year, month);
         });
         
-        // Fetch all data in parallel
-        const [sessionsResults] = await Promise.all([
+        // Fetch all data in parallel, but don't fail the whole dashboard if one endpoint errors
+        const [sessionsResult, paymentsResult, patientsResult] = await Promise.allSettled([
           Promise.all(sessionPromises),
           fetchPayments(true, { from: fromDate, to: toDate, limit: 99 }),
           fetchPatients(),
         ]);
         
         if (!isMounted) return;
+
+        if (paymentsResult.status === 'rejected') {
+          console.warn('[Analitica] Payments fetch failed:', paymentsResult.reason);
+        }
+
+        if (patientsResult.status === 'rejected') {
+          console.warn('[Analitica] Patients fetch failed:', patientsResult.reason);
+        }
+
+        const sessionsResults = sessionsResult.status === 'fulfilled' ? sessionsResult.value : [];
+        if (sessionsResult.status === 'rejected') {
+          console.warn('[Analitica] Sessions fetch failed:', sessionsResult.reason);
+        }
         
         // Flatten and deduplicate sessions by id, then filter by date range
         const sessionsMap = new Map<string, SessionResponse>();
@@ -512,19 +553,10 @@ export function Analitica() {
   // Filter data by time range
   const { start, end } = useMemo(() => getDateRange(timeRange), [timeRange]);
 
-  const filteredSessions = useMemo(() => {
-    return sessionsUI.filter(session => {
-      const sessionDate = new Date(session.scheduledFrom);
-      return sessionDate >= start && sessionDate <= end;
-    });
-  }, [sessionsUI, start, end]);
-
-  const filteredPayments = useMemo(() => {
-    return payments.filter(payment => {
-      const paymentDate = new Date(payment.paymentDate);
-      return paymentDate >= start && paymentDate <= end;
-    });
-  }, [payments, start, end]);
+  // Data is already requested from backend using current date range.
+  // Avoid client-side re-filtering to prevent timezone/parsing mismatches that can show false zeroes.
+  const filteredSessions = useMemo(() => sessionsUI, [sessionsUI]);
+  const filteredPayments = useMemo(() => payments, [payments]);
 
   // ==================== STATS CALCULATIONS ====================
 
@@ -794,17 +826,10 @@ export function Analitica() {
         .filter(Boolean)
     );
     
-    // Get patients who have had sessions but don't have future ones
-    const patientsWithPastSessions = new Set(
-      sessionsUI
-        .filter(s => s.patient?.id)
-        .map(s => s.patient!.id)
-    );
-    
-    // Find the last session for each patient without future sessions
+    // Find the last known session for each patient
     const patientLastSession: Record<string, Date> = {};
     sessionsUI.forEach(s => {
-      if (s.patient?.id && patientsWithPastSessions.has(s.patient.id) && !patientsWithFutureSessions.has(s.patient.id)) {
+      if (s.patient?.id) {
         const sessionDate = new Date(s.scheduledFrom);
         if (!patientLastSession[s.patient.id] || sessionDate > patientLastSession[s.patient.id]) {
           patientLastSession[s.patient.id] = sessionDate;
@@ -813,9 +838,23 @@ export function Analitica() {
     });
     
     return patients
-      .filter(p => patientsWithPastSessions.has(p.id) && !patientsWithFutureSessions.has(p.id))
+      // Include both:
+      // - patients with past sessions but no upcoming
+      // - patients who never had sessions
+      .filter(p => !patientsWithFutureSessions.has(p.id))
       .map(p => ({ ...p, lastSessionDate: patientLastSession[p.id] }))
-      .sort((a, b) => (b.lastSessionDate?.getTime() || 0) - (a.lastSessionDate?.getTime() || 0))
+      .sort((a, b) => {
+        const aTime = a.lastSessionDate?.getTime();
+        const bTime = b.lastSessionDate?.getTime();
+
+        // Patients with no session history first
+        if (!aTime && !bTime) return 0;
+        if (!aTime) return -1;
+        if (!bTime) return 1;
+
+        // Then by latest known session (most recent first)
+        return bTime - aTime;
+      })
       .slice(0, 5);
   }, [patients, sessionsUI]);
 
