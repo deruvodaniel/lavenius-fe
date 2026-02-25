@@ -29,6 +29,8 @@ export interface SyncResult {
  */
 class OnboardingService {
   private readonly basePath = '/auth';
+  private readonly duplicateUserMarkers = ['already exists', 'ya existe', 'already registered', 'registrado'];
+  private readonly genericBadRequestMarkers = ['bad request', 'invalid request data'];
 
   /**
    * Get the localStorage key for a specific user
@@ -79,10 +81,32 @@ class OnboardingService {
       return { success: true };
     } catch (error) {
       if (error instanceof ApiClientError) {
-        // 409 Conflict - User already exists (likely from webhook)
-        if (error.statusCode === 409) {
+        const message = (error.message || '').toLowerCase();
+        const errorCode = (error.error || '').toLowerCase();
+        const isDuplicateOn400 =
+          error.statusCode === 400 &&
+          (this.duplicateUserMarkers.some(marker => message.includes(marker)) ||
+            this.duplicateUserMarkers.some(marker => errorCode.includes(marker)));
+
+        // 409 Conflict or specific 400 duplicate responses
+        if (error.statusCode === 409 || isDuplicateOn400) {
           console.log('User already exists in backend (via webhook or previous registration)');
           return { success: true, alreadyExists: true };
+        }
+
+        // Backend BFF currently sanitizes some conflict/domain errors into generic 400.
+        // Probe the authenticated therapist endpoint: if it resolves, user already exists.
+        const isGenericBadRequest =
+          error.statusCode === 400 &&
+          (this.genericBadRequestMarkers.some(marker => message.includes(marker)) ||
+            this.genericBadRequestMarkers.some(marker => errorCode.includes(marker)));
+
+        if (isGenericBadRequest) {
+          const existingTherapist = await this.tryFindCurrentTherapist();
+          if (existingTherapist?.id) {
+            this.saveBackendPassphrase(externalId, existingTherapist.id);
+            return { success: true, alreadyExists: true, therapistId: existingTherapist.id };
+          }
         }
 
         // 5xx Server errors - Backend unavailable
@@ -99,6 +123,18 @@ class OnboardingService {
       // Unknown error type
       console.warn('Unknown error during backend sync:', error);
       return { success: false, error: 'unknown_error' };
+    }
+  }
+
+  private async tryFindCurrentTherapist(): Promise<{ id: string } | null> {
+    try {
+      const therapist = await apiClient.get<{ id?: string }>('/therapists');
+      if (therapist?.id) {
+        return { id: therapist.id };
+      }
+      return null;
+    } catch {
+      return null;
     }
   }
 

@@ -53,6 +53,12 @@ export function ClerkTokenProvider({ children }: ClerkTokenProviderProps) {
     if (keyFetchedForUser.current === userId) return;
 
     const initializeUserKey = async () => {
+      // If key already exists in storage (session/local), avoid re-bootstrap.
+      if (apiClient.hasUserKey()) {
+        keyFetchedForUser.current = userId;
+        return;
+      }
+
       const storedBackendPassphrase = onboardingService.getBackendPassphrase(userId);
       const unsafeMetadata = user?.unsafeMetadata as Record<string, unknown> | undefined;
       const onboardingComplete = unsafeMetadata?.onboardingComplete === true;
@@ -63,9 +69,24 @@ export function ClerkTokenProvider({ children }: ClerkTokenProviderProps) {
         return;
       }
 
-      const passphraseCandidates = [storedBackendPassphrase].filter(
-        (value): value is string => !!value
-      );
+      const passphraseCandidates: string[] = [];
+      if (storedBackendPassphrase) {
+        passphraseCandidates.push(storedBackendPassphrase);
+      }
+
+      // Recovery path for existing users that don't have the passphrase in local storage.
+      // Backend currently uses therapistId as bootstrap passphrase.
+      if (!storedBackendPassphrase && onboardingComplete) {
+        try {
+          const therapistData = await apiClient.get<{ id?: string }>('/therapists');
+          if (therapistData?.id) {
+            passphraseCandidates.push(therapistData.id);
+            onboardingService.saveBackendPassphrase(userId, therapistData.id);
+          }
+        } catch {
+          // Continue; /auth bootstrap below will fail and emit a dev warning.
+        }
+      }
 
       for (const passphrase of passphraseCandidates) {
         try {

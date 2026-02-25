@@ -290,10 +290,21 @@ export function Onboarding() {
         return;
       }
 
-      // 4.1 Bootstrap encryption key immediately after register.
-      // Backend currently expects passphrase = therapist.id (stored after register response),
-      // with fallback to Clerk user ID for compatibility.
-      const backendPassphrase = syncResult.therapistId || onboardingService.getBackendPassphrase(user.id);
+      // 4.1 Bootstrap encryption key:
+      // Priority: register response -> stored passphrase -> /therapists lookup.
+      let backendPassphrase: string | null =
+        syncResult.therapistId || onboardingService.getBackendPassphrase(user.id);
+
+      if (!backendPassphrase) {
+        try {
+          const therapistData = await apiClient.get<{ id: string }>('/therapists');
+          if (therapistData?.id) {
+            backendPassphrase = therapistData.id;
+          }
+        } catch {
+          // fall through to error handling below
+        }
+      }
 
       if (!backendPassphrase) {
         toast.error('No pudimos obtener tu therapistId para inicializar cifrado.');
