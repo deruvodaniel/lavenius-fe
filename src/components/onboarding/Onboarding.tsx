@@ -32,6 +32,7 @@ import {
 import { toast } from 'sonner';
 import { cn } from '@/components/ui/utils';
 import { onboardingService } from '@/lib/services';
+import { apiClient } from '@/lib/api/client';
 import type { ClerkUserSyncDto, OnboardingExtraData } from '@/lib/types/api.types';
 
 /**
@@ -252,6 +253,7 @@ export function Onboarding() {
       // 2. Prepare data for backend (only fields it accepts)
       const backendData: ClerkUserSyncDto = {
         clerkUserId: user.id,
+        externalId: user.id,
         email,
         firstName: user.firstName || '',
         lastName: user.lastName || '',
@@ -281,8 +283,42 @@ export function Onboarding() {
             : 'User registered with backend successfully'
           );
         }
+      } else {
+        console.warn('Backend registration failed during onboarding:', syncResult.error);
+        toast.error('No pudimos registrar tu usuario en el backend. Intenta nuevamente.');
+        setIsSubmitting(false);
+        return;
       }
-      // Note: We continue even if sync fails - data is saved to Clerk and localStorage
+
+      // 4.1 Bootstrap encryption key immediately after register.
+      // Backend currently expects passphrase = therapist.id (stored after register response),
+      // with fallback to Clerk user ID for compatibility.
+      const backendPassphrase = syncResult.therapistId || onboardingService.getBackendPassphrase(user.id);
+
+      if (!backendPassphrase) {
+        toast.error('No pudimos obtener tu therapistId para inicializar cifrado.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      try {
+        const authResponse = await apiClient.post<{ userKey?: string }>('/auth', {
+          passphrase: backendPassphrase,
+        });
+
+        if (authResponse?.userKey) {
+          apiClient.setUserKey(authResponse.userKey);
+          onboardingService.saveBackendPassphrase(user.id, backendPassphrase);
+        } else {
+          toast.error('No pudimos inicializar tu clave de cifrado. Intenta nuevamente.');
+          setIsSubmitting(false);
+          return;
+        }
+      } catch {
+        toast.error('No pudimos inicializar tu clave de cifrado. Intenta nuevamente.');
+        setIsSubmitting(false);
+        return;
+      }
 
       // 5. Save extra data to localStorage (user-scoped)
       onboardingService.saveExtraData(user.id, extraData);

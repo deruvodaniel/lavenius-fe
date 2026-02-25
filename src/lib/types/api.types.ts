@@ -213,8 +213,10 @@ export type RegisterDto = {
  * as authentication is handled by Clerk
  */
 export type ClerkUserSyncDto = {
-  /** Clerk's user ID (external ID for our backend) */
+  /** Clerk's user ID (legacy field expected by current backend DTO) */
   clerkUserId: string;
+  /** External ID alias used by newer backend variants */
+  externalId?: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -307,7 +309,6 @@ export type UpdatePaymentDto = Partial<CreatePaymentDto>;
 // ==================== Auth Response Types ====================
 
 export type AuthResponse = {
-  access_token: string;
   user: User;
   userKey: string; // Base64 encoded encryption key
 };

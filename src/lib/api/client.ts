@@ -350,10 +350,12 @@ export class ApiClient {
       const apiError = error.response?.data as ApiError | undefined;
       const requestUrl = error.config?.url || '';
 
-      // Handle 401 Unauthorized - but NOT for auth endpoints (login/register)
+      // Handle 401 Unauthorized - but NOT for auth endpoints (login/register/auth)
       // Those are expected to return 401 for invalid credentials
-      const isAuthEndpoint = requestUrl.includes('/auth/login') || 
-                             requestUrl.includes('/auth/register');
+      const isAuthEndpoint = requestUrl.includes('/auth/login') ||
+                             requestUrl.includes('/auth/register') ||
+                             requestUrl.endsWith('/auth') ||
+                             requestUrl.includes('/auth?');
       
       if (error.response?.status === 401 && !isAuthEndpoint) {
         this.handleUnauthorized();
@@ -411,6 +413,13 @@ export class ApiClient {
   }
 
   /**
+   * Clear only user encryption key (keeps token getter/session intact)
+   */
+  clearUserKey(): void {
+    this.tokenStorage.removeUserKey();
+  }
+
+  /**
    * Set both token and userKey
    * @param token - The access token
    * @param userKey - The encryption key  
@@ -436,6 +445,13 @@ export class ApiClient {
     const hasToken = !!this.tokenStorage.getToken();
     const hasUserKey = !!this.tokenStorage.getUserKey();
     return hasToken && hasUserKey;
+  }
+
+  /**
+   * Check if encryption key is present in storage
+   */
+  hasUserKey(): boolean {
+    return !!this.tokenStorage.getUserKey();
   }
 
   /**

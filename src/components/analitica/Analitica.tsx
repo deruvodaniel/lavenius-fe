@@ -440,7 +440,7 @@ export function Analitica() {
         // Fetch all data in parallel
         const [sessionsResults] = await Promise.all([
           Promise.all(sessionPromises),
-          fetchPayments(true, { from: fromDate, to: toDate, limit: 1000 }),
+          fetchPayments(true, { from: fromDate, to: toDate, limit: 99 }),
           fetchPatients(),
         ]);
         

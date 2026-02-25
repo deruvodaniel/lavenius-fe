@@ -44,7 +44,13 @@ describe('OnboardingService', () => {
 
       await onboardingService.syncUserWithBackend(mockUserData);
 
-      expect(apiClient.post).toHaveBeenCalledWith('/auth/register', mockUserData);
+      expect(apiClient.post).toHaveBeenCalledWith(
+        '/auth/register',
+        expect.objectContaining({
+          ...mockUserData,
+          externalId: mockUserData.clerkUserId,
+        })
+      );
       expect(apiClient.post).toHaveBeenCalledTimes(1);
     });
 
@@ -120,7 +126,13 @@ describe('OnboardingService', () => {
 
       await onboardingService.syncUserWithBackend(minimalData);
 
-      expect(apiClient.post).toHaveBeenCalledWith('/auth/register', minimalData);
+      expect(apiClient.post).toHaveBeenCalledWith(
+        '/auth/register',
+        expect.objectContaining({
+          ...minimalData,
+          externalId: minimalData.clerkUserId,
+        })
+      );
     });
 
     it('should include optional fields when provided', async () => {
@@ -136,7 +148,13 @@ describe('OnboardingService', () => {
 
       await onboardingService.syncUserWithBackend(fullData);
 
-      expect(apiClient.post).toHaveBeenCalledWith('/auth/register', fullData);
+      expect(apiClient.post).toHaveBeenCalledWith(
+        '/auth/register',
+        expect.objectContaining({
+          ...fullData,
+          externalId: fullData.clerkUserId,
+        })
+      );
     });
   });
 
