@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { BetaBadge } from '@/components/shared';
 
 const SIDEBAR_COLLAPSED_KEY = 'lavenius_sidebar_collapsed';
 
@@ -75,7 +76,7 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
     <div className="h-screen flex flex-col lg:flex-row overflow-hidden bg-gray-50">
       {/* Mobile Header - hidden on desktop */}
       <header className="bg-indigo-900 text-white p-4 flex items-center justify-between shadow-lg z-40 lg:hidden">
-        <h1 className="text-xl font-bold">{appName}</h1>
+        <h1 className="text-xl font-bold flex items-center gap-2">{appName} <BetaBadge /></h1>
         <button
           onClick={() => setDrawerOpen(!drawerOpen)}
           className="p-2 hover:bg-indigo-800 rounded-lg transition-colors"

@@ -63,6 +63,10 @@
     },
     "done": "Pronto"
   },
+  "beta": {
+    "description": "Este produto está em beta",
+    "label": "Beta"
+  },
   "navigation": {
     "dashboard": "Painel",
     "agenda": "Agenda",
@@ -74,7 +78,8 @@
     "help": "Ajuda",
     "logout": "Sair",
     "collapseSidebar": "Recolher menu",
-    "expandSidebar": "Expandir menu"
+    "expandSidebar": "Expandir menu",
+    "userMenu": "Menu do usuário"
   },
   "auth": {
     "login": "Entrar",
@@ -225,8 +230,13 @@
       "table": "Tabela"
     },
     "filters": {
+      "activeCount": "{{count}} ativos",
       "clearFilters": "Limpar filtros",
-      "onlyWithSessionsThisWeek": "Apenas com sessões esta semana"
+      "label": "Filtros",
+      "onlyWithSessionsThisWeek": "Apenas com sessões esta semana",
+      "sortBy": "Ordenar por",
+      "title": "Filtros",
+      "viewMode": "Visualização"
     },
     "table": {
       "patient": "Paciente",
@@ -618,6 +628,7 @@
     "selectLanguage": "Selecionar idioma",
     "languageChanged": "Idioma alterado com sucesso",
     "sections": {
+      "profile": "Perfil",
       "general": "Geral",
       "notifications": "Notificações",
       "calendar": "Calendário",
@@ -762,7 +773,9 @@
       "specialtyPlaceholder": "Ex: Psicólogo Clínico, Terapeuta Cognitivo-Comportamental...",
       "bio": "Descrição / Bio",
       "bioPlaceholder": "Conte aos seus pacientes sobre você, sua abordagem terapêutica e experiência...",
-      "characters": "caracteres"
+      "characters": "caracteres",
+      "licenseNumber": "Número de registro",
+      "licenseNumberPlaceholder": "ex. LIC 12345"
     },
     "contact": {
       "title": "Informações de Contato",

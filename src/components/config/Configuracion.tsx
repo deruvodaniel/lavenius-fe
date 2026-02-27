@@ -8,7 +8,10 @@ import { TimePicker } from '@/components/ui/time-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
-import { LanguageSwitcher } from '@/components/shared';
+import { useSearchParams } from 'react-router-dom';
+import { LanguageSwitcher, BetaBadge } from '@/components/shared';
+import { Perfil } from '@/components/perfil/Perfil';
+import { User } from 'lucide-react';
 import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
 import { type DayOffConfig, type DayOffSetting } from '@/lib/types/setting.types';
 import { cn } from '@/components/ui/utils';
@@ -18,7 +21,7 @@ import { apiClient } from '@/lib/api/client';
 // NAVIGATION SECTIONS
 // ============================================================================
 
-type SectionId = 'general' | 'calendar' | 'notifications';
+type SectionId = 'profile' | 'general' | 'calendar' | 'notifications';
 
 interface NavigationSection {
   id: SectionId;
@@ -27,6 +30,7 @@ interface NavigationSection {
 }
 
 const NAVIGATION_SECTIONS: NavigationSection[] = [
+  { id: 'profile', labelKey: 'settings.sections.profile', icon: User },
   { id: 'general', labelKey: 'settings.sections.general', icon: Globe },
   { id: 'calendar', labelKey: 'settings.sections.calendar', icon: Calendar },
   { id: 'notifications', labelKey: 'settings.sections.notifications', icon: Bell },
@@ -314,8 +318,13 @@ const ToggleRow = ({ checked, onChange, label, description }: ToggleRowProps) =>
 export function Configuracion() {
   const { t, i18n } = useTranslation();
   
-  // Navigation state
-  const [activeSection, setActiveSection] = useState<SectionId>('general');
+  // Navigation state - read initial tab from URL query params
+  const [searchParams] = useSearchParams();
+  const [activeSection, setActiveSection] = useState<SectionId>(() => {
+    const tab = searchParams.get('tab') as SectionId | null;
+    if (tab && NAVIGATION_SECTIONS.some(s => s.id === tab)) return tab;
+    return 'profile';
+  });
   
   // Load localStorage settings on mount (for working hours, templates, etc.)
   const [localSettings, setLocalSettings] = useState<LocalSettings>(loadLocalSettings);
@@ -592,7 +601,7 @@ export function Configuracion() {
       <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{t('settings.title')}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2">{t('settings.title')} <BetaBadge /></h1>
           <p className="text-sm text-gray-500">{t('settings.subtitle')}</p>
         </div>
 
@@ -639,6 +648,13 @@ export function Configuracion() {
         {/* Right Content Area */}
         {/* ============================================ */}
         <div className="flex-1 min-w-0">
+          {/* ============================================ */}
+          {/* SECTION: Profile */}
+          {/* ============================================ */}
+          {activeSection === 'profile' && (
+            <Perfil />
+          )}
+
           {/* ============================================ */}
           {/* SECTION: General Settings */}
           {/* ============================================ */}

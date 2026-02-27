@@ -33,6 +33,7 @@ import { toast } from 'sonner';
 import { cn } from '@/components/ui/utils';
 import { onboardingService } from '@/lib/services';
 import { apiClient } from '@/lib/api/client';
+import { BetaBadge } from '@/components/shared';
 import type { ClerkUserSyncDto, OnboardingExtraData } from '@/lib/types/api.types';
 
 /**
@@ -692,6 +693,11 @@ export function Onboarding() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="w-full max-w-md">
+        {/* Beta badge */}
+        <div className="flex justify-center mb-4">
+          <BetaBadge />
+        </div>
+
         {/* Step indicator */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">

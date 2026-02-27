@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Calendar, Users, DollarSign, LogOut, Settings, ChevronRight, HelpCircle, LayoutDashboard } from 'lucide-react';
+import { Calendar, Users, DollarSign, LogOut, Settings, ChevronUp, HelpCircle, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { ConfirmDialog } from '@/components/shared';
+import { ConfirmDialog, BetaBadge } from '@/components/shared';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/components/ui/utils';
 
 interface SidebarProps {
@@ -38,11 +39,6 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
     { path: '/dashboard/agenda', labelKey: 'navigation.agenda', icon: Calendar },
     { path: '/dashboard/pacientes', labelKey: 'navigation.patients', icon: Users },
     { path: '/dashboard/cobros', labelKey: 'navigation.payments', icon: DollarSign },
-  ];
-
-  const settingsItems = [
-    { path: '/dashboard/configuracion', labelKey: 'navigation.settings', icon: Settings },
-    { path: '/dashboard/ayuda', labelKey: 'navigation.help', icon: HelpCircle },
   ];
 
   const getLinkClassName = ({ isActive }: { isActive: boolean }) => 
@@ -116,7 +112,7 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
               </div>
             ) : (
               <div>
-                <h1 className="text-white text-2xl font-bold">{t('landing.brand')}</h1>
+                <h1 className="text-white text-2xl font-bold flex items-center gap-2">{t('landing.brand')} <BetaBadge className="border-amber-500/60 bg-amber-500/20 text-amber-300" /></h1>
                 <p className="text-indigo-300 text-sm mt-1">{t('landing.tagline')}</p>
               </div>
             )}
@@ -135,42 +131,27 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
               end={item.end}
             />
           ))}
-          
-          {/* Settings & Help */}
-          {settingsItems.map((item) => (
-            <NavItemWithTooltip
-              key={item.path}
-              to={item.path}
-              icon={item.icon}
-              labelKey={item.labelKey}
-              onClick={handleNavClick}
-            />
-          ))}
         </nav>
 
-        {/* User Profile & Logout */}
-        <div className="border-t border-indigo-800 transition-all duration-200 p-4 space-y-2">
+        {/* User Menu Popover */}
+        <div className="border-t border-indigo-800 transition-all duration-200 p-4">
           {user && (
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                <NavLink
-                  to="/dashboard/perfil"
-                  onClick={handleNavClick}
-                  className={({ isActive }) => 
-                    cn(
-                      'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors group',
-                      collapsed && 'justify-center',
-                      isActive ? 'bg-indigo-700' : 'hover:bg-indigo-800'
-                    )
-                  }
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  className={cn(
+                    'w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-800 transition-colors group',
+                    collapsed && 'justify-center'
+                  )}
+                  aria-label={t('navigation.userMenu')}
                 >
                   <div className={cn(
                     'bg-indigo-600 ring-2 ring-indigo-400 rounded-full flex items-center justify-center flex-shrink-0 group-hover:ring-indigo-300 transition-all duration-200 overflow-hidden',
                     collapsed ? 'w-5 h-5 ring-1' : 'w-10 h-10'
                   )}>
                     {user.imageUrl ? (
-                      <img 
-                        src={user.imageUrl} 
+                      <img
+                        src={user.imageUrl}
                         alt={`${user.firstName} ${user.lastName}`}
                         className="w-full h-full object-cover"
                       />
@@ -192,47 +173,54 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
                     </p>
                     <p className="text-indigo-300 text-xs truncate">{user.email}</p>
                   </div>
-                  <ChevronRight className={cn(
+                  <ChevronUp className={cn(
                     'w-4 h-4 text-indigo-400 group-hover:text-indigo-300 transition-colors flex-shrink-0',
                     collapsed && 'hidden'
                   )} />
-                </NavLink>
-              </TooltipTrigger>
-              {collapsed && (
-                <TooltipContent side="right" className="bg-gray-900 text-white border-0 shadow-lg rounded-md">
-                  <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
-                  <p className="text-gray-400 text-xs">{user.email}</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          )}
-          
-          {/* Logout Button */}
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <button
-                onClick={handleLogoutClick}
-                className={cn(
-                  'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white transition-colors',
-                  collapsed && 'justify-center'
-                )}
-                aria-label={t('navigation.logout')}
+                </button>
+              </PopoverTrigger>
+
+              <PopoverContent
+                side={collapsed ? 'right' : 'top'}
+                align={collapsed ? 'end' : 'start'}
+                sideOffset={8}
+                className="w-56 p-1 bg-white border border-gray-200 shadow-lg rounded-lg"
               >
-                <LogOut className="w-5 h-5 flex-shrink-0" />
-                <span className={cn(
-                  'text-sm transition-opacity duration-200',
-                  collapsed ? 'sr-only' : 'opacity-100'
-                )}>
-                  {t('navigation.logout')}
-                </span>
-              </button>
-            </TooltipTrigger>
-            {collapsed && (
-              <TooltipContent side="right" className="bg-gray-900 text-white border-0 shadow-lg rounded-md text-sm font-medium">
-                {t('navigation.logout')}
-              </TooltipContent>
-            )}
-          </Tooltip>
+                <div className="px-3 py-2 border-b border-gray-100 mb-1">
+                  <p className="text-sm font-semibold text-gray-900 truncate">{user.firstName} {user.lastName}</p>
+                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                </div>
+
+                <NavLink
+                  to="/dashboard/configuracion"
+                  onClick={handleNavClick}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
+                >
+                  <Settings className="w-4 h-4" />
+                  {t('navigation.settings')}
+                </NavLink>
+
+                <NavLink
+                  to="/dashboard/ayuda"
+                  onClick={handleNavClick}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  {t('navigation.help')}
+                </NavLink>
+
+                <div className="border-t border-gray-100 mt-1 pt-1">
+                  <button
+                    onClick={handleLogoutClick}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 rounded-md hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    {t('navigation.logout')}
+                  </button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
 
         {/* Logout Confirmation Dialog */}

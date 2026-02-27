@@ -21,6 +21,8 @@ vi.mock('react-i18next', () => ({
         'profile.professional.bio': 'Biografía',
         'profile.professional.bioPlaceholder': 'Escribe una breve descripción sobre ti',
         'profile.professional.characters': 'caracteres',
+        'profile.professional.licenseNumber': 'License Number',
+        'profile.professional.licenseNumberPlaceholder': 'e.g. LIC 12345',
         'profile.contact.title': 'Información de Contacto',
         'profile.contact.description': 'Cómo te pueden contactar tus pacientes',
         'profile.contact.primaryPhone': 'Teléfono principal',
@@ -70,6 +72,17 @@ vi.mock('@/lib/hooks/useAuth', () => ({
   useAuth: () => ({
     user: mockUser,
     isAuthenticated: true,
+  }),
+}));
+
+// Mock @clerk/clerk-react useUser
+const mockClerkUpdate = vi.fn().mockResolvedValue({});
+vi.mock('@clerk/clerk-react', () => ({
+  useUser: () => ({
+    user: {
+      unsafeMetadata: { licenseNumber: mockUser.licenseNumber },
+      update: mockClerkUpdate,
+    },
   }),
 }));
 
@@ -149,7 +162,7 @@ describe('Perfil', () => {
 
     it('renders user license number', () => {
       renderPerfil();
-      expect(screen.getByText('Matricula: MN-12345')).toBeInTheDocument();
+      expect(screen.getByText('License Number: MN-12345')).toBeInTheDocument();
     });
 
     it('renders user initials when no avatar', () => {
@@ -721,7 +734,7 @@ describe('Perfil', () => {
       renderPerfil();
 
       // The original mock has license number, so it should be displayed
-      expect(screen.getByText('Matricula: MN-12345')).toBeInTheDocument();
+      expect(screen.getByText('License Number: MN-12345')).toBeInTheDocument();
     });
   });
 

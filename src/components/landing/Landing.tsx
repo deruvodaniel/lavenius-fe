@@ -41,7 +41,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { AnimatedSection, LanguageSwitcher } from '@/components/shared';
+import { AnimatedSection, LanguageSwitcher, BetaBadge } from '@/components/shared';
 
 // ============================================================================
 // MOCK DATA FOR DASHBOARD PREVIEW
@@ -99,6 +99,7 @@ function NavBar() {
             <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               {t('landing.brand')}
             </span>
+            <BetaBadge />
           </div>
           
           {/* Navigation Links - Hidden on mobile */}

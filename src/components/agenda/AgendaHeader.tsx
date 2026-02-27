@@ -61,7 +61,7 @@ export function AgendaHeader({
       </div>
 
       {/* Search + View Toggle row */}
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+      <div className="flex flex-row gap-2 items-center">
         {/* Search */}
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />

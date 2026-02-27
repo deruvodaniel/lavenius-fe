@@ -12,7 +12,6 @@ const Pacientes = lazy(() => import('./components/pacientes/Pacientes').then(m =
 const Cobros = lazy(() => import('./components/cobros/Cobros').then(m => ({ default: m.Cobros })));
 const Analitica = lazy(() => import('./components/analitica/Analitica').then(m => ({ default: m.Analitica })));
 const Configuracion = lazy(() => import('./components/config/Configuracion').then(m => ({ default: m.Configuracion })));
-const Perfil = lazy(() => import('./components/perfil/Perfil').then(m => ({ default: m.Perfil })));
 const HelpCenter = lazy(() => import('./components/help/HelpCenter').then(m => ({ default: m.HelpCenter })));
 
 /**
@@ -212,11 +211,7 @@ export default function App() {
             <Configuracion />
           </Suspense>
         } />
-        <Route path="perfil" element={
-          <Suspense fallback={<LoadingOverlay message="Cargando perfil..." />}>
-            <Perfil />
-          </Suspense>
-        } />
+        <Route path="perfil" element={<Navigate to="/dashboard/configuracion?tab=profile" replace />} />
         <Route path="ayuda" element={
           <Suspense fallback={<LoadingOverlay message="Cargando ayuda..." />}>
             <HelpCenter />

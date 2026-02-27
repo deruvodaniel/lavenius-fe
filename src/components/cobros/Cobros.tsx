@@ -733,7 +733,7 @@ export function Cobros() {
       />
 
       {/* Stats Cards */}
-      <PaymentStats totals={totals} isLoading={isLoading} />
+      <PaymentStats totals={totals} isLoading={isLoading} isMobile={isMobile} />
 
       {/* Search, Status Filter and Sort */}
       <SearchAndFilters

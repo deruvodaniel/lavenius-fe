@@ -7,16 +7,15 @@ import { TrendingUp, TrendingDown, Clock } from 'lucide-react';
 // ============================================================================
 // useScrollPosition Hook - Detect scroll for sticky header behavior
 // Works with both window scroll and scrollable containers (overflow-y: auto)
+// Uses hysteresis (two thresholds) to prevent oscillation when header
+// height change causes scroll position to bounce around the threshold.
 // ============================================================================
 
-export function useScrollPosition(threshold = 50): boolean {
+export function useScrollPosition(collapseThreshold = 50, expandThreshold = 20): boolean {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    // Find the scrollable container - in AppLayout it's the <main> element
-    // We look for the closest scrollable parent or fall back to window
     const findScrollableParent = (): HTMLElement | Window => {
-      // Look for main element with overflow-y-auto (AppLayout's main content)
       const mainElement = document.querySelector('main');
       if (mainElement) {
         const style = window.getComputedStyle(mainElement);
@@ -28,23 +27,24 @@ export function useScrollPosition(threshold = 50): boolean {
     };
 
     const scrollTarget = findScrollableParent();
-    
+
     const handleScroll = () => {
-      let scrollY: number;
-      if (scrollTarget instanceof Window) {
-        scrollY = window.scrollY || document.documentElement.scrollTop;
-      } else {
-        scrollY = scrollTarget.scrollTop;
-      }
-      setIsScrolled(scrollY > threshold);
+      const scrollY = scrollTarget instanceof Window
+        ? window.scrollY || document.documentElement.scrollTop
+        : (scrollTarget as HTMLElement).scrollTop;
+
+      setIsScrolled(prev => {
+        if (!prev && scrollY > collapseThreshold) return true;
+        if (prev && scrollY < expandThreshold) return false;
+        return prev;
+      });
     };
 
-    // Initial check
     handleScroll();
 
     scrollTarget.addEventListener('scroll', handleScroll, { passive: true });
     return () => scrollTarget.removeEventListener('scroll', handleScroll);
-  }, [threshold]);
+  }, [collapseThreshold, expandThreshold]);
 
   return isScrolled;
 }

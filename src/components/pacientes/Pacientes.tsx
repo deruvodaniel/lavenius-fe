@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { Video, MapPin, Calendar, Plus, Edit2, Trash2, Users, Search, X, ArrowUpDown, LayoutGrid, List } from 'lucide-react';
+import { Video, MapPin, Calendar, Plus, Edit2, Trash2, Users, Search, X, ArrowUpDown, LayoutGrid, List, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { FichaClinica } from '../dashboard';
@@ -10,6 +10,8 @@ import { SessionStatus } from '@/lib/types/session';
 import { AnimatedList, SkeletonCard, EmptyState, ConfirmDialog, SimplePagination, InfiniteScrollLoader } from '../shared';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import type { CreatePatientDto } from '@/lib/types/api.types';
 import type { PatientFilters } from '@/lib/services/patient.service';
 
@@ -343,6 +345,12 @@ export function Pacientes() {
   }, [filteredPacientes, currentPage, visibleCount, isMobile]);
 
   const hasActiveFilters = searchTerm || modalidadFilter !== 'todas' || frecuenciaFilter !== 'todas' || soloTurnosEstaSemana;
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const activeFilterCount = [
+    modalidadFilter !== 'todas',
+    frecuenciaFilter !== 'todas',
+    soloTurnosEstaSemana,
+  ].filter(Boolean).length;
 
   const getModalidadLabel = (modalidad: string) => {
     switch (modalidad) {
@@ -420,50 +428,171 @@ export function Pacientes() {
       </div>
 
       {/* Search + Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200 space-y-4">
-        {/* Search bar + Sort + View Toggle */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              type="text"
-              placeholder={t('patients.searchPlaceholder')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-9"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-          
-          {/* Sort dropdown */}
-          <div className="relative">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer min-w-[140px]"
+      {isMobile ? (
+        <>
+          {/* Mobile: Search bar + Filters button */}
+          <div className="flex gap-2 items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder={t('patients.searchPlaceholder')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 pr-9"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setFilterDrawerOpen(true)}
+              className="relative flex-shrink-0 flex items-center gap-1.5 h-10"
             >
-              {sortOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+              <Filter className="w-4 h-4" />
+              {t('patients.filters.label')}
+              {activeFilterCount > 0 && (
+                <Badge className="ml-1 h-5 w-5 p-0 text-[10px] bg-indigo-600 text-white border-0 rounded-full flex items-center justify-center">
+                  {activeFilterCount}
+                </Badge>
+              )}
+            </Button>
           </div>
 
-          {/* View toggle - only on desktop */}
-          {!isMobile && (
+          {/* Mobile Filters Drawer */}
+          <Drawer open={filterDrawerOpen} onOpenChange={setFilterDrawerOpen}>
+            <DrawerContent className="max-h-[75vh]">
+              <DrawerHeader className="text-left border-b border-gray-100">
+                <div className="flex items-center justify-between">
+                  <DrawerTitle>{t('patients.filters.title')}</DrawerTitle>
+                  {hasActiveFilters && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSearchTerm('');
+                        setModalidadFilter('todas');
+                        setFrecuenciaFilter('todas');
+                        setSoloTurnosEstaSemana(false);
+                      }}
+                      className="text-gray-500"
+                    >
+                      {t('patients.filters.clearFilters')}
+                    </Button>
+                  )}
+                </div>
+              </DrawerHeader>
+              <div className="px-4 py-4 pb-8 overflow-y-auto space-y-5">
+                {/* Sort */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('patients.filters.sortBy')}</label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as SortOption)}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    {sortOptions.map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Modalidad */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('patients.modality.label')}</label>
+                  <select
+                    value={modalidadFilter}
+                    onChange={(e) => setModalidadFilter(e.target.value as any)}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="todas">{t('patients.modality.all')}</option>
+                    <option value="presencial">{t('patients.modality.presential')}</option>
+                    <option value="remoto">{t('patients.modality.remote')}</option>
+                    <option value="mixto">{t('patients.modality.mixed')}</option>
+                  </select>
+                </div>
+
+                {/* Frecuencia */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('patients.frequency.label')}</label>
+                  <select
+                    value={frecuenciaFilter}
+                    onChange={(e) => setFrecuenciaFilter(e.target.value as any)}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="todas">{t('patients.frequency.all')}</option>
+                    <option value="semanal">{t('patients.frequency.weekly')}</option>
+                    <option value="quincenal">{t('patients.frequency.biweekly')}</option>
+                    <option value="mensual">{t('patients.frequency.monthly')}</option>
+                  </select>
+                </div>
+
+                {/* Sessions this week */}
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={soloTurnosEstaSemana}
+                    onChange={(e) => setSoloTurnosEstaSemana(e.target.checked)}
+                    className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                  />
+                  <span className="text-sm text-gray-700">{t('patients.filters.onlyWithSessionsThisWeek')}</span>
+                </label>
+              </div>
+              <div className="h-[env(safe-area-inset-bottom,0px)]" />
+            </DrawerContent>
+          </Drawer>
+        </>
+      ) : (
+        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200 space-y-4">
+          {/* Desktop: Full filter block */}
+          <div className="flex flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder={t('patients.searchPlaceholder')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 pr-9"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Sort dropdown */}
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer min-w-[140px]"
+              >
+                {sortOptions.map(option => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+            </div>
+
+            {/* View toggle */}
             <div className="inline-flex items-center bg-gray-100 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('cards')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                  viewMode === 'cards' 
-                    ? 'bg-white text-indigo-600 shadow-sm' 
+                  viewMode === 'cards'
+                    ? 'bg-white text-indigo-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -473,8 +602,8 @@ export function Pacientes() {
               <button
                 onClick={() => setViewMode('table')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                  viewMode === 'table' 
-                    ? 'bg-white text-indigo-600 shadow-sm' 
+                  viewMode === 'table'
+                    ? 'bg-white text-indigo-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -482,76 +611,71 @@ export function Pacientes() {
                 <span>{t('patients.view.table')}</span>
               </button>
             </div>
+          </div>
+
+          {/* Other filters */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div>
+              <label htmlFor="filter-modalidad" className="block text-gray-700 mb-2 text-sm">{t('patients.modality.label')}</label>
+              <select
+                id="filter-modalidad"
+                value={modalidadFilter}
+                onChange={(e) => setModalidadFilter(e.target.value as any)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+              >
+                <option value="todas">{t('patients.modality.all')}</option>
+                <option value="presencial">{t('patients.modality.presential')}</option>
+                <option value="remoto">{t('patients.modality.remote')}</option>
+                <option value="mixto">{t('patients.modality.mixed')}</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="filter-frecuencia" className="block text-gray-700 mb-2 text-sm">{t('patients.frequency.label')}</label>
+              <select
+                id="filter-frecuencia"
+                value={frecuenciaFilter}
+                onChange={(e) => setFrecuenciaFilter(e.target.value as any)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+              >
+                <option value="todas">{t('patients.frequency.all')}</option>
+                <option value="semanal">{t('patients.frequency.weekly')}</option>
+                <option value="quincenal">{t('patients.frequency.biweekly')}</option>
+                <option value="mensual">{t('patients.frequency.monthly')}</option>
+              </select>
+            </div>
+            <div className="flex items-end">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={soloTurnosEstaSemana}
+                  onChange={(e) => setSoloTurnosEstaSemana(e.target.checked)}
+                  className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                />
+                <span className="text-gray-700 text-sm">{t('patients.filters.onlyWithSessionsThisWeek')}</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Clear filters button */}
+          {hasActiveFilters && (
+            <div className="flex justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchTerm('');
+                  setModalidadFilter('todas');
+                  setFrecuenciaFilter('todas');
+                  setSoloTurnosEstaSemana(false);
+                }}
+                className="text-gray-500"
+              >
+                {t('patients.filters.clearFilters')}
+              </Button>
+            </div>
           )}
         </div>
-
-        {/* Other filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {/* Modalidad Filter */}
-          <div>
-            <label htmlFor="filter-modalidad" className="block text-gray-700 mb-2 text-sm">{t('patients.modality.label')}</label>
-            <select
-              id="filter-modalidad"
-              value={modalidadFilter}
-              onChange={(e) => setModalidadFilter(e.target.value as any)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
-            >
-              <option value="todas">{t('patients.modality.all')}</option>
-              <option value="presencial">{t('patients.modality.presential')}</option>
-              <option value="remoto">{t('patients.modality.remote')}</option>
-              <option value="mixto">{t('patients.modality.mixed')}</option>
-            </select>
-          </div>
-
-          {/* Frecuencia Filter */}
-          <div>
-            <label htmlFor="filter-frecuencia" className="block text-gray-700 mb-2 text-sm">{t('patients.frequency.label')}</label>
-            <select
-              id="filter-frecuencia"
-              value={frecuenciaFilter}
-              onChange={(e) => setFrecuenciaFilter(e.target.value as any)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
-            >
-              <option value="todas">{t('patients.frequency.all')}</option>
-              <option value="semanal">{t('patients.frequency.weekly')}</option>
-              <option value="quincenal">{t('patients.frequency.biweekly')}</option>
-              <option value="mensual">{t('patients.frequency.monthly')}</option>
-            </select>
-          </div>
-
-          {/* This Week Checkbox */}
-          <div className="flex items-end">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={soloTurnosEstaSemana}
-                onChange={(e) => setSoloTurnosEstaSemana(e.target.checked)}
-                className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-              />
-              <span className="text-gray-700 text-sm">{t('patients.filters.onlyWithSessionsThisWeek')}</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Clear filters button */}
-        {hasActiveFilters && (
-          <div className="flex justify-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setSearchTerm('');
-                setModalidadFilter('todas');
-                setFrecuenciaFilter('todas');
-                setSoloTurnosEstaSemana(false);
-              }}
-              className="text-gray-500"
-            >
-              {t('patients.filters.clearFilters')}
-            </Button>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Patient Cards / Table */}
       {isLoading ? (

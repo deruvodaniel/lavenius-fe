@@ -11,3 +11,4 @@ export { LanguageSwitcher, type LanguageSwitcherProps } from './LanguageSwitcher
 export { BaseDrawer, DrawerBody, DrawerFooter, type BaseDrawerProps } from './BaseDrawer';
 export { LoadingSpinner } from './LoadingSpinner';
 export { AuthHeader, AuthButtons } from './AuthHeader';
+export { BetaBadge } from './BetaBadge';

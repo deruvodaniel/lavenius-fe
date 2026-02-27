@@ -4,6 +4,7 @@ import { User, Camera, Mail, Phone, FileText, Award, Save, X } from 'lucide-reac
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useUser } from '@clerk/clerk-react';
 import { toast } from 'sonner';
 
 // ============================================================================
@@ -14,6 +15,7 @@ const PROFILE_KEY = 'lavenius_profile';
 
 interface ProfileData {
   avatarUrl?: string;
+  licenseNumber?: string;
   specialty?: string;
   bio?: string;
   phone?: string;
@@ -28,6 +30,7 @@ interface ProfileData {
 
 const defaultProfile: ProfileData = {
   avatarUrl: '',
+  licenseNumber: '',
   specialty: '',
   bio: '',
   phone: '',
@@ -142,7 +145,14 @@ const InputField = ({ label, value, onChange, placeholder, type = 'text', icon: 
 export function Perfil() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [profile, setProfile] = useState<ProfileData>(loadProfile);
+  const { user: clerkUser } = useUser();
+  const [profile, setProfile] = useState<ProfileData>(() => {
+    const stored = loadProfile();
+    return {
+      ...stored,
+      licenseNumber: stored.licenseNumber || user?.licenseNumber || '',
+    };
+  });
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -164,10 +174,20 @@ export function Perfil() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasChanges]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
     try {
       saveProfile(profile);
+
+      if (clerkUser && profile.licenseNumber !== user?.licenseNumber) {
+        await clerkUser.update({
+          unsafeMetadata: {
+            ...clerkUser.unsafeMetadata,
+            licenseNumber: profile.licenseNumber?.trim(),
+          },
+        });
+      }
+
       setHasChanges(false);
       toast.success(t('profile.messages.saveSuccess'));
     } catch {
@@ -264,9 +284,9 @@ export function Perfil() {
                     {profile.specialty}
                   </p>
                 )}
-                {user?.licenseNumber && (
+                {(profile.licenseNumber || user?.licenseNumber) && (
                   <p className="text-indigo-200 text-xs mt-1">
-                    Matricula: {user.licenseNumber}
+                    {t('profile.professional.licenseNumber')}: {profile.licenseNumber || user?.licenseNumber}
                   </p>
                 )}
               </div>
@@ -283,6 +303,14 @@ export function Perfil() {
           description={t('profile.professional.description')}
         >
           <div className="space-y-4">
+            <InputField
+              label={t('profile.professional.licenseNumber')}
+              value={profile.licenseNumber || ''}
+              onChange={(v) => updateProfile('licenseNumber', v)}
+              placeholder={t('profile.professional.licenseNumberPlaceholder')}
+              icon={Award}
+              id="profile-license"
+            />
             <InputField
               label={t('profile.professional.specialty')}
               value={profile.specialty || ''}

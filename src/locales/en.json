@@ -63,6 +63,10 @@
     },
     "done": "Done"
   },
+  "beta": {
+    "description": "This product is in beta",
+    "label": "Beta"
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "agenda": "Schedule",
@@ -74,7 +78,8 @@
     "help": "Help",
     "logout": "Log out",
     "collapseSidebar": "Collapse sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "userMenu": "User menu"
   },
   "auth": {
     "login": "Log in",
@@ -234,8 +239,13 @@
       "table": "Table"
     },
     "filters": {
+      "activeCount": "{{count}} active",
       "clearFilters": "Clear filters",
-      "onlyWithSessionsThisWeek": "Only with sessions this week"
+      "label": "Filters",
+      "onlyWithSessionsThisWeek": "Only with sessions this week",
+      "sortBy": "Sort by",
+      "title": "Filters",
+      "viewMode": "View"
     },
     "table": {
       "patient": "Patient",
@@ -627,6 +637,7 @@
     "selectLanguage": "Select language",
     "languageChanged": "Language changed successfully",
     "sections": {
+      "profile": "Profile",
       "general": "General",
       "notifications": "Notifications",
       "calendar": "Calendar",
@@ -771,7 +782,9 @@
       "specialtyPlaceholder": "E.g.: Clinical Psychologist, Cognitive-Behavioral Therapist...",
       "bio": "Description / Bio",
       "bioPlaceholder": "Tell your patients about yourself, your therapeutic approach and experience...",
-      "characters": "characters"
+      "characters": "characters",
+      "licenseNumber": "License Number",
+      "licenseNumberPlaceholder": "e.g. LIC 12345"
     },
     "contact": {
       "title": "Contact Information",

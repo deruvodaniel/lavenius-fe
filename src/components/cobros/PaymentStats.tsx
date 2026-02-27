@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils/dateFormatters';
 import { SkeletonStats } from '@/components/shared/Skeleton';
+import { SwipeableCards } from '@/components/analitica/DashboardComponents';
 import { TrendingUp, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 
 /**
@@ -24,9 +25,10 @@ interface PaymentTotals {
 interface PaymentStatsProps {
   totals: PaymentTotals | null;
   isLoading?: boolean;
+  isMobile?: boolean;
 }
 
-export const PaymentStats = ({ totals, isLoading }: PaymentStatsProps) => {
+export const PaymentStats = ({ totals, isLoading, isMobile }: PaymentStatsProps) => {
   if (isLoading || !totals) {
     return <SkeletonStats cards={4} />;
   }
@@ -66,31 +68,41 @@ export const PaymentStats = ({ totals, isLoading }: PaymentStatsProps) => {
     },
   ];
 
+  const renderCard = (stat: typeof statCards[0]) => {
+    const Icon = stat.icon;
+    return (
+      <Card key={stat.label} className="p-3 sm:p-4 lg:p-6 bg-white">
+        <div className="flex items-start sm:items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
+              {stat.label}
+            </p>
+            <p className="text-lg sm:text-xl lg:text-2xl font-bold mt-1 sm:mt-2 truncate">
+              {formatCurrency(stat.value)}
+            </p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
+              {stat.count} {stat.count === 1 ? 'pago' : 'pagos'}
+            </p>
+          </div>
+          <div className={`${stat.bgColor} p-2 sm:p-3 rounded-full flex-shrink-0`}>
+            <Icon className={`h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 ${stat.color}`} />
+          </div>
+        </div>
+      </Card>
+    );
+  };
+
+  if (isMobile) {
+    return (
+      <SwipeableCards>
+        {statCards.map(renderCard)}
+      </SwipeableCards>
+    );
+  }
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-      {statCards.map((stat) => {
-        const Icon = stat.icon;
-        return (
-          <Card key={stat.label} className="p-3 sm:p-4 lg:p-6 bg-white">
-            <div className="flex items-start sm:items-center justify-between gap-2">
-              <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
-                  {stat.label}
-                </p>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold mt-1 sm:mt-2 truncate">
-                  {formatCurrency(stat.value)}
-                </p>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
-                  {stat.count} {stat.count === 1 ? 'pago' : 'pagos'}
-                </p>
-              </div>
-              <div className={`${stat.bgColor} p-2 sm:p-3 rounded-full flex-shrink-0`}>
-                <Icon className={`h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 ${stat.color}`} />
-              </div>
-            </div>
-          </Card>
-        );
-      })}
+      {statCards.map(renderCard)}
     </div>
   );
 };
