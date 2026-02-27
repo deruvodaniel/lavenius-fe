@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmDialog } from '@/components/shared';
 import { Trash2, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
+import { getNameInitials } from '@/lib/utils/nameInitials';
 import type { Payment } from '@/lib/types/api.types';
 import { PaymentStatus } from '@/lib/types/api.types';
 
@@ -78,7 +79,7 @@ export const PaymentCard = ({ payment, onMarkAsPaid, onDelete }: PaymentCardProp
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
                   <span className="text-indigo-600 text-xs font-semibold">
-                    {patientName.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                    {getNameInitials(patientName)}
                   </span>
                 </div>
                 <span className="text-sm font-medium">{patientName}</span>

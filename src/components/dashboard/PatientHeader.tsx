@@ -6,6 +6,7 @@
 import { useTranslation } from 'react-i18next';
 import { User, Heart, RefreshCw, Flag, Pencil } from 'lucide-react';
 import type { Patient } from '@/lib/types/api.types';
+import { getNameInitials } from '@/lib/utils/nameInitials';
 
 interface PatientHeaderProps {
   patient: Patient;
@@ -42,10 +43,7 @@ export function PatientHeader({
 }: PatientHeaderProps) {
   const { t } = useTranslation();
 
-  const initials = `${patient.firstName} ${patient.lastName}`
-    .split(' ')
-    .map((n) => n[0])
-    .join('');
+  const initials = getNameInitials(`${patient.firstName} ${patient.lastName || ''}`);
 
   return (
     <div className={`bg-gradient-to-r ${isFlagged ? 'from-red-900 to-red-700' : 'from-indigo-900 to-indigo-700'} text-white rounded-lg p-4 md:p-6 lg:p-8 mb-6 transition-colors`}>

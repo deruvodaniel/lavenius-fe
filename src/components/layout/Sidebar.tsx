@@ -7,6 +7,7 @@ import { ConfirmDialog, BetaBadge } from '@/components/shared';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/components/ui/utils';
+import { getNameInitials } from '@/lib/utils/nameInitials';
 
 interface SidebarProps {
   currentPath: string;
@@ -20,12 +21,15 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
   const { t } = useTranslation();
   const { user } = useAuth();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleNavClick = () => {
     onNavigate?.(); // Cerrar drawer en mobile
   };
 
   const handleLogoutClick = () => {
+    // Close popover first to avoid side animation overlap, then open centered confirm dialog
+    setIsUserMenuOpen(false);
     setShowLogoutConfirm(true);
   };
 
@@ -136,7 +140,7 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
         {/* User Menu Popover */}
         <div className="border-t border-indigo-800 transition-all duration-200 p-4">
           {user && (
-            <Popover>
+            <Popover open={isUserMenuOpen} onOpenChange={setIsUserMenuOpen}>
               <PopoverTrigger asChild>
                 <button
                   className={cn(
@@ -160,7 +164,7 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
                         'text-white font-semibold',
                         collapsed ? 'text-[10px]' : 'text-sm'
                       )}>
-                        {user.firstName.charAt(0).toUpperCase()}{user.lastName.charAt(0).toUpperCase()}
+                        {getNameInitials(`${user.firstName} ${user.lastName || ''}`, 'U')}
                       </span>
                     )}
                   </div>

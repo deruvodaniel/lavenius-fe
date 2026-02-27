@@ -151,7 +151,10 @@ export function OnboardingModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md !bg-white p-0 gap-0 overflow-hidden">
+      <DialogContent
+        showCloseButton={false}
+        className="w-[calc(100%-1rem)] sm:max-w-md !bg-white p-0 gap-0 overflow-hidden flex flex-col max-h-[calc(100dvh-1rem)] sm:max-h-[90vh]"
+      >
         {/* Close button */}
         <button
           onClick={handleSkip}
@@ -162,15 +165,15 @@ export function OnboardingModal({
         </button>
 
         {/* Content */}
-        <div className="pt-8 pb-4">
+        <div className="pt-7 sm:pt-8 pb-3 sm:pb-4 overflow-y-auto min-h-0">
           {renderStep()}
         </div>
 
         {/* Progress & Navigation */}
-        <div className="border-t border-gray-100 px-6 py-4 bg-gray-50">
+        <div className="border-t border-gray-100 px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
           <div className="flex items-center justify-between">
             {/* Back button */}
-            <div className="w-24">
+            <div className="w-20 sm:w-24">
               {currentStep > 0 && (
                 <button
                   onClick={handlePrev}
@@ -189,7 +192,7 @@ export function OnboardingModal({
             />
 
             {/* Next/Finish button */}
-            <div className="w-24 flex justify-end">
+            <div className="w-20 sm:w-24 flex justify-end">
               {currentStep < totalSteps - 1 ? (
                 <button
                   onClick={handleNext}

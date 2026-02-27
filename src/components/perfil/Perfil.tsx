@@ -1,11 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Camera, Mail, Phone, FileText, Award, Save, X } from 'lucide-react';
+import { User, Camera, Mail, Phone, FileText, Award, X } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { getNameInitials } from '@/lib/utils/nameInitials';
 import { useUser } from '@clerk/clerk-react';
 import { toast } from 'sonner';
+
+export interface PerfilHandle {
+  save: () => Promise<void>;
+}
+
+interface PerfilProps {
+  onStateChange?: (state: { hasChanges: boolean; isSaving: boolean }) => void;
+}
 
 // ============================================================================
 // PROFILE STORAGE
@@ -142,7 +150,7 @@ const InputField = ({ label, value, onChange, placeholder, type = 'text', icon: 
 // MAIN COMPONENT
 // ============================================================================
 
-export function Perfil() {
+export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ onStateChange }, ref) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { user: clerkUser } = useUser();
@@ -155,6 +163,11 @@ export function Perfil() {
   });
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Notify parent of state changes
+  useEffect(() => {
+    onStateChange?.({ hasChanges, isSaving });
+  }, [hasChanges, isSaving, onStateChange]);
 
   // Update a profile field and mark as changed
   const updateProfile = <K extends keyof ProfileData>(key: K, value: ProfileData[K]) => {
@@ -197,6 +210,11 @@ export function Perfil() {
     }
   };
 
+  // Expose save to parent (Configuracion) via ref
+  useImperativeHandle(ref, () => ({
+    save: handleSave,
+  }));
+
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -213,8 +231,8 @@ export function Perfil() {
     updateProfile('avatarUrl', '');
   };
 
-  const initials = user 
-    ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase()
+  const initials = user
+    ? getNameInitials(`${user.firstName} ${user.lastName || ''}`, 'U')
     : 'U';
 
   return (
@@ -421,21 +439,7 @@ export function Perfil() {
           </div>
         </ProfileSection>
 
-        {/* Save Button */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
-          {hasChanges && (
-            <span className="text-sm text-amber-600">{t('profile.save.unsavedChanges')}</span>
-          )}
-          <Button 
-            onClick={handleSave}
-            disabled={!hasChanges || isSaving}
-            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {isSaving ? t('profile.save.saving') : t('profile.save.saveChanges')}
-          </Button>
-        </div>
       </div>
     </div>
   );
-}
+});

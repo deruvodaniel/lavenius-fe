@@ -5,6 +5,7 @@ export { AnimatedSection, AnimatedList } from './AnimatedSection';
 export { NotFound } from './NotFound';
 export { ErrorBoundary } from './ErrorBoundary';
 export { ConfirmDialog, type ConfirmDialogVariant } from './ConfirmDialog';
+export { CalendarRequiredDialog } from './CalendarRequiredDialog';
 export { SimplePagination } from './SimplePagination';
 export { InfiniteScrollLoader } from './InfiniteScrollLoader';
 export { LanguageSwitcher, type LanguageSwitcherProps } from './LanguageSwitcher';

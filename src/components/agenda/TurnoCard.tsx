@@ -11,6 +11,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { SESSION_STATUS_BORDER_CLASSES } from '@/lib/constants/sessionColors';
 import type { SessionResponse, SessionStatus } from '@/lib/types/session';
+import { getNameInitials } from '@/lib/utils/nameInitials';
 
 // ============================================================================
 // TYPES
@@ -100,17 +101,7 @@ export function TurnoCard({
   const statusLabel = t(`agenda.status.${statusKey}`);
   const isRemote = session.sessionType === 'remote';
   
-  // Get patient initials
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .slice(0, 2)
-      .toUpperCase();
-  };
-  
-  const initials = patient ? getInitials(patient.nombre) : '?';
+  const initials = patient ? getNameInitials(patient.nombre) : '?';
   const patientName = patient?.nombre || t('agenda.details.noPatient');
 
   return (

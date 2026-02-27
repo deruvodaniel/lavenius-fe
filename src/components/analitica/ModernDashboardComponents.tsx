@@ -11,6 +11,7 @@ import { TrendingUp, TrendingDown, Clock } from 'lucide-react';
 // height change causes scroll position to bounce around the threshold.
 // ============================================================================
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useScrollPosition(collapseThreshold = 50, expandThreshold = 20): boolean {
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -362,7 +363,7 @@ export function CompactHeader({
         className
       )}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+      <div className="flex items-start sm:items-center justify-between gap-2 sm:gap-4">
         <div className={cn('transition-all duration-300', isScrolled && 'flex items-center gap-3')}>
           {!isScrolled && (
             <p className="text-indigo-200 text-sm font-medium mb-1">
@@ -378,7 +379,7 @@ export function CompactHeader({
         </div>
         {actions && (
           <div className={cn(
-            'transition-all duration-300',
+            'transition-all duration-300 self-end sm:self-auto',
             isScrolled && 'flex-shrink-0'
           )}>
             {actions}
