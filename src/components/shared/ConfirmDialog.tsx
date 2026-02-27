@@ -1,4 +1,6 @@
 import { AlertTriangle, Info, HelpCircle, Trash2, LucideIcon } from 'lucide-react';
+import { useResponsive } from '@/lib/hooks';
+import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -9,6 +11,14 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+} from '@/components/ui/drawer';
 
 export type ConfirmDialogVariant = 'danger' | 'warning' | 'info' | 'default';
 
@@ -62,8 +72,7 @@ const variantConfig: Record<ConfirmDialogVariant, {
 /**
  * ConfirmDialog - Responsive confirmation dialog
  * 
- * Uses AlertDialog with CSS-based responsive styling.
- * On mobile it appears as a bottom sheet style, on desktop as centered modal.
+ * Uses AlertDialog with centered modal positioning across breakpoints.
  */
 export function ConfirmDialog({
   open,
@@ -78,6 +87,7 @@ export function ConfirmDialog({
   isLoading = false,
   icon,
 }: ConfirmDialogProps) {
+  const { isMobile } = useResponsive();
   const config = variantConfig[variant];
   const Icon = icon || config.icon;
 
@@ -91,14 +101,48 @@ export function ConfirmDialog({
     onOpenChange(false);
   };
 
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerContent className="max-h-[75vh] bg-white">
+          <DrawerHeader className="text-left border-b border-gray-100">
+            <div className="flex items-start gap-4">
+              <div className={`w-12 h-12 rounded-full ${config.iconBg} flex items-center justify-center shrink-0`}>
+                <Icon className={`w-6 h-6 ${config.iconColor}`} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <DrawerTitle className="text-gray-900">{title}</DrawerTitle>
+                <DrawerDescription className="mt-1 text-gray-600">
+                  {description}
+                </DrawerDescription>
+              </div>
+            </div>
+          </DrawerHeader>
+          <DrawerFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isLoading}
+              className="border-gray-300 text-gray-700 hover:bg-gray-50 w-full"
+            >
+              {cancelLabel}
+            </Button>
+            <Button
+              onClick={handleConfirm}
+              disabled={isLoading}
+              className={`${config.confirmButton} w-full`}
+            >
+              {isLoading ? 'Procesando...' : confirmLabel}
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="bg-white max-w-[calc(100%-2rem)] sm:max-w-lg fixed bottom-0 sm:bottom-auto sm:top-[50%] left-[50%] translate-x-[-50%] translate-y-0 sm:translate-y-[-50%] rounded-t-xl sm:rounded-lg rounded-b-none sm:rounded-b-lg">
-        {/* Mobile handle bar - only visible on mobile */}
-        <div className="flex justify-center pt-1 pb-2 sm:hidden">
-          <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
-        </div>
-        
+      <AlertDialogContent className="z-[90] bg-white max-w-[calc(100%-2rem)] sm:max-w-lg">
         <AlertDialogHeader>
           <div className="flex items-start gap-4">
             <div className={`w-12 h-12 rounded-full ${config.iconBg} flex items-center justify-center shrink-0`}>

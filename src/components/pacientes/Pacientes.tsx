@@ -749,7 +749,7 @@ export function Pacientes() {
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <div className="w-9 h-9 aspect-square bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
                             <span className="text-indigo-600 text-xs font-semibold">
                               {getNameInitials(paciente.nombre)}
                             </span>
@@ -845,7 +845,7 @@ export function Pacientes() {
                   className="flex items-center gap-3 cursor-pointer flex-1"
                   onClick={() => handleSelectPatient(paciente.id)}
                 >
-                  <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 aspect-square bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-indigo-600">
                       {getNameInitials(paciente.nombre)}
                     </span>

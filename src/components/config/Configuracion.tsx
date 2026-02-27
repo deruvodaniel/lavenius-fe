@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, Globe, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
 import { useSearchParams } from 'react-router-dom';
 import { LanguageSwitcher, BetaBadge } from '@/components/shared';
-import { Perfil } from '@/components/perfil/Perfil';
+import { Perfil, type PerfilHandle } from '@/components/perfil/Perfil';
 import { User } from 'lucide-react';
 import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
 import { type DayOffConfig, type DayOffSetting } from '@/lib/types/setting.types';
@@ -326,6 +326,16 @@ export function Configuracion() {
     return 'profile';
   });
   
+  // Profile ref for save delegation + state tracking
+  const perfilRef = useRef<PerfilHandle>(null);
+  const [profileHasChanges, setProfileHasChanges] = useState(false);
+  const [profileIsSaving, setProfileIsSaving] = useState(false);
+
+  const handleProfileStateChange = useCallback((state: { hasChanges: boolean; isSaving: boolean }) => {
+    setProfileHasChanges(state.hasChanges);
+    setProfileIsSaving(state.isSaving);
+  }, []);
+
   // Load localStorage settings on mount (for working hours, templates, etc.)
   const [localSettings, setLocalSettings] = useState<LocalSettings>(loadLocalSettings);
   const [hasChanges, setHasChanges] = useState(false);
@@ -445,7 +455,12 @@ export function Configuracion() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasChanges, hasReminderChanges]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // When on profile tab, delegate save to Perfil component
+    if (activeSection === 'profile' && perfilRef.current) {
+      await perfilRef.current.save();
+      return;
+    }
     setIsSaving(true);
     try {
       saveLocalSettings(localSettings);
@@ -652,7 +667,7 @@ export function Configuracion() {
           {/* SECTION: Profile */}
           {/* ============================================ */}
           {activeSection === 'profile' && (
-            <Perfil />
+            <Perfil ref={perfilRef} onStateChange={handleProfileStateChange} />
           )}
 
           {/* ============================================ */}
@@ -1152,16 +1167,18 @@ export function Configuracion() {
       {/* ============================================ */}
       <div className="flex-shrink-0 bg-white border-t border-gray-200 px-4 md:px-6 lg:px-8 py-4">
         <div className="max-w-6xl ml-auto flex items-center justify-end gap-3">
-          {hasChanges && (
+          {(activeSection === 'profile' ? profileHasChanges : hasChanges) && (
             <span className="text-sm text-amber-600">{t('common.unsavedChanges')}</span>
           )}
-          <Button 
+          <Button
             onClick={handleSave}
-            disabled={!hasChanges || isSaving}
+            disabled={activeSection === 'profile'
+              ? !profileHasChanges || profileIsSaving
+              : !hasChanges || isSaving}
             className="bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save className="w-4 h-4 mr-2" />
-            {isSaving ? t('common.saving') : t('common.save')}
+            {(activeSection === 'profile' ? profileIsSaving : isSaving) ? t('common.saving') : t('common.save')}
           </Button>
         </div>
       </div>

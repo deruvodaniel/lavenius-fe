@@ -410,7 +410,11 @@
       "syncing": "Sincronizando...",
       "connectTitle": "Conecte seu Google Calendar",
       "connectDescription": "Sincronize suas consultas com o Google Calendar para receber lembretes e seus pacientes receberem convites automáticos.",
-      "connectNow": "Conectar agora"
+      "connectNow": "Conectar agora",
+      "modalTitle": "Conecte seu calendário",
+      "modalDescription": "Para criar e gerenciar sessões, você precisa conectar seu Google Calendar primeiro. Isso permite a sincronização automática de seus compromissos.",
+      "later": "Lembrar mais tarde",
+      "requiredToast": "Conecte seu Google Calendar para criar sessões"
     },
     "drawer": {
       "selectPatient": "Selecionar paciente...",
@@ -468,6 +472,15 @@
       "scheduled": "Agendada",
       "confirmed": "Confirmada",
       "completed": "Concluída"
+    },
+    "duration": {
+      "label": "Duração",
+      "thirtyMin": "30 min",
+      "fortyFiveMin": "45 min",
+      "oneHour": "1 hora",
+      "ninetyMin": "1,5 horas",
+      "twoHours": "2 horas",
+      "custom": "Personalizado"
     }
   },
   "payments": {
@@ -807,6 +820,12 @@
       "passwordChanged": "Senha alterada com sucesso",
       "saveSuccess": "Perfil salvo com sucesso",
       "saveError": "Erro ao salvar o perfil"
+    },
+    "share": {
+      "copyLink": "Copiar link do perfil",
+      "copied": "Link copiado!",
+      "publicProfile": "Perfil público",
+      "comingSoon": "Perfil público completo em breve"
     }
   },
   "analytics": {
@@ -994,22 +1013,43 @@
           "welcome": {
             "title": "Bem-vindo ao Lavenius",
             "content": "**Bem-vindo ao Lavenius!**\n\nO Lavenius é sua plataforma completa para gerenciar sua prática terapêutica de forma simples e organizada.\n\n**O que você pode fazer com o Lavenius?**\n\n- **Gerenciar pacientes:** Registre informações de contato, histórico clínico e anotações de sessão\n- **Agendar consultas:** Organize seu calendário com sessões presenciais ou remotas\n- **Controlar cobranças:** Mantenha um registro de pagamentos pendentes e realizados\n- **Sincronizar calendário:** Conecte com o Google Calendar para receber lembretes\n- **Analisar métricas:** Visualize estatísticas do seu consultório\n\n**Dica:** Use o menu lateral para navegar entre as diferentes seções do aplicativo.",
-            "tags": ["bem-vindo", "início", "introdução", "começar"]
+            "tags": [
+              "bem-vindo",
+              "início",
+              "introdução",
+              "começar"
+            ]
           },
           "createAccount": {
             "title": "Criar sua conta",
             "content": "**Registro no Lavenius**\n\nCriar sua conta é rápido e fácil:\n\n1. Clique em **\"Começar grátis\"** na página inicial\n2. Digite seu endereço de email\n3. Crie uma senha segura\n4. Verifique seu email (se necessário)\n5. Pronto! Você já pode fazer login\n\n**Dados da conta:**\n\nSua conta inclui:\n- Nome e sobrenome\n- Endereço de email (para login)\n- Foto de perfil (opcional)\n\n**Nota:** O Lavenius usa autenticação segura para proteger sua conta.",
-            "tags": ["conta", "registro", "criar", "login"]
+            "tags": [
+              "conta",
+              "registro",
+              "criar",
+              "login"
+            ]
           },
           "completeProfile": {
             "title": "Completar seu perfil profissional",
             "content": "**Configuração do Perfil**\n\nApós criar sua conta, vamos guiá-lo para completar seu perfil profissional:\n\n**Passo 1: Informações Profissionais**\n- Número de registro profissional (obrigatório)\n- Especialidade\n\n**Passo 2: Informações de Contato**\n- Telefone principal\n- Telefone alternativo\n- Endereço do consultório\n\n**Passo 3: Presença Online**\n- Site\n- Instagram\n- LinkedIn\n- Bio profissional\n\n**Dica:** Você pode editar essas informações a qualquer momento na seção **Perfil** no menu lateral.\n\n**Por que isso é importante?**\n\nSeu registro profissional nos ajuda a verificar sua prática e personalizar sua experiência na plataforma.",
-            "tags": ["perfil", "registro", "configurar", "dados profissionais", "onboarding"]
+            "tags": [
+              "perfil",
+              "registro",
+              "configurar",
+              "dados profissionais",
+              "onboarding"
+            ]
           },
           "firstSteps": {
             "title": "Primeiros passos recomendados",
             "content": "**Por onde começar?**\n\nRecomendamos seguir estes passos para aproveitar ao máximo o Lavenius:\n\n**1. Registre seu primeiro paciente**\n- Vá para **Pacientes** no menu lateral\n- Clique em **\"Novo Paciente\"**\n- Preencha os dados básicos (nome, telefone, email)\n\n**2. Agende sua primeira sessão**\n- Vá para **Agenda** no menu lateral\n- Clique em **\"Nova Consulta\"**\n- Selecione o paciente e escolha data/hora\n\n**3. Conecte o Google Calendar (opcional)**\n- Vá para **Configurações**\n- Na seção \"Calendário\", conecte sua conta Google\n- Suas consultas serão sincronizadas automaticamente\n\n**4. Configure seu horário de trabalho**\n- Em **Configurações**, defina seus dias e horários de trabalho\n- Isso ajudará a organizar melhor sua agenda\n\n**Precisa de ajuda?**\n\nExplore as outras seções da Central de Ajuda para aprender sobre cada funcionalidade em detalhes.",
-            "tags": ["primeiros passos", "começar", "tutorial", "guia"]
+            "tags": [
+              "primeiros passos",
+              "começar",
+              "tutorial",
+              "guia"
+            ]
           }
         }
       },
@@ -1020,17 +1060,33 @@
           "createSession": {
             "title": "Criar uma nova consulta",
             "content": "Para criar uma nova consulta:\n\n1. Vá para a seção **Agenda** no menu lateral\n2. Clique no botão **\"Nova Consulta\"**\n3. Selecione o paciente da lista\n4. Escolha a data e hora\n5. Selecione a modalidade (presencial ou remoto)\n6. Clique em **\"Salvar\"**\n\n**Dica:** Você também pode criar consultas clicando diretamente no calendário.",
-            "tags": ["consulta", "criar", "agendar", "sessão"]
+            "tags": [
+              "consulta",
+              "criar",
+              "agendar",
+              "sessão"
+            ]
           },
           "editSession": {
             "title": "Editar ou cancelar uma consulta",
             "content": "Para editar uma consulta existente:\n\n1. Encontre a consulta na lista ou calendário\n2. Clique no ícone de **editar** (lápis)\n3. Modifique os dados necessários\n4. Salve as alterações\n\nPara cancelar uma consulta, altere o status para \"Cancelada\" no drawer de edição.",
-            "tags": ["consulta", "editar", "cancelar", "modificar"]
+            "tags": [
+              "consulta",
+              "editar",
+              "cancelar",
+              "modificar"
+            ]
           },
           "googleCalendar": {
             "title": "Conectar Google Calendar",
             "content": "Para sincronizar com o Google Calendar:\n\n1. Vá para **Configurações** no menu lateral\n2. Na seção \"Calendário\", clique em **\"Conectar Google Calendar\"**\n3. Autorize o aplicativo na janela popup\n4. Uma vez conectado, suas consultas serão sincronizadas automaticamente\n\n**Benefícios:**\n- Receba lembretes no seu celular\n- Seus pacientes recebem convites de calendário\n- Veja todos os seus eventos em um só lugar",
-            "tags": ["google", "calendar", "calendário", "sincronizar", "conectar"]
+            "tags": [
+              "google",
+              "calendar",
+              "calendário",
+              "sincronizar",
+              "conectar"
+            ]
           }
         }
       },
@@ -1041,17 +1097,32 @@
           "createPatient": {
             "title": "Registrar um novo paciente",
             "content": "Para registrar um novo paciente:\n\n1. Vá para a seção **Pacientes** no menu lateral\n2. Clique em **\"Novo Paciente\"**\n3. Preencha os dados pessoais (nome, email, telefone)\n4. Adicione informações adicionais (plano de saúde, frequência de sessões)\n5. Clique em **\"Salvar\"**\n\n**Dica:** Você pode adicionar anotações iniciais no campo de observações.",
-            "tags": ["paciente", "criar", "registrar", "novo"]
+            "tags": [
+              "paciente",
+              "criar",
+              "registrar",
+              "novo"
+            ]
           },
           "clinicalFile": {
             "title": "Usar a ficha clínica",
             "content": "A ficha clínica permite:\n\n- Ver o histórico completo do paciente\n- Registrar anotações de cada sessão\n- Consultar sessões passadas e futuras\n- Ver o status de pagamentos\n\nPara acessar, clique em **\"Ver ficha\"** no card do paciente ou em uma consulta na agenda.",
-            "tags": ["ficha", "clínica", "histórico", "anotações"]
+            "tags": [
+              "ficha",
+              "clínica",
+              "histórico",
+              "anotações"
+            ]
           },
           "searchPatients": {
             "title": "Pesquisar e filtrar pacientes",
             "content": "Você pode pesquisar pacientes de várias formas:\n\n1. **Pesquisa por nome:** Use a barra de pesquisa\n2. **Filtro por modalidade:** Presencial, remoto ou misto\n3. **Filtro por frequência:** Semanal, quinzenal ou mensal\n4. **Sessões esta semana:** Mostra apenas pacientes com consultas próximas\n\nOs filtros podem ser combinados para resultados mais específicos.",
-            "tags": ["pesquisar", "filtrar", "pacientes", "modalidade"]
+            "tags": [
+              "pesquisar",
+              "filtrar",
+              "pacientes",
+              "modalidade"
+            ]
           }
         }
       },
@@ -1062,17 +1133,32 @@
           "registerPayment": {
             "title": "Registrar um pagamento",
             "content": "Para registrar um pagamento:\n\n1. Vá para a seção **Cobranças** no menu lateral\n2. Encontre a sessão pendente na aba \"Pendentes\"\n3. Clique em **\"Receber\"**\n4. Confirme o valor e método de pagamento\n5. Salve o pagamento\n\n**Dica:** Você também pode registrar pagamentos diretamente na ficha do paciente.",
-            "tags": ["pagamento", "receber", "registrar", "dinheiro"]
+            "tags": [
+              "pagamento",
+              "receber",
+              "registrar",
+              "dinheiro"
+            ]
           },
           "paymentHistory": {
             "title": "Ver histórico de pagamentos",
             "content": "O histórico de pagamentos mostra:\n\n- Todos os pagamentos realizados\n- Data e valor de cada pagamento\n- Paciente associado\n- Descrição do pagamento\n\nVocê pode filtrar por intervalo de datas usando os filtros rápidos (semana, mês) ou selecionando datas personalizadas.",
-            "tags": ["histórico", "pagamentos", "ver", "filtrar"]
+            "tags": [
+              "histórico",
+              "pagamentos",
+              "ver",
+              "filtrar"
+            ]
           },
           "sendReminder": {
             "title": "Enviar lembrete de pagamento",
             "content": "Para enviar um lembrete:\n\n1. Na aba \"Pendentes\", encontre a sessão\n2. Clique em **\"Lembrete\"**\n3. Revise a mensagem predefinida (você pode editá-la)\n4. Escolha enviar por WhatsApp ou copiar a mensagem\n\nA mensagem inclui automaticamente os dados da sessão e o valor.",
-            "tags": ["lembrete", "whatsapp", "mensagem", "receber"]
+            "tags": [
+              "lembrete",
+              "whatsapp",
+              "mensagem",
+              "receber"
+            ]
           }
         }
       },
@@ -1083,12 +1169,23 @@
           "profile": {
             "title": "Editar seu perfil",
             "content": "Seu perfil tem duas partes:\n\n**Dados da conta (gerenciados pelo Clerk)**\n- Nome e sobrenome\n- Foto de perfil\n- Email e senha\n\nPara editar esses dados, clique no seu avatar e selecione **\"Gerenciar conta\"**.\n\n**Dados profissionais**\n\nPara editar suas informações profissionais:\n\n1. Vá para a seção **Perfil** no menu lateral\n2. Modifique seus dados (registro, especialidade, telefones, etc.)\n3. Clique em **\"Salvar Alterações\"**\n\nOs dados profissionais incluem: número de registro, especialidade, telefones de contato, endereço do consultório, redes sociais e bio.",
-            "tags": ["perfil", "editar", "dados", "conta", "clerk"]
+            "tags": [
+              "perfil",
+              "editar",
+              "dados",
+              "conta",
+              "clerk"
+            ]
           },
           "calendarConfig": {
             "title": "Configurar calendário",
             "content": "Na seção de Configurações você pode:\n\n- Conectar ou desconectar o Google Calendar\n- Ver o status da sincronização\n- Forçar uma sincronização manual\n\nA sincronização é bidirecional: as alterações no Lavenius aparecem no seu Google Calendar e vice-versa.",
-            "tags": ["calendário", "configurar", "google", "sincronizar"]
+            "tags": [
+              "calendário",
+              "configurar",
+              "google",
+              "sincronizar"
+            ]
           }
         }
       }

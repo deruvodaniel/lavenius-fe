@@ -85,11 +85,13 @@ export function EmptyState({ icon: Icon, title, variant = 'neutral', className }
 
 interface SwipeableCardsProps {
   children: React.ReactNode[];
+  peek?: boolean;
 }
 
-export function SwipeableCards({ children }: SwipeableCardsProps) {
+export function SwipeableCards({ children, peek = false }: SwipeableCardsProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
@@ -142,14 +144,20 @@ export function SwipeableCards({ children }: SwipeableCardsProps) {
 
   // Scroll to current card
   useEffect(() => {
-    if (containerRef.current) {
-      const cardWidth = containerRef.current.offsetWidth;
+    if (containerRef.current && trackRef.current) {
+      const firstCard = trackRef.current.querySelector('[data-swipe-card]') as HTMLElement | null;
+      if (!firstCard) return;
+
+      const trackStyle = window.getComputedStyle(trackRef.current);
+      const gap = parseFloat(trackStyle.columnGap || trackStyle.gap || '0') || 0;
+      const targetLeft = currentIndex * (firstCard.offsetWidth + gap);
+
       containerRef.current.scrollTo({
-        left: currentIndex * cardWidth,
+        left: targetLeft,
         behavior: 'smooth'
       });
     }
-  }, [currentIndex]);
+  }, [currentIndex, peek]);
 
   if (totalCards === 0) return null;
   if (totalCards === 1) return <>{validChildren[0]}</>;
@@ -159,19 +167,23 @@ export function SwipeableCards({ children }: SwipeableCardsProps) {
       {/* Cards Container */}
       <div
         ref={containerRef}
-        className="overflow-hidden"
+        className="overflow-x-hidden overflow-y-visible"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        <div 
-          className="flex transition-transform duration-300 ease-out"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        <div
+          ref={trackRef}
+          className={cn('flex', peek ? 'gap-3 px-[7%]' : '')}
         >
           {validChildren.map((child, index) => (
             <div 
               key={index} 
-              className="w-full flex-shrink-0 px-1"
+              data-swipe-card
+              className={cn(
+                'flex-shrink-0',
+                peek ? 'w-[86%] pt-5 pb-4' : 'w-full px-1'
+              )}
             >
               {child}
             </div>

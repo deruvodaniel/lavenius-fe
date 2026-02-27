@@ -71,6 +71,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     monto: 8500,
   });
 
+  const [selectedDuration, setSelectedDuration] = useState(60); // minutes
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -164,6 +165,46 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       setFullPatientData(null);
     }
   }, [formData.pacienteId, loadFullPatientData]);
+
+  // Compute end time from start time + duration
+  const addMinutesToTime = (time: string, minutes: number): string => {
+    const [h, m] = time.split(':').map(Number);
+    const totalMin = h * 60 + m + minutes;
+    const newH = Math.floor(totalMin / 60) % 24;
+    const newM = totalMin % 60;
+    return `${newH.toString().padStart(2, '0')}:${newM.toString().padStart(2, '0')}`;
+  };
+
+  const handleStartTimeChange = (newStart: string) => {
+    const newEnd = addMinutesToTime(newStart, selectedDuration);
+    setFormData(prev => ({ ...prev, horaInicio: newStart, horaFin: newEnd }));
+  };
+
+  const handleDurationChange = (minutes: number) => {
+    setSelectedDuration(minutes);
+    const newEnd = addMinutesToTime(formData.horaInicio, minutes);
+    setFormData(prev => ({ ...prev, horaFin: newEnd }));
+  };
+
+  // Sync duration when editing an existing session
+  useEffect(() => {
+    if (session && formData.horaInicio && formData.horaFin) {
+      const [sh, sm] = formData.horaInicio.split(':').map(Number);
+      const [eh, em] = formData.horaFin.split(':').map(Number);
+      const diff = (eh * 60 + em) - (sh * 60 + sm);
+      if ([30, 45, 60, 90, 120].includes(diff)) {
+        setSelectedDuration(diff);
+      }
+    }
+  }, [session, formData.horaInicio, formData.horaFin]);
+
+  const durationOptions = [
+    { value: 30, labelKey: 'agenda.duration.thirtyMin' },
+    { value: 45, labelKey: 'agenda.duration.fortyFiveMin' },
+    { value: 60, labelKey: 'agenda.duration.oneHour' },
+    { value: 90, labelKey: 'agenda.duration.ninetyMin' },
+    { value: 120, labelKey: 'agenda.duration.twoHours' },
+  ];
 
   const isEditing = !!session;
   
@@ -339,40 +380,43 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
             />
           </div>
 
-          {/* Hora Inicio */}
-          <div>
-            <label htmlFor="turno-hora-inicio" className="flex items-center gap-2 text-gray-700 mb-2">
-              <Clock className="w-4 h-4" />
-              {t('agenda.fields.startTime')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
-            </label>
-            <select
-              id="turno-hora-inicio"
-              value={formData.horaInicio}
-              onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              {['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'].map((h) => (
-                <option key={h} value={h}>{h}</option>
-              ))}
-            </select>
-          </div>
+          {/* Start Time & Duration */}
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label htmlFor="turno-hora-inicio" className="flex items-center gap-2 text-gray-700 mb-2">
+                <Clock className="w-4 h-4" />
+                {t('agenda.fields.startTime')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
+              </label>
+              <select
+                id="turno-hora-inicio"
+                value={formData.horaInicio}
+                onChange={(e) => handleStartTimeChange(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                {['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'].map((h) => (
+                  <option key={h} value={h}>{h}</option>
+                ))}
+              </select>
+            </div>
 
-          {/* Hora Fin */}
-          <div>
-            <label htmlFor="turno-hora-fin" className="flex items-center gap-2 text-gray-700 mb-2">
-              <Clock className="w-4 h-4" />
-              {t('agenda.fields.endTime')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
-            </label>
-            <select
-              id="turno-hora-fin"
-              value={formData.horaFin}
-              onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              {['09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'].map((h) => (
-                <option key={h} value={h}>{h}</option>
-              ))}
-            </select>
+            <div className="flex-1">
+              <label htmlFor="turno-duration" className="flex items-center gap-2 text-gray-700 mb-2">
+                <Clock className="w-4 h-4" />
+                {t('agenda.duration.label')}
+              </label>
+              <select
+                id="turno-duration"
+                value={selectedDuration}
+                onChange={(e) => handleDurationChange(Number(e.target.value))}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                {durationOptions.map(({ value, labelKey }) => (
+                  <option key={value} value={value}>
+                    {addMinutesToTime(formData.horaInicio, value)} ({t(labelKey)})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Motivo */}

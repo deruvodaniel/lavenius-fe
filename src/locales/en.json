@@ -419,7 +419,11 @@
       "syncing": "Syncing...",
       "connectTitle": "Connect your Google Calendar",
       "connectDescription": "Sync your appointments with Google Calendar to receive reminders and have your patients receive automatic invitations.",
-      "connectNow": "Connect now"
+      "connectNow": "Connect now",
+      "modalTitle": "Connect your calendar",
+      "modalDescription": "To create and manage sessions, you need to connect your Google Calendar first. This allows automatic synchronization of your appointments.",
+      "later": "Remind me later",
+      "requiredToast": "Connect your Google Calendar to create sessions"
     },
     "drawer": {
       "selectPatient": "Select patient...",
@@ -477,6 +481,15 @@
       "scheduled": "Scheduled",
       "confirmed": "Confirmed",
       "completed": "Completed"
+    },
+    "duration": {
+      "label": "Duration",
+      "thirtyMin": "30 min",
+      "fortyFiveMin": "45 min",
+      "oneHour": "1 hour",
+      "ninetyMin": "1.5 hours",
+      "twoHours": "2 hours",
+      "custom": "Custom"
     }
   },
   "payments": {
@@ -816,6 +829,12 @@
       "passwordChanged": "Password changed successfully",
       "saveSuccess": "Profile saved successfully",
       "saveError": "Error saving profile"
+    },
+    "share": {
+      "copyLink": "Copy profile link",
+      "copied": "Link copied!",
+      "publicProfile": "Public profile",
+      "comingSoon": "Full public profile coming soon"
     }
   },
   "analytics": {
@@ -1003,22 +1022,43 @@
           "welcome": {
             "title": "Welcome to Lavenius",
             "content": "**Welcome to Lavenius!**\n\nLavenius is your comprehensive platform to manage your therapeutic practice in a simple and organized way.\n\n**What can you do with Lavenius?**\n\n- **Manage patients:** Record contact information, clinical history, and session notes\n- **Schedule appointments:** Organize your calendar with in-person or remote sessions\n- **Track billing:** Keep a record of pending and completed payments\n- **Sync calendar:** Connect with Google Calendar to receive reminders\n- **Analyze metrics:** View statistics of your practice\n\n**Tip:** Use the sidebar to navigate between the different sections of the application.",
-            "tags": ["welcome", "start", "introduction", "begin"]
+            "tags": [
+              "welcome",
+              "start",
+              "introduction",
+              "begin"
+            ]
           },
           "createAccount": {
             "title": "Create your account",
             "content": "**Registration in Lavenius**\n\nCreating your account is quick and easy:\n\n1. Click **\"Start for free\"** on the homepage\n2. Enter your email address\n3. Create a secure password\n4. Verify your email (if required)\n5. Done! You can now log in\n\n**Account information:**\n\nYour account includes:\n- First and last name\n- Email address (for login)\n- Profile picture (optional)\n\n**Note:** Lavenius uses secure authentication to protect your account.",
-            "tags": ["account", "registration", "create", "login"]
+            "tags": [
+              "account",
+              "registration",
+              "create",
+              "login"
+            ]
           },
           "completeProfile": {
             "title": "Complete your professional profile",
             "content": "**Profile Setup**\n\nAfter creating your account, we'll guide you to complete your professional profile:\n\n**Step 1: Professional Information**\n- Professional license number (required)\n- Specialty\n\n**Step 2: Contact Information**\n- Primary phone\n- Alternative phone\n- Office address\n\n**Step 3: Online Presence**\n- Website\n- Instagram\n- LinkedIn\n- Professional bio\n\n**Tip:** You can edit this information at any time from the **Profile** section in the sidebar.\n\n**Why is this important?**\n\nYour professional license helps us verify your practice and personalize your experience on the platform.",
-            "tags": ["profile", "license", "setup", "professional data", "onboarding"]
+            "tags": [
+              "profile",
+              "license",
+              "setup",
+              "professional data",
+              "onboarding"
+            ]
           },
           "firstSteps": {
             "title": "Recommended first steps",
             "content": "**Where to start?**\n\nWe recommend following these steps to get the most out of Lavenius:\n\n**1. Register your first patient**\n- Go to **Patients** in the sidebar\n- Click **\"New Patient\"**\n- Fill in the basic data (name, phone, email)\n\n**2. Schedule your first session**\n- Go to **Schedule** in the sidebar\n- Click **\"New Appointment\"**\n- Select the patient and choose date/time\n\n**3. Connect Google Calendar (optional)**\n- Go to **Settings**\n- In the \"Calendar\" section, connect your Google account\n- Your appointments will sync automatically\n\n**4. Set up your working hours**\n- In **Settings**, define your working days and hours\n- This will help organize your schedule better\n\n**Need help?**\n\nExplore the other sections of the Help Center to learn about each feature in detail.",
-            "tags": ["first steps", "start", "tutorial", "guide"]
+            "tags": [
+              "first steps",
+              "start",
+              "tutorial",
+              "guide"
+            ]
           }
         }
       },
@@ -1029,17 +1069,32 @@
           "createSession": {
             "title": "Create a new appointment",
             "content": "To create a new appointment:\n\n1. Go to the **Schedule** section from the sidebar\n2. Click the **\"New Appointment\"** button\n3. Select the patient from the list\n4. Choose the date and time\n5. Select the modality (in-person or remote)\n6. Click **\"Save\"**\n\n**Tip:** You can also create appointments by clicking directly on the calendar.",
-            "tags": ["appointment", "create", "schedule", "session"]
+            "tags": [
+              "appointment",
+              "create",
+              "schedule",
+              "session"
+            ]
           },
           "editSession": {
             "title": "Edit or cancel an appointment",
             "content": "To edit an existing appointment:\n\n1. Find the appointment in the list or calendar\n2. Click the **edit** icon (pencil)\n3. Modify the necessary data\n4. Save the changes\n\nTo cancel an appointment, change the status to \"Cancelled\" from the edit drawer.",
-            "tags": ["appointment", "edit", "cancel", "modify"]
+            "tags": [
+              "appointment",
+              "edit",
+              "cancel",
+              "modify"
+            ]
           },
           "googleCalendar": {
             "title": "Connect Google Calendar",
             "content": "To sync with Google Calendar:\n\n1. Go to **Settings** from the sidebar\n2. In the \"Calendar\" section, click **\"Connect Google Calendar\"**\n3. Authorize the application in the popup window\n4. Once connected, your appointments will sync automatically\n\n**Benefits:**\n- Receive reminders on your phone\n- Your patients receive calendar invitations\n- See all your events in one place",
-            "tags": ["google", "calendar", "sync", "connect"]
+            "tags": [
+              "google",
+              "calendar",
+              "sync",
+              "connect"
+            ]
           }
         }
       },
@@ -1050,17 +1105,32 @@
           "createPatient": {
             "title": "Register a new patient",
             "content": "To register a new patient:\n\n1. Go to the **Patients** section from the sidebar\n2. Click **\"New Patient\"**\n3. Fill in the personal data (name, email, phone)\n4. Add additional information (health insurance, session frequency)\n5. Click **\"Save\"**\n\n**Tip:** You can add initial notes in the observations field.",
-            "tags": ["patient", "create", "register", "new"]
+            "tags": [
+              "patient",
+              "create",
+              "register",
+              "new"
+            ]
           },
           "clinicalFile": {
             "title": "Using the clinical file",
             "content": "The clinical file allows you to:\n\n- View the complete patient history\n- Record notes for each session\n- View past and future sessions\n- See payment status\n\nTo access it, click **\"View file\"** from the patient card or from an appointment in the schedule.",
-            "tags": ["file", "clinical", "history", "notes"]
+            "tags": [
+              "file",
+              "clinical",
+              "history",
+              "notes"
+            ]
           },
           "searchPatients": {
             "title": "Search and filter patients",
             "content": "You can search for patients in several ways:\n\n1. **Search by name:** Use the search bar\n2. **Filter by modality:** In-person, remote, or mixed\n3. **Filter by frequency:** Weekly, biweekly, or monthly\n4. **Sessions this week:** Show only patients with upcoming appointments\n\nFilters can be combined for more specific results.",
-            "tags": ["search", "filter", "patients", "modality"]
+            "tags": [
+              "search",
+              "filter",
+              "patients",
+              "modality"
+            ]
           }
         }
       },
@@ -1071,17 +1141,32 @@
           "registerPayment": {
             "title": "Register a payment",
             "content": "To register a payment:\n\n1. Go to the **Billing** section from the sidebar\n2. Find the pending session in the \"Pending\" tab\n3. Click **\"Collect\"**\n4. Confirm the amount and payment method\n5. Save the payment\n\n**Tip:** You can also register payments directly from the patient file.",
-            "tags": ["payment", "collect", "register", "money"]
+            "tags": [
+              "payment",
+              "collect",
+              "register",
+              "money"
+            ]
           },
           "paymentHistory": {
             "title": "View payment history",
             "content": "The payment history shows:\n\n- All payments made\n- Date and amount of each payment\n- Associated patient\n- Payment description\n\nYou can filter by date range using quick filters (week, month) or by selecting custom dates.",
-            "tags": ["history", "payments", "view", "filter"]
+            "tags": [
+              "history",
+              "payments",
+              "view",
+              "filter"
+            ]
           },
           "sendReminder": {
             "title": "Send payment reminder",
             "content": "To send a reminder:\n\n1. In the \"Pending\" tab, find the session\n2. Click **\"Reminder\"**\n3. Review the predefined message (you can edit it)\n4. Choose to send via WhatsApp or copy the message\n\nThe message automatically includes the session data and amount.",
-            "tags": ["reminder", "whatsapp", "message", "collect"]
+            "tags": [
+              "reminder",
+              "whatsapp",
+              "message",
+              "collect"
+            ]
           }
         }
       },
@@ -1092,12 +1177,23 @@
           "profile": {
             "title": "Edit your profile",
             "content": "Your profile has two parts:\n\n**Account data (managed by Clerk)**\n- First and last name\n- Profile picture\n- Email and password\n\nTo edit this data, click your avatar and select **\"Manage account\"**.\n\n**Professional data**\n\nTo edit your professional information:\n\n1. Go to the **Profile** section from the sidebar\n2. Modify your data (license, specialty, phones, etc.)\n3. Click **\"Save Changes\"**\n\nProfessional data includes: license number, specialty, contact phones, office address, social media, and bio.",
-            "tags": ["profile", "edit", "data", "account", "clerk"]
+            "tags": [
+              "profile",
+              "edit",
+              "data",
+              "account",
+              "clerk"
+            ]
           },
           "calendarConfig": {
             "title": "Configure calendar",
             "content": "In the Settings section you can:\n\n- Connect or disconnect Google Calendar\n- View sync status\n- Force a manual sync\n\nSync is bidirectional: changes in Lavenius appear in your Google Calendar and vice versa.",
-            "tags": ["calendar", "configure", "google", "sync"]
+            "tags": [
+              "calendar",
+              "configure",
+              "google",
+              "sync"
+            ]
           }
         }
       }

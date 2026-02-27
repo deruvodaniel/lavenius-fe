@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { SwipeableCards } from '@/components/analitica/DashboardComponents';
 import {
   Accordion,
   AccordionContent,
@@ -247,22 +248,24 @@ function HeroSection() {
             
             <AnimatedSection animation="slide-up" delay={300} duration={500}>
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <Button 
-                  size="lg"
-                  onClick={() => navigate('/register')}
-                  className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
-                >
-                  {t('landing.hero.cta')}
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  onClick={() => navigate('/login')}
-                  className="w-full sm:w-auto px-8 py-6 text-lg border-2 hover:bg-gray-50"
-                >
-                  {t('landing.hero.hasAccount')}
-                </Button>
+                <SignUpButton mode="modal">
+                  <Button
+                    size="lg"
+                    className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
+                  >
+                    {t('landing.hero.cta')}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </SignUpButton>
+                <SignInButton mode="modal">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full sm:w-auto px-8 py-6 text-lg border-2 hover:bg-gray-50"
+                  >
+                    {t('landing.hero.hasAccount')}
+                  </Button>
+                </SignInButton>
               </div>
             </AnimatedSection>
             
@@ -1049,6 +1052,98 @@ function FAQSection() {
   );
 }
 
+interface PricingPlan {
+  id: string;
+  nameKey: string;
+  priceKey: string;
+  periodKey: string;
+  descriptionKey: string;
+  featuresKeys: string[];
+  notIncludedKeys: string[];
+  popular: boolean;
+  icon: LucideIcon;
+  color: string;
+}
+
+function PricingCard({ 
+  plan, 
+  t, 
+  compactMobile = false 
+}: { 
+  plan: PricingPlan; 
+  t: (key: string) => string;
+  compactMobile?: boolean;
+}) {
+  const visibleFeatures = compactMobile ? plan.featuresKeys.slice(0, 5) : plan.featuresKeys;
+
+  return (
+    <Card className={`relative border-0 shadow-lg hover:shadow-xl transition-all h-full flex flex-col ${
+      plan.popular
+        ? 'ring-2 ring-purple-500 bg-white scale-[1.01]'
+        : 'bg-white'
+    } ${
+      compactMobile ? 'min-h-[520px]' : ''
+    }`}>
+      {plan.popular && (
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+          <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-medium px-4 py-1 rounded-full shadow-lg">
+            {t('landing.pricing.popular')}
+          </span>
+        </div>
+      )}
+      <CardContent className={`flex flex-col h-full ${compactMobile ? 'p-5' : 'p-6'}`}>
+        <div className={`text-center ${compactMobile ? 'mb-4' : 'mb-6'}`}>
+          <div className={`mx-auto rounded-xl flex items-center justify-center ${compactMobile ? 'w-10 h-10 mb-3' : 'w-12 h-12 mb-4'} ${
+            plan.color === 'indigo' ? 'bg-indigo-100 text-indigo-600' :
+            plan.color === 'purple' ? 'bg-purple-100 text-purple-600' :
+            'bg-amber-100 text-amber-600'
+          }`}>
+            <plan.icon className={compactMobile ? 'w-5 h-5' : 'w-6 h-6'} />
+          </div>
+          <h3 className={`font-bold text-gray-900 mb-2 ${compactMobile ? 'text-lg' : 'text-xl'}`}>{t(plan.nameKey)}</h3>
+          <p className="text-gray-500 text-sm mb-3">{t(plan.descriptionKey)}</p>
+          <div className="flex items-baseline justify-center gap-1">
+            <span className={`${compactMobile ? 'text-3xl' : 'text-4xl'} font-bold text-gray-900`}>{t(plan.priceKey)}</span>
+            <span className="text-gray-500 text-sm">{t(plan.periodKey)}</span>
+          </div>
+        </div>
+        <div className="flex-1">
+          <ul className={`${compactMobile ? 'space-y-2.5 mb-4' : 'space-y-3 mb-6'}`}>
+            {visibleFeatures.map((featureKey, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-green-600" />
+                </div>
+                <span className="text-gray-600 text-sm">{t(featureKey)}</span>
+              </li>
+            ))}
+            {!compactMobile && plan.notIncludedKeys.map((featureKey, i) => (
+              <li key={`not-${i}`} className="flex items-start gap-3 opacity-50">
+                <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <X className="w-3 h-3 text-gray-400" />
+                </div>
+                <span className="text-gray-400 text-sm">{t(featureKey)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <SignUpButton mode="modal">
+          <Button
+            className={`w-full py-6 ${
+              plan.popular
+                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+            }`}
+          >
+            {t('landing.pricing.cta')}
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </SignUpButton>
+      </CardContent>
+    </Card>
+  );
+}
+
 function PricingSection() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -1137,88 +1232,27 @@ function PricingSection() {
           </div>
         </AnimatedSection>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Mobile: swipeable cards with arrows and indicators */}
+        <div className="md:hidden">
+          <SwipeableCards peek>
+            {plans.map((plan) => (
+              <div key={plan.id} className="w-full">
+                <PricingCard plan={plan} t={t} compactMobile />
+              </div>
+            ))}
+          </SwipeableCards>
+        </div>
+
+        {/* Desktop: grid */}
+        <div className="hidden md:grid grid-cols-3 gap-8">
           {plans.map((plan, index) => (
-            <AnimatedSection 
-              key={plan.id} 
-              animation="slide-up" 
-              delay={index * 150} 
+            <AnimatedSection
+              key={plan.id}
+              animation="slide-up"
+              delay={index * 150}
               duration={500}
             >
-              <Card className={`relative border-0 shadow-lg hover:shadow-xl transition-all h-full flex flex-col ${
-                plan.popular 
-                  ? 'ring-2 ring-purple-500 bg-white scale-[1.02]' 
-                  : 'bg-white'
-              }`}>
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-medium px-4 py-1 rounded-full shadow-lg">
-                      {t('landing.pricing.popular')}
-                    </span>
-                  </div>
-                )}
-                <CardContent className="p-6 flex flex-col h-full">
-                  {/* Header */}
-                  <div className="text-center mb-6">
-                    <div className={`w-12 h-12 mx-auto rounded-xl flex items-center justify-center mb-4 ${
-                      plan.color === 'indigo' ? 'bg-indigo-100 text-indigo-600' :
-                      plan.color === 'purple' ? 'bg-purple-100 text-purple-600' :
-                      'bg-amber-100 text-amber-600'
-                    }`}>
-                      <plan.icon className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                      {t(plan.nameKey)}
-                    </h3>
-                    <p className="text-gray-500 text-sm mb-4">
-                      {t(plan.descriptionKey)}
-                    </p>
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-bold text-gray-900">
-                        {t(plan.priceKey)}
-                      </span>
-                      <span className="text-gray-500 text-sm">
-                        {t(plan.periodKey)}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {/* Features */}
-                  <div className="flex-1">
-                    <ul className="space-y-3 mb-6">
-                      {plan.featuresKeys.map((featureKey, featureIndex) => (
-                        <li key={featureIndex} className="flex items-start gap-3">
-                          <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <Check className="w-3 h-3 text-green-600" />
-                          </div>
-                          <span className="text-gray-600 text-sm">{t(featureKey)}</span>
-                        </li>
-                      ))}
-                      {plan.notIncludedKeys.map((featureKey, featureIndex) => (
-                        <li key={`not-${featureIndex}`} className="flex items-start gap-3 opacity-50">
-                          <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <X className="w-3 h-3 text-gray-400" />
-                          </div>
-                          <span className="text-gray-400 text-sm">{t(featureKey)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  {/* CTA Button */}
-                  <Button
-                    onClick={() => navigate('/register')}
-                    className={`w-full py-6 ${
-                      plan.popular
-                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-                    }`}
-                  >
-                    {t('landing.pricing.cta')}
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </CardContent>
-              </Card>
+              <PricingCard plan={plan} t={t} />
             </AnimatedSection>
           ))}
         </div>
@@ -1264,23 +1298,25 @@ function CTASection() {
         </AnimatedSection>
         <AnimatedSection animation="slide-up" delay={300} duration={500}>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button 
-              size="lg"
-              variant="secondary"
-              onClick={() => navigate('/register')}
-              className="w-full sm:w-auto !bg-white !text-indigo-600 hover:!bg-indigo-50 px-8 py-6 text-lg shadow-lg"
-            >
-              {t('landing.cta.createAccount')}
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-            <Button 
-              size="lg"
-              variant="outline"
-              onClick={() => navigate('/login')}
-              className="w-full sm:w-auto px-8 py-6 text-lg !border-white/30 !text-white hover:!bg-white/10 !bg-transparent"
-            >
-              {t('landing.cta.login')}
-            </Button>
+            <SignUpButton mode="modal">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="w-full sm:w-auto !bg-white !text-indigo-600 hover:!bg-indigo-50 px-8 py-6 text-lg shadow-lg"
+              >
+                {t('landing.cta.createAccount')}
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </SignUpButton>
+            <SignInButton mode="modal">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto px-8 py-6 text-lg !border-white/30 !text-white hover:!bg-white/10 !bg-transparent"
+              >
+                {t('landing.cta.login')}
+              </Button>
+            </SignInButton>
           </div>
         </AnimatedSection>
       </div>

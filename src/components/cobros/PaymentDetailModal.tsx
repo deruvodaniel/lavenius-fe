@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, DollarSign, Calendar, FileText, User, Clock, CheckCircle2, AlertCircle, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useFocusTrap } from '@/lib/hooks/useFocusTrap';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import type { Payment } from '@/lib/types/api.types';
 import { PaymentStatus } from '@/lib/types/api.types';
 
@@ -122,23 +121,6 @@ export const PaymentDetailModal = ({
 }: PaymentDetailModalProps) => {
   const { t } = useTranslation();
   
-  // Focus trap
-  const containerRef = useFocusTrap<HTMLDivElement>({
-    isActive: true,
-    onEscape: onClose,
-    restoreFocus: true,
-  });
-
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
-  
   const patientName = payment.patient 
     ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
     : t('payments.noPatient');
@@ -148,23 +130,11 @@ export const PaymentDetailModal = ({
   const isPaid = payment.status === PaymentStatus.PAID;
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="payment-detail-title"
-    >
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      
-      {/* Modal/Bottom Sheet */}
-      <div 
-        ref={containerRef}
-        className="relative bg-white w-full sm:max-w-md sm:rounded-xl rounded-t-xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col"
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        showCloseButton={false}
+        aria-labelledby="payment-detail-title"
+        className="w-full sm:max-w-md !bg-white p-0 gap-0 rounded-xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col"
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 sm:p-5">
@@ -278,7 +248,7 @@ export const PaymentDetailModal = ({
             </Button>
           </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };

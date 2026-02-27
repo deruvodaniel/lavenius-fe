@@ -419,7 +419,11 @@
       "syncing": "Sincronizando...",
       "connectTitle": "Conecta tu Google Calendar",
       "connectDescription": "Sincroniza tus turnos con Google Calendar para recibir recordatorios y que tus pacientes reciban invitaciones automáticas.",
-      "connectNow": "Conectar ahora"
+      "connectNow": "Conectar ahora",
+      "modalTitle": "Conecta tu calendario",
+      "modalDescription": "Para crear y gestionar sesiones, necesitas conectar tu Google Calendar primero. Esto permite la sincronización automática de tus citas.",
+      "later": "Recordarme más tarde",
+      "requiredToast": "Conecta tu Google Calendar para crear sesiones"
     },
     "drawer": {
       "selectPatient": "Seleccionar paciente...",
@@ -477,6 +481,15 @@
       "scheduled": "Agendada",
       "confirmed": "Confirmada",
       "completed": "Completada"
+    },
+    "duration": {
+      "label": "Duración",
+      "thirtyMin": "30 min",
+      "fortyFiveMin": "45 min",
+      "oneHour": "1 hora",
+      "ninetyMin": "1.5 horas",
+      "twoHours": "2 horas",
+      "custom": "Personalizado"
     }
   },
   "payments": {
@@ -816,6 +829,12 @@
       "passwordChanged": "Contraseña cambiada exitosamente",
       "saveSuccess": "Perfil guardado correctamente",
       "saveError": "Error al guardar el perfil"
+    },
+    "share": {
+      "copyLink": "Copiar enlace del perfil",
+      "copied": "¡Enlace copiado!",
+      "publicProfile": "Perfil público",
+      "comingSoon": "Perfil público completo próximamente"
     }
   },
   "analytics": {
@@ -1003,22 +1022,43 @@
           "welcome": {
             "title": "Bienvenido a Lavenius",
             "content": "**¡Bienvenido a Lavenius!**\n\nLavenius es tu plataforma integral para gestionar tu práctica terapéutica de manera simple y organizada.\n\n**¿Qué puedes hacer con Lavenius?**\n\n- **Gestionar pacientes:** Registra información de contacto, historial clínico y notas de sesión\n- **Agendar turnos:** Organiza tu calendario con sesiones presenciales o remotas\n- **Controlar cobros:** Lleva un registro de pagos pendientes y realizados\n- **Sincronizar calendario:** Conecta con Google Calendar para recibir recordatorios\n- **Analizar métricas:** Visualiza estadísticas de tu consultorio\n\n**Tip:** Usa el menú lateral para navegar entre las diferentes secciones de la aplicación.",
-            "tags": ["bienvenido", "inicio", "introducción", "comenzar"]
+            "tags": [
+              "bienvenido",
+              "inicio",
+              "introducción",
+              "comenzar"
+            ]
           },
           "createAccount": {
             "title": "Crear tu cuenta",
             "content": "**Registro en Lavenius**\n\nCrear tu cuenta es rápido y sencillo:\n\n1. Haz clic en **\"Comenzar gratis\"** en la página de inicio\n2. Ingresa tu correo electrónico\n3. Crea una contraseña segura\n4. Verifica tu correo (si es necesario)\n5. ¡Listo! Ya puedes iniciar sesión\n\n**Datos de la cuenta:**\n\nTu cuenta incluye:\n- Nombre y apellido\n- Correo electrónico (para iniciar sesión)\n- Foto de perfil (opcional)\n\n**Nota:** Lavenius utiliza autenticación segura para proteger tu cuenta.",
-            "tags": ["cuenta", "registro", "crear", "iniciar sesión"]
+            "tags": [
+              "cuenta",
+              "registro",
+              "crear",
+              "iniciar sesión"
+            ]
           },
           "completeProfile": {
             "title": "Completar tu perfil profesional",
             "content": "**Configuración del Perfil**\n\nDespués de crear tu cuenta, te guiaremos para completar tu perfil profesional:\n\n**Paso 1: Información Profesional**\n- Matrícula profesional (requerida)\n- Especialidad\n\n**Paso 2: Información de Contacto**\n- Teléfono principal\n- Teléfono alternativo\n- Dirección del consultorio\n\n**Paso 3: Presencia Online**\n- Sitio web\n- Instagram\n- LinkedIn\n- Biografía profesional\n\n**Tip:** Puedes editar esta información en cualquier momento desde la sección **Perfil** en el menú lateral.\n\n**¿Por qué es importante?**\n\nTu matrícula profesional nos ayuda a verificar tu práctica y personalizar tu experiencia en la plataforma.",
-            "tags": ["perfil", "matrícula", "configurar", "datos profesionales", "onboarding"]
+            "tags": [
+              "perfil",
+              "matrícula",
+              "configurar",
+              "datos profesionales",
+              "onboarding"
+            ]
           },
           "firstSteps": {
             "title": "Primeros pasos recomendados",
             "content": "**¿Por dónde empezar?**\n\nTe recomendamos seguir estos pasos para aprovechar al máximo Lavenius:\n\n**1. Registra tu primer paciente**\n- Ve a **Pacientes** en el menú lateral\n- Haz clic en **\"Nuevo Paciente\"**\n- Completa los datos básicos (nombre, teléfono, email)\n\n**2. Agenda tu primera sesión**\n- Ve a **Agenda** en el menú lateral\n- Haz clic en **\"Nuevo Turno\"**\n- Selecciona el paciente y elige fecha/hora\n\n**3. Conecta Google Calendar (opcional)**\n- Ve a **Configuración**\n- En la sección \"Calendario\", conecta tu cuenta de Google\n- Tus turnos se sincronizarán automáticamente\n\n**4. Configura tu horario laboral**\n- En **Configuración**, define tus días y horarios de trabajo\n- Esto ayudará a organizar mejor tu agenda\n\n**¿Necesitas ayuda?**\n\nExplora las otras secciones del Centro de Ayuda para aprender sobre cada funcionalidad en detalle.",
-            "tags": ["primeros pasos", "empezar", "tutorial", "guía"]
+            "tags": [
+              "primeros pasos",
+              "empezar",
+              "tutorial",
+              "guía"
+            ]
           }
         }
       },
@@ -1029,22 +1069,42 @@
           "overview": {
             "title": "Entendiendo tu Dashboard",
             "content": "El Dashboard es tu centro de control donde puedes ver de un vistazo el estado de tu práctica profesional.\n\n**¿Qué encontrarás?**\n- Estadísticas resumidas de sesiones, ingresos y pacientes\n- Gráficos de tendencias a lo largo del tiempo\n- Tu tasa de asistencia\n- Los pacientes con más sesiones\n\n**Navegación rápida**\nHaciendo clic en cada tarjeta o gráfico, puedes acceder directamente a la sección correspondiente para ver más detalles.",
-            "tags": ["dashboard", "inicio", "resumen", "métricas"]
+            "tags": [
+              "dashboard",
+              "inicio",
+              "resumen",
+              "métricas"
+            ]
           },
           "statistics": {
             "title": "Leyendo tus estadísticas",
             "content": "Las tarjetas de estadísticas en la parte superior del Dashboard muestran:\n\n**Sesiones**\nEl número total de sesiones en el período seleccionado y cuántas fueron completadas.\n\n**Ingresos**\nEl total cobrado y el monto pendiente de cobro.\n\n**Pacientes atendidos**\nCuántos pacientes únicos tuvieron sesiones, y cuántos son nuevos en el período.\n\n**Tasa de asistencia**\nEl porcentaje de sesiones completadas vs canceladas.",
-            "tags": ["estadísticas", "sesiones", "ingresos", "pacientes"]
+            "tags": [
+              "estadísticas",
+              "sesiones",
+              "ingresos",
+              "pacientes"
+            ]
           },
           "charts": {
             "title": "Interpretando los gráficos",
             "content": "Los gráficos te ayudan a identificar patrones y tendencias:\n\n**Sesiones en el tiempo**\nMuestra la evolución de tus sesiones (totales y completadas) a lo largo del período.\n\n**Estado de sesiones**\nGráfico circular con la distribución de sesiones por estado.\n\n**Ingresos en el tiempo**\nCompara lo cobrado vs pendiente en cada período.\n\n**Ocupación por hora y día**\nIdentifica tus horarios y días más ocupados.\n\n**Top pacientes**\nLos 5 pacientes con más sesiones en el período.",
-            "tags": ["gráficos", "tendencias", "análisis"]
+            "tags": [
+              "gráficos",
+              "tendencias",
+              "análisis"
+            ]
           },
           "timeFilter": {
             "title": "Filtrando por período",
             "content": "Puedes ajustar el período de análisis usando el selector en la esquina superior derecha:\n\n- **Semana**: Últimos 7 días\n- **Mes**: Mes calendario actual\n- **Trimestre**: Últimos 3 meses\n- **Año**: Año calendario actual\n\nTodos los gráficos y estadísticas se actualizarán automáticamente al cambiar el período.",
-            "tags": ["filtro", "período", "semana", "mes", "año"]
+            "tags": [
+              "filtro",
+              "período",
+              "semana",
+              "mes",
+              "año"
+            ]
           }
         }
       },
@@ -1055,17 +1115,33 @@
           "createSession": {
             "title": "Crear un nuevo turno",
             "content": "Para crear un nuevo turno:\n\n1. Ve a la sección **Agenda** desde el menú lateral\n2. Haz clic en el botón **\"Nuevo Turno\"**\n3. Selecciona el paciente de la lista\n4. Elige la fecha y hora del turno\n5. Selecciona la modalidad (presencial o remoto)\n6. Haz clic en **\"Guardar\"**\n\n**Tip:** También puedes crear turnos haciendo clic directamente en el calendario.",
-            "tags": ["turno", "crear", "agendar", "cita"]
+            "tags": [
+              "turno",
+              "crear",
+              "agendar",
+              "cita"
+            ]
           },
           "editSession": {
             "title": "Editar o cancelar un turno",
             "content": "Para editar un turno existente:\n\n1. Encuentra el turno en la lista o calendario\n2. Haz clic en el ícono de **editar** (lápiz)\n3. Modifica los datos necesarios\n4. Guarda los cambios\n\nPara cancelar un turno, cambia el estado a \"Cancelado\" desde el drawer de edición.",
-            "tags": ["turno", "editar", "cancelar", "modificar"]
+            "tags": [
+              "turno",
+              "editar",
+              "cancelar",
+              "modificar"
+            ]
           },
           "googleCalendar": {
             "title": "Conectar Google Calendar",
             "content": "Para sincronizar con Google Calendar:\n\n1. Ve a **Configuración** desde el menú lateral\n2. En la sección \"Calendario\", haz clic en **\"Conectar Google Calendar\"**\n3. Autoriza la aplicación en la ventana emergente\n4. Una vez conectado, tus turnos se sincronizarán automáticamente\n\n**Beneficios:**\n- Recibe recordatorios en tu celular\n- Tus pacientes reciben invitaciones de calendario\n- Ve todos tus eventos en un solo lugar",
-            "tags": ["google", "calendar", "calendario", "sincronizar", "conectar"]
+            "tags": [
+              "google",
+              "calendar",
+              "calendario",
+              "sincronizar",
+              "conectar"
+            ]
           }
         }
       },
@@ -1076,17 +1152,32 @@
           "createPatient": {
             "title": "Registrar un nuevo paciente",
             "content": "Para registrar un nuevo paciente:\n\n1. Ve a la sección **Pacientes** desde el menú lateral\n2. Haz clic en **\"Nuevo Paciente\"**\n3. Completa los datos personales (nombre, email, teléfono)\n4. Agrega información adicional (cobertura médica, frecuencia de sesiones)\n5. Haz clic en **\"Guardar\"**\n\n**Tip:** Puedes agregar notas iniciales en el campo de observaciones.",
-            "tags": ["paciente", "crear", "registrar", "nuevo"]
+            "tags": [
+              "paciente",
+              "crear",
+              "registrar",
+              "nuevo"
+            ]
           },
           "clinicalFile": {
             "title": "Usar la ficha clínica",
             "content": "La ficha clínica te permite:\n\n- Ver el historial completo del paciente\n- Registrar notas de cada sesión\n- Consultar sesiones pasadas y futuras\n- Ver el estado de pagos\n\nPara acceder, haz clic en **\"Ver ficha\"** desde la tarjeta del paciente o desde un turno en la agenda.",
-            "tags": ["ficha", "clinica", "historial", "notas"]
+            "tags": [
+              "ficha",
+              "clinica",
+              "historial",
+              "notas"
+            ]
           },
           "searchPatients": {
             "title": "Buscar y filtrar pacientes",
             "content": "Puedes buscar pacientes de varias formas:\n\n1. **Búsqueda por nombre:** Usa la barra de búsqueda\n2. **Filtro por modalidad:** Presencial, remoto o mixto\n3. **Filtro por frecuencia:** Semanal, quincenal o mensual\n4. **Turnos esta semana:** Muestra solo pacientes con citas próximas\n\nLos filtros se pueden combinar para resultados más específicos.",
-            "tags": ["buscar", "filtrar", "pacientes", "modalidad"]
+            "tags": [
+              "buscar",
+              "filtrar",
+              "pacientes",
+              "modalidad"
+            ]
           }
         }
       },
@@ -1097,17 +1188,32 @@
           "registerPayment": {
             "title": "Registrar un pago",
             "content": "Para registrar un pago:\n\n1. Ve a la sección **Cobros** desde el menú lateral\n2. Encuentra la sesión pendiente en la pestaña \"Pendientes\"\n3. Haz clic en **\"Cobrar\"**\n4. Confirma el monto y método de pago\n5. Guarda el pago\n\n**Tip:** También puedes registrar pagos directamente desde la ficha del paciente.",
-            "tags": ["pago", "cobrar", "registrar", "dinero"]
+            "tags": [
+              "pago",
+              "cobrar",
+              "registrar",
+              "dinero"
+            ]
           },
           "paymentHistory": {
             "title": "Ver historial de pagos",
             "content": "El historial de pagos muestra:\n\n- Todos los pagos realizados\n- Fecha y monto de cada pago\n- Paciente asociado\n- Descripción del pago\n\nPuedes filtrar por rango de fechas usando los filtros rápidos (semana, mes) o seleccionando fechas personalizadas.",
-            "tags": ["historial", "pagos", "ver", "filtrar"]
+            "tags": [
+              "historial",
+              "pagos",
+              "ver",
+              "filtrar"
+            ]
           },
           "sendReminder": {
             "title": "Enviar recordatorio de pago",
             "content": "Para enviar un recordatorio:\n\n1. En la pestaña \"Pendientes\", encuentra la sesión\n2. Haz clic en **\"Recordatorio\"**\n3. Revisa el mensaje predefinido (puedes editarlo)\n4. Elige enviar por WhatsApp o copiar el mensaje\n\nEl mensaje incluye automáticamente los datos de la sesión y el monto.",
-            "tags": ["recordatorio", "whatsapp", "mensaje", "cobrar"]
+            "tags": [
+              "recordatorio",
+              "whatsapp",
+              "mensaje",
+              "cobrar"
+            ]
           }
         }
       },
@@ -1118,12 +1224,23 @@
           "profile": {
             "title": "Editar tu perfil",
             "content": "Tu perfil tiene dos partes:\n\n**Datos de cuenta (gestionados por Clerk)**\n- Nombre y apellido\n- Foto de perfil\n- Email y contraseña\n\nPara editar estos datos, haz clic en tu avatar y selecciona **\"Administrar cuenta\"**.\n\n**Datos profesionales**\n\nPara editar tu información profesional:\n\n1. Ve a la sección **Perfil** desde el menú lateral\n2. Modifica tus datos (matrícula, especialidad, teléfonos, etc.)\n3. Haz clic en **\"Guardar Cambios\"**\n\nLos datos profesionales incluyen: matrícula, especialidad, teléfonos de contacto, dirección del consultorio, redes sociales y biografía.",
-            "tags": ["perfil", "editar", "datos", "cuenta", "clerk"]
+            "tags": [
+              "perfil",
+              "editar",
+              "datos",
+              "cuenta",
+              "clerk"
+            ]
           },
           "calendarConfig": {
             "title": "Configurar calendario",
             "content": "En la sección de Configuración puedes:\n\n- Conectar o desconectar Google Calendar\n- Ver el estado de la sincronización\n- Forzar una sincronización manual\n\nLa sincronización es bidireccional: los cambios en Lavenius aparecen en tu Google Calendar y viceversa.",
-            "tags": ["calendario", "configurar", "google", "sincronizar"]
+            "tags": [
+              "calendario",
+              "configurar",
+              "google",
+              "sincronizar"
+            ]
           }
         }
       }
