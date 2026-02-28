@@ -105,7 +105,11 @@ html {
     --chart-5: #f87171;
   }
 
-  /* Apply theme colors to body */
+  /* Apply theme colors globally */
+  * {
+    @apply border-border;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
