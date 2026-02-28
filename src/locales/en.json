@@ -657,6 +657,7 @@
     "languageChanged": "Language changed successfully",
     "sections": {
       "profile": "Profile",
+      "preferences": "Preferences",
       "general": "General",
       "notifications": "Notifications",
       "calendar": "Calendar",
@@ -781,7 +782,13 @@
       "sat": "S",
       "sun": "S"
     },
-    "saveReminders": "Save Reminders"
+    "saveReminders": "Save Reminders",
+    "sessionDuration": {
+      "title": "Default Session Duration",
+      "description": "Sessions will use this duration by default. You can change it per session.",
+      "custom": "Custom",
+      "customMinutes": "minutes"
+    }
   },
   "profile": {
     "title": "My Profile",
@@ -837,18 +844,18 @@
       "saveError": "Error saving profile"
     },
     "share": {
-      "copyLink": "Copy profile link",
+      "bookSession": "Book a Session",
+      "bookSessionDescription": "Online booking coming soon",
+      "backToSettings": "Back to Settings",
+      "contactInfo": "Contact Information",
       "copied": "Link copied!",
-      "publicProfile": "Public profile",
-      "comingSoon": "Full public profile coming soon",
+      "copyLink": "Copy profile link",
+      "noBio": "No bio available",
+      "noSpecialty": "Specialty not specified",
       "previewDescription": "This is how patients will see your profile",
-      "previewTitle": "View preview",
-      "noSpecialty": "No specialty registered",
-      "noBio": "No biography registered",
-      "contactInfo": "Contact information",
-      "backToSettings": "Back to settings",
-      "bookSession": "Book session",
-      "bookSessionDescription": "Soon you will be able to book a session directly from your public profile."
+      "previewTitle": "Profile Preview",
+      "publicProfile": "Public profile",
+      "comingSoon": "Full public profile coming soon"
     }
   },
   "analytics": {

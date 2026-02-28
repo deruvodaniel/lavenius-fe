@@ -88,7 +88,7 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
 
       {/* Mobile Drawer - only visible on mobile when open */}
       {isMobile && drawerOpen && (
-        <div className="fixed inset-0 z-[80] flex top-[56px] lg:hidden">
+        <div className="fixed inset-0 z-[80] flex top-[72px] lg:hidden">
           {/* Backdrop/Overlay */}
           <div
             className="absolute inset-0 z-[80] bg-black/30 backdrop-blur-[2px]"

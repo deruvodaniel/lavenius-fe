@@ -78,7 +78,7 @@ export function PublicProfile() {
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         {/* Hero Card */}
         <Card className="overflow-hidden">
-          <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 pt-8 pb-16" />
+          <div className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 px-6 pt-8 pb-16" />
           <div className="px-6 pb-6 -mt-12">
             <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4">
               {/* Avatar */}

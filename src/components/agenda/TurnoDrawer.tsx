@@ -71,7 +71,16 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     monto: 8500,
   });
 
-  const [selectedDuration, setSelectedDuration] = useState(60); // minutes
+  const [selectedDuration, setSelectedDuration] = useState(() => {
+    try {
+      const stored = localStorage.getItem('lavenius_settings');
+      if (stored) {
+        const settings = JSON.parse(stored);
+        if (settings.defaultSessionDuration) return settings.defaultSessionDuration as number;
+      }
+    } catch { /* use fallback */ }
+    return 60;
+  });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);

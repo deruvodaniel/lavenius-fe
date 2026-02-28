@@ -648,6 +648,7 @@
     "languageChanged": "Idioma alterado com sucesso",
     "sections": {
       "profile": "Perfil",
+      "preferences": "Preferências",
       "general": "Geral",
       "notifications": "Notificações",
       "calendar": "Calendário",
@@ -772,7 +773,13 @@
       "sat": "S",
       "sun": "D"
     },
-    "saveReminders": "Salvar Lembretes"
+    "saveReminders": "Salvar Lembretes",
+    "sessionDuration": {
+      "title": "Duração padrão da sessão",
+      "description": "As sessões usarão esta duração por padrão. Você pode alterá-la por sessão.",
+      "custom": "Personalizado",
+      "customMinutes": "minutos"
+    }
   },
   "profile": {
     "title": "Meu Perfil",
@@ -828,18 +835,18 @@
       "saveError": "Erro ao salvar o perfil"
     },
     "share": {
-      "copyLink": "Copiar link do perfil",
-      "copied": "Link copiado!",
-      "publicProfile": "Perfil público",
+      "backToSettings": "Voltar para Configurações",
+      "bookSession": "Agendar uma sessão",
+      "bookSessionDescription": "Reserva online em breve",
       "comingSoon": "Perfil público completo em breve",
-      "previewDescription": "Assim os pacientes verão seu perfil",
-      "previewTitle": "Ver prévia",
-      "noSpecialty": "Sem especialidade registrada",
-      "noBio": "Sem biografia registrada",
       "contactInfo": "Informações de contato",
-      "backToSettings": "Voltar para configurações",
-      "bookSession": "Agendar sessão",
-      "bookSessionDescription": "Em breve você poderá agendar uma sessão diretamente do seu perfil público."
+      "copied": "Link copiado!",
+      "copyLink": "Copiar link do perfil",
+      "noBio": "Sem biografia disponível",
+      "noSpecialty": "Especialidade não especificada",
+      "previewDescription": "Assim os pacientes verão seu perfil",
+      "previewTitle": "Pré-visualização do perfil",
+      "publicProfile": "Perfil público"
     }
   },
   "analytics": {

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
 import { useSearchParams } from 'react-router-dom';
-import { LanguageSwitcher, BetaBadge } from '@/components/shared';
+import { LanguageSwitcher } from '@/components/shared';
 import { Perfil, type PerfilHandle } from '@/components/perfil/Perfil';
 import { User } from 'lucide-react';
 import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
@@ -21,7 +21,7 @@ import { apiClient } from '@/lib/api/client';
 // NAVIGATION SECTIONS
 // ============================================================================
 
-type SectionId = 'profile' | 'general' | 'calendar' | 'notifications';
+type SectionId = 'profile' | 'preferences' | 'calendar';
 
 interface NavigationSection {
   id: SectionId;
@@ -31,9 +31,8 @@ interface NavigationSection {
 
 const NAVIGATION_SECTIONS: NavigationSection[] = [
   { id: 'profile', labelKey: 'settings.sections.profile', icon: User },
-  { id: 'general', labelKey: 'settings.sections.general', icon: Globe },
+  { id: 'preferences', labelKey: 'settings.sections.preferences', icon: Globe },
   { id: 'calendar', labelKey: 'settings.sections.calendar', icon: Calendar },
-  { id: 'notifications', labelKey: 'settings.sections.notifications', icon: Bell },
 ];
 
 // ============================================================================
@@ -84,6 +83,7 @@ interface WorkingHours {
 // Note: Reminder settings and WhatsApp templates are managed by the backend
 interface LocalSettings {
   workingHours: WorkingHours;
+  defaultSessionDuration: number; // minutes: 30, 45, 60, 90, 120
 }
 
 const defaultLocalSettings: LocalSettings = {
@@ -92,6 +92,7 @@ const defaultLocalSettings: LocalSettings = {
     endTime: '18:00',
     workingDays: [1, 2, 3, 4, 5], // Monday to Friday
   },
+  defaultSessionDuration: 60,
 };
 
 const loadLocalSettings = (): LocalSettings => {
@@ -243,7 +244,7 @@ const ConfigSection = ({ icon: Icon, iconColor, iconBg, title, description, chil
         </div>
       </div>
     )}
-    <div className="p-4 sm:p-6 border-b border-gray-100">
+    <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-start gap-3 sm:gap-4">
         <div className={`w-10 h-10 sm:w-12 sm:h-12 ${iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
           <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${iconColor}`} />
@@ -253,8 +254,6 @@ const ConfigSection = ({ icon: Icon, iconColor, iconBg, title, description, chil
           <p className="text-xs sm:text-sm text-gray-500 mt-0.5">{description}</p>
         </div>
       </div>
-    </div>
-    <div className="p-4 sm:p-6">
       {children}
     </div>
   </Card>
@@ -461,6 +460,28 @@ export function Configuracion() {
       await perfilRef.current.save();
       return;
     }
+    // When on preferences tab, save local settings + reminders
+    if (activeSection === 'preferences') {
+      setIsSaving(true);
+      try {
+        // Save local settings (language, session duration)
+        if (hasChanges) {
+          saveLocalSettings(localSettings);
+          setHasChanges(false);
+        }
+        // Save reminder settings to backend
+        if (hasReminderChanges) {
+          await handleSaveReminders();
+        }
+        toast.success(t('settings.messages.saved'));
+      } catch {
+        toast.error(t('settings.messages.saveError'));
+      } finally {
+        setIsSaving(false);
+      }
+      return;
+    }
+    // Calendar tab — save local settings (working hours, days)
     setIsSaving(true);
     try {
       saveLocalSettings(localSettings);
@@ -615,8 +636,8 @@ export function Configuracion() {
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2">{t('settings.title')} <BetaBadge /></h1>
+        <div className="mb-3">
+          <h1 className="text-lg font-semibold text-gray-900">{t('settings.title')}</h1>
           <p className="text-sm text-gray-500">{t('settings.subtitle')}</p>
         </div>
 
@@ -661,7 +682,7 @@ export function Configuracion() {
           </div>
 
           {/* Desktop: Vertical sidebar navigation */}
-          <div className="hidden md:flex md:flex-col gap-1">
+          <div className="hidden md:flex md:flex-col">
             {NAVIGATION_SECTIONS.map((section) => {
               const Icon = section.icon;
               const isActive = activeSection === section.id;
@@ -671,10 +692,10 @@ export function Configuracion() {
                   type="button"
                   onClick={() => setActiveSection(section.id)}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all w-full text-left",
+                    "flex items-center gap-2.5 px-3 py-2 text-sm transition-colors w-full text-left border-l-2",
                     isActive
-                      ? "bg-white shadow-sm border-l-2 border-indigo-600 text-gray-900"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-2 border-transparent"
+                      ? "border-indigo-600 text-indigo-700 font-medium"
+                      : "border-transparent text-gray-500 font-normal hover:text-gray-900 hover:border-gray-300"
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
@@ -701,9 +722,9 @@ export function Configuracion() {
           )}
 
           {/* ============================================ */}
-          {/* SECTION: General Settings */}
+          {/* SECTION: Preferences (Language + Duration + Reminders) */}
           {/* ============================================ */}
-          {activeSection === 'general' && (
+          {activeSection === 'preferences' && (
             <div className="space-y-4">
             {/* Language Section */}
             <ConfigSection
@@ -716,7 +737,208 @@ export function Configuracion() {
               <LanguageSwitcher showLabel={false} variant="dropdown" className="max-w-xs" />
             </ConfigSection>
 
-            {/* Working Hours */}
+            {/* Default Session Duration */}
+            <ConfigSection
+              icon={Clock}
+              iconColor="text-teal-600"
+              iconBg="bg-teal-100"
+              title={t('settings.sessionDuration.title')}
+              description={t('settings.sessionDuration.description')}
+            >
+              <div className="space-y-3">
+                <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t('settings.sessionDuration.title')}>
+                  {[
+                    { value: 30, labelKey: 'agenda.duration.thirtyMin' },
+                    { value: 45, labelKey: 'agenda.duration.fortyFiveMin' },
+                    { value: 60, labelKey: 'agenda.duration.oneHour' },
+                    { value: 90, labelKey: 'agenda.duration.ninetyMin' },
+                    { value: 120, labelKey: 'agenda.duration.twoHours' },
+                  ].map(({ value, labelKey }) => {
+                    const isSelected = localSettings.defaultSessionDuration === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        role="radio"
+                        aria-checked={isSelected}
+                        onClick={() => updateLocalSetting('defaultSessionDuration', value)}
+                        className={cn(
+                          "px-4 py-2 rounded-lg text-sm font-medium transition-all border",
+                          isSelected
+                            ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                            : "bg-white text-gray-700 border-gray-200 hover:border-indigo-300 hover:bg-indigo-50"
+                        )}
+                      >
+                        {t(labelKey)}
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* Custom duration input */}
+                <div className="flex items-center gap-2">
+                  <label htmlFor="custom-duration" className="text-sm text-gray-500">{t('settings.sessionDuration.custom')}:</label>
+                  <input
+                    id="custom-duration"
+                    type="number"
+                    min="15"
+                    max="240"
+                    step="5"
+                    value={localSettings.defaultSessionDuration}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      if (val >= 15 && val <= 240) {
+                        updateLocalSetting('defaultSessionDuration', val);
+                      }
+                    }}
+                    className="w-20 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                  />
+                  <span className="text-sm text-gray-500">min</span>
+                </div>
+              </div>
+            </ConfigSection>
+
+            {/* Recordatorios de Cobros */}
+            <ConfigSection
+              icon={DollarSign}
+              iconColor="text-orange-600"
+              iconBg="bg-orange-100"
+              title={t('settings.paymentReminders.title')}
+              description={t('settings.paymentReminders.description')}
+            >
+              <div className="space-y-6">
+                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-700">{t('settings.paymentReminders.automation')}</h3>
+                  <ToggleRow
+                    checked={paymentReminderEnabled}
+                    onChange={(v) => {
+                      setPaymentReminderEnabled(v);
+                      markReminderChanged();
+                    }}
+                    label={t('settings.paymentReminders.enableAuto')}
+                    description={t('settings.paymentReminders.enableAutoHint')}
+                  />
+
+                  {paymentReminderEnabled && (
+                    <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
+                      <div className="space-y-2">
+                        <label htmlFor="frecuencia-recordatorio" className="block text-sm font-medium text-gray-700">
+                          {t('settings.paymentReminders.frequency')}
+                        </label>
+                        <Select
+                          value={paymentReminderFrequency}
+                          onValueChange={(value: 'daily' | 'weekly' | 'biweekly') => {
+                            setPaymentReminderFrequency(value);
+                            markReminderChanged();
+                          }}
+                        >
+                          <SelectTrigger className="w-full sm:w-48">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="daily">{t('settings.paymentReminders.daily')}</SelectItem>
+                            <SelectItem value="weekly">{t('settings.paymentReminders.weekly')}</SelectItem>
+                            <SelectItem value="biweekly">{t('settings.paymentReminders.biweekly')}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="minimo-turnos" className="block text-sm font-medium text-gray-700">
+                          {t('settings.paymentReminders.minimumSessions')}
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            id="minimo-turnos"
+                            type="number"
+                            min="1"
+                            max="20"
+                            value={paymentReminderLimit}
+                            onChange={(e) => {
+                              setPaymentReminderLimit(Number(e.target.value));
+                              markReminderChanged();
+                            }}
+                            className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                          />
+                          <span className="text-sm text-gray-600">
+                            {paymentReminderLimit === 1 ? t('settings.paymentReminders.sessionsUnpaid') : t('settings.paymentReminders.sessionsUnpaidPlural')}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                        <p className="text-xs sm:text-sm text-orange-800">
+                          <span className="font-medium">{t('settings.paymentReminders.example')}:</span> {t('settings.paymentReminders.exampleText', { count: paymentReminderLimit })}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </ConfigSection>
+
+            {/* Recordatorios de Turnos */}
+            <ConfigSection
+              icon={Bell}
+              iconColor="text-blue-600"
+              iconBg="bg-blue-100"
+              title={t('settings.appointmentReminders.title')}
+              description={t('settings.appointmentReminders.description')}
+            >
+              <div className="space-y-6">
+                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-700">{t('settings.appointmentReminders.automation')}</h3>
+                  <ToggleRow
+                    checked={sessionReminderEnabled}
+                    onChange={(v) => {
+                      setSessionReminderEnabled(v);
+                      markReminderChanged();
+                    }}
+                    label={t('settings.appointmentReminders.enableAuto')}
+                    description={t('settings.appointmentReminders.enableAutoHint')}
+                  />
+
+                  {sessionReminderEnabled && (
+                    <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
+                      <div className="space-y-2">
+                        <label htmlFor="horas-anticipacion" className="block text-sm font-medium text-gray-700">
+                          {t('settings.appointmentReminders.hoursBeforeLabel')}
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            id="horas-anticipacion"
+                            type="number"
+                            min="1"
+                            max="72"
+                            value={sessionReminderHours}
+                            onChange={(e) => {
+                              setSessionReminderHours(Number(e.target.value));
+                              markReminderChanged();
+                            }}
+                            className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                          />
+                          <span className="text-sm text-gray-600">{t('settings.appointmentReminders.hoursBeforeAppointment')}</span>
+                        </div>
+                      </div>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p className="text-xs sm:text-sm text-blue-800">
+                          <span className="font-medium">{t('settings.appointmentReminders.example')}:</span> {t('settings.appointmentReminders.exampleText', { hours: sessionReminderHours })}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </ConfigSection>
+          </div>
+          )}
+
+          {/* ============================================ */}
+          {/* SECTION: Calendar (Sync + Working Hours + Days Off) */}
+          {/* ============================================ */}
+          {activeSection === 'calendar' && (
+            <div className="space-y-4">
+            {/* Google Calendar Sync */}
+            <CalendarSync />
+
+            {/* Working Hours & Days */}
             <ConfigSection
               icon={Clock}
               iconColor="text-indigo-600"
@@ -725,7 +947,6 @@ export function Configuracion() {
               description={t('settings.workingHours.description')}
             >
               <div className="space-y-5">
-                {/* Horario de atención */}
                 <fieldset className="space-y-2">
                   <legend className="block text-sm font-medium text-gray-700">
                     {t('settings.workingHours.schedule')}
@@ -764,7 +985,6 @@ export function Configuracion() {
                   </div>
                 </fieldset>
 
-                {/* Días de trabajo */}
                 <fieldset className="space-y-2">
                   <legend className="block text-sm font-medium text-gray-700">
                     {t('settings.workingHours.workingDays')}
@@ -787,8 +1007,8 @@ export function Configuracion() {
                           }}
                           className={`
                             w-9 h-9 rounded-full text-xs font-medium transition-all
-                            ${isSelected 
-                              ? 'bg-indigo-600 text-white shadow-sm' 
+                            ${isSelected
+                              ? 'bg-indigo-600 text-white shadow-sm'
                               : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                             }
                           `}
@@ -807,16 +1027,6 @@ export function Configuracion() {
                 </fieldset>
               </div>
             </ConfigSection>
-          </div>
-          )}
-
-          {/* ============================================ */}
-          {/* SECTION: Calendar & Scheduling */}
-          {/* ============================================ */}
-          {activeSection === 'calendar' && (
-            <div className="space-y-4">
-            {/* Google Calendar Sync */}
-            <CalendarSync />
 
             {/* Días Off */}
             <ConfigSection
@@ -1023,195 +1233,39 @@ export function Configuracion() {
           </div>
           )}
 
-          {/* ============================================ */}
-          {/* SECTION: Notifications & Reminders */}
-          {/* ============================================ */}
-          {activeSection === 'notifications' && (
-            <div className="space-y-4">
-            {/* Recordatorios de Cobros */}
-            <ConfigSection
-              icon={DollarSign}
-              iconColor="text-orange-600"
-              iconBg="bg-orange-100"
-              title={t('settings.paymentReminders.title')}
-              description={t('settings.paymentReminders.description')}
-            >
-              <div className="space-y-6">
-                {/* Automatización - Now connected to backend */}
-                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-700">{t('settings.paymentReminders.automation')}</h3>
-                  <ToggleRow
-                    checked={paymentReminderEnabled}
-                    onChange={(v) => {
-                      setPaymentReminderEnabled(v);
-                      markReminderChanged();
-                    }}
-                    label={t('settings.paymentReminders.enableAuto')}
-                    description={t('settings.paymentReminders.enableAutoHint')}
-                  />
-
-                  {paymentReminderEnabled && (
-                    <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
-                      {/* Frecuencia */}
-                      <div className="space-y-2">
-                        <label htmlFor="frecuencia-recordatorio" className="block text-sm font-medium text-gray-700">
-                          {t('settings.paymentReminders.frequency')}
-                        </label>
-                        <Select
-                          value={paymentReminderFrequency}
-                          onValueChange={(value: 'daily' | 'weekly' | 'biweekly') => {
-                            setPaymentReminderFrequency(value);
-                            markReminderChanged();
-                          }}
-                        >
-                          <SelectTrigger className="w-full sm:w-48">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="daily">{t('settings.paymentReminders.daily')}</SelectItem>
-                            <SelectItem value="weekly">{t('settings.paymentReminders.weekly')}</SelectItem>
-                            <SelectItem value="biweekly">{t('settings.paymentReminders.biweekly')}</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {/* Mínimo de turnos */}
-                      <div className="space-y-2">
-                        <label htmlFor="minimo-turnos" className="block text-sm font-medium text-gray-700">
-                          {t('settings.paymentReminders.minimumSessions')}
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            id="minimo-turnos"
-                            type="number"
-                            min="1"
-                            max="20"
-                            value={paymentReminderLimit}
-                            onChange={(e) => {
-                              setPaymentReminderLimit(Number(e.target.value));
-                              markReminderChanged();
-                            }}
-                            className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
-                          />
-                          <span className="text-sm text-gray-600">
-                            {paymentReminderLimit === 1 ? t('settings.paymentReminders.sessionsUnpaid') : t('settings.paymentReminders.sessionsUnpaidPlural')}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Preview */}
-                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                        <p className="text-xs sm:text-sm text-orange-800">
-                          <span className="font-medium">{t('settings.paymentReminders.example')}:</span> {t('settings.paymentReminders.exampleText', { count: paymentReminderLimit })}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </ConfigSection>
-
-            {/* Recordatorios de Turnos */}
-            <ConfigSection
-              icon={Bell}
-              iconColor="text-blue-600"
-              iconBg="bg-blue-100"
-              title={t('settings.appointmentReminders.title')}
-              description={t('settings.appointmentReminders.description')}
-            >
-              <div className="space-y-6">
-                {/* Automatización - Now connected to backend */}
-                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-700">{t('settings.appointmentReminders.automation')}</h3>
-                  <ToggleRow
-                    checked={sessionReminderEnabled}
-                    onChange={(v) => {
-                      setSessionReminderEnabled(v);
-                      markReminderChanged();
-                    }}
-                    label={t('settings.appointmentReminders.enableAuto')}
-                    description={t('settings.appointmentReminders.enableAutoHint')}
-                  />
-
-                  {sessionReminderEnabled && (
-                    <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
-                      {/* Horas de anticipación */}
-                      <div className="space-y-2">
-                        <label htmlFor="horas-anticipacion" className="block text-sm font-medium text-gray-700">
-                          {t('settings.appointmentReminders.hoursBeforeLabel')}
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            id="horas-anticipacion"
-                            type="number"
-                            min="1"
-                            max="72"
-                            value={sessionReminderHours}
-                            onChange={(e) => {
-                              setSessionReminderHours(Number(e.target.value));
-                              markReminderChanged();
-                            }}
-                            className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
-                          />
-                          <span className="text-sm text-gray-600">{t('settings.appointmentReminders.hoursBeforeAppointment')}</span>
-                        </div>
-                      </div>
-
-                      {/* Preview */}
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                        <p className="text-xs sm:text-sm text-blue-800">
-                          <span className="font-medium">{t('settings.appointmentReminders.example')}:</span> {t('settings.appointmentReminders.exampleText', { hours: sessionReminderHours })}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </ConfigSection>
-
-            {/* Save Reminders Button */}
-            {hasReminderChanges && (
-              <div className="flex justify-end pt-4">
-                <Button 
-                  onClick={handleSaveReminders}
-                  disabled={isSavingReminders}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                >
-                  {isSavingReminders ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Save className="w-4 h-4 mr-2" />
-                  )}
-                  {t('settings.saveReminders')}
-                </Button>
-              </div>
-            )}
-          </div>
-          )}
-
         </div>
         </div>
       </div>
       {/* ============================================ */}
       {/* Fixed Footer - Save Button */}
       {/* ============================================ */}
-      <div className="flex-shrink-0 bg-white border-t border-gray-200 px-4 md:px-6 lg:px-8 py-4">
-        <div className="max-w-6xl ml-auto flex items-center justify-end gap-3">
-          {(activeSection === 'profile' ? profileHasChanges : hasChanges) && (
-            <span className="text-sm text-amber-600">{t('common.unsavedChanges')}</span>
-          )}
-          <Button
-            onClick={handleSave}
-            disabled={activeSection === 'profile'
-              ? !profileHasChanges || profileIsSaving
-              : !hasChanges || isSaving}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {(activeSection === 'profile' ? profileIsSaving : isSaving) ? t('common.saving') : t('common.save')}
-          </Button>
-        </div>
-      </div>
+      {(() => {
+        // Compute footer state per section
+        const sectionHasChanges =
+          activeSection === 'profile' ? profileHasChanges
+          : activeSection === 'preferences' ? (hasChanges || hasReminderChanges)
+          : hasChanges;
+        const sectionIsSaving =
+          activeSection === 'profile' ? profileIsSaving
+          : activeSection === 'preferences' ? (isSaving || isSavingReminders)
+          : isSaving;
+
+        return sectionHasChanges ? (
+          <div className="flex-shrink-0 bg-white border-t border-gray-200 px-4 md:px-6 lg:px-8 py-4">
+            <div className="max-w-6xl ml-auto flex items-center justify-end gap-3">
+              <span className="text-sm text-amber-600">{t('common.unsavedChanges')}</span>
+              <Button
+                onClick={handleSave}
+                disabled={sectionIsSaving}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {sectionIsSaving ? t('common.saving') : t('common.save')}
+              </Button>
+            </div>
+          </div>
+        ) : null;
+      })()}
     </div>
   );
 }

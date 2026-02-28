@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Check, ChevronDown, Globe } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -223,7 +223,6 @@ export function LanguageSwitcher({
         >
           <SelectValue>
             <span className="flex items-center gap-2">
-              <Globe className="h-4 w-4 text-indigo-600" aria-hidden="true" />
               <currentLang.Flag className="w-5 h-4 rounded-sm" aria-hidden="true" />
               <span>{currentLang.label}</span>
             </span>
