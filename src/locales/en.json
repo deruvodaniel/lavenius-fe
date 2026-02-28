@@ -788,6 +788,13 @@
       "description": "Sessions will use this duration by default. You can change it per session.",
       "custom": "Custom",
       "customMinutes": "minutes"
+    },
+    "theme": {
+      "title": "Appearance",
+      "description": "Choose how Lavenius looks on your device.",
+      "light": "Light",
+      "system": "System",
+      "dark": "Dark"
     }
   },
   "profile": {

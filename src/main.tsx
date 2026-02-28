@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from 'react-router-dom';
 import { ClerkProvider } from '@clerk/clerk-react';
+import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
 import App from "./App.tsx";
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
@@ -19,15 +20,17 @@ if (!PUBLISHABLE_KEY) {
 }
 
 createRoot(document.getElementById("root")!).render(
-  <ErrorBoundary>
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
-      <ClerkTokenProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-        <Toaster position="top-right" richColors closeButton />
-      </ClerkTokenProvider>
-    </ClerkProvider>
-  </ErrorBoundary>
+  <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="lavenius-theme">
+    <ErrorBoundary>
+      <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+        <ClerkTokenProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+          <Toaster position="top-right" richColors closeButton />
+        </ClerkTokenProvider>
+      </ClerkProvider>
+    </ErrorBoundary>
+  </ThemeProvider>
 );
   

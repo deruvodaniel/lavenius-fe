@@ -788,6 +788,13 @@
       "description": "Las sesiones usarán esta duración por defecto. Puedes cambiarla por sesión.",
       "custom": "Personalizado",
       "customMinutes": "minutos"
+    },
+    "theme": {
+      "title": "Apariencia",
+      "description": "Elige cómo se ve Lavenius en tu dispositivo.",
+      "light": "Claro",
+      "system": "Sistema",
+      "dark": "Oscuro"
     }
   },
   "profile": {

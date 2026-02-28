@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, Globe, Loader2 } from 'lucide-react';
+import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, Globe, Loader2, Sun } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
 import { useSearchParams } from 'react-router-dom';
-import { LanguageSwitcher } from '@/components/shared';
+import { LanguageSwitcher, ThemeToggle } from '@/components/shared';
 import { Perfil, type PerfilHandle } from '@/components/perfil/Perfil';
 import { User } from 'lucide-react';
 import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
@@ -726,6 +726,17 @@ export function Configuracion() {
           {/* ============================================ */}
           {activeSection === 'preferences' && (
             <div className="space-y-4">
+            {/* Appearance / Theme */}
+            <ConfigSection
+              icon={Sun}
+              iconColor="text-amber-600"
+              iconBg="bg-amber-100"
+              title={t('settings.theme.title')}
+              description={t('settings.theme.description')}
+            >
+              <ThemeToggle />
+            </ConfigSection>
+
             {/* Language Section */}
             <ConfigSection
               icon={Globe}

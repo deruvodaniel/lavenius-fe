@@ -13,3 +13,4 @@ export { BaseDrawer, DrawerBody, DrawerFooter, type BaseDrawerProps } from './Ba
 export { LoadingSpinner } from './LoadingSpinner';
 export { AuthHeader, AuthButtons } from './AuthHeader';
 export { BetaBadge } from './BetaBadge';
+export { ThemeToggle } from './ThemeToggle';
