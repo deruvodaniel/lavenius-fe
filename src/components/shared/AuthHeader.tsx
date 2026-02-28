@@ -36,9 +36,9 @@ export function AuthHeader({
   
   const headerClasses = cn(
     'fixed top-0 left-0 right-0 z-50 border-b',
-    variant === 'glass' 
-      ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-gray-100 dark:border-gray-800' 
-      : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800',
+    variant === 'glass'
+      ? 'bg-background/80 backdrop-blur-md border-border'
+      : 'bg-background border-border',
     className
   );
 
@@ -62,15 +62,15 @@ export function AuthHeader({
           {/* Navigation Links (optional) */}
           {showNavLinks && (
             <nav className="hidden md:flex items-center gap-6">
-              <Link 
-                to="#features" 
-                className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              <Link
+                to="#features"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 {t('landing.nav.features', 'Features')}
               </Link>
-              <Link 
-                to="#pricing" 
-                className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              <Link
+                to="#pricing"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 {t('landing.nav.pricing', 'Pricing')}
               </Link>
@@ -86,7 +86,7 @@ export function AuthHeader({
               <SignInButton mode="modal">
                 <Button 
                   variant="ghost"
-                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted"
                 >
                   {t('landing.cta.login')}
                 </Button>
@@ -106,7 +106,7 @@ export function AuthHeader({
               <Button
                 variant="ghost"
                 onClick={() => navigate('/dashboard')}
-                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted"
               >
                 {t('landing.nav.dashboard', 'Dashboard')}
               </Button>
@@ -143,7 +143,7 @@ export function AuthButtons({ className }: { className?: string }) {
         <SignInButton mode="modal">
           <Button 
             variant="ghost"
-            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+            className="text-muted-foreground hover:text-foreground"
           >
             {t('landing.cta.login')}
           </Button>
@@ -162,7 +162,7 @@ export function AuthButtons({ className }: { className?: string }) {
         <Button
           variant="ghost"
           onClick={() => navigate('/dashboard')}
-          className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+          className="text-muted-foreground hover:text-foreground"
         >
           {t('landing.nav.dashboard', 'Dashboard')}
         </Button>

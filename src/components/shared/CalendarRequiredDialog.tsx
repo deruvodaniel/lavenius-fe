@@ -60,15 +60,15 @@ export function CalendarRequiredDialog({
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[75vh] bg-white">
-          <DrawerHeader className="text-left border-b border-gray-100">
+        <DrawerContent className="max-h-[75vh] bg-background">
+          <DrawerHeader className="text-left border-b border-border">
             <div className="flex items-start gap-4">
               {icon}
               <div className="flex-1 min-w-0">
-                <DrawerTitle className="text-gray-900">
+                <DrawerTitle className="text-foreground">
                   {t('agenda.googleCalendar.modalTitle')}
                 </DrawerTitle>
-                <DrawerDescription className="mt-1 text-gray-600">
+                <DrawerDescription className="mt-1 text-muted-foreground">
                   {t('agenda.googleCalendar.modalDescription')}
                 </DrawerDescription>
               </div>
@@ -78,7 +78,7 @@ export function CalendarRequiredDialog({
             <Button
               variant="outline"
               onClick={handleLater}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50 w-full"
+              className="border-border text-foreground hover:bg-muted w-full"
             >
               {t('agenda.googleCalendar.later')}
             </Button>
@@ -96,7 +96,7 @@ export function CalendarRequiredDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="z-[90] bg-white max-w-[calc(100%-2rem)] sm:max-w-md">
+      <AlertDialogContent className="z-[90] bg-background max-w-[calc(100%-2rem)] sm:max-w-md">
         <AlertDialogHeader>
           <div className="flex items-start gap-4">
             {icon}

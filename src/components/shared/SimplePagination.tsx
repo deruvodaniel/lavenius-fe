@@ -37,8 +37,8 @@ export function SimplePagination({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-      <p className="text-sm text-gray-500">
+    <div className="flex items-center justify-between pt-4 border-t border-border">
+      <p className="text-sm text-muted-foreground">
         {startItem}-{endItem} {ofLabel} {totalItems}
       </p>
       <div className="flex items-center gap-1">
@@ -52,7 +52,7 @@ export function SimplePagination({
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <span className="px-3 text-sm text-gray-600">
+        <span className="px-3 text-sm text-muted-foreground">
           {currentPage} / {totalPages}
         </span>
         <Button

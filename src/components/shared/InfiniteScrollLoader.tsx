@@ -72,7 +72,7 @@ export function InfiniteScrollLoader({
               style={{ animationDelay: '300ms' }}
             />
           </div>
-          <p className="text-sm text-gray-500">{loadingText}</p>
+          <p className="text-sm text-muted-foreground">{loadingText}</p>
         </div>
       ) : (
         <div className="h-4" />

@@ -104,15 +104,15 @@ export function ConfirmDialog({
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[75vh] bg-white">
-          <DrawerHeader className="text-left border-b border-gray-100">
+        <DrawerContent className="max-h-[75vh] bg-background">
+          <DrawerHeader className="text-left border-b border-border">
             <div className="flex items-start gap-4">
               <div className={`w-12 h-12 rounded-full ${config.iconBg} flex items-center justify-center shrink-0`}>
                 <Icon className={`w-6 h-6 ${config.iconColor}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <DrawerTitle className="text-gray-900">{title}</DrawerTitle>
-                <DrawerDescription className="mt-1 text-gray-600">
+                <DrawerTitle className="text-foreground">{title}</DrawerTitle>
+                <DrawerDescription className="mt-1 text-muted-foreground">
                   {description}
                 </DrawerDescription>
               </div>
@@ -123,7 +123,7 @@ export function ConfirmDialog({
               variant="outline"
               onClick={handleCancel}
               disabled={isLoading}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50 w-full"
+              className="border-border text-foreground hover:bg-muted w-full"
             >
               {cancelLabel}
             </Button>
@@ -142,15 +142,15 @@ export function ConfirmDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="z-[90] bg-white max-w-[calc(100%-2rem)] sm:max-w-lg">
+      <AlertDialogContent className="z-[90] bg-background max-w-[calc(100%-2rem)] sm:max-w-lg">
         <AlertDialogHeader>
           <div className="flex items-start gap-4">
             <div className={`w-12 h-12 rounded-full ${config.iconBg} flex items-center justify-center shrink-0`}>
               <Icon className={`w-6 h-6 ${config.iconColor}`} />
             </div>
             <div className="flex-1 min-w-0">
-              <AlertDialogTitle className="text-gray-900">{title}</AlertDialogTitle>
-              <AlertDialogDescription className="mt-1 text-gray-600">
+              <AlertDialogTitle className="text-foreground">{title}</AlertDialogTitle>
+              <AlertDialogDescription className="mt-1 text-muted-foreground">
                 {description}
               </AlertDialogDescription>
             </div>
@@ -160,7 +160,7 @@ export function ConfirmDialog({
           <AlertDialogCancel 
             onClick={handleCancel}
             disabled={isLoading}
-            className="border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto"
+            className="border-border text-foreground hover:bg-muted w-full sm:w-auto"
           >
             {cancelLabel}
           </AlertDialogCancel>

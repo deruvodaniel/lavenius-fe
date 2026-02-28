@@ -115,7 +115,7 @@ interface DrawerFooterProps {
 
 export function DrawerFooter({ children }: DrawerFooterProps) {
   return (
-    <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 flex flex-col sm:flex-row gap-3">
+    <div className="sticky bottom-0 bg-background border-t border-border p-4 flex flex-col sm:flex-row gap-3">
       {children}
     </div>
   );
@@ -237,7 +237,7 @@ export function BaseDrawer({
       <div
         ref={containerRef}
         className={cn(
-          'relative ml-auto h-full w-full bg-white shadow-2xl flex flex-col',
+          'relative ml-auto h-full w-full bg-background shadow-2xl flex flex-col',
           // Animation classes
           'animate-in slide-in-from-right duration-300',
           maxWidth,

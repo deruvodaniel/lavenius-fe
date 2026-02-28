@@ -44,14 +44,14 @@ export function CalendarView({
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={onPreviousMonth}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-muted rounded-lg transition-colors"
           title="Mes anterior"
         >
-          <ChevronLeft className="w-5 h-5 text-gray-600" />
+          <ChevronLeft className="w-5 h-5 text-muted-foreground" />
         </button>
         
         <div className="flex items-center gap-3">
-          <h2 className="text-gray-900 capitalize font-medium">{monthName}</h2>
+          <h2 className="text-foreground capitalize font-medium">{monthName}</h2>
           <button
             onClick={onToday}
             className="text-sm px-3 py-1 bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors"
@@ -62,17 +62,17 @@ export function CalendarView({
         
         <button
           onClick={onNextMonth}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-muted rounded-lg transition-colors"
           title="Mes siguiente"
         >
-          <ChevronRight className="w-5 h-5 text-gray-600" />
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
         </button>
       </div>
 
       {/* Calendar Grid */}
       <div className={`grid grid-cols-7 ${isMobile ? 'gap-1' : 'gap-2'}`}>
         {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
-          <div key={day} className="text-center text-gray-500 text-sm p-2">
+          <div key={day} className="text-center text-muted-foreground text-sm p-2">
             {day}
           </div>
         ))}
@@ -97,13 +97,13 @@ export function CalendarView({
                 isToday
                   ? 'border-indigo-600 bg-indigo-50'
                   : isPast
-                  ? 'border-gray-100 bg-gray-50'
-                  : 'border-gray-200 hover:border-indigo-300'
+                  ? 'border-border bg-muted'
+                  : 'border-border hover:border-indigo-300'
               } ${isMobile && isToday ? 'bg-indigo-600 text-white font-bold' : ''}`}
             >
               <span
                 className={`text-sm ${
-                  isToday && isMobile ? 'text-white' : isToday ? 'text-indigo-600' : isPast ? 'text-gray-400' : 'text-gray-700'
+                  isToday && isMobile ? 'text-white' : isToday ? 'text-indigo-600' : isPast ? 'text-muted-foreground' : 'text-foreground'
                 }`}
               >
                 {day}

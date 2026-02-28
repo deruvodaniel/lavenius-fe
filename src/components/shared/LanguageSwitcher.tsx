@@ -121,7 +121,7 @@ export function LanguageSwitcher({
     return (
       <div className={cn('relative flex items-center', className)} ref={dropdownRef}>
         {showLabel && (
-          <span className="mr-3 text-sm font-medium text-gray-700">
+          <span className="mr-3 text-sm font-medium text-foreground">
             {t('common.language', 'Idioma')}
           </span>
         )}
@@ -131,9 +131,9 @@ export function LanguageSwitcher({
           onClick={() => setOpen(!open)}
           className={cn(
             'inline-flex items-center h-9 gap-1.5 px-2.5 rounded-md',
-            'bg-white/80 backdrop-blur-md border border-gray-200/60 shadow-sm',
-            'hover:bg-white hover:shadow-md hover:border-gray-300/60',
-            'text-gray-700 hover:text-gray-900',
+            'bg-background/80 backdrop-blur-md border border-border/60 shadow-sm',
+            'hover:bg-background hover:shadow-md hover:border-border',
+            'text-foreground',
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1',
             'transition-all duration-200'
           )}
@@ -144,7 +144,7 @@ export function LanguageSwitcher({
           <currentLang.Flag className="w-5 h-4 rounded-sm" aria-hidden="true" />
           <ChevronDown
             className={cn(
-              'h-3.5 w-3.5 text-gray-500 transition-transform duration-200',
+              'h-3.5 w-3.5 text-muted-foreground transition-transform duration-200',
               open && 'rotate-180'
             )}
             aria-hidden="true"
@@ -159,7 +159,7 @@ export function LanguageSwitcher({
               'absolute top-full mt-2 z-[100]',
               align === 'end' ? 'right-0' : align === 'start' ? 'left-0' : 'left-1/2 -translate-x-1/2',
               'min-w-[160px] p-1.5',
-              'bg-white border border-gray-200 shadow-xl rounded-xl',
+              'bg-background border border-border shadow-xl rounded-xl',
               'animate-in fade-in-0 zoom-in-95 duration-150'
             )}
             role="listbox"
@@ -179,11 +179,11 @@ export function LanguageSwitcher({
                       'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg',
                       'text-sm font-medium text-left',
                       'transition-colors duration-150',
-                      'hover:bg-gray-100',
+                      'hover:bg-muted',
                       'focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset',
                       isActive
                         ? 'bg-indigo-50 text-indigo-700'
-                        : 'text-gray-700'
+                        : 'text-foreground'
                     )}
                   >
                     <lang.Flag className="w-5 h-4 rounded-sm" aria-hidden="true" />
@@ -210,7 +210,7 @@ export function LanguageSwitcher({
       {showLabel && (
         <label
           htmlFor="language-select"
-          className="text-sm font-medium text-gray-700"
+          className="text-sm font-medium text-foreground"
         >
           {t('common.language', 'Idioma')}
         </label>
@@ -218,7 +218,7 @@ export function LanguageSwitcher({
       <Select value={currentLanguage} onValueChange={handleLanguageChange}>
         <SelectTrigger
           id="language-select"
-          className="w-full min-w-[180px] bg-white"
+          className="w-full min-w-[180px]"
           aria-label={t('common.selectLanguage', 'Select language')}
         >
           <SelectValue>
@@ -228,7 +228,7 @@ export function LanguageSwitcher({
             </span>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className="bg-white">
+        <SelectContent>
           {languages.map((lang) => (
             <SelectItem
               key={lang.code}

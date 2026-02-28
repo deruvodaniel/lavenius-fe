@@ -24,18 +24,18 @@ export function EmptyState({
   return (
     <div className={`flex flex-col items-center justify-center ${isSubtle ? 'py-12' : 'py-16'} px-4 text-center`}>
       <div className={`${
-        isSubtle 
-          ? 'w-16 h-16 bg-gray-100' 
+        isSubtle
+          ? 'w-16 h-16 bg-muted'
           : 'w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100'
       } rounded-full flex items-center justify-center mb-4 transition-transform hover:scale-110`}>
-        <Icon className={`${isSubtle ? 'w-8 h-8 text-gray-400' : 'w-10 h-10 text-indigo-600'}`} />
+        <Icon className={`${isSubtle ? 'w-8 h-8 text-muted-foreground' : 'w-10 h-10 text-indigo-600'}`} />
       </div>
       
-      <h3 className={`${isSubtle ? 'text-base' : 'text-lg'} font-medium text-gray-900 mb-2`}>
+      <h3 className={`${isSubtle ? 'text-base' : 'text-lg'} font-medium text-foreground mb-2`}>
         {title}
       </h3>
       
-      <p className={`${isSubtle ? 'text-sm' : 'text-base'} text-gray-500 max-w-sm mb-6`}>
+      <p className={`${isSubtle ? 'text-sm' : 'text-base'} text-muted-foreground max-w-sm mb-6`}>
         {description}
       </p>
       

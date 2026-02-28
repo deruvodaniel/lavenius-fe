@@ -15,8 +15,8 @@ export function Skeleton({
   height,
   animation = 'pulse'
 }: SkeletonProps) {
-  const baseClasses = 'bg-gray-200 rounded';
-  
+  const baseClasses = 'bg-muted rounded';
+
   const variantClasses = {
     text: 'h-4',
     circular: 'rounded-full',
@@ -25,7 +25,7 @@ export function Skeleton({
 
   const animationClasses = {
     pulse: 'animate-pulse',
-    wave: 'animate-shimmer bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%]'
+    wave: 'animate-shimmer bg-gradient-to-r from-muted via-muted/50 to-muted bg-[length:200%_100%]'
   };
 
   const style: React.CSSProperties = {
@@ -43,7 +43,7 @@ export function Skeleton({
 
 export function SkeletonCard() {
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+    <div className="bg-card rounded-lg shadow-sm p-6 border border-border">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3 flex-1">
           <Skeleton variant="circular" width={48} height={48} />
@@ -71,9 +71,9 @@ export function SkeletonCard() {
 
 export function SkeletonTable({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div className="bg-card rounded-lg shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
+      <div className="px-6 py-4 border-b border-border">
         <div className="flex gap-4">
           <Skeleton width="20%" />
           <Skeleton width="30%" />
@@ -83,7 +83,7 @@ export function SkeletonTable({ rows = 5 }: { rows?: number }) {
         </div>
       </div>
       {/* Rows */}
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y divide-border">
         {Array.from({ length: rows }).map((_, i) => (
           <div key={i} className="px-6 py-4">
             <div className="flex gap-4 items-center">
@@ -104,7 +104,7 @@ export function SkeletonList({ items = 3 }: { items?: number }) {
   return (
     <div className="space-y-4">
       {Array.from({ length: items }).map((_, i) => (
-        <div key={i} className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+        <div key={i} className="bg-card rounded-lg shadow-sm p-4 border border-border">
           <div className="flex items-center gap-3">
             <Skeleton variant="circular" width={40} height={40} />
             <div className="flex-1">
@@ -124,7 +124,7 @@ export function SkeletonList({ items = 3 }: { items?: number }) {
  */
 export function SkeletonCalendar() {
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+    <div className="bg-card rounded-lg shadow-sm p-4 border border-border">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <Skeleton width={120} height={28} />
@@ -156,7 +156,7 @@ export function SkeletonStats({ cards = 4 }: { cards?: number }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {Array.from({ length: cards }).map((_, i) => (
-        <div key={i} className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+        <div key={i} className="bg-card rounded-lg shadow-sm p-4 border border-border">
           <div className="flex items-center gap-3 mb-3">
             <Skeleton variant="circular" width={40} height={40} />
             <Skeleton width="60%" height={16} />
@@ -176,7 +176,7 @@ export function SkeletonNotes({ items = 3 }: { items?: number }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: items }).map((_, i) => (
-        <div key={i} className="bg-white rounded-lg p-4 border border-gray-200">
+        <div key={i} className="bg-card rounded-lg p-4 border border-border">
           <div className="flex items-start justify-between mb-2">
             <Skeleton width="40%" height={18} />
             <Skeleton width={80} height={14} />
@@ -197,7 +197,7 @@ export function SkeletonNotes({ items = 3 }: { items?: number }) {
  */
 export function SkeletonSessionCard() {
   return (
-    <div className="bg-white rounded-lg p-4 border border-gray-200">
+    <div className="bg-card rounded-lg p-4 border border-border">
       <div className="flex items-center gap-3 mb-3">
         <Skeleton variant="circular" width={36} height={36} />
         <div className="flex-1">
@@ -218,10 +218,10 @@ export function SkeletonSessionCard() {
  */
 export function LoadingOverlay({ message = 'Cargando...' }: { message?: string }) {
   return (
-    <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="flex flex-col items-center gap-3">
         <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-        <p className="text-gray-600 text-sm">{message}</p>
+        <p className="text-muted-foreground text-sm">{message}</p>
       </div>
     </div>
   );

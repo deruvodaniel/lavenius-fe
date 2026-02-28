@@ -19,7 +19,7 @@ export function NotFound() {
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="relative">
               {/* Search icon with question mark */}
-              <div className="w-24 h-24 bg-white rounded-2xl shadow-xl flex items-center justify-center transform -rotate-6 border-2 border-indigo-100">
+              <div className="w-24 h-24 bg-card rounded-2xl shadow-xl flex items-center justify-center transform -rotate-6 border-2 border-indigo-100">
                 <Search className="w-12 h-12 text-indigo-400" />
               </div>
               <div className="absolute -top-2 -right-2 w-8 h-8 bg-amber-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
@@ -30,10 +30,10 @@ export function NotFound() {
         </div>
 
         {/* Content */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
           Pagina no encontrada
         </h1>
-        <p className="text-gray-600 mb-8 max-w-md mx-auto">
+        <p className="text-muted-foreground mb-8 max-w-md mx-auto">
           Lo sentimos, la pagina que buscas no existe o fue movida. 
           Verifica la URL o vuelve al inicio.
         </p>
@@ -58,8 +58,8 @@ export function NotFound() {
         </div>
 
         {/* Support section */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200 p-6">
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="bg-background/60 backdrop-blur-sm rounded-xl border border-border p-6">
+          <p className="text-sm text-muted-foreground mb-4">
             Si el problema persiste, contacta a soporte tecnico:
           </p>
           <a 
@@ -72,7 +72,7 @@ export function NotFound() {
         </div>
 
         {/* Footer */}
-        <p className="mt-8 text-xs text-gray-400">
+        <p className="mt-8 text-xs text-muted-foreground">
           Lavenius - Gestion de Pacientes
         </p>
       </div>

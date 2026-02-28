@@ -36,7 +36,7 @@ export function LoadingSpinner({ message, size = 'md' }: LoadingSpinnerProps) {
           style={{ animationDelay: '300ms' }}
         />
       </div>
-      <p className="text-gray-500">{displayMessage}</p>
+      <p className="text-muted-foreground">{displayMessage}</p>
     </div>
   );
 }

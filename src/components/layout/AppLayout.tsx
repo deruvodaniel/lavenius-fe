@@ -73,7 +73,7 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
 
   // Single consistent structure - CSS handles responsive visibility
   return (
-    <div className="h-screen flex flex-col lg:flex-row overflow-hidden bg-gray-50">
+    <div className="h-screen flex flex-col lg:flex-row overflow-hidden bg-muted">
       {/* Mobile Header - hidden on desktop */}
       <header className="bg-indigo-900 text-white p-4 flex items-center justify-between shadow-lg z-40 lg:hidden">
         <h1 className="text-xl font-bold flex items-center gap-2">{appName} <BetaBadge /></h1>
@@ -119,7 +119,7 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
             <TooltipTrigger asChild>
               <button
                 onClick={handleToggleCollapse}
-                className="absolute top-1/2 -translate-y-1/2 -right-3 z-30 w-6 h-6 bg-white rounded-full shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:shadow-lg transition-all duration-200"
+                className="absolute top-1/2 -translate-y-1/2 -right-3 z-30 w-6 h-6 bg-background rounded-full shadow-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:shadow-lg transition-all duration-200"
                 aria-label={sidebarCollapsed ? t('navigation.expandSidebar') : t('navigation.collapseSidebar')}
               >
                 {sidebarCollapsed ? (
@@ -129,7 +129,7 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
                 )}
               </button>
             </TooltipTrigger>
-            <TooltipContent side="right" className="bg-gray-900 text-white border-0 shadow-lg rounded-md text-sm font-medium">
+            <TooltipContent side="right" className="shadow-lg rounded-md text-sm font-medium">
               {sidebarCollapsed ? t('navigation.expandSidebar') : t('navigation.collapseSidebar')}
             </TooltipContent>
           </Tooltip>
