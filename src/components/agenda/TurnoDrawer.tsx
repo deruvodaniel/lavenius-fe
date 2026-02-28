@@ -335,7 +335,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         <DrawerBody>
           {/* Paciente */}
           <div>
-            <label htmlFor="turno-paciente" className="flex items-center gap-2 text-gray-700 mb-2">
+            <label htmlFor="turno-paciente" className="flex items-center gap-2 text-foreground mb-2">
               <User className="w-4 h-4" />
               {t('agenda.fields.patient')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
             </label>
@@ -344,7 +344,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               value={formData.pacienteId}
               onChange={(e) => setFormData({ ...formData, pacienteId: e.target.value })}
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                !formData.pacienteId ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                !formData.pacienteId ? 'border-red-300 bg-red-50' : 'border-border'
               }`}
               required
             >
@@ -357,7 +357,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
             </select>
             {/* Loading indicator or email status */}
             {formData.pacienteId && isLoadingPatient && (
-              <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
+              <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span>{t('agenda.drawer.loadingPatientData')}</span>
               </div>
@@ -376,7 +376,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
           {/* Fecha */}
           <div>
-            <label htmlFor="turno-fecha" className="flex items-center gap-2 text-gray-700 mb-2">
+            <label htmlFor="turno-fecha" className="flex items-center gap-2 text-foreground mb-2">
               <Calendar className="w-4 h-4" />
               {t('agenda.fields.date')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
             </label>
@@ -392,7 +392,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           {/* Start Time & Duration */}
           <div className="flex gap-3">
             <div className="flex-1">
-              <label htmlFor="turno-hora-inicio" className="flex items-center gap-2 text-gray-700 mb-2">
+              <label htmlFor="turno-hora-inicio" className="flex items-center gap-2 text-foreground mb-2">
                 <Clock className="w-4 h-4" />
                 {t('agenda.fields.startTime')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
               </label>
@@ -400,7 +400,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
                 id="turno-hora-inicio"
                 value={formData.horaInicio}
                 onChange={(e) => handleStartTimeChange(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'].map((h) => (
                   <option key={h} value={h}>{h}</option>
@@ -409,7 +409,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
             </div>
 
             <div className="flex-1">
-              <label htmlFor="turno-duration" className="flex items-center gap-2 text-gray-700 mb-2">
+              <label htmlFor="turno-duration" className="flex items-center gap-2 text-foreground mb-2">
                 <Clock className="w-4 h-4" />
                 {t('agenda.duration.label')}
               </label>
@@ -417,7 +417,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
                 id="turno-duration"
                 value={selectedDuration}
                 onChange={(e) => handleDurationChange(Number(e.target.value))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {durationOptions.map(({ value, labelKey }) => (
                   <option key={value} value={value}>
@@ -430,7 +430,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
           {/* Motivo */}
           <div>
-            <label htmlFor="turno-motivo" className="block text-gray-700 mb-2">
+            <label htmlFor="turno-motivo" className="block text-foreground mb-2">
               {t('agenda.fields.reason')}
             </label>
             <input
@@ -439,18 +439,18 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               value={formData.motivo}
               onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}
               placeholder={t('agenda.fields.reasonPlaceholder')}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
           {/* Tipo de Sesi\u00F3n */}
           <div>
-            <label htmlFor="turno-tipo-sesion" className="block text-gray-700 mb-2">{t('agenda.fields.type')}</label>
+            <label htmlFor="turno-tipo-sesion" className="block text-foreground mb-2">{t('agenda.fields.type')}</label>
             <select
               id="turno-tipo-sesion"
               value={formData.sessionType}
               onChange={(e) => setFormData({ ...formData, sessionType: e.target.value as SessionType })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="presential">{t('agenda.sessionTypes.presential')}</option>
               <option value="remote">{t('agenda.sessionTypes.remote')}</option>
@@ -459,12 +459,12 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
           {/* Estado */}
           <div>
-            <label htmlFor="turno-estado" className="block text-gray-700 mb-2">{t('agenda.fields.status')}</label>
+            <label htmlFor="turno-estado" className="block text-foreground mb-2">{t('agenda.fields.status')}</label>
             <select
               id="turno-estado"
               value={formData.estado}
               onChange={(e) => setFormData({ ...formData, estado: e.target.value as SessionStatus })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="pending">{t('agenda.status.scheduled')}</option>
               <option value="confirmed">{t('agenda.status.confirmed')}</option>
@@ -475,7 +475,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
           {/* Monto */}
           <div>
-            <label htmlFor="turno-monto" className="block text-gray-700 mb-2">
+            <label htmlFor="turno-monto" className="block text-foreground mb-2">
               {t('agenda.fields.amount')}
             </label>
             <input
@@ -483,7 +483,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               type="number"
               value={formData.monto}
               onChange={(e) => setFormData({ ...formData, monto: Number(e.target.value) })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
         </DrawerBody>

@@ -46,8 +46,8 @@ export function AgendaHeader({
       {/* Title row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('agenda.title')}</h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('agenda.title')}</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
             {t('agenda.subtitle')}
           </p>
         </div>
@@ -64,7 +64,7 @@ export function AgendaHeader({
       <div className="flex flex-row gap-2 items-center">
         {/* Search */}
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
             placeholder={t('agenda.searchPlaceholder')}
@@ -76,7 +76,7 @@ export function AgendaHeader({
           {searchTerm && (
             <button
               onClick={() => onSearchChange('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               aria-label={t('agenda.clearSearch')}
             >
               <X className="h-4 w-4" />
@@ -99,7 +99,7 @@ export function AgendaHeader({
 
       {/* Search results count */}
       {searchTerm && (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           {t('agenda.searchResults', { count: searchResultsCount })}
           {searchTerm && ` ${t('agenda.searchResultsFor', { search: searchTerm })}`}
         </p>

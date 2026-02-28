@@ -60,8 +60,8 @@ export function AgendaSessionList({
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col flex-1">
-      <h2 className="text-gray-900 px-6 pt-6 pb-4 flex-shrink-0">{t('agenda.upcoming')}</h2>
+    <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden flex flex-col flex-1">
+      <h2 className="text-foreground px-6 pt-6 pb-4 flex-shrink-0">{t('agenda.upcoming')}</h2>
       <div className="flex-1 overflow-y-auto px-6 pb-6">
         {isLoading ? (
           <SkeletonList items={5} />
@@ -97,8 +97,8 @@ export function AgendaSessionList({
               return (
                 <div key={fecha} className="space-y-3">
                   {/* Date Header */}
-                  <div className={`pb-2 border-b-2 ${isToday ? 'border-indigo-600' : 'border-gray-200'}`}>
-                    <h3 className={`capitalize ${isToday ? 'text-indigo-600' : 'text-gray-700'}`}>
+                  <div className={`pb-2 border-b-2 ${isToday ? 'border-indigo-600' : 'border-border'}`}>
+                    <h3 className={`capitalize ${isToday ? 'text-indigo-600' : 'text-foreground'}`}>
                       {formatFecha(fecha)}
                     </h3>
                   </div>
@@ -148,7 +148,7 @@ export function AgendaSessionList({
                       <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
                       <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
-                    <p className="text-sm text-gray-500">{t('agenda.loadingMore')}</p>
+                    <p className="text-sm text-muted-foreground">{t('agenda.loadingMore')}</p>
                   </div>
                 ) : (
                   <div className="h-4"></div>

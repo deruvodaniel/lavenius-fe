@@ -105,10 +105,10 @@ export function TurnoCard({
   const patientName = patient?.nombre || t('agenda.details.noPatient');
 
   return (
-    <Card className={`p-3 sm:p-4 border-l-4 bg-white hover:shadow-md transition-shadow ${borderClass}`}>
+    <Card className={`p-3 sm:p-4 border-l-4 bg-card hover:shadow-md transition-shadow ${borderClass}`}>
       <div className="flex items-center gap-3">
         {/* Time */}
-        <div className="flex items-center gap-1.5 text-gray-600 min-w-[60px]">
+        <div className="flex items-center gap-1.5 text-muted-foreground min-w-[60px]">
           <Clock className="w-4 h-4 flex-shrink-0" />
           <span className="text-sm font-medium">{hora}</span>
         </div>
@@ -116,21 +116,21 @@ export function TurnoCard({
         {/* Avatar + Name (clickable) */}
         <button
           onClick={() => patient && onPatientClick(patient.id)}
-          className="flex items-center gap-2 min-w-0 flex-1 text-left hover:bg-gray-50 rounded-lg p-1 -m-1 transition-colors group"
+          className="flex items-center gap-2 min-w-0 flex-1 text-left hover:bg-muted rounded-lg p-1 -m-1 transition-colors group"
           disabled={!patient}
         >
           <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-200 transition-colors">
             <span className="text-indigo-600 text-xs font-semibold">{initials}</span>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
+            <p className="text-sm font-medium text-foreground truncate group-hover:text-indigo-600 transition-colors">
               {patientName}
             </p>
             {/* Secondary info line - status + modality */}
             {!isCompactView && (
-              <div className="flex items-center gap-2 text-xs text-gray-500">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span>{statusLabel}</span>
-                <span className="text-gray-300">•</span>
+                <span className="text-border">•</span>
                 <span className="flex items-center gap-1">
                   {isRemote ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
                   {isRemote ? t('agenda.sessionTypes.remote') : t('agenda.sessionTypes.presential')}
@@ -172,13 +172,13 @@ export function TurnoCard({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button 
-              className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer"
               aria-label={t('agenda.card.actions')}
             >
               <MoreVertical className="w-4 h-4" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 bg-white border border-gray-200 shadow-lg">
+          <DropdownMenuContent align="end" className="w-48 bg-card border border-border shadow-lg">
             <DropdownMenuItem 
               onClick={() => patient && onPatientClick(patient.id)} 
               disabled={!patient}

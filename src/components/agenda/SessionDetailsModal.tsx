@@ -37,31 +37,31 @@ function SessionDetailsContent({ session, isPaid }: { session: SessionUI; isPaid
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-4 py-4 text-gray-900">
+    <div className="space-y-4 py-4 text-foreground">
       {/* Paciente */}
       <div>
-        <h3 className="text-sm font-semibold text-gray-500 mb-1">{t('agenda.details.patient')}</h3>
-        <p className="text-base font-medium text-gray-900">{session.patientName || t('agenda.details.noPatient')}</p>
+        <h3 className="text-sm font-semibold text-muted-foreground mb-1">{t('agenda.details.patient')}</h3>
+        <p className="text-base font-medium text-foreground">{session.patientName || t('agenda.details.noPatient')}</p>
       </div>
 
       {/* Fecha y hora */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 mb-1 flex items-center gap-1">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-1 flex items-center gap-1">
             <Calendar className="h-3.5 w-3.5" />
             {t('agenda.details.date')}
           </h3>
           <p className="text-sm">{formatDate(session.scheduledFrom)}</p>
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 mb-1 flex items-center gap-1">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-1 flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" />
             {t('agenda.details.schedule')}
           </h3>
           <p className="text-sm">
             {formatTime(session.scheduledFrom)} - {formatTime(session.scheduledTo)}
           </p>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             {formatDuration(session.scheduledFrom, session.scheduledTo)}
           </p>
         </div>
@@ -69,7 +69,7 @@ function SessionDetailsContent({ session, isPaid }: { session: SessionUI; isPaid
 
       {/* Tipo de sesión */}
       <div>
-        <h3 className="text-sm font-semibold text-gray-500 mb-1">{t('agenda.details.modality')}</h3>
+        <h3 className="text-sm font-semibold text-muted-foreground mb-1">{t('agenda.details.modality')}</h3>
         <div className="flex items-center gap-2">
           {SESSION_TYPE_ICONS[session.sessionType]}
           <span className="text-sm">{SESSION_TYPE_LABELS[session.sessionType]}</span>
@@ -79,7 +79,7 @@ function SessionDetailsContent({ session, isPaid }: { session: SessionUI; isPaid
       {/* Costo */}
       {session.cost && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 mb-1 flex items-center gap-1">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-1 flex items-center gap-1">
             <DollarSign className="h-3.5 w-3.5" />
             {t('agenda.details.cost')}
           </h3>
@@ -100,8 +100,8 @@ function SessionDetailsContent({ session, isPaid }: { session: SessionUI; isPaid
       {/* Resumen de sesión */}
       {session.sessionSummary && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 mb-1">{t('agenda.details.summary')}</h3>
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-1">{t('agenda.details.summary')}</h3>
+          <p className="text-sm text-foreground whitespace-pre-wrap">
             {session.sessionSummary}
           </p>
         </div>
@@ -146,10 +146,10 @@ export function SessionDetailsModal({
   if (isMobile) {
     return (
       <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DrawerContent className="max-h-[85vh] bg-white">
-          <DrawerHeader className="text-left border-b border-gray-100">
+        <DrawerContent className="max-h-[85vh] bg-card">
+          <DrawerHeader className="text-left border-b border-border">
             <div className="flex items-center justify-between">
-              <DrawerTitle className="text-gray-900">
+              <DrawerTitle className="text-foreground">
                 {t('agenda.details.title')}
               </DrawerTitle>
               {statusBadge}
@@ -168,9 +168,9 @@ export function SessionDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] !bg-white">
+      <DialogContent className="sm:max-w-[500px] !bg-card">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between text-gray-900">
+          <DialogTitle className="flex items-center justify-between text-foreground">
             <span>{t('agenda.details.title')}</span>
             {statusBadge}
           </DialogTitle>

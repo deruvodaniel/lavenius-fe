@@ -480,19 +480,19 @@ export function FullCalendarView({
   };
 
   return (
-    <Card className="p-4 sm:p-5 relative bg-white">
+    <Card className="p-4 sm:p-5 relative bg-card">
       {/* Loading Overlay */}
       {isLoading && <LoadingOverlay message="Cargando turnos..." />}
       
       {/* Toolbar personalizado */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mb-4 gap-3">
         {/* Botones de vista */}
-        <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-lg w-full sm:w-auto justify-center sm:justify-start">
+        <div className="flex items-center gap-1.5 bg-muted p-1 rounded-lg w-full sm:w-auto justify-center sm:justify-start">
           <Button
             variant={currentView === 'dayGridMonth' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => changeView('dayGridMonth')}
-            className={`h-8 px-2 sm:px-3 text-xs flex-1 sm:flex-none ${currentView === 'dayGridMonth' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'}`}
+            className={`h-8 px-2 sm:px-3 text-xs flex-1 sm:flex-none ${currentView === 'dayGridMonth' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-transparent'}`}
           >
             <Grid3x3 className="h-3.5 w-3.5 sm:mr-1.5" />
             <span className="hidden sm:inline">Mes</span>
@@ -501,7 +501,7 @@ export function FullCalendarView({
             variant={currentView === 'timeGridWeek' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => changeView('timeGridWeek')}
-            className={`h-8 px-2 sm:px-3 text-xs flex-1 sm:flex-none ${currentView === 'timeGridWeek' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'}`}
+            className={`h-8 px-2 sm:px-3 text-xs flex-1 sm:flex-none ${currentView === 'timeGridWeek' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-transparent'}`}
           >
             <Calendar className="h-3.5 w-3.5 sm:mr-1.5" />
             <span className="hidden sm:inline">Semana</span>
@@ -510,7 +510,7 @@ export function FullCalendarView({
             variant={currentView === 'timeGridDay' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => changeView('timeGridDay')}
-            className={`h-8 px-2 sm:px-3 text-xs flex-1 sm:flex-none ${currentView === 'timeGridDay' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'}`}
+            className={`h-8 px-2 sm:px-3 text-xs flex-1 sm:flex-none ${currentView === 'timeGridDay' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-transparent'}`}
           >
             <Clock className="h-3.5 w-3.5 sm:mr-1.5" />
             <span className="hidden sm:inline">Día</span>
@@ -521,15 +521,15 @@ export function FullCalendarView({
         <div className="flex items-center justify-center sm:justify-end gap-3 text-[11px] flex-wrap">
           <div className="flex items-center gap-1">
             <div className="w-2.5 h-2.5 rounded-sm bg-amber-500" />
-            <span className="text-gray-600">Agendada</span>
+            <span className="text-muted-foreground">Agendada</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-2.5 h-2.5 rounded-sm bg-blue-500" />
-            <span className="text-gray-600">Confirmada</span>
+            <span className="text-muted-foreground">Confirmada</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-2.5 h-2.5 rounded-sm bg-green-500" />
-            <span className="text-gray-600">Completada</span>
+            <span className="text-muted-foreground">Completada</span>
           </div>
         </div>
       </div>

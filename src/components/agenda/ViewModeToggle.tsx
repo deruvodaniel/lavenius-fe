@@ -26,7 +26,7 @@ export function ViewModeToggle({ value, onChange, isMobile, labels }: ViewModeTo
       ];
 
   return (
-    <div className="inline-flex items-center bg-gray-100 rounded-lg p-1 gap-0.5">
+    <div className="inline-flex items-center bg-muted rounded-lg p-1 gap-0.5">
       {options.map((option) => {
         const isActive = value === option.value;
         return (
@@ -35,9 +35,9 @@ export function ViewModeToggle({ value, onChange, isMobile, labels }: ViewModeTo
             onClick={() => onChange(option.value)}
             className={`
               flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all
-              ${isActive 
-                ? 'bg-white text-indigo-600 shadow-sm' 
-                : 'text-gray-600 hover:text-gray-900'
+              ${isActive
+                ? 'bg-background text-indigo-600 shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
               }
             `}
             aria-pressed={isActive}
