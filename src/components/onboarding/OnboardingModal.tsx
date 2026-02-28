@@ -205,7 +205,6 @@ export function OnboardingModal({
                 <Button
                   onClick={handleComplete}
                   size="sm"
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
                 >
                   {t('onboarding.navigation.start')}
                 </Button>

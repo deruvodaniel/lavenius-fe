@@ -170,7 +170,7 @@ const CobroCard = ({ item, onMarkAsPaid, onReminder, onDelete, onViewDetail, onR
         {item.isVirtual && isPending && onRegisterPayment && (
           <Button 
             size="sm" 
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white" 
+            className="flex-1" 
             onClick={onRegisterPayment}
           >
             <DollarSign className="h-4 w-4 mr-1.5" />
@@ -187,7 +187,7 @@ const CobroCard = ({ item, onMarkAsPaid, onReminder, onDelete, onViewDetail, onR
         {!item.isVirtual && !isPaid && onMarkAsPaid && (
           <Button 
             size="sm" 
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white" 
+            className="flex-1" 
             onClick={onMarkAsPaid}
             disabled={isMarkingAsPaid}
           >
@@ -283,7 +283,7 @@ const PaymentCard = ({ payment, onMarkAsPaid, onReminder, onDelete, onViewDetail
         {!isPaid && onMarkAsPaid && (
           <Button 
             size="sm" 
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white" 
+            className="flex-1" 
             onClick={onMarkAsPaid}
             disabled={isMarkingAsPaid}
           >
@@ -727,7 +727,7 @@ export function Cobros() {
             {t('payments.managePayments')}
           </p>
         </div>
-        <Button onClick={handleCreatePayment} className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white">
+        <Button onClick={handleCreatePayment} className="w-full sm:w-auto">
           <Plus className="h-4 w-4 mr-2" />
           {t('payments.registerPayment')}
         </Button>

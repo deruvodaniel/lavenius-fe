@@ -130,7 +130,7 @@ export function DateFilters({
           variant={quickFilter === 'all' ? 'default' : 'outline'}
           size="sm"
           onClick={() => handleQuickFilter('all')}
-          className={quickFilter === 'all' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
+          className=""
         >
           {t('payments.filters.all')}
         </Button>
@@ -138,7 +138,7 @@ export function DateFilters({
           variant={quickFilter === 'week' ? 'default' : 'outline'}
           size="sm"
           onClick={() => handleQuickFilter('week')}
-          className={quickFilter === 'week' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
+          className=""
         >
           {t('payments.filters.thisWeek')}
         </Button>
@@ -146,7 +146,7 @@ export function DateFilters({
           variant={quickFilter === 'month' ? 'default' : 'outline'}
           size="sm"
           onClick={() => handleQuickFilter('month')}
-          className={quickFilter === 'month' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
+          className=""
         >
           {t('payments.filters.thisMonth')}
         </Button>
@@ -154,7 +154,7 @@ export function DateFilters({
           variant={quickFilter === 'custom' ? 'default' : 'outline'}
           size="sm"
           onClick={() => handleQuickFilter('custom')}
-          className={quickFilter === 'custom' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
+          className=""
         >
           <Calendar className="h-4 w-4 mr-1.5" />
           {t('payments.filters.range')}

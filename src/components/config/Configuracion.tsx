@@ -1206,7 +1206,6 @@ export function Configuracion() {
                         size="sm"
                         onClick={handleAddDiaOff}
                         disabled={isAddingDayOff}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white"
                       >
                         {isAddingDayOff ? (
                           <Loader2 className="w-4 h-4 mr-1 animate-spin" />
@@ -1257,7 +1256,7 @@ export function Configuracion() {
               <Button
                 onClick={handleSave}
                 disabled={sectionIsSaving}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                className="disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4 mr-2" />
                 {sectionIsSaving ? t('common.saving') : t('common.save')}

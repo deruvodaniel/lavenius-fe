@@ -126,32 +126,39 @@ body {
 
 /* ==========================================================================
    Primary Button Gradient
-   Applies the brand gradient to all default-variant buttons (bg-primary)
-   without modifying shadcn/ui primitives.
+   Applies the brand gradient to all primary buttons — both shadcn <Button>
+   (data-slot="button") and raw <button> with bg-indigo-600.
    ========================================================================== */
 
 [data-slot="button"].bg-primary,
-[data-slot="button"][class*="bg-indigo-600"] {
+button[class*="bg-indigo-600"],
+a[class*="bg-indigo-600"] {
   background: linear-gradient(to right, #4f46e5, #6366f1, #9333ea) !important;
   border: none;
 }
 
 [data-slot="button"].bg-primary:hover,
-[data-slot="button"][class*="bg-indigo-600"]:hover {
+button[class*="bg-indigo-600"]:hover,
+a[class*="bg-indigo-600"]:hover {
   background: linear-gradient(to right, #4338ca, #4f46e5, #7e22ce) !important;
 }
 
 [data-slot="button"].bg-primary:disabled,
-[data-slot="button"][class*="bg-indigo-600"]:disabled {
+button[class*="bg-indigo-600"]:disabled,
+a[class*="bg-indigo-600"]:disabled {
   background: linear-gradient(to right, #4f46e5, #6366f1, #9333ea) !important;
 }
 
 /* Dark mode gradient buttons */
-.dark [data-slot="button"].bg-primary {
+.dark [data-slot="button"].bg-primary,
+.dark button[class*="bg-indigo-600"],
+.dark a[class*="bg-indigo-600"] {
   background: linear-gradient(to right, #818cf8, #a78bfa, #c084fc) !important;
 }
 
-.dark [data-slot="button"].bg-primary:hover {
+.dark [data-slot="button"].bg-primary:hover,
+.dark button[class*="bg-indigo-600"]:hover,
+.dark a[class*="bg-indigo-600"]:hover {
   background: linear-gradient(to right, #6366f1, #8b5cf6, #a855f7) !important;
 }
 

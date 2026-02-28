@@ -84,7 +84,7 @@ export function CalendarRequiredDialog({
             </Button>
             <Button
               onClick={handleConnect}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white w-full"
+              className="w-full"
             >
               {t('agenda.googleCalendar.connectNow')}
             </Button>
@@ -114,7 +114,6 @@ export function CalendarRequiredDialog({
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConnect}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white"
           >
             {t('agenda.googleCalendar.connectNow')}
           </AlertDialogAction>

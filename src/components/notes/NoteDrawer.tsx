@@ -169,7 +169,7 @@ export function NoteDrawer({
         <Button
           onClick={handleSave}
           disabled={isSaving || !formData.text.trim()}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white flex-1 sm:flex-none"
+          className="flex-1 sm:flex-none"
         >
           {isSaving ? (
             t('notes.drawer.saving')

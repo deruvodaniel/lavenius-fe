@@ -135,7 +135,7 @@ export function SessionDetailsModal({
       </Button>
       <Button
         onClick={onEdit}
-        className={`gap-2 bg-indigo-600 hover:bg-indigo-700 text-white ${isMobile ? 'w-full' : ''}`}
+        className={`gap-2 ${isMobile ? 'w-full' : ''}`}
       >
         <Edit2 className="h-4 w-4" />
         {t('agenda.details.editSession')}

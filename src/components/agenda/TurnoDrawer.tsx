@@ -492,11 +492,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           <Button
             onClick={handleSave}
             disabled={!isFormValid}
-            className={`flex-1 ${
-              isFormValid
-                ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
+            className="flex-1"
           >
             {isEditing ? t('agenda.drawer.saveChanges') : t('agenda.drawer.createAppointment')}
           </Button>
