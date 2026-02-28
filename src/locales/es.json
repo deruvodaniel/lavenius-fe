@@ -840,7 +840,15 @@
       "copyLink": "Copiar enlace del perfil",
       "copied": "¡Enlace copiado!",
       "publicProfile": "Perfil público",
-      "comingSoon": "Perfil público completo próximamente"
+      "comingSoon": "Perfil público completo próximamente",
+      "previewDescription": "Así verán tu perfil los pacientes",
+      "previewTitle": "Ver vista previa",
+      "noSpecialty": "Sin especialidad registrada",
+      "noBio": "Sin biografía registrada",
+      "contactInfo": "Información de contacto",
+      "backToSettings": "Volver a configuración",
+      "bookSession": "Reservar sesión",
+      "bookSessionDescription": "Próximamente podrás agendar una sesión directamente desde tu perfil público."
     }
   },
   "analytics": {

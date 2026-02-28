@@ -831,7 +831,15 @@
       "copyLink": "Copiar link do perfil",
       "copied": "Link copiado!",
       "publicProfile": "Perfil público",
-      "comingSoon": "Perfil público completo em breve"
+      "comingSoon": "Perfil público completo em breve",
+      "previewDescription": "Assim os pacientes verão seu perfil",
+      "previewTitle": "Ver prévia",
+      "noSpecialty": "Sem especialidade registrada",
+      "noBio": "Sem biografia registrada",
+      "contactInfo": "Informações de contato",
+      "backToSettings": "Voltar para configurações",
+      "bookSession": "Agendar sessão",
+      "bookSessionDescription": "Em breve você poderá agendar uma sessão diretamente do seu perfil público."
     }
   },
   "analytics": {
@@ -1481,8 +1489,8 @@
       "content": "Conteúdo",
       "date": "Data",
       "session": "Sessão associada"
-    },
-    "messages": {
+      },
+      "messages": {
       "createSuccess": "Anotação criada com sucesso",
       "updateSuccess": "Anotação atualizada com sucesso",
       "deleteSuccess": "Anotação excluída"
