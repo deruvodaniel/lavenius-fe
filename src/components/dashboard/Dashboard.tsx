@@ -1,13 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useClerk } from '@clerk/clerk-react';
+import { LogOut } from 'lucide-react';
 import { AppLayout, Sidebar } from '../layout';
 import { OnboardingModal } from '../onboarding';
+import { ConfirmDialog } from '../shared';
 import { useOnboarding } from '@/lib/hooks/useOnboarding';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 
 export function Dashboard() {
+  const { t } = useTranslation();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const { signOut } = useClerk();
   const { shouldShowOnboarding } = useOnboarding();
   const { connectCalendar } = useCalendarStore();
@@ -35,16 +40,25 @@ export function Dashboard() {
     window.dispatchEvent(new CustomEvent('openPatientDrawer'));
   };
 
+  const handleLogoutRequest = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    signOut({ redirectUrl: '/' });
+  };
+
   return (
     <>
       <AppLayout
         appName="Lavenius"
-        sidebar={(onNavigate?: () => void, collapsed?: boolean) => (
+        sidebar={(onNavigate?: () => void, collapsed?: boolean, showHeader?: boolean) => (
           <Sidebar
             currentPath={location.pathname}
-            onLogout={() => signOut({ redirectUrl: '/' })}
+            onLogout={handleLogoutRequest}
             onNavigate={onNavigate}
             collapsed={collapsed}
+            showHeader={showHeader}
           />
         )}
       >
@@ -57,6 +71,19 @@ export function Dashboard() {
         onClose={() => setShowOnboarding(false)}
         onConnectCalendar={handleConnectCalendar}
         onCreatePatient={handleCreatePatient}
+      />
+
+      {/* Logout Confirmation — rendered at root level, outside sidebar/drawer */}
+      <ConfirmDialog
+        open={showLogoutConfirm}
+        onOpenChange={setShowLogoutConfirm}
+        title={t('logout.confirmTitle')}
+        description={t('logout.confirmDescription')}
+        confirmLabel={t('navigation.logout')}
+        cancelLabel={t('common.cancel')}
+        variant="warning"
+        icon={LogOut}
+        onConfirm={handleLogoutConfirm}
       />
     </>
   );

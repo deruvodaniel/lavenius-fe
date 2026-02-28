@@ -9,7 +9,7 @@ const SIDEBAR_COLLAPSED_KEY = 'lavenius_sidebar_collapsed';
 
 interface AppLayoutProps {
   children: ReactNode;
-  sidebar: (onNavigate?: () => void, collapsed?: boolean) => ReactNode;
+  sidebar: (onNavigate?: () => void, collapsed?: boolean, showHeader?: boolean) => ReactNode;
   appName?: string;
 }
 
@@ -95,9 +95,9 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
             onClick={handleDrawerClose}
           />
 
-          {/* Drawer Content - never collapsed on mobile */}
+          {/* Drawer Content - never collapsed on mobile, no header (AppLayout already shows one) */}
           <aside className="relative z-[81] ml-auto h-full w-64 bg-indigo-900 text-white shadow-2xl overflow-y-auto">
-            {sidebar(handleDrawerClose)}
+            {sidebar(handleDrawerClose, false, false)}
           </aside>
         </div>
       )}
@@ -110,7 +110,7 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
             sidebarCollapsed ? 'w-20' : 'w-64'
           )}
         >
-          {sidebar(undefined, sidebarCollapsed)}
+          {sidebar(undefined, sidebarCollapsed, true)}
         </aside>
         
         {/* Floating Toggle Button - positioned on sidebar edge */}

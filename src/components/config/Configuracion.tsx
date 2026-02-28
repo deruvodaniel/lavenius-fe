@@ -269,7 +269,7 @@ interface ComingSoonWrapperProps {
   text?: string;
 }
 
-const ComingSoonWrapper = ({ children, text = 'Coming soon' }: ComingSoonWrapperProps) => (
+const _ComingSoonWrapper = ({ children, text = 'Coming soon' }: ComingSoonWrapperProps) => (
   <div className="relative select-none">
     <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
       <div className="bg-white/90 border border-gray-200 shadow-lg rounded-lg px-3 py-1.5 transform -rotate-2">
@@ -625,12 +625,12 @@ export function Configuracion() {
         {/* ============================================ */}
         {/* Left Navigation Sidebar */}
         {/* ============================================ */}
-        <nav 
+        <nav
           className="md:w-56 flex-shrink-0"
           aria-label={t('settings.title')}
         >
-          {/* Mobile: Horizontal scroll */}
-          <div className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+          {/* Mobile: Equal-width tab bar with bottom border indicator */}
+          <div className="md:hidden grid border-b border-gray-200" style={{ gridTemplateColumns: `repeat(${NAVIGATION_SECTIONS.length}, 1fr)` }}>
             {NAVIGATION_SECTIONS.map((section) => {
               const Icon = section.icon;
               const isActive = activeSection === section.id;
@@ -640,8 +640,38 @@ export function Configuracion() {
                   type="button"
                   onClick={() => setActiveSection(section.id)}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
-                    "min-w-[120px] md:min-w-0 md:w-full text-left",
+                    "flex flex-col items-center gap-1 px-1 py-3 text-xs font-medium transition-all relative",
+                    isActive
+                      ? "text-indigo-600"
+                      : "text-gray-500 hover:text-gray-700"
+                  )}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <Icon className={cn(
+                    "w-5 h-5",
+                    isActive ? "text-indigo-600" : "text-gray-400"
+                  )} />
+                  <span className="truncate w-full text-center">{t(section.labelKey)}</span>
+                  {isActive && (
+                    <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-indigo-600 rounded-full" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Desktop: Vertical sidebar navigation */}
+          <div className="hidden md:flex md:flex-col gap-1">
+            {NAVIGATION_SECTIONS.map((section) => {
+              const Icon = section.icon;
+              const isActive = activeSection === section.id;
+              return (
+                <button
+                  key={section.id}
+                  type="button"
+                  onClick={() => setActiveSection(section.id)}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all w-full text-left",
                     isActive
                       ? "bg-white shadow-sm border-l-2 border-indigo-600 text-gray-900"
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-2 border-transparent"

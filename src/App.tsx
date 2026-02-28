@@ -13,6 +13,7 @@ const Cobros = lazy(() => import('./components/cobros/Cobros').then(m => ({ defa
 const Analitica = lazy(() => import('./components/analitica/Analitica').then(m => ({ default: m.Analitica })));
 const Configuracion = lazy(() => import('./components/config/Configuracion').then(m => ({ default: m.Configuracion })));
 const HelpCenter = lazy(() => import('./components/help/HelpCenter').then(m => ({ default: m.HelpCenter })));
+const PublicProfile = lazy(() => import('./components/public/PublicProfile').then(m => ({ default: m.PublicProfile })));
 
 /**
  * Landing page wrapper that redirects authenticated users to dashboard
@@ -219,6 +220,18 @@ export default function App() {
         } />
       </Route>
       
+      {/* Public profile preview (authenticated — therapist previews their own profile) */}
+      <Route
+        path="/perfil-publico"
+        element={
+          <ProtectedRoute>
+            <Suspense fallback={<LoadingOverlay message="Cargando..." />}>
+              <PublicProfile />
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
+
       {/* 404 - Catch all unmatched routes */}
       <Route path="*" element={<NotFound />} />
     </Routes>

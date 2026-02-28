@@ -1,6 +1,8 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Camera, Mail, Phone, FileText, Award, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { User, Camera, Mail, Phone, FileText, Award, X, Globe, Link2, Copy, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { getNameInitials } from '@/lib/utils/nameInitials';
@@ -152,6 +154,7 @@ const InputField = ({ label, value, onChange, placeholder, type = 'text', icon: 
 
 export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ onStateChange }, ref) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { user: clerkUser } = useUser();
   const [profile, setProfile] = useState<ProfileData>(() => {
@@ -436,6 +439,44 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
               onChange={(v) => updateProfile('socialMedia', { ...profile.socialMedia, linkedin: v })}
               placeholder="linkedin.com/in/mi-perfil"
             />
+          </div>
+        </ProfileSection>
+
+        {/* Public Profile */}
+        <ProfileSection
+          icon={Globe}
+          iconColor="text-teal-600"
+          iconBg="bg-teal-100"
+          title={t('profile.share.publicProfile')}
+          description={t('profile.share.previewDescription')}
+        >
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-500">
+              <Link2 className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">lavenius.app/p/{user?.firstName?.toLowerCase() || 'tu-nombre'}</span>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => navigate('/perfil-publico')}
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                {t('profile.share.previewTitle')}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const url = `https://lavenius.app/p/${user?.firstName?.toLowerCase() || 'tu-nombre'}`;
+                  navigator.clipboard.writeText(url);
+                  toast.success(t('profile.share.copied'));
+                }}
+              >
+                <Copy className="w-4 h-4 mr-2" />
+                {t('profile.share.copyLink')}
+              </Button>
+            </div>
           </div>
         </ProfileSection>
 

@@ -208,7 +208,6 @@ function NavBar() {
 }
 
 function HeroSection() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   
   return (
@@ -1031,7 +1030,7 @@ function FAQSection() {
         
         <AnimatedSection animation="fade" delay={200} duration={600}>
           <Accordion type="single" collapsible className="space-y-4">
-            {questions.map((questionKey, index) => (
+            {questions.map((questionKey) => (
               <AccordionItem
                 key={questionKey}
                 value={questionKey}
@@ -1145,7 +1144,6 @@ function PricingCard({
 }
 
 function PricingSection() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   
   const plans = [
@@ -1280,7 +1278,6 @@ function PricingSection() {
 }
 
 function CTASection() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   
   return (

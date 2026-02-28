@@ -455,7 +455,13 @@
       "title": "Session Details",
       "patient": "Patient",
       "noPatient": "No patient",
-      "editSession": "Edit Session"
+      "editSession": "Edit Session",
+      "date": "Date",
+      "schedule": "Schedule",
+      "modality": "Modality",
+      "cost": "Cost",
+      "paid": "Paid",
+      "summary": "Summary"
     },
     "validation": {
       "selectPatient": "Please select a patient",

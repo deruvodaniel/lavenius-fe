@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Users, DollarSign, LogOut, Settings, ChevronUp, HelpCircle, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { ConfirmDialog, BetaBadge } from '@/components/shared';
+import { BetaBadge } from '@/components/shared';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/components/ui/utils';
@@ -20,22 +20,18 @@ interface SidebarProps {
 export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true, onNavigate, collapsed = false }: SidebarProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleNavClick = () => {
-    onNavigate?.(); // Cerrar drawer en mobile
+    setIsUserMenuOpen(false); // Close popover if open
+    onNavigate?.(); // Close mobile drawer
   };
 
   const handleLogoutClick = () => {
-    // Close popover first to avoid side animation overlap, then open centered confirm dialog
+    // Close popover + drawer, then notify parent to show confirm dialog
     setIsUserMenuOpen(false);
-    setShowLogoutConfirm(true);
-  };
-
-  const handleLogoutConfirm = () => {
+    onNavigate?.();
     onLogout?.();
-    setShowLogoutConfirm(false);
   };
 
   const menuItems = [
@@ -227,18 +223,6 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
           )}
         </div>
 
-        {/* Logout Confirmation Dialog */}
-        <ConfirmDialog
-          open={showLogoutConfirm}
-          onOpenChange={setShowLogoutConfirm}
-          title={t('logout.confirmTitle')}
-          description={t('logout.confirmDescription')}
-          confirmLabel={t('navigation.logout')}
-          cancelLabel={t('common.cancel')}
-          variant="warning"
-          icon={LogOut}
-          onConfirm={handleLogoutConfirm}
-        />
       </div>
     </TooltipProvider>
   );
