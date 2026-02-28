@@ -55,7 +55,7 @@ export function PublicProfile() {
   const hasContact = profile.phone || user?.email || profile.website || profile.officeAddress;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-muted to-background">
       {/* Preview Banner */}
       <div className="bg-amber-50 border-b border-amber-200 px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
@@ -98,17 +98,17 @@ export function PublicProfile() {
 
               {/* Name & Specialty */}
               <div className="text-center sm:text-left flex-1 min-w-0 pb-1">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{fullName || 'Terapeuta'}</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground">{fullName || 'Terapeuta'}</h1>
                 {profile.specialty ? (
                   <p className="text-indigo-600 font-medium flex items-center justify-center sm:justify-start gap-1.5 mt-1">
                     <Award className="w-4 h-4" />
                     {profile.specialty}
                   </p>
                 ) : (
-                  <p className="text-gray-400 text-sm mt-1">{t('profile.share.noSpecialty')}</p>
+                  <p className="text-muted-foreground text-sm mt-1">{t('profile.share.noSpecialty')}</p>
                 )}
                 {profile.licenseNumber && (
-                  <p className="text-gray-500 text-xs mt-1">
+                  <p className="text-muted-foreground text-xs mt-1">
                     {t('profile.professional.licenseNumber')}: {profile.licenseNumber}
                   </p>
                 )}
@@ -119,25 +119,25 @@ export function PublicProfile() {
 
         {/* Bio */}
         <Card className="p-6">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
             {t('profile.professional.bio')}
           </h2>
           {profile.bio ? (
-            <p className="text-gray-700 leading-relaxed whitespace-pre-line">{profile.bio}</p>
+            <p className="text-foreground leading-relaxed whitespace-pre-line">{profile.bio}</p>
           ) : (
-            <p className="text-gray-400 italic">{t('profile.share.noBio')}</p>
+            <p className="text-muted-foreground italic">{t('profile.share.noBio')}</p>
           )}
         </Card>
 
         {/* Contact Info */}
         {hasContact && (
           <Card className="p-6">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
               {t('profile.share.contactInfo')}
             </h2>
             <div className="space-y-3">
               {user?.email && (
-                <div className="flex items-center gap-3 text-gray-700">
+                <div className="flex items-center gap-3 text-foreground">
                   <div className="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Mail className="w-4 h-4 text-blue-600" />
                   </div>
@@ -145,7 +145,7 @@ export function PublicProfile() {
                 </div>
               )}
               {profile.phone && (
-                <div className="flex items-center gap-3 text-gray-700">
+                <div className="flex items-center gap-3 text-foreground">
                   <div className="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Phone className="w-4 h-4 text-emerald-600" />
                   </div>
@@ -153,7 +153,7 @@ export function PublicProfile() {
                 </div>
               )}
               {profile.officeAddress && (
-                <div className="flex items-center gap-3 text-gray-700">
+                <div className="flex items-center gap-3 text-foreground">
                   <div className="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-4 h-4 text-amber-600" />
                   </div>
@@ -161,7 +161,7 @@ export function PublicProfile() {
                 </div>
               )}
               {profile.website && (
-                <div className="flex items-center gap-3 text-gray-700">
+                <div className="flex items-center gap-3 text-foreground">
                   <div className="w-9 h-9 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Globe className="w-4 h-4 text-indigo-600" />
                   </div>
@@ -182,7 +182,7 @@ export function PublicProfile() {
         {/* Social Media */}
         {hasSocial && (
           <Card className="p-6">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
               {t('profile.social.title')}
             </h2>
             <div className="flex gap-3">
@@ -219,8 +219,8 @@ export function PublicProfile() {
               <Calendar className="w-6 h-6 text-indigo-600" />
             </div>
             <div className="flex-1 text-center sm:text-left">
-              <h3 className="font-semibold text-gray-900">{t('profile.share.bookSession')}</h3>
-              <p className="text-sm text-gray-500 mt-0.5">{t('profile.share.bookSessionDescription')}</p>
+              <h3 className="font-semibold text-foreground">{t('profile.share.bookSession')}</h3>
+              <p className="text-sm text-muted-foreground mt-0.5">{t('profile.share.bookSessionDescription')}</p>
             </div>
             <Button disabled className="w-full sm:w-auto">
               {t('profile.share.bookSession')}

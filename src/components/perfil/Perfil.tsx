@@ -88,15 +88,15 @@ interface ProfileSectionProps {
 }
 
 const ProfileSection = ({ icon: Icon, iconColor, iconBg, title, description, children }: ProfileSectionProps) => (
-  <Card className="overflow-hidden bg-white">
+  <Card className="overflow-hidden bg-card">
     <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-start gap-3 sm:gap-4">
         <div className={`w-10 h-10 sm:w-12 sm:h-12 ${iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
           <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${iconColor}`} />
         </div>
         <div className="min-w-0">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900">{title}</h2>
-          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">{description}</p>
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">{title}</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">{description}</p>
         </div>
       </div>
       {children}
@@ -125,11 +125,11 @@ const InputField = ({ label, value, onChange, placeholder, type = 'text', icon: 
   
   return (
     <div className="space-y-1.5">
-      <label htmlFor={inputId} className="block text-sm font-medium text-gray-700">{label}</label>
+      <label htmlFor={inputId} className="block text-sm font-medium text-foreground">{label}</label>
       <div className="relative">
         {Icon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Icon className="w-4 h-4 text-gray-400" />
+            <Icon className="w-4 h-4 text-muted-foreground" />
           </div>
         )}
         <input
@@ -139,7 +139,7 @@ const InputField = ({ label, value, onChange, placeholder, type = 'text', icon: 
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
-          className={`w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${Icon ? 'pl-10' : ''}`}
+          className={`w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-muted disabled:cursor-not-allowed ${Icon ? 'pl-10' : ''}`}
         />
       </div>
     </div>
@@ -356,16 +356,16 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
               placeholder={t('profile.professional.specialtyPlaceholder')}
             />
             <div className="space-y-1.5">
-              <label htmlFor="profile-bio" className="block text-sm font-medium text-gray-700">{t('profile.professional.bio')}</label>
+              <label htmlFor="profile-bio" className="block text-sm font-medium text-foreground">{t('profile.professional.bio')}</label>
               <textarea
                 id="profile-bio"
                 value={profile.bio || ''}
                 onChange={(e) => updateProfile('bio', e.target.value)}
                 placeholder={t('profile.professional.bioPlaceholder')}
                 rows={4}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
               />
-              <p className="text-xs text-gray-400">{(profile.bio || '').length}/500 {t('profile.professional.characters')}</p>
+              <p className="text-xs text-muted-foreground">{(profile.bio || '').length}/500 {t('profile.professional.characters')}</p>
             </div>
           </div>
         </ProfileSection>
@@ -414,11 +414,11 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
             </div>
 
             {/* Divider */}
-            <div className="border-t border-gray-100" />
+            <div className="border-t border-border" />
 
             {/* Location */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
                 <FileText className="w-4 h-4 text-amber-500" />
                 {t('profile.location.title')}
               </h3>
@@ -436,11 +436,11 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
             </div>
 
             {/* Divider */}
-            <div className="border-t border-gray-100" />
+            <div className="border-t border-border" />
 
             {/* Social Media */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
                 <User className="w-4 h-4 text-pink-500" />
                 {t('profile.social.title')}
               </h3>

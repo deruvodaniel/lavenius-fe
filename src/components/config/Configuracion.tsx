@@ -233,12 +233,12 @@ interface ConfigSectionProps {
 }
 
 const ConfigSection = ({ icon: Icon, iconColor, iconBg, title, description, children, comingSoon, comingSoonText = 'Coming soon' }: ConfigSectionProps) => (
-  <Card className={`relative bg-white ${comingSoon ? 'select-none' : ''}`}>
+  <Card className={`relative bg-card ${comingSoon ? 'select-none' : ''}`}>
     {/* Coming Soon Overlay */}
     {comingSoon && (
-      <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-[1px] z-10 flex items-center justify-center">
-        <div className="bg-white/90 border border-gray-200 shadow-lg rounded-lg px-4 py-2 transform -rotate-3">
-          <span className="text-sm font-bold text-gray-500 tracking-wider uppercase">
+      <div className="absolute inset-0 bg-muted/80 backdrop-blur-[1px] z-10 flex items-center justify-center">
+        <div className="bg-card/90 border border-border shadow-lg rounded-lg px-4 py-2 transform -rotate-3">
+          <span className="text-sm font-bold text-muted-foreground tracking-wider uppercase">
             {comingSoonText}
           </span>
         </div>
@@ -250,8 +250,8 @@ const ConfigSection = ({ icon: Icon, iconColor, iconBg, title, description, chil
           <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${iconColor}`} />
         </div>
         <div className="min-w-0">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900">{title}</h2>
-          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">{description}</p>
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">{title}</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">{description}</p>
         </div>
       </div>
       {children}
@@ -270,9 +270,9 @@ interface ComingSoonWrapperProps {
 
 const _ComingSoonWrapper = ({ children, text = 'Coming soon' }: ComingSoonWrapperProps) => (
   <div className="relative select-none">
-    <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
-      <div className="bg-white/90 border border-gray-200 shadow-lg rounded-lg px-3 py-1.5 transform -rotate-2">
-        <span className="text-xs font-bold text-gray-500 tracking-wider uppercase">
+    <div className="absolute inset-0 bg-muted/80 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
+      <div className="bg-card/90 border border-border shadow-lg rounded-lg px-3 py-1.5 transform -rotate-2">
+        <span className="text-xs font-bold text-muted-foreground tracking-wider uppercase">
           {text}
         </span>
       </div>
@@ -301,11 +301,11 @@ const ToggleRow = ({ checked, onChange, label, description }: ToggleRowProps) =>
         onChange={(e) => onChange(e.target.checked)}
         className="sr-only peer"
       />
-      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+      <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
     </div>
     <div className="flex-1">
-      <span className="text-sm font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">{label}</span>
-      {description && <p className="text-xs text-gray-500 mt-0.5">{description}</p>}
+      <span className="text-sm font-medium text-foreground group-hover:text-indigo-600 transition-colors">{label}</span>
+      {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
     </div>
   </label>
 );
@@ -637,8 +637,8 @@ export function Configuracion() {
       <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
         {/* Header */}
         <div className="mb-3">
-          <h1 className="text-lg font-semibold text-gray-900">{t('settings.title')}</h1>
-          <p className="text-sm text-gray-500">{t('settings.subtitle')}</p>
+          <h1 className="text-lg font-semibold text-foreground">{t('settings.title')}</h1>
+          <p className="text-sm text-muted-foreground">{t('settings.subtitle')}</p>
         </div>
 
         {/* Main Settings Container - Notion-style side-by-side layout */}
@@ -651,7 +651,7 @@ export function Configuracion() {
           aria-label={t('settings.title')}
         >
           {/* Mobile: Equal-width tab bar with bottom border indicator */}
-          <div className="md:hidden grid border-b border-gray-200" style={{ gridTemplateColumns: `repeat(${NAVIGATION_SECTIONS.length}, 1fr)` }}>
+          <div className="md:hidden grid border-b border-border" style={{ gridTemplateColumns: `repeat(${NAVIGATION_SECTIONS.length}, 1fr)` }}>
             {NAVIGATION_SECTIONS.map((section) => {
               const Icon = section.icon;
               const isActive = activeSection === section.id;
@@ -664,13 +664,13 @@ export function Configuracion() {
                     "flex flex-col items-center gap-1 px-1 py-3 text-xs font-medium transition-all relative",
                     isActive
                       ? "text-indigo-600"
-                      : "text-gray-500 hover:text-gray-700"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
                   <Icon className={cn(
                     "w-5 h-5",
-                    isActive ? "text-indigo-600" : "text-gray-400"
+                    isActive ? "text-indigo-600" : "text-muted-foreground"
                   )} />
                   <span className="truncate w-full text-center">{t(section.labelKey)}</span>
                   {isActive && (
@@ -695,13 +695,13 @@ export function Configuracion() {
                     "flex items-center gap-2.5 px-3 py-2 text-sm transition-colors w-full text-left border-l-2",
                     isActive
                       ? "border-indigo-600 text-indigo-700 font-medium"
-                      : "border-transparent text-gray-500 font-normal hover:text-gray-900 hover:border-gray-300"
+                      : "border-transparent text-muted-foreground font-normal hover:text-foreground hover:border-border"
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
                   <Icon className={cn(
                     "w-4 h-4 flex-shrink-0",
-                    isActive ? "text-indigo-600" : "text-gray-400"
+                    isActive ? "text-indigo-600" : "text-muted-foreground"
                   )} />
                   <span>{t(section.labelKey)}</span>
                 </button>
@@ -777,7 +777,7 @@ export function Configuracion() {
                           "px-4 py-2 rounded-lg text-sm font-medium transition-all border",
                           isSelected
                             ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
-                            : "bg-white text-gray-700 border-gray-200 hover:border-indigo-300 hover:bg-indigo-50"
+                            : "bg-card text-foreground border-border hover:border-indigo-300 hover:bg-indigo-50"
                         )}
                       >
                         {t(labelKey)}
@@ -787,7 +787,7 @@ export function Configuracion() {
                 </div>
                 {/* Custom duration input */}
                 <div className="flex items-center gap-2">
-                  <label htmlFor="custom-duration" className="text-sm text-gray-500">{t('settings.sessionDuration.custom')}:</label>
+                  <label htmlFor="custom-duration" className="text-sm text-muted-foreground">{t('settings.sessionDuration.custom')}:</label>
                   <input
                     id="custom-duration"
                     type="number"
@@ -801,9 +801,9 @@ export function Configuracion() {
                         updateLocalSetting('defaultSessionDuration', val);
                       }
                     }}
-                    className="w-20 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                    className="w-20 px-3 py-1.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
                   />
-                  <span className="text-sm text-gray-500">min</span>
+                  <span className="text-sm text-muted-foreground">min</span>
                 </div>
               </div>
             </ConfigSection>
@@ -817,8 +817,8 @@ export function Configuracion() {
               description={t('settings.paymentReminders.description')}
             >
               <div className="space-y-6">
-                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-700">{t('settings.paymentReminders.automation')}</h3>
+                <div className="space-y-4 p-4 bg-muted rounded-lg border border-border">
+                  <h3 className="text-sm font-medium text-foreground">{t('settings.paymentReminders.automation')}</h3>
                   <ToggleRow
                     checked={paymentReminderEnabled}
                     onChange={(v) => {
@@ -830,9 +830,9 @@ export function Configuracion() {
                   />
 
                   {paymentReminderEnabled && (
-                    <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
+                    <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-border">
                       <div className="space-y-2">
-                        <label htmlFor="frecuencia-recordatorio" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="frecuencia-recordatorio" className="block text-sm font-medium text-foreground">
                           {t('settings.paymentReminders.frequency')}
                         </label>
                         <Select
@@ -853,7 +853,7 @@ export function Configuracion() {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <label htmlFor="minimo-turnos" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="minimo-turnos" className="block text-sm font-medium text-foreground">
                           {t('settings.paymentReminders.minimumSessions')}
                         </label>
                         <div className="flex items-center gap-2">
@@ -867,9 +867,9 @@ export function Configuracion() {
                               setPaymentReminderLimit(Number(e.target.value));
                               markReminderChanged();
                             }}
-                            className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                            className="w-20 px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
                           />
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-muted-foreground">
                             {paymentReminderLimit === 1 ? t('settings.paymentReminders.sessionsUnpaid') : t('settings.paymentReminders.sessionsUnpaidPlural')}
                           </span>
                         </div>
@@ -894,8 +894,8 @@ export function Configuracion() {
               description={t('settings.appointmentReminders.description')}
             >
               <div className="space-y-6">
-                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-700">{t('settings.appointmentReminders.automation')}</h3>
+                <div className="space-y-4 p-4 bg-muted rounded-lg border border-border">
+                  <h3 className="text-sm font-medium text-foreground">{t('settings.appointmentReminders.automation')}</h3>
                   <ToggleRow
                     checked={sessionReminderEnabled}
                     onChange={(v) => {
@@ -907,9 +907,9 @@ export function Configuracion() {
                   />
 
                   {sessionReminderEnabled && (
-                    <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-gray-200">
+                    <div className="pl-4 sm:pl-14 space-y-4 pt-4 border-t border-border">
                       <div className="space-y-2">
-                        <label htmlFor="horas-anticipacion" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="horas-anticipacion" className="block text-sm font-medium text-foreground">
                           {t('settings.appointmentReminders.hoursBeforeLabel')}
                         </label>
                         <div className="flex items-center gap-2">
@@ -923,9 +923,9 @@ export function Configuracion() {
                               setSessionReminderHours(Number(e.target.value));
                               markReminderChanged();
                             }}
-                            className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                            className="w-20 px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
                           />
-                          <span className="text-sm text-gray-600">{t('settings.appointmentReminders.hoursBeforeAppointment')}</span>
+                          <span className="text-sm text-muted-foreground">{t('settings.appointmentReminders.hoursBeforeAppointment')}</span>
                         </div>
                       </div>
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
@@ -959,12 +959,12 @@ export function Configuracion() {
             >
               <div className="space-y-5">
                 <fieldset className="space-y-2">
-                  <legend className="block text-sm font-medium text-gray-700">
+                  <legend className="block text-sm font-medium text-foreground">
                     {t('settings.workingHours.schedule')}
                   </legend>
                   <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <label htmlFor="working-hours-start" className="text-sm text-gray-500">{t('common.from')}</label>
+                      <label htmlFor="working-hours-start" className="text-sm text-muted-foreground">{t('common.from')}</label>
                       <TimePicker
                         id="working-hours-start"
                         value={localSettings.workingHours.startTime}
@@ -979,7 +979,7 @@ export function Configuracion() {
                       />
                     </div>
                     <div className="flex items-center gap-2">
-                      <label htmlFor="working-hours-end" className="text-sm text-gray-500">{t('common.to').toLowerCase()}</label>
+                      <label htmlFor="working-hours-end" className="text-sm text-muted-foreground">{t('common.to').toLowerCase()}</label>
                       <TimePicker
                         id="working-hours-end"
                         value={localSettings.workingHours.endTime}
@@ -997,7 +997,7 @@ export function Configuracion() {
                 </fieldset>
 
                 <fieldset className="space-y-2">
-                  <legend className="block text-sm font-medium text-gray-700">
+                  <legend className="block text-sm font-medium text-foreground">
                     {t('settings.workingHours.workingDays')}
                   </legend>
                   <div className="flex flex-wrap gap-2" role="group" aria-label={t('settings.workingHours.workingDays')}>
@@ -1020,7 +1020,7 @@ export function Configuracion() {
                             w-9 h-9 rounded-full text-xs font-medium transition-all
                             ${isSelected
                               ? 'bg-indigo-600 text-white shadow-sm'
-                              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                              : 'bg-muted text-muted-foreground hover:bg-muted'
                             }
                           `}
                           title={t(day.nameKey)}
@@ -1032,7 +1032,7 @@ export function Configuracion() {
                       );
                     })}
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     {t('settings.workingHours.nonWorkingDaysHint')}
                   </p>
                 </fieldset>
@@ -1061,20 +1061,20 @@ export function Configuracion() {
                         {diasOffFromApi.map(dia => (
                           <div 
                             key={dia.id} 
-                            className={`flex items-center justify-between gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg group hover:bg-gray-100 transition-colors ${deletingDayOffId === dia.id ? 'opacity-50' : ''}`}
+                            className={`flex items-center justify-between gap-3 p-3 bg-muted border border-border rounded-lg group hover:bg-muted transition-colors ${deletingDayOffId === dia.id ? 'opacity-50' : ''}`}
                           >
                             <div className="flex items-center gap-3 min-w-0">
                               <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <Calendar className="w-4 h-4 text-rose-600" />
                               </div>
                               <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-900">{formatDateRangeDisplay(dia.fechaInicio, dia.fechaFin)}</p>
+                                <p className="text-sm font-medium text-foreground">{formatDateRangeDisplay(dia.fechaInicio, dia.fechaFin)}</p>
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <span className="text-xs text-rose-600 font-medium">{formatDiaOffTime(dia)}</span>
                                   {dia.motivo && (
                                     <>
-                                      <span className="text-gray-300">•</span>
-                                      <span className="text-xs text-gray-500 truncate">{dia.motivo}</span>
+                                      <span className="text-muted-foreground">•</span>
+                                      <span className="text-xs text-muted-foreground truncate">{dia.motivo}</span>
                                     </>
                                   )}
                                 </div>
@@ -1083,7 +1083,7 @@ export function Configuracion() {
                             <button
                               onClick={() => handleRemoveDiaOff(dia.id)}
                               disabled={deletingDayOffId === dia.id}
-                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="p-1.5 text-muted-foreground hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
                               title={t('common.delete')}
                               aria-label={t('common.delete')}
                             >
@@ -1097,10 +1097,10 @@ export function Configuracion() {
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-200">
-                        <Calendar className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500">{t('settings.daysOff.noDaysOff')}</p>
-                        <p className="text-xs text-gray-400 mt-1">{t('settings.daysOff.noDaysOffHint')}</p>
+                      <div className="text-center py-6 bg-muted rounded-lg border border-dashed border-border">
+                        <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">{t('settings.daysOff.noDaysOff')}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t('settings.daysOff.noDaysOffHint')}</p>
                       </div>
                     )}
                   </>
@@ -1108,11 +1108,11 @@ export function Configuracion() {
 
                 {/* Formulario para agregar */}
                 {showAddDiaOff ? (
-                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-4">
+                  <div className="p-4 bg-muted rounded-lg border border-border space-y-4">
                     {/* Fecha Inicio y Fecha Fin */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label htmlFor="diaoff-fecha-inicio" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.startDate')}</label>
+                        <label htmlFor="diaoff-fecha-inicio" className="block text-xs font-medium text-foreground mb-1">{t('settings.daysOff.startDate')}</label>
                         <DatePicker
                           id="diaoff-fecha-inicio"
                           value={newDiaOff.fechaInicio}
@@ -1121,7 +1121,7 @@ export function Configuracion() {
                         />
                       </div>
                       <div>
-                        <label htmlFor="diaoff-fecha-fin" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.endDate')}</label>
+                        <label htmlFor="diaoff-fecha-fin" className="block text-xs font-medium text-foreground mb-1">{t('settings.daysOff.endDate')}</label>
                         <DatePicker
                           id="diaoff-fecha-fin"
                           value={newDiaOff.fechaFin}
@@ -1134,20 +1134,20 @@ export function Configuracion() {
 
                     {/* Motivo */}
                     <div>
-                      <label htmlFor="diaoff-motivo" className="block text-xs font-medium text-gray-700 mb-1">{t('settings.daysOff.reason')} ({t('common.optional')})</label>
+                      <label htmlFor="diaoff-motivo" className="block text-xs font-medium text-foreground mb-1">{t('settings.daysOff.reason')} ({t('common.optional')})</label>
                       <input
                         id="diaoff-motivo"
                         type="text"
                         value={newDiaOff.motivo}
                         onChange={(e) => setNewDiaOff({ ...newDiaOff, motivo: e.target.value })}
                         placeholder={t('settings.daysOff.reasonPlaceholder')}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                        className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-background"
                       />
                     </div>
 
                     {/* Tipo de día off */}
                     <fieldset>
-                      <legend className="block text-xs font-medium text-gray-700 mb-2">{t('settings.daysOff.blockType')}</legend>
+                      <legend className="block text-xs font-medium text-foreground mb-2">{t('settings.daysOff.blockType')}</legend>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="radiogroup" aria-label={t('settings.daysOff.blockType')}>
                         {DIA_OFF_TIPO_KEYS.map((tipo) => (
                           <button
@@ -1158,14 +1158,14 @@ export function Configuracion() {
                               p-2 rounded-lg border text-left transition-all
                               ${newDiaOff.tipo === tipo.value
                                 ? 'border-rose-500 bg-rose-50 ring-1 ring-rose-500'
-                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-100'
+                                : 'border-border hover:border-border hover:bg-muted'
                               }
                             `}
                           >
-                            <p className={`text-sm font-medium ${newDiaOff.tipo === tipo.value ? 'text-rose-700' : 'text-gray-900'}`}>
+                            <p className={`text-sm font-medium ${newDiaOff.tipo === tipo.value ? 'text-rose-700' : 'text-foreground'}`}>
                               {t(tipo.labelKey)}
                             </p>
-                            <p className="text-xs text-gray-500">{tipo.descriptionKey.startsWith('settings.') ? t(tipo.descriptionKey) : tipo.descriptionKey}</p>
+                            <p className="text-xs text-muted-foreground">{tipo.descriptionKey.startsWith('settings.') ? t(tipo.descriptionKey) : tipo.descriptionKey}</p>
                           </button>
                         ))}
                       </div>
@@ -1173,9 +1173,9 @@ export function Configuracion() {
 
                     {/* Rango horario personalizado */}
                     {newDiaOff.tipo === 'custom' && (
-                      <div className="flex flex-wrap items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+                      <div className="flex flex-wrap items-center gap-3 p-3 bg-background rounded-lg border border-border">
                         <div className="flex items-center gap-2">
-                          <label htmlFor="diaoff-start-time" className="text-sm text-gray-500">{t('common.from')}</label>
+                          <label htmlFor="diaoff-start-time" className="text-sm text-muted-foreground">{t('common.from')}</label>
                           <TimePicker
                             id="diaoff-start-time"
                             value={newDiaOff.startTime}
@@ -1187,7 +1187,7 @@ export function Configuracion() {
                           />
                         </div>
                         <div className="flex items-center gap-2">
-                          <label htmlFor="diaoff-end-time" className="text-sm text-gray-500">{t('common.to').toLowerCase()}</label>
+                          <label htmlFor="diaoff-end-time" className="text-sm text-muted-foreground">{t('common.to').toLowerCase()}</label>
                           <TimePicker
                             id="diaoff-end-time"
                             value={newDiaOff.endTime}
@@ -1261,7 +1261,7 @@ export function Configuracion() {
           : isSaving;
 
         return sectionHasChanges ? (
-          <div className="flex-shrink-0 bg-white border-t border-gray-200 px-4 md:px-6 lg:px-8 py-4">
+          <div className="flex-shrink-0 bg-background border-t border-border px-4 md:px-6 lg:px-8 py-4">
             <div className="max-w-6xl ml-auto flex items-center justify-end gap-3">
               <span className="text-sm text-amber-600">{t('common.unsavedChanges')}</span>
               <Button
