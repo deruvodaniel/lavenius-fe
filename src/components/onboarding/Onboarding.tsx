@@ -395,7 +395,7 @@ export function Onboarding() {
     <div className="space-y-5">
       {/* License Number - Required */}
       <div className="space-y-2">
-        <Label htmlFor="licenseNumber" className="flex items-center gap-2 text-gray-700">
+        <Label htmlFor="licenseNumber" className="flex items-center gap-2 text-foreground">
           <Award className="w-4 h-4 text-indigo-600" />
           {t('onboarding.stepper.fields.licenseNumber')}
           <span className="text-red-500">*</span>
@@ -423,10 +423,10 @@ export function Onboarding() {
 
       {/* Specialty - Optional */}
       <div className="space-y-2">
-        <Label htmlFor="specialty" className="flex items-center gap-2 text-gray-700">
+        <Label htmlFor="specialty" className="flex items-center gap-2 text-foreground">
           <Stethoscope className="w-4 h-4 text-indigo-600" />
           {t('onboarding.stepper.fields.specialty')}
-          <span className="text-gray-400 text-xs">({t('common.optional')})</span>
+          <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
         <Select
           value={formData.specialty}
@@ -452,10 +452,10 @@ export function Onboarding() {
     <div className="space-y-5">
       {/* Phone */}
       <div className="space-y-2">
-        <Label htmlFor="phone" className="flex items-center gap-2 text-gray-700">
+        <Label htmlFor="phone" className="flex items-center gap-2 text-foreground">
           <Phone className="w-4 h-4 text-indigo-600" />
           {t('onboarding.stepper.fields.phone')}
-          <span className="text-gray-400 text-xs">({t('common.optional')})</span>
+          <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
         <Input
           id="phone"
@@ -480,10 +480,10 @@ export function Onboarding() {
 
       {/* Alternative Phone */}
       <div className="space-y-2">
-        <Label htmlFor="alternativePhone" className="flex items-center gap-2 text-gray-700">
+        <Label htmlFor="alternativePhone" className="flex items-center gap-2 text-foreground">
           <Phone className="w-4 h-4 text-emerald-600" />
           {t('onboarding.stepper.fields.alternativePhone')}
-          <span className="text-gray-400 text-xs">({t('common.optional')})</span>
+          <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
         <Input
           id="alternativePhone"
@@ -508,10 +508,10 @@ export function Onboarding() {
 
       {/* Office Address */}
       <div className="space-y-2">
-        <Label htmlFor="officeAddress" className="flex items-center gap-2 text-gray-700">
+        <Label htmlFor="officeAddress" className="flex items-center gap-2 text-foreground">
           <MapPin className="w-4 h-4 text-amber-600" />
           {t('onboarding.stepper.fields.officeAddress')}
-          <span className="text-gray-400 text-xs">({t('common.optional')})</span>
+          <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
         <Input
           id="officeAddress"
@@ -530,10 +530,10 @@ export function Onboarding() {
     <div className="space-y-5">
       {/* Website */}
       <div className="space-y-2">
-        <Label htmlFor="website" className="flex items-center gap-2 text-gray-700">
+        <Label htmlFor="website" className="flex items-center gap-2 text-foreground">
           <Globe className="w-4 h-4 text-indigo-600" />
           {t('onboarding.stepper.fields.website')}
-          <span className="text-gray-400 text-xs">({t('common.optional')})</span>
+          <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
         <Input
           id="website"
@@ -560,7 +560,7 @@ export function Onboarding() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Instagram */}
         <div className="space-y-2">
-          <Label htmlFor="instagram" className="flex items-center gap-2 text-gray-700">
+          <Label htmlFor="instagram" className="flex items-center gap-2 text-foreground">
             <Instagram className="w-4 h-4 text-pink-600" />
             {t('onboarding.stepper.fields.instagram')}
           </Label>
@@ -577,7 +577,7 @@ export function Onboarding() {
 
         {/* LinkedIn */}
         <div className="space-y-2">
-          <Label htmlFor="linkedin" className="flex items-center gap-2 text-gray-700">
+          <Label htmlFor="linkedin" className="flex items-center gap-2 text-foreground">
             <Linkedin className="w-4 h-4 text-blue-600" />
             {t('onboarding.stepper.fields.linkedin')}
           </Label>
@@ -595,10 +595,10 @@ export function Onboarding() {
 
       {/* Bio */}
       <div className="space-y-2">
-        <Label htmlFor="bio" className="flex items-center gap-2 text-gray-700">
-          <FileText className="w-4 h-4 text-gray-500" />
+        <Label htmlFor="bio" className="flex items-center gap-2 text-foreground">
+          <FileText className="w-4 h-4 text-muted-foreground" />
           {t('onboarding.stepper.fields.bio')}
-          <span className="text-gray-400 text-xs">({t('common.optional')})</span>
+          <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
         <Textarea
           id="bio"
@@ -623,7 +623,7 @@ export function Onboarding() {
           ) : (
             <span className={cn(
               "text-xs transition-colors duration-200",
-              formData.bio.length > 450 ? "text-amber-500" : "text-gray-400"
+              formData.bio.length > 450 ? "text-amber-500" : "text-muted-foreground"
             )}>
               {formData.bio.length}/500 {t('profile.professional.characters')}
             </span>
@@ -654,7 +654,7 @@ export function Onboarding() {
           <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-stepper-check">
             <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
-          <p className="text-gray-600 mb-4">
+          <p className="text-muted-foreground mb-4">
             {t('onboarding.stepper.complete.ready')}
           </p>
         </div>
@@ -662,16 +662,16 @@ export function Onboarding() {
         {/* Summary */}
         {filledData.length > 0 && (
           <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 space-y-2">
-            <h4 className="text-sm font-medium text-gray-700 mb-3">
+            <h4 className="text-sm font-medium text-foreground mb-3">
               {t('onboarding.stepper.complete.summary')}
             </h4>
             {filledData.map((item, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="flex justify-between text-sm py-1 border-b border-indigo-100 last:border-0"
               >
-                <span className="text-gray-500">{item.label}:</span>
-                <span className="text-gray-900 font-medium truncate ml-2 max-w-[60%]">
+                <span className="text-muted-foreground">{item.label}:</span>
+                <span className="text-foreground font-medium truncate ml-2 max-w-[60%]">
                   {item.value}
                 </span>
               </div>
@@ -701,16 +701,16 @@ export function Onboarding() {
         {/* Step indicator */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">
+            <span className="text-sm font-medium text-muted-foreground">
               {t('onboarding.stepper.stepOf', { current: currentStep + 1, total: TOTAL_STEPS })}
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-muted-foreground">
               {Math.round(progressPercentage)}%
             </span>
           </div>
           
           {/* Progress bar */}
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-500 ease-out"
               style={{ width: `${progressPercentage}%` }}
@@ -734,7 +734,7 @@ export function Onboarding() {
                       "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300",
                       isCompleted && "bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg shadow-indigo-200",
                       isCurrent && "bg-gradient-to-br from-indigo-600 to-purple-600 ring-4 ring-indigo-100 shadow-lg shadow-indigo-200",
-                      !isCompleted && !isCurrent && "bg-gray-100 border-2 border-gray-200"
+                      !isCompleted && !isCurrent && "bg-muted border-2 border-border"
                     )}
                   >
                     {isCompleted ? (
@@ -742,13 +742,13 @@ export function Onboarding() {
                     ) : (
                       <StepIcon className={cn(
                         "w-5 h-5 transition-colors duration-300",
-                        isCurrent ? "text-white" : "text-gray-400"
+                        isCurrent ? "text-white" : "text-muted-foreground"
                       )} />
                     )}
                   </div>
                   <span className={cn(
                     "text-xs mt-1 hidden sm:block transition-colors duration-300",
-                    isCompleted ? "text-indigo-600 font-medium" : isCurrent ? "text-gray-900 font-medium" : "text-gray-400"
+                    isCompleted ? "text-indigo-600 font-medium" : isCurrent ? "text-foreground font-medium" : "text-muted-foreground"
                   )}>
                     {t(`onboarding.stepper.stepNames.${step.key}`)}
                   </span>
@@ -758,7 +758,7 @@ export function Onboarding() {
           </div>
         </div>
 
-        <Card className="bg-white shadow-xl border-0 overflow-hidden">
+        <Card className="bg-card shadow-xl border-0 overflow-hidden">
           {/* Animated content container */}
           <div 
             key={currentStep}
@@ -774,10 +774,10 @@ export function Onboarding() {
                   return <Icon className="w-8 h-8 text-indigo-600" />;
                 })()}
               </div>
-              <CardTitle className="text-xl sm:text-2xl font-semibold text-gray-900">
+              <CardTitle className="text-xl sm:text-2xl font-semibold text-foreground">
                 {t(stepConfig.titleKey)}
               </CardTitle>
-              <CardDescription className="text-gray-600 mt-2">
+              <CardDescription className="text-muted-foreground mt-2">
                 {t(stepConfig.descriptionKey)}
               </CardDescription>
             </CardHeader>
@@ -788,7 +788,7 @@ export function Onboarding() {
           </div>
 
           {/* Navigation buttons */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted/50">
             {/* Back button */}
             <div className="w-24">
               {!isFirstStep && (
@@ -797,7 +797,7 @@ export function Onboarding() {
                   variant="outline"
                   onClick={handlePrev}
                   disabled={isSubmitting}
-                  className="border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200"
+                  className="border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all duration-200"
                 >
                   <ArrowLeft className="w-4 h-4 mr-1" />
                   {t('common.back')}
@@ -813,7 +813,7 @@ export function Onboarding() {
                   variant="ghost"
                   onClick={handleSkip}
                   disabled={isSubmitting}
-                  className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                  className="text-muted-foreground hover:text-foreground transition-colors duration-200"
                 >
                   {t('onboarding.stepper.skip')}
                 </Button>
@@ -854,7 +854,7 @@ export function Onboarding() {
         </Card>
 
         {/* Brand footer */}
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-muted-foreground mt-6">
           Lavenius © {new Date().getFullYear()}
         </p>
       </div>

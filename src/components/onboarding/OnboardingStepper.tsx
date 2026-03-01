@@ -122,7 +122,7 @@ export function OnboardingStepper() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
-          <p className="text-sm text-gray-500">{t('common.loading')}</p>
+          <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -258,7 +258,7 @@ export function OnboardingStepper() {
         />
 
         {/* Step Content Card */}
-        <Card className="bg-white shadow-xl border-0 overflow-hidden">
+        <Card className="bg-card shadow-xl border-0 overflow-hidden">
           {/* Animated content container */}
           <div 
             key={currentStep}
@@ -469,7 +469,7 @@ export function OnboardingStepper() {
                 {/* Summary of entered info */}
                 <div className="space-y-4">
                   <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 space-y-3">
-                    <h4 className="text-sm font-medium text-gray-900">
+                    <h4 className="text-sm font-medium text-foreground">
                       {t('onboarding.complete.summary')}
                     </h4>
                     
@@ -515,9 +515,9 @@ export function OnboardingStepper() {
                   </div>
 
                   {/* Tip */}
-                  <div className="bg-gray-50 rounded-lg p-4 text-left">
-                    <p className="text-sm text-gray-600">
-                      <span className="font-medium text-gray-900">{t('onboarding.complete.tip')}</span>{' '}
+                  <div className="bg-muted rounded-lg p-4 text-left">
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium text-foreground">{t('onboarding.complete.tip')}</span>{' '}
                       {t('onboarding.complete.tipText')}{' '}
                       <span className="text-indigo-600 font-medium">{t('onboarding.complete.helpSection')}</span>{' '}
                       {t('onboarding.complete.tipSuffix')}
@@ -529,7 +529,7 @@ export function OnboardingStepper() {
           </div>
 
           {/* Navigation Footer */}
-          <div className="border-t border-gray-100 px-6 py-4 bg-gray-50/50">
+          <div className="border-t border-border px-6 py-4 bg-muted/50">
             <div className="flex items-center justify-between gap-4">
               {/* Back button */}
               <div className="w-24">
@@ -539,7 +539,7 @@ export function OnboardingStepper() {
                     variant="outline"
                     onClick={handleBack}
                     disabled={isSubmitting}
-                    className="border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                    className="border-border text-muted-foreground hover:text-foreground hover:bg-muted"
                   >
                     <ChevronLeft className="w-4 h-4 mr-1" />
                     {t('onboarding.navigation.back')}
@@ -555,7 +555,7 @@ export function OnboardingStepper() {
                     variant="ghost"
                     onClick={handleSkip}
                     disabled={isSubmitting}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     {t('onboarding.navigation.skip')}
                   </Button>
@@ -597,7 +597,7 @@ export function OnboardingStepper() {
         </Card>
 
         {/* Brand footer */}
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-muted-foreground mt-6">
           Lavenius © {new Date().getFullYear()}
         </p>
       </div>
@@ -623,10 +623,10 @@ function StepContent({ icon: Icon, title, description, iconClassName = '', child
         <div className={`w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 ${iconClassName}`}>
           <Icon className="w-8 h-8 text-indigo-600" />
         </div>
-        <CardTitle className="text-xl sm:text-2xl font-semibold text-gray-900">
+        <CardTitle className="text-xl sm:text-2xl font-semibold text-foreground">
           {title}
         </CardTitle>
-        <CardDescription className="text-gray-600 mt-2">
+        <CardDescription className="text-muted-foreground mt-2">
           {description}
         </CardDescription>
       </CardHeader>
@@ -657,7 +657,7 @@ function FormField({ id, label, icon: Icon, required, error, children }: FormFie
         <Icon className="w-4 h-4 text-indigo-600" />
         {label}
         {required && <span className="text-red-500">*</span>}
-        {!required && <span className="text-gray-400 text-xs">(opcional)</span>}
+        {!required && <span className="text-muted-foreground text-xs">(opcional)</span>}
       </Label>
       {children}
       {error && (
@@ -682,8 +682,8 @@ function SummaryItem({ icon: Icon, label, value }: SummaryItemProps) {
   return (
     <div className="flex items-center gap-3 text-sm">
       <Icon className="w-4 h-4 text-indigo-500 flex-shrink-0" />
-      <span className="text-gray-500">{label}:</span>
-      <span className="text-gray-900 font-medium truncate">{value}</span>
+      <span className="text-muted-foreground">{label}:</span>
+      <span className="text-foreground font-medium truncate">{value}</span>
     </div>
   );
 }

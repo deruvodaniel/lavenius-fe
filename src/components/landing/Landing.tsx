@@ -89,7 +89,7 @@ function NavBar() {
   ];
   
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -109,7 +109,7 @@ function NavBar() {
               <button
                 key={link.key}
                 onClick={() => scrollToSection(link.sectionId)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
               >
                 {t(`landing.nav.${link.key}`)}
               </button>
@@ -128,7 +128,7 @@ function NavBar() {
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  className="hidden sm:inline-flex text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  className="hidden sm:inline-flex text-muted-foreground hover:text-foreground hover:bg-muted"
                 >
                   {t('landing.cta.login')}
                 </Button>
@@ -166,7 +166,7 @@ function NavBar() {
             {/* Mobile menu button - Always at the end */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+              className="md:hidden p-2 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
               aria-label="Toggle menu"
             >
               <Menu className="w-5 h-5" />
@@ -176,24 +176,24 @@ function NavBar() {
         
         {/* Mobile Menu Dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100 dark:border-gray-800">
+          <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
                 <button
                   key={link.key}
                   onClick={() => scrollToSection(link.sectionId)}
-                  className="px-4 py-3 text-left text-sm font-medium text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                  className="px-4 py-3 text-left text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                 >
                   {t(`landing.nav.${link.key}`)}
                 </button>
               ))}
-              <div className="pt-2 border-t border-gray-100 dark:border-gray-800 mt-2">
+              <div className="pt-2 border-t border-border mt-2">
                 <div className="px-4 py-2">
                   <LanguageSwitcher variant="buttons" />
                 </div>
                 <SignedOut>
                   <SignInButton mode="modal">
-                    <button className="w-full px-4 py-3 text-left text-sm font-medium text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                    <button className="w-full px-4 py-3 text-left text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
                       {t('landing.cta.login')}
                     </button>
                   </SignInButton>
@@ -230,7 +230,7 @@ function HeroSection() {
             </AnimatedSection>
             
             <AnimatedSection animation="slide-up" delay={100} duration={500}>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-[1.1] mb-6 tracking-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-foreground leading-[1.1] mb-6 tracking-tight">
                 {t('landing.hero.title')}
                 <br />
                 <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
@@ -240,7 +240,7 @@ function HeroSection() {
             </AnimatedSection>
             
             <AnimatedSection animation="slide-up" delay={200} duration={500}>
-              <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
                 {t('landing.hero.description')}
               </p>
             </AnimatedSection>
@@ -269,7 +269,7 @@ function HeroSection() {
             </AnimatedSection>
             
             <AnimatedSection animation="fade" delay={500} duration={600}>
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 mt-10 text-sm text-gray-500">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 mt-10 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-green-500" />
                   <span className="font-medium">{t('landing.hero.noCreditCard')}</span>
@@ -419,14 +419,14 @@ function FeaturesSection() {
   };
   
   return (
-    <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+    <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-background">
       <div className="max-w-7xl mx-auto">
         <AnimatedSection animation="slide-up" duration={500}>
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {t('landing.features.title')}
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t('landing.features.subtitle')}
             </p>
           </div>
@@ -440,13 +440,13 @@ function FeaturesSection() {
               delay={index * 100} 
               duration={500}
             >
-              <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-white h-full">
+              <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-card h-full">
                 <CardContent className="p-6">
                   <div className={`w-12 h-12 rounded-xl ${colorClasses[feature.color as keyof typeof colorClasses]} flex items-center justify-center mb-4`}>
                     <feature.icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{t(feature.titleKey)}</h3>
-                  <p className="text-gray-600 text-sm">{t(feature.descriptionKey)}</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{t(feature.titleKey)}</h3>
+                  <p className="text-muted-foreground text-sm">{t(feature.descriptionKey)}</p>
                 </CardContent>
               </Card>
             </AnimatedSection>
@@ -604,30 +604,30 @@ function RemindersSection() {
   };
   
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Preview */}
           <AnimatedSection animation="scale" delay={100} duration={600} className="order-2 lg:order-1">
-            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+            <div className="bg-card rounded-2xl shadow-xl p-6 border border-border">
               <div className="flex items-center gap-2 mb-6">
                 <Bell className="w-5 h-5 text-indigo-600" />
-                <span className="font-semibold text-gray-900">{t('landing.reminders.notifications')}</span>
+                <span className="font-semibold text-foreground">{t('landing.reminders.notifications')}</span>
               </div>
               
               <div className="space-y-4">
                 {reminders.map((reminder, index) => (
                   <AnimatedSection key={index} animation="slide-left" delay={300 + index * 150} duration={400}>
-                    <div className="flex gap-4 p-4 bg-gray-50 rounded-xl">
+                    <div className="flex gap-4 p-4 bg-muted rounded-xl">
                       <div className={`w-10 h-10 rounded-full ${colorClasses[reminder.color as keyof typeof colorClasses]} flex items-center justify-center flex-shrink-0`}>
                         <reminder.icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                          <span className="font-medium text-gray-900 text-sm">{reminder.type}</span>
-                          <span className="text-xs text-gray-400">{reminder.time}</span>
+                          <span className="font-medium text-foreground text-sm">{reminder.type}</span>
+                          <span className="text-xs text-muted-foreground">{reminder.time}</span>
                         </div>
-                        <p className="text-sm text-gray-600">{reminder.message}</p>
+                        <p className="text-sm text-muted-foreground">{reminder.message}</p>
                       </div>
                     </div>
                   </AnimatedSection>
@@ -643,10 +643,10 @@ function RemindersSection() {
                 <Bell className="w-4 h-4" />
                 {t('landing.reminders.badge')}
               </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
                 {t('landing.reminders.title')}
               </h2>
-              <p className="text-lg text-gray-600 mb-8">
+              <p className="text-lg text-muted-foreground mb-8">
                 {t('landing.reminders.description')}
               </p>
               
@@ -657,7 +657,7 @@ function RemindersSection() {
                       <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
                         <item.icon className="w-5 h-5 text-indigo-600" />
                       </div>
-                      <span className="text-gray-700">{item.text}</span>
+                      <span className="text-foreground">{item.text}</span>
                     </div>
                   </AnimatedSection>
                 ))}
@@ -674,7 +674,7 @@ function SecuritySection() {
   const { t } = useTranslation();
   
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-background">
       <div className="max-w-7xl mx-auto">
         <AnimatedSection animation="scale" duration={600}>
           <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl p-8 sm:p-12">
@@ -683,21 +683,21 @@ function SecuritySection() {
                 <Shield className="w-10 h-10 text-white" />
               </div>
               <div className="flex-1 text-center lg:text-left">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                <h3 className="text-2xl font-bold text-foreground mb-2">
                   {t('landing.security.title')}
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   {t('landing.security.description')}
                 </p>
               </div>
               <div className="flex items-center gap-6 text-sm">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-indigo-600">256-bit</div>
-                  <div className="text-gray-500">{t('landing.security.encryption')}</div>
+                  <div className="text-muted-foreground">{t('landing.security.encryption')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-indigo-600">E2E</div>
-                  <div className="text-gray-500">{t('landing.security.e2e')}</div>
+                  <div className="text-muted-foreground">{t('landing.security.e2e')}</div>
                 </div>
               </div>
             </div>
@@ -780,14 +780,14 @@ function AnimatedStatCard({
   
   return (
     <AnimatedSection animation="scale" delay={delay} duration={500}>
-      <div ref={ref} className="bg-white rounded-2xl p-8 shadow-lg text-center border border-gray-100">
+      <div ref={ref} className="bg-card rounded-2xl p-8 shadow-lg text-center border border-border">
         <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center mx-auto mb-4">
           <Icon className="w-7 h-7 text-white" />
         </div>
         <div className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
           {prefix}{count.toLocaleString()}{suffix}
         </div>
-        <div className="text-gray-500 font-medium">{label}</div>
+        <div className="text-muted-foreground font-medium">{label}</div>
       </div>
     </AnimatedSection>
   );
@@ -847,7 +847,7 @@ function SocialProofSection() {
               <Users className="w-4 h-4" />
               {t('landing.socialProof.badge')}
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {t('landing.socialProof.title')}
             </h2>
           </div>
@@ -872,14 +872,14 @@ function SocialProofSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map((testimonial, index) => (
             <AnimatedSection key={index} animation="slide-up" delay={200 + index * 100} duration={500}>
-              <Card className="border-0 shadow-lg bg-white h-full">
+              <Card className="border-0 shadow-lg bg-card h-full">
                 <CardContent className="p-6">
                   <div className="flex gap-1 mb-4">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
-                  <blockquote className="text-gray-600 mb-6 leading-relaxed">
+                  <blockquote className="text-muted-foreground mb-6 leading-relaxed">
                     "{testimonial.quote}"
                   </blockquote>
                   <div className="flex items-center gap-3">
@@ -887,8 +887,8 @@ function SocialProofSection() {
                       {testimonial.name.split(' ').slice(1, 3).map(n => n[0]).join('')}
                     </div>
                     <div>
-                      <div className="font-semibold text-gray-900 text-sm">{testimonial.name}</div>
-                      <div className="text-xs text-gray-500">{testimonial.role}</div>
+                      <div className="font-semibold text-foreground text-sm">{testimonial.name}</div>
+                      <div className="text-xs text-muted-foreground">{testimonial.role}</div>
                     </div>
                   </div>
                 </CardContent>
@@ -951,7 +951,7 @@ function WhyLaveniusSection() {
   };
   
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-background">
       <div className="max-w-7xl mx-auto">
         <AnimatedSection animation="slide-up" duration={500}>
           <div className="text-center mb-16">
@@ -959,10 +959,10 @@ function WhyLaveniusSection() {
               <Sparkles className="w-4 h-4" />
               {t('landing.whyLavenius.badge')}
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {t('landing.whyLavenius.title')}
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t('landing.whyLavenius.subtitle')}
             </p>
           </div>
@@ -981,10 +981,10 @@ function WhyLaveniusSection() {
                     <div className={`inline-block px-2 py-1 rounded text-xs font-medium text-white ${colors.highlight} mb-3`}>
                       {t(`landing.whyLavenius.features.${feature.key}.highlight`)}
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
                       {t(`landing.whyLavenius.features.${feature.key}.title`)}
                     </h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">
+                    <p className="text-muted-foreground text-sm leading-relaxed">
                       {t(`landing.whyLavenius.features.${feature.key}.description`)}
                     </p>
                   </CardContent>
@@ -1011,7 +1011,7 @@ function FAQSection() {
   ];
   
   return (
-    <section id="faq" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <section id="faq" className="py-20 px-4 sm:px-6 lg:px-8 bg-muted">
       <div className="max-w-3xl mx-auto">
         <AnimatedSection animation="slide-up" duration={500}>
           <div className="text-center mb-12">
@@ -1019,10 +1019,10 @@ function FAQSection() {
               <MessageCircle className="w-4 h-4" />
               {t('landing.faq.badge')}
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {t('landing.faq.title')}
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-muted-foreground">
               {t('landing.faq.subtitle')}
             </p>
           </div>
@@ -1034,12 +1034,12 @@ function FAQSection() {
               <AccordionItem
                 key={questionKey}
                 value={questionKey}
-                className="bg-white rounded-xl border-0 shadow-md overflow-hidden px-6"
+                className="bg-card rounded-xl border-0 shadow-md overflow-hidden px-6"
               >
-                <AccordionTrigger className="text-left font-medium text-gray-900 hover:no-underline py-5">
+                <AccordionTrigger className="text-left font-medium text-foreground hover:no-underline py-5">
                   {t(`landing.faq.questions.${questionKey}.question`)}
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-600 pb-5 leading-relaxed">
+                <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
                   {t(`landing.faq.questions.${questionKey}.answer`)}
                 </AccordionContent>
               </AccordionItem>
@@ -1078,8 +1078,8 @@ function PricingCard({
   return (
     <Card className={`relative border-0 shadow-lg hover:shadow-xl transition-all h-full flex flex-col ${
       plan.popular
-        ? 'ring-2 ring-purple-500 bg-white scale-[1.01]'
-        : 'bg-white'
+        ? 'ring-2 ring-purple-500 bg-card scale-[1.01]'
+        : 'bg-card'
     } ${
       compactMobile ? 'min-h-[520px]' : ''
     }`}>
@@ -1099,11 +1099,11 @@ function PricingCard({
           }`}>
             <plan.icon className={compactMobile ? 'w-5 h-5' : 'w-6 h-6'} />
           </div>
-          <h3 className={`font-bold text-gray-900 mb-2 ${compactMobile ? 'text-lg' : 'text-xl'}`}>{t(plan.nameKey)}</h3>
-          <p className="text-gray-500 text-sm mb-3">{t(plan.descriptionKey)}</p>
+          <h3 className={`font-bold text-foreground mb-2 ${compactMobile ? 'text-lg' : 'text-xl'}`}>{t(plan.nameKey)}</h3>
+          <p className="text-muted-foreground text-sm mb-3">{t(plan.descriptionKey)}</p>
           <div className="flex items-baseline justify-center gap-1">
-            <span className={`${compactMobile ? 'text-3xl' : 'text-4xl'} font-bold text-gray-900`}>{t(plan.priceKey)}</span>
-            <span className="text-gray-500 text-sm">{t(plan.periodKey)}</span>
+            <span className={`${compactMobile ? 'text-3xl' : 'text-4xl'} font-bold text-foreground`}>{t(plan.priceKey)}</span>
+            <span className="text-muted-foreground text-sm">{t(plan.periodKey)}</span>
           </div>
         </div>
         <div className="flex-1">
@@ -1113,15 +1113,15 @@ function PricingCard({
                 <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-green-600" />
                 </div>
-                <span className="text-gray-600 text-sm">{t(featureKey)}</span>
+                <span className="text-muted-foreground text-sm">{t(featureKey)}</span>
               </li>
             ))}
             {!compactMobile && plan.notIncludedKeys.map((featureKey, i) => (
               <li key={`not-${i}`} className="flex items-start gap-3 opacity-50">
-                <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <X className="w-3 h-3 text-gray-400" />
+                <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <X className="w-3 h-3 text-muted-foreground" />
                 </div>
-                <span className="text-gray-400 text-sm">{t(featureKey)}</span>
+                <span className="text-muted-foreground text-sm">{t(featureKey)}</span>
               </li>
             ))}
           </ul>
@@ -1131,7 +1131,7 @@ function PricingCard({
             className={`w-full py-6 ${
               plan.popular
                 ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
-                : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                : 'bg-muted hover:bg-muted/80 text-foreground'
             }`}
           >
             {t('landing.pricing.cta')}
@@ -1221,10 +1221,10 @@ function PricingSection() {
               <DollarSign className="w-4 h-4" />
               {t('landing.pricing.badge')}
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {t('landing.pricing.title')}
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t('landing.pricing.subtitle')}
             </p>
           </div>
@@ -1257,7 +1257,7 @@ function PricingSection() {
         
         {/* Trust badges */}
         <AnimatedSection animation="fade" delay={500} duration={600}>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-12 text-sm text-gray-500">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-12 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-indigo-500" />
               {t('landing.pricing.trustBadges.encryption')}
@@ -1439,7 +1439,7 @@ function StickyMobileCTA() {
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >
-      <div className="bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 py-3 shadow-lg">
+      <div className="bg-background/95 backdrop-blur-md border-t border-border px-4 py-3 shadow-lg">
         <SignedOut>
           <SignUpButton mode="modal">
             <Button 
@@ -1470,7 +1470,7 @@ function StickyMobileCTA() {
 
 export function Landing() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <NavBar />
       <HeroSection />
       <FeaturesSection />

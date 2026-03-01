@@ -24,12 +24,12 @@ export function OnboardingStep({
       </div>
       
       {/* Title */}
-      <h2 className="text-xl font-semibold text-gray-900 mb-3">
+      <h2 className="text-xl font-semibold text-foreground mb-3">
         {title}
       </h2>
-      
+
       {/* Description */}
-      <p className="text-gray-600 max-w-sm mb-6 leading-relaxed break-words text-balance">
+      <p className="text-muted-foreground max-w-sm mb-6 leading-relaxed break-words text-balance">
         {description}
       </p>
       

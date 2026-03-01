@@ -96,7 +96,7 @@ export function OnboardingModal({
               </Button>
               <button
                 onClick={handleNext}
-                className="w-full text-sm text-gray-500 hover:text-gray-700 py-2"
+                className="w-full text-sm text-muted-foreground hover:text-foreground py-2"
               >
                 {t('onboarding.calendar.later')}
               </button>
@@ -120,7 +120,7 @@ export function OnboardingModal({
               </Button>
               <button
                 onClick={handleNext}
-                className="w-full text-sm text-gray-500 hover:text-gray-700 py-2"
+                className="w-full text-sm text-muted-foreground hover:text-foreground py-2"
               >
                 {t('onboarding.patient.later')}
               </button>
@@ -135,9 +135,9 @@ export function OnboardingModal({
             title={t('onboarding.complete.title')}
             description={t('onboarding.complete.description')}
           >
-            <div className="bg-gray-50 rounded-lg p-4 text-left space-y-2">
-              <p className="text-sm text-gray-600">
-                <span className="font-medium text-gray-900">{t('onboarding.complete.tip')}</span> {t('onboarding.complete.tipText')}{' '}
+            <div className="bg-muted rounded-lg p-4 text-left space-y-2">
+              <p className="text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">{t('onboarding.complete.tip')}</span> {t('onboarding.complete.tipText')}{' '}
                 <span className="text-indigo-600 font-medium">{t('onboarding.complete.helpSection')}</span> {t('onboarding.complete.tipSuffix')}
               </p>
             </div>
@@ -153,15 +153,15 @@ export function OnboardingModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
         showCloseButton={false}
-        className="w-[calc(100%-1rem)] sm:max-w-md !bg-white p-0 gap-0 overflow-hidden flex flex-col max-h-[calc(100dvh-1rem)] sm:max-h-[90vh]"
+        className="w-[calc(100%-1rem)] sm:max-w-md !bg-card p-0 gap-0 overflow-hidden flex flex-col max-h-[calc(100dvh-1rem)] sm:max-h-[90vh]"
       >
         {/* Close button */}
         <button
           onClick={handleSkip}
-          className="absolute right-4 top-4 p-1 rounded-full hover:bg-gray-100 transition-colors z-10"
+          className="absolute right-4 top-4 p-1 rounded-full hover:bg-muted transition-colors z-10"
           aria-label={t('onboarding.navigation.close')}
         >
-          <X className="w-5 h-5 text-gray-400" />
+          <X className="w-5 h-5 text-muted-foreground" />
         </button>
 
         {/* Content */}
@@ -170,14 +170,14 @@ export function OnboardingModal({
         </div>
 
         {/* Progress & Navigation */}
-        <div className="border-t border-gray-100 px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
+        <div className="border-t border-border px-4 sm:px-6 py-3 sm:py-4 bg-muted">
           <div className="flex items-center justify-between">
             {/* Back button */}
             <div className="w-20 sm:w-24">
               {currentStep > 0 && (
                 <button
                   onClick={handlePrev}
-                  className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   {t('onboarding.navigation.back')}

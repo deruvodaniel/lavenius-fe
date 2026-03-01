@@ -19,7 +19,7 @@ export function OnboardingProgress({ currentStep, totalSteps }: OnboardingProgre
               ? 'bg-indigo-600 w-6' 
               : index < currentStep 
                 ? 'bg-indigo-400' 
-                : 'bg-gray-300'
+                : 'bg-border'
             }
           `}
           aria-label={`Paso ${index + 1} de ${totalSteps}`}

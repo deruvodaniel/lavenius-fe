@@ -221,20 +221,20 @@ const CategoryCard = ({ category, onClick }: CategoryCardProps) => {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left p-4 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all group"
+      className="w-full text-left p-4 bg-card rounded-lg border border-border hover:border-indigo-300 hover:shadow-md transition-all group"
     >
       <div className="flex items-start gap-4">
         <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-200 transition-colors">
           <Icon className="w-5 h-5 text-indigo-600" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
+          <h3 className="font-medium text-foreground group-hover:text-indigo-600 transition-colors">
             {t(category.titleKey)}
           </h3>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {t(category.descriptionKey)}
           </p>
-          <p className="text-xs text-gray-400 mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             {articleCount} {t(articleCount !== 1 ? 'help.articles' : 'help.article')}
           </p>
         </div>
@@ -258,7 +258,7 @@ const ArticleList = ({ category, onBack, onSelectArticle }: ArticleListProps) =>
     <div className="space-y-4">
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-sm text-gray-600 hover:text-indigo-600 transition-colors"
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-indigo-600 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         {t('help.backToCategories')}
@@ -268,7 +268,7 @@ const ArticleList = ({ category, onBack, onSelectArticle }: ArticleListProps) =>
         <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
           <Icon className="w-5 h-5 text-indigo-600" />
         </div>
-        <h2 className="text-lg font-semibold text-gray-900">{t(category.titleKey)}</h2>
+        <h2 className="text-lg font-semibold text-foreground">{t(category.titleKey)}</h2>
       </div>
       
       <div className="space-y-2">
@@ -276,13 +276,13 @@ const ArticleList = ({ category, onBack, onSelectArticle }: ArticleListProps) =>
           <button
             key={article.id}
             onClick={() => onSelectArticle(article)}
-            className="w-full text-left p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all group flex items-center gap-3"
+            className="w-full text-left p-3 bg-card rounded-lg border border-border hover:border-indigo-300 hover:bg-indigo-50 transition-all group flex items-center gap-3"
           >
-            <FileText className="w-4 h-4 text-gray-400 group-hover:text-indigo-600 transition-colors flex-shrink-0" />
-            <span className="text-gray-700 group-hover:text-indigo-600 transition-colors">
+            <FileText className="w-4 h-4 text-muted-foreground group-hover:text-indigo-600 transition-colors flex-shrink-0" />
+            <span className="text-foreground group-hover:text-indigo-600 transition-colors">
               {t(article.titleKey)}
             </span>
-            <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-indigo-600 transition-colors ml-auto flex-shrink-0" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-indigo-600 transition-colors ml-auto flex-shrink-0" />
           </button>
         ))}
       </div>
@@ -305,24 +305,24 @@ const ArticleView = ({ article, categoryTitleKey, onBack }: ArticleViewProps) =>
     <div className="space-y-4">
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-sm text-gray-600 hover:text-indigo-600 transition-colors"
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-indigo-600 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         {t('help.backTo', { category: t(categoryTitleKey) })}
       </button>
       
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">{t(article.titleKey)}</h2>
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">{t(article.titleKey)}</h2>
         <div className="prose prose-sm prose-gray max-w-none">
           {content.split('\n').map((line, i) => {
             if (line.startsWith('**') && line.endsWith('**')) {
-              return <p key={i} className="font-semibold text-gray-900 mt-4">{line.replace(/\*\*/g, '')}</p>;
+              return <p key={i} className="font-semibold text-foreground mt-4">{line.replace(/\*\*/g, '')}</p>;
             }
             if (line.startsWith('- ')) {
-              return <li key={i} className="text-gray-700 ml-4">{line.substring(2)}</li>;
+              return <li key={i} className="text-foreground ml-4">{line.substring(2)}</li>;
             }
             if (line.match(/^\d+\./)) {
-              return <p key={i} className="text-gray-700 ml-4">{line}</p>;
+              return <p key={i} className="text-foreground ml-4">{line}</p>;
             }
             if (line.trim() === '') {
               return <div key={i} className="h-2" />;
@@ -330,23 +330,23 @@ const ArticleView = ({ article, categoryTitleKey, onBack }: ArticleViewProps) =>
             // Handle inline bold
             const parts = line.split(/(\*\*[^*]+\*\*)/g);
             return (
-              <p key={i} className="text-gray-700">
-                {parts.map((part, j) => 
+              <p key={i} className="text-foreground">
+                {parts.map((part, j) =>
                   part.startsWith('**') && part.endsWith('**')
-                    ? <strong key={j} className="font-semibold text-gray-900">{part.replace(/\*\*/g, '')}</strong>
+                    ? <strong key={j} className="font-semibold text-foreground">{part.replace(/\*\*/g, '')}</strong>
                     : part
                 )}
               </p>
             );
           })}
         </div>
-        
+
         {Array.isArray(tags) && tags.length > 0 && (
-          <div className="mt-6 pt-4 border-t border-gray-100">
-            <p className="text-xs text-gray-400 mb-2">{t('help.relatedTopics')}</p>
+          <div className="mt-6 pt-4 border-t border-border">
+            <p className="text-xs text-muted-foreground mb-2">{t('help.relatedTopics')}</p>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag) => (
-                <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                <span key={tag} className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded">
                   {tag}
                 </span>
               ))}
@@ -409,8 +409,8 @@ export function HelpCenter() {
         <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <HelpCircle className="w-7 h-7 text-indigo-600" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">{t('help.title')}</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">{t('help.title')}</h1>
+        <p className="text-muted-foreground mt-1">
           {t('help.subtitle')}
         </p>
       </div>
@@ -428,23 +428,23 @@ export function HelpCenter() {
         
         {/* Search results dropdown */}
         {searchResults.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-80 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-10 max-h-80 overflow-y-auto">
             {searchResults.map((result) => (
               <button
                 key={`${result.category.id}-${result.id}`}
                 onClick={() => handleSelectSearchResult(result)}
-                className="w-full text-left p-3 hover:bg-gray-50 border-b border-gray-100 last:border-0"
+                className="w-full text-left p-3 hover:bg-muted border-b border-border last:border-0"
               >
-                <p className="font-medium text-gray-900 text-sm">{t(result.titleKey)}</p>
-                <p className="text-xs text-gray-500">{t(result.categoryTitleKey)}</p>
+                <p className="font-medium text-foreground text-sm">{t(result.titleKey)}</p>
+                <p className="text-xs text-muted-foreground">{t(result.categoryTitleKey)}</p>
               </button>
             ))}
           </div>
         )}
         
         {searchTerm && searchResults.length === 0 && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 p-4 text-center">
-            <p className="text-gray-500 text-sm">{t('help.noResults', { search: searchTerm })}</p>
+          <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-10 p-4 text-center">
+            <p className="text-muted-foreground text-sm">{t('help.noResults', { search: searchTerm })}</p>
           </div>
         )}
       </div>
@@ -475,11 +475,11 @@ export function HelpCenter() {
       )}
 
       {/* Contact support */}
-      <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
-        <p className="text-sm text-gray-600">
+      <div className="bg-muted rounded-lg p-4 text-center border border-border">
+        <p className="text-sm text-muted-foreground">
           {t('help.notFound')}
         </p>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {t('help.contactUs')}{' '}
           <a href="mailto:soporte@lavenius.com" className="text-indigo-600 hover:underline">
             soporte@lavenius.com
