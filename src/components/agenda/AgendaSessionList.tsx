@@ -60,7 +60,7 @@ export function AgendaSessionList({
   const { t } = useTranslation();
 
   return (
-    <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden flex flex-col flex-1">
+    <div className="bg-card rounded-xl border border-border overflow-hidden flex flex-col flex-1">
       <h2 className="text-foreground px-6 pt-6 pb-4 flex-shrink-0">{t('agenda.upcoming')}</h2>
       <div className="flex-1 overflow-y-auto px-6 pb-6">
         {isLoading ? (

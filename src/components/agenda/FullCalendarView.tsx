@@ -535,7 +535,7 @@ export function FullCalendarView({
       </div>
 
       {/* FullCalendar */}
-      <div className="fullcalendar-wrapper">
+      <div className="fullcalendar-wrapper overflow-hidden rounded-lg">
         <FullCalendar
           key={calendarKey}
           ref={calendarRef}
@@ -643,16 +643,18 @@ export function FullCalendarView({
         .fullcalendar-wrapper .fc-scrollgrid {
           border-color: var(--border);
           background: var(--background);
+          border-radius: 0.5rem;
+          overflow: hidden;
         }
 
         .fullcalendar-wrapper .fc-scrollgrid-sync-table td,
         .fullcalendar-wrapper .fc-scrollgrid-sync-table th {
-          border-color: var(--border);
+          border-color: color-mix(in srgb, var(--border) 70%, transparent);
         }
 
         .fullcalendar-wrapper .fc-scrollgrid td,
         .fullcalendar-wrapper .fc-scrollgrid th {
-          border-color: var(--border);
+          border-color: color-mix(in srgb, var(--border) 70%, transparent);
         }
 
         /* Daygrid and timegrid body backgrounds */
@@ -714,6 +716,40 @@ export function FullCalendarView({
           padding: 0.5rem 1rem;
           border-radius: 0.5rem;
           transition: all 0.15s ease;
+          border: none !important;
+        }
+
+        /* Gradient on toolbar buttons — matches app primary button style */
+        .fullcalendar-wrapper .fc-button-primary {
+          background: linear-gradient(to right, #4f46e5, #6366f1, #9333ea) !important;
+          border: none !important;
+          box-shadow: 0 1px 3px rgba(79, 70, 229, 0.3);
+        }
+
+        .fullcalendar-wrapper .fc-button-primary:hover:not(:disabled) {
+          background: linear-gradient(to right, #6366f1, #818cf8, #a855f7) !important;
+          box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4);
+        }
+
+        .fullcalendar-wrapper .fc-button-primary:not(:disabled).fc-button-active,
+        .fullcalendar-wrapper .fc-button-primary:not(:disabled):active {
+          background: linear-gradient(to right, #4338ca, #4f46e5, #7c3aed) !important;
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Dark mode gradient */
+        .dark .fullcalendar-wrapper .fc-button-primary {
+          background: linear-gradient(to right, #6366f1, #8b5cf6, #a855f7) !important;
+          box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
+        }
+
+        .dark .fullcalendar-wrapper .fc-button-primary:hover:not(:disabled) {
+          background: linear-gradient(to right, #818cf8, #a78bfa, #c084fc) !important;
+        }
+
+        .dark .fullcalendar-wrapper .fc-button-primary:not(:disabled).fc-button-active,
+        .dark .fullcalendar-wrapper .fc-button-primary:not(:disabled):active {
+          background: linear-gradient(to right, #4f46e5, #6366f1, #9333ea) !important;
         }
 
         .fullcalendar-wrapper .fc-button:focus {
@@ -722,12 +758,6 @@ export function FullCalendarView({
 
         .fullcalendar-wrapper .fc-button:disabled {
           opacity: 0.5;
-        }
-
-        .fullcalendar-wrapper .fc-button-primary:not(:disabled).fc-button-active,
-        .fullcalendar-wrapper .fc-button-primary:not(:disabled):active {
-          background-color: #3730a3;
-          border-color: #3730a3;
         }
 
         /* Mobile: Stack toolbar vertically */
