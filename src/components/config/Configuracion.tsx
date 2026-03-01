@@ -299,7 +299,7 @@ const ToggleRow = ({ checked, onChange, label, description }: ToggleRowProps) =>
     <Switch
       checked={checked}
       onCheckedChange={onChange}
-      className="mt-0.5 flex-shrink-0"
+      className="switch-lg mt-0.5 flex-shrink-0"
     />
     <div className="flex-1 cursor-pointer" onClick={() => onChange(!checked)}>
       <span className="text-sm font-medium text-foreground hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">{label}</span>
