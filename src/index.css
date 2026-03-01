@@ -61,44 +61,46 @@ html {
 
   .dark {
     /* Background & Foreground */
-    --background: #0f172a;
+    --background: #0f172a;        /* slate-900 — deepest layer */
     --foreground: #f8fafc;
-    
-    /* Card */
-    --card: #1e293b;
+
+    /* Card — slate-800 pushed slightly lighter for separation from background */
+    --card: #1c2d42;
     --card-foreground: #f8fafc;
-    
-    /* Popover */
-    --popover: #1e293b;
+
+    /* Popover — same level as card */
+    --popover: #1c2d42;
     --popover-foreground: #f8fafc;
-    
+
     /* Primary - Indigo 400 */
     --primary: #818cf8;
     --primary-foreground: #0f172a;
-    
-    /* Secondary - Slate 800 */
-    --secondary: #1e293b;
+
+    /* Secondary — one step above card for subtle surface variation */
+    --secondary: #243552;
     --secondary-foreground: #f8fafc;
-    
-    /* Muted - Slate 800/400 */
-    --muted: #1e293b;
+
+    /* Muted — same level as secondary, foreground kept muted */
+    --muted: #243552;
     --muted-foreground: #94a3b8;
-    
-    /* Accent - Slate 800 */
-    --accent: #1e293b;
+
+    /* Accent — one more step up for hover/selected states */
+    --accent: #2d4060;
     --accent-foreground: #f8fafc;
-    
+
     /* Destructive - Red 900/400 */
     --destructive: #7f1d1d;
     --destructive-foreground: #fca5a5;
-    
-    /* Border, Input, Ring */
-    --border: #334155;
-    --input: #334155;
-    --input-background: #1e293b;
+
+    /* Border — visible but not harsh against dark backgrounds */
+    --border: #3a5068;
+    /* Input border color */
+    --input: #3a5068;
+    /* Input background — clearly above card level so inputs are visible */
+    --input-background: #2d4060;
     --ring: #818cf8;
     --switch-background: #64748b;
-    
+
     /* Chart colors - brighter for dark mode */
     --chart-1: #818cf8;
     --chart-2: #22d3ee;
@@ -165,6 +167,40 @@ body {
 .switch-lg [data-slot="switch-thumb"] {
   width: 1.25rem !important;
   height: 1.25rem !important;
+}
+
+/* ==========================================================================
+   Input & Textarea Dark Mode Override
+   shadcn input.tsx applies `dark:bg-input/30` (Tailwind opacity modifier on
+   the --input border token) which renders nearly transparent in dark mode.
+   Override with the --input-background token so inputs sit visibly above cards.
+   ========================================================================== */
+
+.dark [data-slot="input"] {
+  background-color: var(--input-background) !important; /* #2d4060 — above card #1c2d42 */
+}
+
+.dark textarea[data-slot="textarea"] {
+  background-color: var(--input-background) !important;
+}
+
+/* Select trigger (shadcn SelectTrigger) uses data-slot="select-trigger" */
+.dark [data-slot="select-trigger"] {
+  background-color: var(--input-background) !important;
+}
+
+/* ==========================================================================
+   Card Dark Mode Shadow
+   In light mode cards use shadow-sm for elevation. In dark mode shadows are
+   invisible, so a subtle inner glow via box-shadow provides separation from
+   the background without needing a bright border.
+   ========================================================================== */
+
+.dark [data-slot="card"] {
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.4),
+    0 1px 2px -1px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 
 /* ==========================================================================
