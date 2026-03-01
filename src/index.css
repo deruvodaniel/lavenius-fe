@@ -46,6 +46,7 @@ html {
     --input: #e2e8f0;
     --input-background: #f3f4f6;
     --ring: #4f46e5;
+    --switch-background: #cbd5e1;
     
     /* Radius */
     --radius: 0.5rem;
@@ -96,6 +97,7 @@ html {
     --input: #334155;
     --input-background: #1e293b;
     --ring: #818cf8;
+    --switch-background: #64748b;
     
     /* Chart colors - brighter for dark mode */
     --chart-1: #818cf8;
@@ -135,6 +137,12 @@ body {
    Also strengthen the unchecked track so it's visible against dark backgrounds.
    ========================================================================== */
 
+/* Light mode: unchecked track visible on white cards */
+[data-slot="switch"][data-state="unchecked"] {
+  background-color: #cbd5e1 !important; /* slate-300 */
+}
+
+/* Dark mode overrides */
 .dark [data-slot="switch"][data-state="unchecked"] {
   background-color: #64748b !important; /* slate-500 — 3.4:1 contrast on dark card */
 }
