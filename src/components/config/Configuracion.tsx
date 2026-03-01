@@ -1065,9 +1065,6 @@ export function Configuracion() {
                             className={`flex items-center justify-between gap-3 p-3 bg-muted border border-border rounded-lg group hover:bg-muted transition-colors ${deletingDayOffId === dia.id ? 'opacity-50' : ''}`}
                           >
                             <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <Calendar className="w-4 h-4 text-rose-600" />
-                              </div>
                               <div className="min-w-0">
                                 <p className="text-sm font-medium text-foreground">{formatDateRangeDisplay(dia.fechaInicio, dia.fechaFin)}</p>
                                 <div className="flex items-center gap-2 flex-wrap">

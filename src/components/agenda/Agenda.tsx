@@ -140,7 +140,7 @@ export function Agenda() {
   }
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6 flex flex-col h-[calc(100vh-100px)]">
+    <div className="p-4 md:p-6 lg:p-8 gap-4 sm:gap-6 flex flex-col h-full">
       {/* Header */}
       <AgendaHeader
         viewMode={viewMode}
