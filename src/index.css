@@ -136,7 +136,11 @@ body {
    ========================================================================== */
 
 .dark [data-slot="switch"][data-state="unchecked"] {
-  background-color: #475569 !important; /* slate-600 — visible on dark bg */
+  background-color: #64748b !important; /* slate-500 — 3.4:1 contrast on dark card */
+}
+
+.dark [data-slot="switch"][data-state="checked"] {
+  background-color: #818cf8 !important; /* indigo-400 — consistent with --primary */
 }
 
 .dark [data-slot="switch-thumb"] {
