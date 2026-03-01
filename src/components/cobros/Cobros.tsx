@@ -133,9 +133,9 @@ const CobroCard = ({ item, onMarkAsPaid, onReminder, onDelete, onViewDetail, onR
   const isPending = item.status === PaymentStatus.PENDING;
 
   return (
-    <Card className={`p-3 transition-all hover:shadow-md border-l-4 bg-white ${config.borderColor}`}>
+    <Card className={`p-3 transition-all hover:shadow-md border-l-4 bg-card ${config.borderColor}`}>
       {/* Clickeable area for detail */}
-      <div 
+      <div
         className={!item.isVirtual ? 'cursor-pointer' : ''}
         onClick={!item.isVirtual ? onViewDetail : undefined}
       >
@@ -149,8 +149,8 @@ const CobroCard = ({ item, onMarkAsPaid, onReminder, onDelete, onViewDetail, onR
               )}
             </div>
             <div className="min-w-0">
-              <p className="font-medium text-gray-900 text-sm truncate">{item.patientName || t('payments.noPatient')}</p>
-              <p className="text-xs text-gray-500">{formatDateShort(item.date)}</p>
+              <p className="font-medium text-foreground text-sm truncate">{item.patientName || t('payments.noPatient')}</p>
+              <p className="text-xs text-muted-foreground">{formatDateShort(item.date)}</p>
             </div>
           </div>
           <PaymentStatusBadge status={item.status} />
@@ -158,14 +158,14 @@ const CobroCard = ({ item, onMarkAsPaid, onReminder, onDelete, onViewDetail, onR
         
         <div className="flex items-center justify-between mt-3">
           {item.description && (
-            <p className="text-xs text-gray-500 truncate flex-1 mr-2">{item.description}</p>
+            <p className="text-xs text-muted-foreground truncate flex-1 mr-2">{item.description}</p>
           )}
-          <p className="font-semibold text-gray-900">{formatCurrency(item.amount)}</p>
+          <p className="font-semibold text-foreground">{formatCurrency(item.amount)}</p>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex gap-2 pt-2 mt-3 border-t border-gray-100">
+      <div className="flex gap-2 pt-2 mt-3 border-t border-border">
         {/* Virtual items (sessions without payment) - show Register Payment button */}
         {item.isVirtual && isPending && onRegisterPayment && (
           <Button 
@@ -241,9 +241,9 @@ const PaymentCard = ({ payment, onMarkAsPaid, onReminder, onDelete, onViewDetail
   const isPaid = payment.status === PaymentStatus.PAID;
 
   return (
-    <Card className={`p-3 transition-all hover:shadow-md border-l-4 bg-white ${config.borderColor}`}>
+    <Card className={`p-3 transition-all hover:shadow-md border-l-4 bg-card ${config.borderColor}`}>
       {/* Clickeable area for detail */}
-      <div 
+      <div
         className="cursor-pointer"
         onClick={onViewDetail}
       >
@@ -257,8 +257,8 @@ const PaymentCard = ({ payment, onMarkAsPaid, onReminder, onDelete, onViewDetail
               )}
             </div>
             <div className="min-w-0">
-              <p className="font-medium text-gray-900 text-sm truncate">{patientName}</p>
-              <p className="text-xs text-gray-500">{formatDateShort(payment.paymentDate)}</p>
+              <p className="font-medium text-foreground text-sm truncate">{patientName}</p>
+              <p className="text-xs text-muted-foreground">{formatDateShort(payment.paymentDate)}</p>
             </div>
           </div>
           <PaymentStatusBadge status={payment.status} />
@@ -266,14 +266,14 @@ const PaymentCard = ({ payment, onMarkAsPaid, onReminder, onDelete, onViewDetail
         
         <div className="flex items-center justify-between mt-3">
           {payment.description && (
-            <p className="text-xs text-gray-500 truncate flex-1 mr-2">{payment.description}</p>
+            <p className="text-xs text-muted-foreground truncate flex-1 mr-2">{payment.description}</p>
           )}
-          <p className="font-semibold text-gray-900">{formatCurrency(payment.amount)}</p>
+          <p className="font-semibold text-foreground">{formatCurrency(payment.amount)}</p>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex gap-2 pt-2 mt-3 border-t border-gray-100">
+      <div className="flex gap-2 pt-2 mt-3 border-t border-border">
         {!isPaid && onReminder && (
           <Button size="sm" variant="outline" className="flex-1" onClick={onReminder}>
             <Bell className="h-4 w-4 mr-1.5" />
@@ -722,8 +722,8 @@ export function Cobros() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('payments.title')}</h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('payments.title')}</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
             {t('payments.managePayments')}
           </p>
         </div>
@@ -809,19 +809,19 @@ export function Cobros() {
       ) : (
         /* Desktop: Table with pagination */
         <>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-muted border-b border-border">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('payments.table.patient')}</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('payments.table.date')}</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('payments.table.status')}</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('payments.table.amount')}</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('payments.table.actions')}</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('payments.table.patient')}</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('payments.table.date')}</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('payments.table.status')}</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('payments.table.amount')}</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('payments.table.actions')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-border">
                   {displayedCobroItems.map((item) => {
                     const initials = getInitials(item.patientName || 'SP');
                     const config = STATUS_CONFIG[item.status];
@@ -831,7 +831,7 @@ export function Cobros() {
                     return (
                       <tr 
                         key={item.id} 
-                        className={`hover:bg-gray-50 transition-colors ${!item.isVirtual ? 'cursor-pointer' : ''}`}
+                        className={`hover:bg-muted transition-colors ${!item.isVirtual ? 'cursor-pointer' : ''}`}
                         onClick={!item.isVirtual && item.payment ? () => handleViewDetail(item.payment!) : undefined}
                       >
                         <td className="px-4 py-3">
@@ -840,26 +840,26 @@ export function Cobros() {
                               <span className={`text-xs font-semibold ${config.iconColor}`}>{initials}</span>
                             </div>
                             <div className="min-w-0">
-                              <p className="font-medium text-gray-900 truncate">{item.patientName}</p>
+                              <p className="font-medium text-foreground truncate">{item.patientName}</p>
                               {item.description && (
-                                <p className="text-xs text-gray-500 truncate max-w-[200px]">{item.description}</p>
+                                <p className="text-xs text-muted-foreground truncate max-w-[200px]">{item.description}</p>
                               )}
                               {item.isVirtual && (
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-600 mt-0.5">
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-muted text-muted-foreground mt-0.5">
                                   {t('payments.virtual.sessionUnpaid')}
                                 </span>
                               )}
                             </div>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">
+                        <td className="px-4 py-3 text-sm text-muted-foreground">
                           {formatDateShort(item.date)}
                         </td>
                         <td className="px-4 py-3">
                           <PaymentStatusBadge status={item.status} />
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="font-semibold text-gray-900">{formatCurrency(item.amount)}</span>
+                          <span className="font-semibold text-foreground">{formatCurrency(item.amount)}</span>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-end gap-1">
@@ -883,7 +883,7 @@ export function Cobros() {
                                   e.stopPropagation();
                                   handleViewDetail(item.payment!);
                                 }}
-                                className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                className="p-2 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                                 title={t('payments.actions.viewDetail')}
                               >
                                 <Eye className="w-4 h-4" />
@@ -897,7 +897,7 @@ export function Cobros() {
                                     e.stopPropagation();
                                     setReminderPayment(item.payment!);
                                   }}
-                                  className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                  className="p-2 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                                   title={t('payments.actions.sendReminder')}
                                 >
                                   <Bell className="w-4 h-4" />
@@ -926,7 +926,7 @@ export function Cobros() {
                                   e.stopPropagation();
                                   setDeletePaymentData(item.payment!);
                                 }}
-                                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                 title={t('payments.actions.deletePayment')}
                               >
                                 <Trash2 className="w-4 h-4" />

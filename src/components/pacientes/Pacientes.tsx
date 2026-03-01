@@ -409,7 +409,7 @@ export function Pacientes() {
               <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
               <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
             </div>
-            <p className="text-gray-500">{t('patients.loadingPatientFile')}</p>
+            <p className="text-muted-foreground">{t('patients.loadingPatientFile')}</p>
           </div>
         </div>
       );
@@ -429,8 +429,8 @@ export function Pacientes() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('patients.title')}</h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('patients.title')}</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
             {filteredPacientes.length} {t('patients.patientCount', { count: filteredPacientes.length }).split(' ').slice(1).join(' ')} 
             {hasActiveFilters 
               ? ` ${t(filteredPacientes.length !== 1 ? 'patients.found_plural' : 'patients.found')}` 
@@ -452,7 +452,7 @@ export function Pacientes() {
           {/* Mobile: Search bar + Filters button */}
           <div className="flex gap-2 items-center">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder={t('patients.searchPlaceholder')}
@@ -463,7 +463,7 @@ export function Pacientes() {
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -488,7 +488,7 @@ export function Pacientes() {
           {/* Mobile Filters Drawer */}
           <Drawer open={filterDrawerOpen} onOpenChange={setFilterDrawerOpen}>
             <DrawerContent className="max-h-[75vh]">
-              <DrawerHeader className="text-left border-b border-gray-100">
+              <DrawerHeader className="text-left border-b border-border">
                 <div className="flex items-center justify-between">
                   <DrawerTitle>{t('patients.filters.title')}</DrawerTitle>
                   {hasActiveFilters && (
@@ -501,7 +501,7 @@ export function Pacientes() {
                         setFrecuenciaFilter('todas');
                         setSoloTurnosEstaSemana(false);
                       }}
-                      className="text-gray-500"
+                      className="text-muted-foreground"
                     >
                       {t('patients.filters.clearFilters')}
                     </Button>
@@ -511,11 +511,11 @@ export function Pacientes() {
               <div className="px-4 py-4 pb-8 overflow-y-auto space-y-5">
                 {/* Sort */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('patients.filters.sortBy')}</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">{t('patients.filters.sortBy')}</label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as SortOption)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     {sortOptions.map(option => (
                       <option key={option.value} value={option.value}>{option.label}</option>
@@ -525,11 +525,11 @@ export function Pacientes() {
 
                 {/* Modalidad */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('patients.modality.label')}</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">{t('patients.modality.label')}</label>
                   <select
                     value={modalidadFilter}
                     onChange={(e) => setModalidadFilter(e.target.value as any)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="todas">{t('patients.modality.all')}</option>
                     <option value="presencial">{t('patients.modality.presential')}</option>
@@ -540,11 +540,11 @@ export function Pacientes() {
 
                 {/* Frecuencia */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('patients.frequency.label')}</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">{t('patients.frequency.label')}</label>
                   <select
                     value={frecuenciaFilter}
                     onChange={(e) => setFrecuenciaFilter(e.target.value as any)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="todas">{t('patients.frequency.all')}</option>
                     <option value="semanal">{t('patients.frequency.weekly')}</option>
@@ -559,9 +559,9 @@ export function Pacientes() {
                     type="checkbox"
                     checked={soloTurnosEstaSemana}
                     onChange={(e) => setSoloTurnosEstaSemana(e.target.checked)}
-                    className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                    className="w-4 h-4 text-indigo-600 border-border rounded focus:ring-indigo-500"
                   />
-                  <span className="text-sm text-gray-700">{t('patients.filters.onlyWithSessionsThisWeek')}</span>
+                  <span className="text-sm text-foreground">{t('patients.filters.onlyWithSessionsThisWeek')}</span>
                 </label>
               </div>
               <div className="h-[env(safe-area-inset-bottom,0px)]" />
@@ -569,11 +569,11 @@ export function Pacientes() {
           </Drawer>
         </>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200 space-y-4">
+        <div className="bg-card rounded-lg shadow-sm p-4 sm:p-6 border border-border space-y-4">
           {/* Desktop: Full filter block */}
           <div className="flex flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder={t('patients.searchPlaceholder')}
@@ -584,7 +584,7 @@ export function Pacientes() {
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -596,23 +596,23 @@ export function Pacientes() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
-                className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer min-w-[140px]"
+                className="h-10 pl-8 pr-3 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer min-w-[140px]"
               >
                 {sortOptions.map(option => (
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
               </select>
-              <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+              <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             </div>
 
             {/* View toggle */}
-            <div className="inline-flex items-center bg-gray-100 rounded-lg p-1">
+            <div className="inline-flex items-center bg-muted rounded-lg p-1">
               <button
                 onClick={() => setViewMode('cards')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                   viewMode === 'cards'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-background text-indigo-600 shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <LayoutGrid className="w-4 h-4" />
@@ -622,8 +622,8 @@ export function Pacientes() {
                 onClick={() => setViewMode('table')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                   viewMode === 'table'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-background text-indigo-600 shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <List className="w-4 h-4" />
@@ -635,12 +635,12 @@ export function Pacientes() {
           {/* Other filters */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="filter-modalidad" className="block text-gray-700 mb-2 text-sm">{t('patients.modality.label')}</label>
+              <label htmlFor="filter-modalidad" className="block text-foreground mb-2 text-sm">{t('patients.modality.label')}</label>
               <select
                 id="filter-modalidad"
                 value={modalidadFilter}
                 onChange={(e) => setModalidadFilter(e.target.value as any)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-background text-sm"
               >
                 <option value="todas">{t('patients.modality.all')}</option>
                 <option value="presencial">{t('patients.modality.presential')}</option>
@@ -649,12 +649,12 @@ export function Pacientes() {
               </select>
             </div>
             <div>
-              <label htmlFor="filter-frecuencia" className="block text-gray-700 mb-2 text-sm">{t('patients.frequency.label')}</label>
+              <label htmlFor="filter-frecuencia" className="block text-foreground mb-2 text-sm">{t('patients.frequency.label')}</label>
               <select
                 id="filter-frecuencia"
                 value={frecuenciaFilter}
                 onChange={(e) => setFrecuenciaFilter(e.target.value as any)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-background text-sm"
               >
                 <option value="todas">{t('patients.frequency.all')}</option>
                 <option value="semanal">{t('patients.frequency.weekly')}</option>
@@ -668,9 +668,9 @@ export function Pacientes() {
                   type="checkbox"
                   checked={soloTurnosEstaSemana}
                   onChange={(e) => setSoloTurnosEstaSemana(e.target.checked)}
-                  className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                  className="w-4 h-4 text-indigo-600 border-border rounded focus:ring-indigo-500"
                 />
-                <span className="text-gray-700 text-sm">{t('patients.filters.onlyWithSessionsThisWeek')}</span>
+                <span className="text-foreground text-sm">{t('patients.filters.onlyWithSessionsThisWeek')}</span>
               </label>
             </div>
           </div>
@@ -687,7 +687,7 @@ export function Pacientes() {
                   setFrecuenciaFilter('todas');
                   setSoloTurnosEstaSemana(false);
                 }}
-                className="text-gray-500"
+                className="text-muted-foreground"
               >
                 {t('patients.filters.clearFilters')}
               </Button>
@@ -723,28 +723,28 @@ export function Pacientes() {
         />
       ) : viewMode === 'table' && !isMobile ? (
         // Table View (Desktop only)
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted border-b border-border">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('patients.table.patient')}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('patients.table.age')}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('patients.table.healthInsurance')}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('patients.table.modality')}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('patients.table.nextAppointment')}</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('patients.table.actions')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('patients.table.patient')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('patients.table.age')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('patients.table.healthInsurance')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('patients.table.modality')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('patients.table.nextAppointment')}</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('patients.table.actions')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-border">
                 {displayedPacientes.map((paciente) => {
                   const proximoTurno = getProximoTurno(paciente.id);
                   const patient = patients.find(p => p.id === paciente.id);
                   
                   return (
-                    <tr 
-                      key={paciente.id} 
-                      className="hover:bg-gray-50 transition-colors cursor-pointer"
+                    <tr
+                      key={paciente.id}
+                      className="hover:bg-muted transition-colors cursor-pointer"
                       onClick={() => handleSelectPatient(paciente.id)}
                     >
                       <td className="px-4 py-3">
@@ -754,10 +754,10 @@ export function Pacientes() {
                               {getNameInitials(paciente.nombre)}
                             </span>
                           </div>
-                          <span className="font-medium text-gray-900">{paciente.nombre}</span>
+                          <span className="font-medium text-foreground">{paciente.nombre}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{t('patients.fields.ageYears', { age: paciente.edad })}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{t('patients.fields.ageYears', { age: paciente.edad })}</td>
                       <td className="px-4 py-3">
                         <span className="px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700">
                           {paciente.coberturaMedica || '-'}
@@ -789,7 +789,7 @@ export function Pacientes() {
                               : t('patients.nextAppointment.inDays', { days: proximoTurno.dias })}
                           </span>
                         ) : (
-                          <span className="text-gray-400">{t('patients.nextAppointment.noAppointments')}</span>
+                          <span className="text-muted-foreground">{t('patients.nextAppointment.noAppointments')}</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -800,7 +800,7 @@ export function Pacientes() {
                               setEditingPatient(patient || null);
                               setPacienteDrawerOpen(true);
                             }}
-                            className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                            className="p-2 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                             title={t('patients.actions.editPatient')}
                             aria-label={t('patients.actions.editPatient')}
                           >
@@ -813,7 +813,7 @@ export function Pacientes() {
                                 handleDeletePaciente(patient.id, paciente.nombre);
                               }
                             }}
-                            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title={t('patients.actions.deletePatient')}
                             aria-label={t('patients.actions.deletePatient')}
                           >
@@ -838,7 +838,7 @@ export function Pacientes() {
           return (
             <div
               key={paciente.id}
-              className="bg-white rounded-lg shadow-sm p-6 hover:shadow-lg transition-all border border-gray-200"
+              className="bg-card rounded-lg shadow-sm p-6 hover:shadow-lg transition-all border border-border"
             >
               <div className="flex items-start justify-between mb-4">
                 <div 
@@ -851,8 +851,8 @@ export function Pacientes() {
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-gray-900">{paciente.nombre}</h3>
-                    <p className="text-gray-500 text-sm">{t('patients.fields.ageYears', { age: paciente.edad })}</p>
+                    <h3 className="text-foreground">{paciente.nombre}</h3>
+                    <p className="text-muted-foreground text-sm">{t('patients.fields.ageYears', { age: paciente.edad })}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -862,7 +862,7 @@ export function Pacientes() {
                       setEditingPatient(patient || null);
                       setPacienteDrawerOpen(true);
                     }}
-                    className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                    className="p-2 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                     title={t('patients.actions.editPatient')}
                     aria-label={t('patients.actions.editPatient')}
                   >
@@ -875,7 +875,7 @@ export function Pacientes() {
                         handleDeletePaciente(patient.id, paciente.nombre);
                       }
                     }}
-                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title={t('patients.actions.deletePatient')}
                     aria-label={t('patients.actions.deletePatient')}
                   >
@@ -903,7 +903,7 @@ export function Pacientes() {
                   <span>{getModalidadLabel(paciente.modalidad)}</span>
                 </span>
 
-                <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
+                <span className="px-2 py-1 rounded-full text-xs bg-muted text-muted-foreground">
                   {getFrecuenciaLabel(paciente.frecuencia)}
                 </span>
 
@@ -915,11 +915,11 @@ export function Pacientes() {
               </div>
 
               {/* Next Appointment */}
-              <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="mt-4 pt-4 border-t border-border">
                 {proximoTurno ? (
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar className="w-4 h-4 text-indigo-600" />
-                    <span className="text-gray-600">
+                    <span className="text-muted-foreground">
                       {t('patients.nextAppointment.nextIn')}{' '}
                       <span className="text-indigo-600">
                         {proximoTurno.dias === 0
@@ -931,7 +931,7 @@ export function Pacientes() {
                     </span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="w-4 h-4" />
                     <span>{t('patients.nextAppointment.noUpcomingAppointments')}</span>
                   </div>

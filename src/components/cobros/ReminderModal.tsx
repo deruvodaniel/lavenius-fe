@@ -100,7 +100,7 @@ export function ReminderModal({ payment, onClose }: ReminderModalProps) {
   };
 
   const phoneStatus = isLoadingPatient ? (
-    <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+    <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
       <Loader2 className="w-4 h-4 animate-spin" />
       <span>{t('payments.reminderModal.loadingPatient')}</span>
     </div>
@@ -116,12 +116,12 @@ export function ReminderModal({ payment, onClose }: ReminderModalProps) {
 
   const messageField = (
     <div className="mb-4">
-      <label htmlFor="reminder-message" className="text-gray-700 text-sm block mb-2">
+      <label htmlFor="reminder-message" className="text-foreground text-sm block mb-2">
         {t('payments.reminderModal.message')}
       </label>
       <textarea
         id="reminder-message"
-        className="w-full h-28 sm:h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm resize-none"
+        className="w-full h-28 sm:h-32 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm resize-none"
         autoFocus
         value={message}
         onChange={(e) => setMessage(e.target.value)}
@@ -149,9 +149,9 @@ export function ReminderModal({ payment, onClose }: ReminderModalProps) {
   if (isMobile) {
     return (
       <Drawer open onOpenChange={(open) => !open && onClose()}>
-        <DrawerContent className="max-h-[85vh] bg-white">
-          <DrawerHeader className="text-left border-b border-gray-100">
-            <DrawerTitle className="text-gray-900">
+        <DrawerContent className="max-h-[85vh] bg-background">
+          <DrawerHeader className="text-left border-b border-border">
+            <DrawerTitle className="text-foreground">
               {t('payments.reminderModal.title')}
             </DrawerTitle>
           </DrawerHeader>
@@ -172,14 +172,14 @@ export function ReminderModal({ payment, onClose }: ReminderModalProps) {
       <DialogContent
         showCloseButton={false}
         aria-labelledby="reminder-modal-title"
-        className="w-full sm:max-w-md !bg-white p-4 sm:p-6 gap-4 rounded-lg"
+        className="w-full sm:max-w-md !bg-background p-4 sm:p-6 gap-4 rounded-lg"
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 id="reminder-modal-title" className="text-base sm:text-lg font-semibold text-gray-900">
+          <h3 id="reminder-modal-title" className="text-base sm:text-lg font-semibold text-foreground">
             {t('payments.reminderModal.title')}
           </h3>
           <button
-            className="text-gray-500 hover:text-gray-700 p-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            className="text-muted-foreground hover:text-foreground p-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             onClick={onClose}
             aria-label={t('common.close')}
           >

@@ -163,10 +163,10 @@ export function DateFilters({
 
       {/* Custom date range (expanded when "Rango" is selected) */}
       {(isExpanded || quickFilter === 'custom') && (
-        <Card className="p-3 space-y-3 bg-white">
+        <Card className="p-3 space-y-3 bg-card">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="date-from" className="text-xs text-gray-500 mb-1 block">
+              <label htmlFor="date-from" className="text-xs text-muted-foreground mb-1 block">
                 {t('payments.filters.from')}
               </label>
               <DatePicker
@@ -180,7 +180,7 @@ export function DateFilters({
               />
             </div>
             <div>
-              <label htmlFor="date-to" className="text-xs text-gray-500 mb-1 block">
+              <label htmlFor="date-to" className="text-xs text-muted-foreground mb-1 block">
                 {t('payments.filters.to')}
               </label>
               <DatePicker
@@ -196,7 +196,7 @@ export function DateFilters({
             </div>
           </div>
           {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={onClearFilters} className="text-gray-500">
+            <Button variant="ghost" size="sm" onClick={onClearFilters} className="text-muted-foreground">
               {t('payments.filters.clearFilters')}
             </Button>
           )}
@@ -239,7 +239,7 @@ export function SearchAndFilters({
     <div className="flex flex-col sm:flex-row gap-2">
       {/* Search */}
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
           placeholder={t('payments.filters.searchByPatient')}
@@ -256,29 +256,29 @@ export function SearchAndFilters({
           <select
             value={statusFilter}
             onChange={(e) => onStatusFilterChange(e.target.value as StatusFilterOption)}
-            className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
+            className="h-10 pl-8 pr-3 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
             aria-label={t('payments.filters.sortBy')}
           >
             {STATUS_FILTER_OPTIONS.map(option => (
               <option key={option.value} value={option.value}>{t(option.labelKey)}</option>
             ))}
           </select>
-          <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+          <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         </div>
-        
+
         {/* Sort dropdown */}
         <div className="relative">
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as SortOption)}
-            className="h-10 pl-8 pr-3 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
+            className="h-10 pl-8 pr-3 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
             aria-label={t('payments.filters.sortBy')}
           >
             {SORT_OPTIONS.map(option => (
               <option key={option.value} value={option.value}>{t(option.labelKey)}</option>
             ))}
           </select>
-          <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+          <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         </div>
       </div>
     </div>

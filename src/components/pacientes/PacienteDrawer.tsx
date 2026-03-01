@@ -283,15 +283,15 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
         </div>
 
         {/* Personal Information */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-card border border-border rounded-lg p-6">
+          <h3 className="text-foreground mb-4 flex items-center gap-2">
             <User className="w-5 h-5 text-indigo-600" />
             {t('patients.drawer.sections.personalInfo')}
           </h3>
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="paciente-nombre" className="block text-gray-700 mb-2">
+              <label htmlFor="paciente-nombre" className="block text-foreground mb-2">
                 {t('patients.fields.firstName')} <span className="text-red-500">*</span>
               </label>
               <input
@@ -302,14 +302,14 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 onBlur={() => handleFieldBlur('nombre')}
                 placeholder={t('patients.drawer.placeholders.firstName')}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  errors.nombre && touched.nombre ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  errors.nombre && touched.nombre ? 'border-red-300 bg-red-50' : 'border-border'
                 }`}
               />
               <InputError error={touched.nombre ? errors.nombre : undefined} />
             </div>
 
             <div>
-              <label htmlFor="paciente-apellido" className="block text-gray-700 mb-2">
+              <label htmlFor="paciente-apellido" className="block text-foreground mb-2">
                 {t('patients.fields.lastName')} <span className="text-red-500">*</span>
               </label>
               <input
@@ -320,14 +320,14 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 onBlur={() => handleFieldBlur('apellido')}
                 placeholder={t('patients.drawer.placeholders.lastName')}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  errors.apellido && touched.apellido ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  errors.apellido && touched.apellido ? 'border-red-300 bg-red-50' : 'border-border'
                 }`}
               />
               <InputError error={touched.apellido ? errors.apellido : undefined} />
             </div>
 
             <div>
-              <label htmlFor="paciente-edad" className="block text-gray-700 mb-2">{t('patients.fields.age')}</label>
+              <label htmlFor="paciente-edad" className="block text-foreground mb-2">{t('patients.fields.age')}</label>
               <input
                 id="paciente-edad"
                 type="number"
@@ -338,14 +338,14 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 onBlur={() => handleFieldBlur('edad')}
                 placeholder={t('patients.drawer.placeholders.age')}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  errors.edad && touched.edad ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  errors.edad && touched.edad ? 'border-red-300 bg-red-50' : 'border-border'
                 }`}
               />
               <InputError error={touched.edad ? errors.edad : undefined} />
             </div>
 
             <div>
-              <label htmlFor="paciente-telefono" className="flex items-center gap-2 text-gray-700 mb-2">
+              <label htmlFor="paciente-telefono" className="flex items-center gap-2 text-foreground mb-2">
                 <Phone className="w-4 h-4" />
                 {t('patients.fields.phone')}
               </label>
@@ -357,14 +357,14 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 onBlur={() => handleFieldBlur('telefono')}
                 placeholder={t('patients.drawer.placeholders.phone')}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  errors.telefono && touched.telefono ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  errors.telefono && touched.telefono ? 'border-red-300 bg-red-50' : 'border-border'
                 }`}
               />
               <InputError error={touched.telefono ? errors.telefono : undefined} />
             </div>
 
             <div>
-              <label htmlFor="paciente-email" className="flex items-center gap-2 text-gray-700 mb-2">
+              <label htmlFor="paciente-email" className="flex items-center gap-2 text-foreground mb-2">
                 <Mail className="w-4 h-4" />
                 {t('patients.fields.email')}
               </label>
@@ -376,14 +376,14 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 onBlur={() => handleFieldBlur('email')}
                 placeholder={t('patients.drawer.placeholders.email')}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  errors.email && touched.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  errors.email && touched.email ? 'border-red-300 bg-red-50' : 'border-border'
                 }`}
               />
               <InputError error={touched.email ? errors.email : undefined} />
             </div>
 
             <div>
-              <label htmlFor="paciente-cobertura" className="flex items-center gap-2 text-gray-700 mb-2">
+              <label htmlFor="paciente-cobertura" className="flex items-center gap-2 text-foreground mb-2">
                 <Heart className="w-4 h-4" />
                 {t('patients.fields.healthInsurance')}
               </label>
@@ -393,7 +393,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 value={formData.coberturaMedica}
                 onChange={(e) => setFormData({ ...formData, coberturaMedica: e.target.value })}
                 placeholder={t('patients.drawer.placeholders.healthInsurance')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
@@ -404,7 +404,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
                   formData.whatsappOptIn
                     ? 'border-green-500 bg-green-50'
-                    : 'border-gray-200 hover:border-green-300'
+                    : 'border-border hover:border-green-300'
                 }`}
               >
                 <input
@@ -412,16 +412,16 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                   type="checkbox"
                   checked={formData.whatsappOptIn}
                   onChange={(e) => setFormData({ ...formData, whatsappOptIn: e.target.checked })}
-                  className="mt-0.5 w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                  className="mt-0.5 w-5 h-5 text-green-600 border-border rounded focus:ring-green-500"
                 />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <MessageCircle className="w-4 h-4 text-green-600" />
-                    <span className={`text-sm font-medium ${formData.whatsappOptIn ? 'text-green-700' : 'text-gray-700'}`}>
+                    <span className={`text-sm font-medium ${formData.whatsappOptIn ? 'text-green-700' : 'text-foreground'}`}>
                       {t('patients.fields.whatsappOptIn')}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {t('patients.fields.whatsappOptInDescription')}
                   </p>
                   {patient?.whatsappOptInDate && formData.whatsappOptIn && (
@@ -438,15 +438,15 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
         </div>
 
         {/* Treatment Modality */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-card border border-border rounded-lg p-6">
+          <h3 className="text-foreground mb-4 flex items-center gap-2">
             <Calendar className="w-5 h-5 text-indigo-600" />
             {t('patients.drawer.sections.treatmentModality')}
           </h3>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-gray-700 mb-2">{t('patients.fields.sessionType')}</label>
+              <label className="block text-foreground mb-2">{t('patients.fields.sessionType')}</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
@@ -454,7 +454,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                   className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
                     formData.tipoSesion === 'presential'
                       ? 'border-purple-600 bg-purple-50 text-purple-700'
-                      : 'border-gray-300 text-gray-700 hover:border-purple-300'
+                      : 'border-border text-foreground hover:border-purple-300'
                   }`}
                 >
                   <MapPin className="w-5 h-5" />
@@ -466,7 +466,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                   className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
                     formData.tipoSesion === 'remote'
                       ? 'border-blue-600 bg-blue-50 text-blue-700'
-                      : 'border-gray-300 text-gray-700 hover:border-blue-300'
+                      : 'border-border text-foreground hover:border-blue-300'
                   }`}
                 >
                   <Video className="w-5 h-5" />
@@ -476,7 +476,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
             </div>
 
             <div>
-              <label className="block text-gray-700 mb-3">{t('patients.fields.frequency')}</label>
+              <label className="block text-foreground mb-3">{t('patients.fields.frequency')}</label>
               <div className="space-y-2">
                 {(['semanal', 'quincenal', 'mensual', 'otra'] as const).map((freq) => (
                   <label
@@ -484,7 +484,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                     className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
                       formData.frecuencia === freq
                         ? 'border-indigo-600 bg-indigo-50'
-                        : 'border-gray-200 hover:border-indigo-300'
+                        : 'border-border hover:border-indigo-300'
                     }`}
                   >
                     <input
@@ -493,9 +493,9 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                       value={freq}
                       checked={formData.frecuencia === freq}
                       onChange={(e) => setFormData({ ...formData, frecuencia: e.target.value as Frecuencia })}
-                      className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                      className="w-4 h-4 text-indigo-600 border-border focus:ring-indigo-500"
                     />
-                    <span className={`text-sm font-medium ${formData.frecuencia === freq ? 'text-indigo-700' : 'text-gray-700'}`}>
+                    <span className={`text-sm font-medium ${formData.frecuencia === freq ? 'text-indigo-700' : 'text-foreground'}`}>
                       {freq === 'semanal' && t('patients.frequency.weekly')}
                       {freq === 'quincenal' && t('patients.frequency.biweekly')}
                       {freq === 'mensual' && t('patients.frequency.monthly')}
@@ -518,7 +518,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                       onBlur={() => handleFieldBlur('frecuenciaOtra')}
                       placeholder={t('patients.drawer.placeholders.customFrequency')}
                       className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm ${
-                        errors.frecuenciaOtra && touched.frecuenciaOtra ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                        errors.frecuenciaOtra && touched.frecuenciaOtra ? 'border-red-300 bg-red-50' : 'border-border'
                       }`}
                     />
                     <InputError error={touched.frecuenciaOtra ? errors.frecuenciaOtra : undefined} />
@@ -530,43 +530,43 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
         </div>
 
         {/* Clinical History */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-gray-900 mb-4">{t('patients.drawer.sections.clinicalHistory')}</h3>
+        <div className="bg-card border border-border rounded-lg p-6">
+          <h3 className="text-foreground mb-4">{t('patients.drawer.sections.clinicalHistory')}</h3>
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="paciente-diagnostico" className="block text-gray-700 mb-2">{t('patients.fields.diagnosis')}</label>
+              <label htmlFor="paciente-diagnostico" className="block text-foreground mb-2">{t('patients.fields.diagnosis')}</label>
               <textarea
                 id="paciente-diagnostico"
                 value={formData.diagnostico}
                 onChange={(e) => setFormData({ ...formData, diagnostico: e.target.value })}
                 placeholder={t('patients.drawer.placeholders.diagnosis')}
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
               />
             </div>
 
             <div>
-              <label htmlFor="paciente-tratamiento" className="block text-gray-700 mb-2">{t('patients.fields.currentTreatment')}</label>
+              <label htmlFor="paciente-tratamiento" className="block text-foreground mb-2">{t('patients.fields.currentTreatment')}</label>
               <textarea
                 id="paciente-tratamiento"
                 value={formData.tratamientoActual}
                 onChange={(e) => setFormData({ ...formData, tratamientoActual: e.target.value })}
                 placeholder={t('patients.drawer.placeholders.currentTreatment')}
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
               />
             </div>
 
             <div>
-              <label htmlFor="paciente-observaciones" className="block text-gray-700 mb-2">{t('patients.fields.observations')}</label>
+              <label htmlFor="paciente-observaciones" className="block text-foreground mb-2">{t('patients.fields.observations')}</label>
               <textarea
                 id="paciente-observaciones"
                 value={formData.observaciones}
                 onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
                 placeholder={t('patients.drawer.placeholders.observations')}
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
               />
             </div>
           </div>
@@ -586,7 +586,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
           className={`flex-1 ${
             isFormValid
               ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-muted text-muted-foreground cursor-not-allowed'
           }`}
           disabled={!isFormValid}
         >

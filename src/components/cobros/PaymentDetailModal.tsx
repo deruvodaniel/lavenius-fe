@@ -92,12 +92,12 @@ interface DetailRowProps {
 
 const DetailRow = ({ icon: Icon, label, value, className = '' }: DetailRowProps) => (
   <div className={`flex items-start gap-3 py-3 ${className}`}>
-    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-      <Icon className="w-4 h-4 text-gray-500" />
+    <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+      <Icon className="w-4 h-4 text-muted-foreground" />
     </div>
     <div className="flex-1 min-w-0">
-      <p className="text-xs text-gray-500 mb-0.5">{label}</p>
-      <div className="text-sm text-gray-900 font-medium">{value}</div>
+      <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
+      <div className="text-sm text-foreground font-medium">{value}</div>
     </div>
   </div>
 );
@@ -153,9 +153,9 @@ function PaymentDetailContent({
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-5">
         {/* Amount Card */}
-        <div className="bg-gray-50 rounded-xl p-4 mb-4 text-center">
-          <p className="text-sm text-gray-500 mb-1">{t('payments.fields.amount')}</p>
-          <p className="text-3xl font-bold text-gray-900">{formatCurrency(payment.amount)}</p>
+        <div className="bg-muted rounded-xl p-4 mb-4 text-center">
+          <p className="text-sm text-muted-foreground mb-1">{t('payments.fields.amount')}</p>
+          <p className="text-3xl font-bold text-foreground">{formatCurrency(payment.amount)}</p>
           <div className="mt-3 flex justify-center">
             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${config.className}`}>
               <StatusIcon className="w-4 h-4" />
@@ -165,7 +165,7 @@ function PaymentDetailContent({
         </div>
 
         {/* Details */}
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-border">
           <DetailRow icon={User} label={t('payments.fields.patient')} value={patientName} />
           <DetailRow icon={Calendar} label={t('payments.fields.paymentDate')} value={formatDate(payment.paymentDate)} />
           {payment.paidDate && (
@@ -178,7 +178,7 @@ function PaymentDetailContent({
       </div>
 
       {/* Actions */}
-      <div className="border-t border-gray-100 p-4 sm:p-5 bg-gray-50">
+      <div className="border-t border-border p-4 sm:p-5 bg-muted">
         {!isPaid && onMarkAsPaid && (
           <Button
             className="w-full mb-3 bg-green-600 hover:bg-green-700 text-white"
@@ -228,7 +228,7 @@ export const PaymentDetailModal = (props: PaymentDetailModalProps) => {
   if (isMobile) {
     return (
       <Drawer open onOpenChange={(open) => !open && onClose()}>
-        <DrawerContent className="max-h-[90vh] bg-white p-0 gap-0 overflow-hidden flex flex-col">
+        <DrawerContent className="max-h-[90vh] bg-background p-0 gap-0 overflow-hidden flex flex-col">
           <PaymentDetailContent {...props} />
         </DrawerContent>
       </Drawer>
@@ -240,7 +240,7 @@ export const PaymentDetailModal = (props: PaymentDetailModalProps) => {
       <DialogContent
         showCloseButton={false}
         aria-labelledby="payment-detail-title"
-        className="w-full sm:max-w-md !bg-white p-0 gap-0 rounded-xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col"
+        className="w-full sm:max-w-md !bg-background p-0 gap-0 rounded-xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col"
       >
         <PaymentDetailContent {...props} />
       </DialogContent>

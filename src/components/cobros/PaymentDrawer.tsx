@@ -34,7 +34,7 @@ const PaymentTypeSelector = ({ selected, onChange, disabled }: PaymentTypeSelect
         className={`flex-1 p-3 rounded-lg border-2 transition-all ${
           selected === 'single'
             ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-            : 'border-gray-200 hover:border-gray-300 text-gray-600'
+            : 'border-border hover:border-border/70 text-muted-foreground'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         <DollarSign className="w-5 h-5 mx-auto mb-1" />
@@ -47,7 +47,7 @@ const PaymentTypeSelector = ({ selected, onChange, disabled }: PaymentTypeSelect
         className={`flex-1 p-3 rounded-lg border-2 transition-all ${
           selected === 'monthly'
             ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-            : 'border-gray-200 hover:border-gray-300 text-gray-600'
+            : 'border-border hover:border-border/70 text-muted-foreground'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         <CalendarRange className="w-5 h-5 mx-auto mb-1" />
@@ -108,10 +108,10 @@ const PaymentStatusSelector = ({ selected, onChange, disabled }: PaymentStatusSe
             className={`flex-1 p-3 rounded-lg border-2 transition-all ${
               isActive
                 ? option.className
-                : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                : 'border-border hover:border-border/70 text-muted-foreground'
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            <Icon className={`w-5 h-5 mx-auto mb-1 ${isActive ? option.iconColor : 'text-gray-400'}`} />
+            <Icon className={`w-5 h-5 mx-auto mb-1 ${isActive ? option.iconColor : 'text-muted-foreground'}`} />
             <span className="text-sm font-medium block">{t(option.labelKey)}</span>
           </button>
         );
@@ -132,8 +132,8 @@ const ComingSoonOverlay = () => {
       <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
         <Sparkles className="w-8 h-8 text-indigo-600" />
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('payments.comingSoon.title')}</h3>
-      <p className="text-sm text-gray-500 text-center max-w-xs px-4">
+      <h3 className="text-lg font-semibold text-foreground mb-2">{t('payments.comingSoon.title')}</h3>
+      <p className="text-sm text-muted-foreground text-center max-w-xs px-4">
         {t('payments.comingSoon.description')}
       </p>
     </div>
@@ -150,22 +150,22 @@ const MonthlyPaymentForm = () => {
   return (
     <div className="relative">
       <ComingSoonOverlay />
-      <div className="space-y-4 opacity-50 pointer-events-none select-none p-4 border border-gray-200 rounded-lg">
+      <div className="space-y-4 opacity-50 pointer-events-none select-none p-4 border border-border rounded-lg">
         <div>
-          <label className="text-gray-700 text-sm mb-2 block">{t('payments.fields.patient')}</label>
-          <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
+          <label className="text-foreground text-sm mb-2 block">{t('payments.fields.patient')}</label>
+          <div className="w-full px-4 py-3 border border-border rounded-lg bg-muted text-muted-foreground">
             {t('payments.drawer.selectPatient')}
           </div>
         </div>
         <div>
-          <label className="text-gray-700 text-sm mb-2 block">{t('payments.drawer.sessionCount')}</label>
-          <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
+          <label className="text-foreground text-sm mb-2 block">{t('payments.drawer.sessionCount')}</label>
+          <div className="w-full px-4 py-3 border border-border rounded-lg bg-muted text-muted-foreground">
             {t('payments.drawer.sessionsPerMonth')}
           </div>
         </div>
         <div>
-          <label className="text-gray-700 text-sm mb-2 block">{t('payments.drawer.pricePerSession')}</label>
-          <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
+          <label className="text-foreground text-sm mb-2 block">{t('payments.drawer.pricePerSession')}</label>
+          <div className="w-full px-4 py-3 border border-border rounded-lg bg-muted text-muted-foreground">
             $15,000
           </div>
         </div>
@@ -373,7 +373,7 @@ export const PaymentDrawer = ({
           {/* Payment Type Selector - only show in create mode */}
           {!isEditMode && (
             <div>
-              <label className="text-gray-700 mb-2 block text-sm font-medium">{t('payments.drawer.paymentType')}</label>
+              <label className="text-foreground mb-2 block text-sm font-medium">{t('payments.drawer.paymentType')}</label>
               <PaymentTypeSelector
                 selected={paymentType}
                 onChange={setPaymentType}
@@ -392,7 +392,7 @@ export const PaymentDrawer = ({
             <>
               {/* Session Selector */}
               <div>
-                <label htmlFor="payment-session" className="flex items-center gap-2 text-gray-700 mb-2">
+                <label htmlFor="payment-session" className="flex items-center gap-2 text-foreground mb-2">
                   <Calendar className="w-4 h-4" />
                   {t('payments.fields.session')} <span className="text-red-500">*</span>
                 </label>
@@ -401,7 +401,7 @@ export const PaymentDrawer = ({
                   value={formData.sessionId}
                   onChange={(e) => setFormData({ ...formData, sessionId: e.target.value })}
                   className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    !formData.sessionId ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                    !formData.sessionId ? 'border-red-300 bg-red-50' : 'border-border'
                   }`}
                   disabled={isLoading || isSaving || !!preselectedSessionId}
                   required
@@ -436,7 +436,7 @@ export const PaymentDrawer = ({
 
               {/* Amount */}
               <div>
-                <label htmlFor="payment-amount" className="flex items-center gap-2 text-gray-700 mb-2">
+                <label htmlFor="payment-amount" className="flex items-center gap-2 text-foreground mb-2">
                   <DollarSign className="w-4 h-4" />
                   {t('payments.fields.amountARS')} <span className="text-red-500">*</span>
                 </label>
@@ -448,7 +448,7 @@ export const PaymentDrawer = ({
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
                   className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    formData.amount <= 0 ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                    formData.amount <= 0 ? 'border-red-300 bg-red-50' : 'border-border'
                   }`}
                   required
                   disabled={isLoading || isSaving}
@@ -457,7 +457,7 @@ export const PaymentDrawer = ({
 
               {/* Payment Date */}
               <div>
-                <label htmlFor="payment-date" className="flex items-center gap-2 text-gray-700 mb-2">
+                <label htmlFor="payment-date" className="flex items-center gap-2 text-foreground mb-2">
                   {t('payments.fields.paymentDate')} <span className="text-red-500">*</span>
                 </label>
                 <DatePicker
@@ -471,7 +471,7 @@ export const PaymentDrawer = ({
 
               {/* Payment Status */}
               <div>
-                <label className="flex items-center gap-2 text-gray-700 mb-2">
+                <label className="flex items-center gap-2 text-foreground mb-2">
                   <CheckCircle2 className="w-4 h-4" />
                   {t('payments.fields.paymentStatus')}
                 </label>
@@ -484,7 +484,7 @@ export const PaymentDrawer = ({
 
               {/* Description */}
               <div>
-                <label htmlFor="payment-description" className="flex items-center gap-2 text-gray-700 mb-2">
+                <label htmlFor="payment-description" className="flex items-center gap-2 text-foreground mb-2">
                   <FileText className="w-4 h-4" />
                   {t('payments.fields.descriptionOptional')}
                 </label>
@@ -494,7 +494,7 @@ export const PaymentDrawer = ({
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder={t('payments.fields.descriptionPlaceholder')}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                  className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                   disabled={isLoading || isSaving}
                 />
               </div>
@@ -519,7 +519,7 @@ export const PaymentDrawer = ({
               className={`flex-1 ${
                 isFormValid && !isLoading && !isSaving
                   ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-muted text-muted-foreground cursor-not-allowed'
               }`}
             >
               {isSaving 
