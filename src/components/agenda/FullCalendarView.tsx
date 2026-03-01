@@ -596,22 +596,22 @@ export function FullCalendarView({
       {/* Estilos personalizados */}
       <style>{`
         .fullcalendar-wrapper {
-          --fc-border-color: #e5e7eb;
+          --fc-border-color: var(--border);
           --fc-button-bg-color: #4f46e5;
           --fc-button-border-color: #4f46e5;
           --fc-button-hover-bg-color: #4338ca;
           --fc-button-hover-border-color: #4338ca;
           --fc-button-active-bg-color: #3730a3;
           --fc-button-active-border-color: #3730a3;
-          --fc-today-bg-color: #eef2ff;
-          --fc-page-bg-color: #ffffff;
-          --fc-neutral-bg-color: #f9fafb;
-          --fc-list-event-hover-bg-color: #f3f4f6;
+          --fc-today-bg-color: color-mix(in srgb, var(--primary) 12%, transparent);
+          --fc-page-bg-color: var(--background);
+          --fc-neutral-bg-color: var(--muted);
+          --fc-list-event-hover-bg-color: var(--muted);
         }
 
         .fullcalendar-wrapper .fc {
           font-family: inherit;
-          background: white;
+          background: var(--background);
         }
 
         /* Toolbar styling - Responsive */
@@ -629,7 +629,7 @@ export function FullCalendarView({
         .fullcalendar-wrapper .fc-toolbar-title {
           font-size: 1.25rem;
           font-weight: 600;
-          color: #111827;
+          color: var(--foreground);
         }
 
         /* Mobile: Stack toolbar vertically */
@@ -655,6 +655,7 @@ export function FullCalendarView({
           .fullcalendar-wrapper .fc-toolbar-title {
             font-size: 1.1rem;
             text-align: center;
+            color: var(--foreground);
           }
 
           .fullcalendar-wrapper .fc-button {
@@ -694,7 +695,7 @@ export function FullCalendarView({
         }
 
         .fullcalendar-wrapper .fc-button:focus {
-          box-shadow: 0 0 0 2px white, 0 0 0 4px #4f46e5;
+          box-shadow: 0 0 0 2px var(--background), 0 0 0 4px #4f46e5;
         }
 
         .fullcalendar-wrapper .fc-button:disabled {
@@ -709,17 +710,17 @@ export function FullCalendarView({
 
         /* Header cells */
         .fullcalendar-wrapper .fc-col-header-cell {
-          background-color: #f9fafb;
+          background-color: var(--muted);
           font-weight: 600;
           padding: 0.75rem 0.5rem;
           font-size: 0.75rem;
           letter-spacing: 0.025em;
-          color: #6b7280;
-          border-color: #e5e7eb;
+          color: var(--muted-foreground);
+          border-color: var(--border);
         }
 
         .fullcalendar-wrapper .fc-col-header-cell-cushion {
-          color: #6b7280;
+          color: var(--muted-foreground);
           text-decoration: none;
         }
 
@@ -729,13 +730,13 @@ export function FullCalendarView({
         }
 
         .fullcalendar-wrapper .fc-daygrid-day:hover {
-          background-color: #f9fafb;
+          background-color: var(--muted);
         }
 
         .fullcalendar-wrapper .fc-daygrid-day-number {
           padding: 0.5rem;
           font-weight: 500;
-          color: #374151;
+          color: var(--foreground);
           font-size: 0.875rem;
         }
 
@@ -782,12 +783,12 @@ export function FullCalendarView({
         /* Time grid */
         .fullcalendar-wrapper .fc-timegrid-slot {
           height: 3rem;
-          border-color: #f3f4f6;
+          border-color: var(--border);
         }
 
         .fullcalendar-wrapper .fc-timegrid-slot-label {
           font-size: 0.75rem;
-          color: #9ca3af;
+          color: var(--muted-foreground);
           font-weight: 500;
         }
 
@@ -826,7 +827,7 @@ export function FullCalendarView({
         /* All day slot */
         .fullcalendar-wrapper .fc-timegrid-axis {
           font-size: 0.75rem;
-          color: #9ca3af;
+          color: var(--muted-foreground);
         }
 
         /* Mobile: Wider columns in week view */
@@ -852,17 +853,17 @@ export function FullCalendarView({
         }
 
         .fullcalendar-wrapper .fc-scroller::-webkit-scrollbar-track {
-          background: #f3f4f6;
+          background: var(--muted);
           border-radius: 3px;
         }
 
         .fullcalendar-wrapper .fc-scroller::-webkit-scrollbar-thumb {
-          background: #d1d5db;
+          background: var(--border);
           border-radius: 3px;
         }
 
         .fullcalendar-wrapper .fc-scroller::-webkit-scrollbar-thumb:hover {
-          background: #9ca3af;
+          background: var(--muted-foreground);
         }
 
         /* Event colors */
@@ -940,12 +941,12 @@ export function FullCalendarView({
         }
 
         .fullcalendar-wrapper .fc-list-day-cushion {
-          background-color: #f9fafb;
+          background-color: var(--muted);
           padding: 0.75rem 1rem;
         }
 
         .fullcalendar-wrapper .fc-list-event:hover td {
-          background-color: #f3f4f6;
+          background-color: var(--muted);
         }
 
         .fullcalendar-wrapper .fc-list-event-dot {

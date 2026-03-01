@@ -184,17 +184,17 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
                 side={collapsed ? 'right' : 'top'}
                 align={collapsed ? 'end' : 'start'}
                 sideOffset={8}
-                className="w-56 p-1 bg-white border border-gray-200 shadow-lg rounded-lg"
+                className="w-56 p-1 bg-card border border-border shadow-lg rounded-lg"
               >
-                <div className="px-3 py-2 border-b border-gray-100 mb-1">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{user.firstName} {user.lastName}</p>
-                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                <div className="px-3 py-2 border-b border-border mb-1">
+                  <p className="text-sm font-semibold text-foreground truncate">{user.firstName} {user.lastName}</p>
+                  <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                 </div>
 
                 <NavLink
                   to="/dashboard/configuracion"
                   onClick={handleNavClick}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-muted transition-colors"
                 >
                   <Settings className="w-4 h-4" />
                   {t('navigation.settings')}
@@ -203,13 +203,13 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
                 <NavLink
                   to="/dashboard/ayuda"
                   onClick={handleNavClick}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-muted transition-colors"
                 >
                   <HelpCircle className="w-4 h-4" />
                   {t('navigation.help')}
                 </NavLink>
 
-                <div className="border-t border-gray-100 mt-1 pt-1">
+                <div className="border-t border-border mt-1 pt-1">
                   <button
                     onClick={handleLogoutClick}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 rounded-md hover:bg-red-50 transition-colors"
