@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, Globe, Loader2, Sun } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
@@ -294,21 +295,17 @@ interface ToggleRowProps {
 }
 
 const ToggleRow = ({ checked, onChange, label, description }: ToggleRowProps) => (
-  <label className="flex items-start gap-3 cursor-pointer group">
-    <div className="relative mt-0.5">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="sr-only peer"
-      />
-      <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-    </div>
-    <div className="flex-1">
-      <span className="text-sm font-medium text-foreground group-hover:text-indigo-600 transition-colors">{label}</span>
+  <div className="flex items-start gap-3">
+    <Switch
+      checked={checked}
+      onCheckedChange={onChange}
+      className="mt-0.5 flex-shrink-0"
+    />
+    <div className="flex-1 cursor-pointer" onClick={() => onChange(!checked)}>
+      <span className="text-sm font-medium text-foreground hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">{label}</span>
       {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
     </div>
-  </label>
+  </div>
 );
 
 // ============================================================================
