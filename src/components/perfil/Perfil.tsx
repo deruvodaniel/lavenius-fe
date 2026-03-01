@@ -1,11 +1,20 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { User, Camera, Mail, Phone, FileText, Award, X, Copy, ExternalLink } from 'lucide-react';
+import { User, Camera, Mail, Phone, FileText, Award, X, Copy, ExternalLink, Trash2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { getNameInitials } from '@/lib/utils/nameInitials';
 import { useUser } from '@clerk/clerk-react';
@@ -166,6 +175,9 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
   });
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirmInput, setDeleteConfirmInput] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Notify parent of state changes
   useEffect(() => {
@@ -210,6 +222,17 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
       toast.error(t('profile.messages.saveError'));
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      await clerkUser?.delete();
+      navigate('/login');
+    } catch {
+      toast.error(t('profile.dangerZone.deleteError'));
+      setIsDeleting(false);
     }
   };
 
@@ -464,6 +487,103 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
           </div>
         </ProfileSection>
 
+      {/* Danger Zone */}
+      <div className="rounded-lg border border-red-200 dark:border-red-900/50 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center gap-3 px-4 sm:px-6 py-4 bg-red-50 dark:bg-red-950/30 border-b border-red-200 dark:border-red-900/50">
+          <div className="w-9 h-9 bg-red-100 dark:bg-red-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-red-700 dark:text-red-400">
+              {t('profile.dangerZone.title')}
+            </h2>
+            <p className="text-xs text-red-600/80 dark:text-red-500 mt-0.5">
+              {t('profile.dangerZone.description')}
+            </p>
+          </div>
+        </div>
+
+        {/* Delete Account Row */}
+        <div className="px-4 sm:px-6 py-4 bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-foreground">{t('profile.dangerZone.deleteAccount')}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{t('profile.dangerZone.deleteAccountDescription')}</p>
+          </div>
+          <button
+            onClick={() => {
+              setDeleteConfirmInput('');
+              setShowDeleteDialog(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors flex-shrink-0"
+          >
+            <Trash2 className="w-4 h-4" />
+            {t('profile.dangerZone.deleteAccount')}
+          </button>
+        </div>
+      </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-10 h-10 bg-red-100 dark:bg-red-900/40 rounded-full flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
+              </div>
+              <AlertDialogTitle className="text-red-700 dark:text-red-400">
+                {t('profile.dangerZone.confirmTitle')}
+              </AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-sm text-muted-foreground leading-relaxed">
+              {t('profile.dangerZone.confirmDescription')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {/* Type-to-confirm */}
+          <div className="space-y-2 py-2">
+            <label className="text-xs font-medium text-muted-foreground">
+              {t('profile.dangerZone.typeToConfirm')}
+            </label>
+            <Input
+              value={deleteConfirmInput}
+              onChange={(e) => setDeleteConfirmInput(e.target.value)}
+              placeholder={t('profile.dangerZone.confirmWord')}
+              className="font-mono border-red-200 dark:border-red-900 focus-visible:ring-red-500/30"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+            />
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              disabled={isDeleting}
+              onClick={() => setShowDeleteDialog(false)}
+            >
+              {t('profile.dangerZone.cancelButton')}
+            </AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={deleteConfirmInput !== t('profile.dangerZone.confirmWord') || isDeleting}
+              onClick={handleDeleteAccount}
+              className="gap-2"
+            >
+              {isDeleting ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  {t('profile.dangerZone.deleting')}
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4" />
+                  {t('profile.dangerZone.confirmButton')}
+                </>
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 });

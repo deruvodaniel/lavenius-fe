@@ -850,6 +850,20 @@
       "saveSuccess": "Perfil guardado correctamente",
       "saveError": "Error al guardar el perfil"
     },
+    "dangerZone": {
+      "title": "Zona de peligro",
+      "description": "Estas acciones son permanentes e irreversibles. Procede con extrema cautela.",
+      "deleteAccount": "Eliminar cuenta",
+      "deleteAccountDescription": "Elimina permanentemente tu cuenta y todos tus datos de Lavenius, incluyendo pacientes, turnos, cobros y notas clínicas.",
+      "confirmTitle": "¿Eliminar tu cuenta?",
+      "confirmDescription": "Esta acción es permanente e irreversible. Todos tus datos, pacientes, turnos, cobros y notas clínicas serán eliminados para siempre. No podrás recuperar esta información.",
+      "typeToConfirm": "Escribe ELIMINAR para confirmar",
+      "confirmWord": "ELIMINAR",
+      "confirmButton": "Sí, eliminar mi cuenta",
+      "cancelButton": "Cancelar",
+      "deleting": "Eliminando cuenta...",
+      "deleteError": "Error al eliminar la cuenta. Intentá de nuevo."
+    },
     "share": {
       "backToSettings": "Volver a Configuración",
       "bookSession": "Agendar una sesión",

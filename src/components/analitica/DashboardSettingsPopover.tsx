@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Settings, Eye, EyeOff } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -37,21 +37,17 @@ function SectionToggle({ id, label, checked, onCheckedChange }: SectionTogglePro
       <label
         htmlFor={id}
         className={cn(
-          'text-sm cursor-pointer flex items-center gap-2',
+          'text-sm cursor-pointer',
           checked ? 'text-foreground' : 'text-muted-foreground'
         )}
       >
-        {checked ? (
-          <Eye className="w-4 h-4 text-green-500" />
-        ) : (
-          <EyeOff className="w-4 h-4" />
-        )}
         {label}
       </label>
       <Switch
         id={id}
         checked={checked}
         onCheckedChange={onCheckedChange}
+        className="switch-lg"
       />
     </div>
   );

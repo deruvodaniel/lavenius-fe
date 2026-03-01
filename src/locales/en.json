@@ -850,6 +850,20 @@
       "saveSuccess": "Profile saved successfully",
       "saveError": "Error saving profile"
     },
+    "dangerZone": {
+      "title": "Danger Zone",
+      "description": "These actions are permanent and irreversible. Proceed with extreme caution.",
+      "deleteAccount": "Delete Account",
+      "deleteAccountDescription": "Permanently delete your account and all your Lavenius data, including patients, appointments, payments, and clinical notes.",
+      "confirmTitle": "Delete your account?",
+      "confirmDescription": "This action is permanent and irreversible. All your data, patients, appointments, payments, and clinical notes will be deleted forever. You will not be able to recover this information.",
+      "typeToConfirm": "Type DELETE to confirm",
+      "confirmWord": "DELETE",
+      "confirmButton": "Yes, delete my account",
+      "cancelButton": "Cancel",
+      "deleting": "Deleting account...",
+      "deleteError": "Error deleting account. Please try again."
+    },
     "share": {
       "bookSession": "Book a Session",
       "bookSessionDescription": "Online booking coming soon",
