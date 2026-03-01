@@ -595,6 +595,9 @@ export function FullCalendarView({
 
       {/* Estilos personalizados */}
       <style>{`
+        /* ================================================================
+           FC CUSTOM PROPERTIES — light mode base
+           ================================================================ */
         .fullcalendar-wrapper {
           --fc-border-color: var(--border);
           --fc-button-bg-color: #4f46e5;
@@ -603,18 +606,90 @@ export function FullCalendarView({
           --fc-button-hover-border-color: #4338ca;
           --fc-button-active-bg-color: #3730a3;
           --fc-button-active-border-color: #3730a3;
-          --fc-today-bg-color: color-mix(in srgb, var(--primary) 12%, transparent);
+          --fc-today-bg-color: color-mix(in srgb, var(--primary) 10%, transparent);
           --fc-page-bg-color: var(--background);
           --fc-neutral-bg-color: var(--muted);
           --fc-list-event-hover-bg-color: var(--muted);
+          --fc-non-business-color: rgba(0, 0, 0, 0.04);
+          --fc-highlight-color: color-mix(in srgb, var(--primary) 8%, transparent);
         }
 
+        /* Dark mode custom property overrides */
+        .dark .fullcalendar-wrapper {
+          --fc-border-color: var(--border);
+          --fc-today-bg-color: color-mix(in srgb, var(--primary) 14%, transparent);
+          --fc-page-bg-color: var(--background);
+          --fc-neutral-bg-color: var(--muted);
+          --fc-list-event-hover-bg-color: var(--muted);
+          --fc-non-business-color: rgba(0, 0, 0, 0.25);
+          --fc-highlight-color: color-mix(in srgb, var(--primary) 12%, transparent);
+        }
+
+        /* ================================================================
+           ROOT ELEMENT — backgrounds & font
+           ================================================================ */
         .fullcalendar-wrapper .fc {
           font-family: inherit;
           background: var(--background);
+          color: var(--foreground);
         }
 
-        /* Toolbar styling - Responsive */
+        .dark .fullcalendar-wrapper .fc {
+          background: var(--background);
+          color: var(--foreground);
+        }
+
+        /* Scrollgrid table and cells */
+        .fullcalendar-wrapper .fc-scrollgrid {
+          border-color: var(--border);
+          background: var(--background);
+        }
+
+        .fullcalendar-wrapper .fc-scrollgrid-sync-table td,
+        .fullcalendar-wrapper .fc-scrollgrid-sync-table th {
+          border-color: var(--border);
+        }
+
+        .fullcalendar-wrapper .fc-scrollgrid td,
+        .fullcalendar-wrapper .fc-scrollgrid th {
+          border-color: var(--border);
+        }
+
+        /* Daygrid and timegrid body backgrounds */
+        .fullcalendar-wrapper .fc-daygrid-body,
+        .fullcalendar-wrapper .fc-timegrid-body {
+          background: var(--background);
+        }
+
+        .dark .fullcalendar-wrapper .fc-daygrid-body,
+        .dark .fullcalendar-wrapper .fc-timegrid-body {
+          background: var(--background);
+        }
+
+        /* Individual day cells in daygrid */
+        .fullcalendar-wrapper .fc-daygrid-day {
+          background: var(--background);
+          border-color: var(--border);
+          transition: background-color 0.15s ease;
+        }
+
+        .dark .fullcalendar-wrapper .fc-daygrid-day {
+          background: var(--background);
+        }
+
+        /* Timegrid columns */
+        .fullcalendar-wrapper .fc-timegrid-col {
+          background: var(--background);
+          border-color: var(--border);
+        }
+
+        .dark .fullcalendar-wrapper .fc-timegrid-col {
+          background: var(--background);
+        }
+
+        /* ================================================================
+           TOOLBAR — navigation buttons and title
+           ================================================================ */
         .fullcalendar-wrapper .fc-toolbar {
           margin-bottom: 1rem !important;
           gap: 0.5rem;
@@ -630,6 +705,29 @@ export function FullCalendarView({
           font-size: 1.25rem;
           font-weight: 600;
           color: var(--foreground);
+        }
+
+        .fullcalendar-wrapper .fc-button {
+          text-transform: capitalize;
+          font-weight: 500;
+          font-size: 0.875rem;
+          padding: 0.5rem 1rem;
+          border-radius: 0.5rem;
+          transition: all 0.15s ease;
+        }
+
+        .fullcalendar-wrapper .fc-button:focus {
+          box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--primary);
+        }
+
+        .fullcalendar-wrapper .fc-button:disabled {
+          opacity: 0.5;
+        }
+
+        .fullcalendar-wrapper .fc-button-primary:not(:disabled).fc-button-active,
+        .fullcalendar-wrapper .fc-button-primary:not(:disabled):active {
+          background-color: #3730a3;
+          border-color: #3730a3;
         }
 
         /* Mobile: Stack toolbar vertically */
@@ -655,7 +753,6 @@ export function FullCalendarView({
           .fullcalendar-wrapper .fc-toolbar-title {
             font-size: 1.1rem;
             text-align: center;
-            color: var(--foreground);
           }
 
           .fullcalendar-wrapper .fc-button {
@@ -685,50 +782,70 @@ export function FullCalendarView({
           }
         }
 
-        .fullcalendar-wrapper .fc-button {
-          text-transform: capitalize;
-          font-weight: 500;
-          font-size: 0.875rem;
-          padding: 0.5rem 1rem;
-          border-radius: 0.5rem;
-          transition: all 0.15s ease;
-        }
-
-        .fullcalendar-wrapper .fc-button:focus {
-          box-shadow: 0 0 0 2px var(--background), 0 0 0 4px #4f46e5;
-        }
-
-        .fullcalendar-wrapper .fc-button:disabled {
-          opacity: 0.5;
-        }
-
-        .fullcalendar-wrapper .fc-button-primary:not(:disabled).fc-button-active,
-        .fullcalendar-wrapper .fc-button-primary:not(:disabled):active {
-          background-color: #3730a3;
-          border-color: #3730a3;
-        }
-
-        /* Header cells */
+        /* ================================================================
+           COLUMN HEADERS — week/day view day-of-week labels
+           ================================================================ */
         .fullcalendar-wrapper .fc-col-header-cell {
           background-color: var(--muted);
-          font-weight: 600;
-          padding: 0.75rem 0.5rem;
-          font-size: 0.75rem;
-          letter-spacing: 0.025em;
-          color: var(--muted-foreground);
           border-color: var(--border);
+          padding: 0;
+        }
+
+        .dark .fullcalendar-wrapper .fc-col-header-cell {
+          background-color: var(--muted);
         }
 
         .fullcalendar-wrapper .fc-col-header-cell-cushion {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.15rem;
+          padding: 0.5rem 0.25rem;
+          text-decoration: none;
+          color: var(--muted-foreground);
+        }
+
+        /* Week view: day abbreviation (Mon, Tue…) */
+        .fullcalendar-wrapper .fc-col-header-cell-cushion .fc-col-header-cell-abbr {
+          font-size: 0.65rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: var(--muted-foreground);
+        }
+
+        /* Week view: day number */
+        .fullcalendar-wrapper .fc-col-header-cell-cushion .fc-col-header-cell-date {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--foreground);
+          line-height: 1;
+        }
+
+        /* Today column header highlight */
+        .fullcalendar-wrapper .fc-day-today .fc-col-header-cell-cushion .fc-col-header-cell-date {
+          background-color: var(--primary);
+          color: var(--primary-foreground);
+          border-radius: 9999px;
+          width: 1.75rem;
+          height: 1.75rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        /* Fallback for when FullCalendar renders header as plain text */
+        .fullcalendar-wrapper .fc-col-header-cell a {
+          font-size: 0.75rem;
+          font-weight: 600;
+          letter-spacing: 0.025em;
           color: var(--muted-foreground);
           text-decoration: none;
         }
 
-        /* Day cells */
-        .fullcalendar-wrapper .fc-daygrid-day {
-          transition: background-color 0.15s ease;
-        }
-
+        /* ================================================================
+           DAY CELLS — month grid
+           ================================================================ */
         .fullcalendar-wrapper .fc-daygrid-day:hover {
           background-color: var(--muted);
         }
@@ -738,15 +855,18 @@ export function FullCalendarView({
           font-weight: 500;
           color: var(--foreground);
           font-size: 0.875rem;
+          text-decoration: none;
         }
 
+        /* Today highlight — uses --fc-today-bg-color (CSS variable, no hardcode) */
         .fullcalendar-wrapper .fc-day-today {
-          background-color: #eef2ff !important;
+          background-color: var(--fc-today-bg-color) !important;
         }
 
+        /* Today day number badge */
         .fullcalendar-wrapper .fc-day-today .fc-daygrid-day-number {
-          background-color: #4f46e5;
-          color: white;
+          background-color: var(--primary);
+          color: var(--primary-foreground);
           border-radius: 9999px;
           width: 1.75rem;
           height: 1.75rem;
@@ -754,22 +874,37 @@ export function FullCalendarView({
           align-items: center;
           justify-content: center;
           margin: 0.25rem;
+          padding: 0;
         }
 
-        /* Events */
+        /* ================================================================
+           NON-BUSINESS HOURS — outside working hours shading
+           ================================================================ */
+        .fullcalendar-wrapper .fc-non-business {
+          background: rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .dark .fullcalendar-wrapper .fc-non-business {
+          background: rgba(0, 0, 0, 0.28) !important;
+        }
+
+        /* ================================================================
+           EVENTS — base styles
+           ================================================================ */
         .fullcalendar-wrapper .fc-event {
           border-radius: 6px;
           padding: 2px 6px;
           margin: 1px 2px;
           cursor: pointer;
-          transition: all 0.15s ease;
+          transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
           border-width: 0;
           font-size: 0.75rem;
         }
 
         .fullcalendar-wrapper .fc-event:hover {
           transform: translateY(-1px);
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.18), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+          opacity: 0.95;
         }
 
         .fullcalendar-wrapper .fc-daygrid-event {
@@ -780,73 +915,172 @@ export function FullCalendarView({
           padding: 4px 6px;
         }
 
-        /* Time grid */
-        .fullcalendar-wrapper .fc-timegrid-slot {
-          height: 3rem;
-          border-color: var(--border);
+        /* Event text — always white regardless of mode */
+        .fullcalendar-wrapper .fc-event-main {
+          color: white !important;
         }
 
-        .fullcalendar-wrapper .fc-timegrid-slot-label {
-          font-size: 0.75rem;
-          color: var(--muted-foreground);
-          font-weight: 500;
+        .fullcalendar-wrapper .fc-event-title,
+        .fullcalendar-wrapper .fc-event-time {
+          color: white !important;
         }
 
+        /* ================================================================
+           TIMEGRID EVENTS — card-like with border-left status indicator
+           ================================================================ */
         .fullcalendar-wrapper .fc-timegrid-event {
           border-radius: 6px;
           border-left-width: 4px;
           border-left-style: solid;
           overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+        }
+
+        .dark .fullcalendar-wrapper .fc-timegrid-event {
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
+        }
+
+        .fullcalendar-wrapper .fc-timegrid-event:hover {
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18), 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .fullcalendar-wrapper .fc-timegrid-event:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45), 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .fullcalendar-wrapper .fc-timegrid-event .fc-event-main {
-          padding: 2px 4px;
+          padding: 3px 5px;
         }
 
-        /* Better event sizing in week view */
+        /* Event harness spacing */
         .fullcalendar-wrapper .fc-timegrid-col-events {
           margin: 0 2px;
         }
 
-        /* Ensure events have minimum height for readability */
         .fullcalendar-wrapper .fc-timegrid-event-harness {
           min-height: 2.5rem;
         }
 
+        /* ================================================================
+           TIME GRID — slot rows and labels
+           ================================================================ */
+        .fullcalendar-wrapper .fc-timegrid-slot {
+          height: 3rem;
+          border-color: var(--border);
+        }
+
+        /* Day view — slightly taller slots for readability */
+        .fullcalendar-wrapper .fc-timeGridDay-view .fc-timegrid-slot {
+          height: 3.5rem;
+        }
+
+        .fullcalendar-wrapper .fc-timegrid-slot-label {
+          font-size: 0.7rem;
+          color: var(--muted-foreground);
+          font-weight: 500;
+          letter-spacing: 0.025em;
+          border-color: var(--border);
+          vertical-align: top;
+          padding-top: 0.25rem;
+        }
+
+        .fullcalendar-wrapper .fc-timegrid-slot-label-cushion {
+          font-size: 0.7rem;
+          letter-spacing: 0.025em;
+        }
+
+        /* Minor slot line (30-min mark) — lighter than border */
+        .fullcalendar-wrapper .fc-timegrid-slot-minor {
+          border-top-style: dashed;
+          border-color: color-mix(in srgb, var(--border) 50%, transparent);
+        }
+
+        .dark .fullcalendar-wrapper .fc-timegrid-slot-minor {
+          border-color: color-mix(in srgb, var(--border) 60%, transparent);
+        }
+
+        /* Axis column (time labels) */
+        .fullcalendar-wrapper .fc-timegrid-axis {
+          font-size: 0.7rem;
+          color: var(--muted-foreground);
+          border-color: var(--border);
+        }
+
+        /* All-day row */
+        .fullcalendar-wrapper .fc-timegrid-axis-cushion {
+          font-size: 0.65rem;
+          color: var(--muted-foreground);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+
+        /* ================================================================
+           NOW INDICATOR — current time line with dot
+           ================================================================ */
         .fullcalendar-wrapper .fc-timegrid-now-indicator-line {
           border-color: #ef4444;
           border-width: 2px;
+          position: relative;
+        }
+
+        .fullcalendar-wrapper .fc-timegrid-now-indicator-line::before {
+          content: '';
+          position: absolute;
+          left: -5px;
+          top: -4px;
+          width: 10px;
+          height: 10px;
+          background: #ef4444;
+          border-radius: 9999px;
+          box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
         }
 
         .fullcalendar-wrapper .fc-timegrid-now-indicator-arrow {
           border-color: #ef4444;
           border-top-color: transparent;
           border-bottom-color: transparent;
+          display: none; /* Hidden in favour of the dot above */
         }
 
-        /* All day slot */
-        .fullcalendar-wrapper .fc-timegrid-axis {
-          font-size: 0.75rem;
-          color: var(--muted-foreground);
-        }
-
-        /* Mobile: Wider columns in week view */
+        /* ================================================================
+           MOBILE — compact sizing
+           ================================================================ */
         @media (max-width: 768px) {
-          .fullcalendar-wrapper .fc-timegrid-slot {
+          .fullcalendar-wrapper .fc-timegrid-slot,
+          .fullcalendar-wrapper .fc-timeGridDay-view .fc-timegrid-slot {
             height: 2.5rem;
           }
-          
-          .fullcalendar-wrapper .fc-col-header-cell {
-            padding: 0.5rem 0.25rem;
+
+          .fullcalendar-wrapper .fc-col-header-cell-cushion {
+            padding: 0.35rem 0.15rem;
+            gap: 0.1rem;
+          }
+
+          .fullcalendar-wrapper .fc-col-header-cell-cushion .fc-col-header-cell-abbr {
+            font-size: 0.6rem;
+          }
+
+          .fullcalendar-wrapper .fc-col-header-cell-cushion .fc-col-header-cell-date {
+            font-size: 0.85rem;
+          }
+
+          .fullcalendar-wrapper .fc-col-header-cell a {
             font-size: 0.65rem;
           }
-          
-          .fullcalendar-wrapper .fc-timegrid-slot-label {
-            font-size: 0.65rem;
+
+          .fullcalendar-wrapper .fc-timegrid-slot-label,
+          .fullcalendar-wrapper .fc-timegrid-slot-label-cushion {
+            font-size: 0.6rem;
+          }
+
+          .fullcalendar-wrapper .fc-timegrid-axis {
+            font-size: 0.6rem;
           }
         }
 
-        /* Scrollbar styling */
+        /* ================================================================
+           SCROLLBAR — custom slim scrollbar inside calendar
+           ================================================================ */
         .fullcalendar-wrapper .fc-scroller::-webkit-scrollbar {
           width: 6px;
           height: 6px;
@@ -866,17 +1100,9 @@ export function FullCalendarView({
           background: var(--muted-foreground);
         }
 
-        /* Event colors */
-        .fullcalendar-wrapper .fc-event-main {
-          color: white !important;
-        }
-
-        .fullcalendar-wrapper .fc-event-title,
-        .fullcalendar-wrapper .fc-event-time {
-          color: white !important;
-        }
-
-        /* Session status colors */
+        /* ================================================================
+           SESSION STATUS COLORS — DO NOT CHANGE
+           ================================================================ */
         .fullcalendar-wrapper .session-pending {
           background-color: ${SESSION_STATUS_COLORS.pending} !important;
           border-left-color: #d97706 !important;
@@ -897,7 +1123,9 @@ export function FullCalendarView({
           border-left-color: #dc2626 !important;
         }
 
-        /* Días Off - Background events with striped pattern */
+        /* ================================================================
+           DÍAS OFF — striped background + label badge
+           ================================================================ */
         .fullcalendar-wrapper .dia-off-event {
           background: repeating-linear-gradient(
             45deg,
@@ -909,7 +1137,16 @@ export function FullCalendarView({
           border: none !important;
         }
 
-        /* Días Off - Label styling */
+        .dark .fullcalendar-wrapper .dia-off-event {
+          background: repeating-linear-gradient(
+            45deg,
+            rgba(244, 63, 94, 0.18),
+            rgba(244, 63, 94, 0.18) 5px,
+            rgba(244, 63, 94, 0.09) 5px,
+            rgba(244, 63, 94, 0.09) 10px
+          ) !important;
+        }
+
         .fullcalendar-wrapper .dia-off-label {
           background-color: #f43f5e !important;
           border-color: #e11d48 !important;
@@ -934,23 +1171,74 @@ export function FullCalendarView({
           ) !important;
         }
 
-        /* List view */
+        /* ================================================================
+           LIST VIEW
+           ================================================================ */
         .fullcalendar-wrapper .fc-list {
           border-radius: 0.5rem;
           overflow: hidden;
+          border-color: var(--border);
+          background: var(--background);
+        }
+
+        .dark .fullcalendar-wrapper .fc-list {
+          background: var(--background);
         }
 
         .fullcalendar-wrapper .fc-list-day-cushion {
           background-color: var(--muted);
           padding: 0.75rem 1rem;
+          color: var(--foreground);
+        }
+
+        .dark .fullcalendar-wrapper .fc-list-day-cushion {
+          background-color: var(--muted);
+          color: var(--foreground);
+        }
+
+        .fullcalendar-wrapper .fc-list-event td {
+          border-color: var(--border);
+          background: var(--background);
+          color: var(--foreground);
+        }
+
+        .dark .fullcalendar-wrapper .fc-list-event td {
+          border-color: var(--border);
+          background: var(--background);
+          color: var(--foreground);
         }
 
         .fullcalendar-wrapper .fc-list-event:hover td {
           background-color: var(--muted);
         }
 
+        .dark .fullcalendar-wrapper .fc-list-event:hover td {
+          background-color: var(--muted);
+        }
+
+        .fullcalendar-wrapper .fc-list-empty {
+          background: var(--background);
+          color: var(--muted-foreground);
+        }
+
+        .dark .fullcalendar-wrapper .fc-list-empty {
+          background: var(--background);
+          color: var(--muted-foreground);
+        }
+
         .fullcalendar-wrapper .fc-list-event-dot {
           border-radius: 4px;
+        }
+
+        .fullcalendar-wrapper .fc-list-day-text,
+        .fullcalendar-wrapper .fc-list-day-side-text {
+          color: var(--foreground);
+          text-decoration: none;
+        }
+
+        .dark .fullcalendar-wrapper .fc-list-day-text,
+        .dark .fullcalendar-wrapper .fc-list-day-side-text {
+          color: var(--foreground);
         }
       `}</style>
     </Card>
