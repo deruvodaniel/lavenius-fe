@@ -5,6 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { FileText, Edit2, Phone, Mail, Calendar, Save, X, MessageCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface ContactInfoCardProps {
   telefono: string;
@@ -58,11 +59,11 @@ export function ContactInfoCard({
         <div>
           <label className="text-muted-foreground text-sm block mb-1">{t('clinicalFile.fields.phone')}</label>
           {isEditing ? (
-            <input
+            <Input
               type="text"
               value={telefono}
               onChange={(e) => onTelefonoChange(e.target.value)}
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full"
             />
           ) : (
             <div className="flex items-center justify-between">
@@ -88,11 +89,11 @@ export function ContactInfoCard({
         <div>
           <label className="text-muted-foreground text-sm block mb-1">{t('clinicalFile.fields.email')}</label>
           {isEditing ? (
-            <input
+            <Input
               type="email"
               value={email}
               onChange={(e) => onEmailChange(e.target.value)}
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full"
             />
           ) : (
             <div className="flex items-center gap-2 text-foreground">

@@ -8,7 +8,7 @@ import { usePatients, useErrorToast, useResponsive } from '@/lib/hooks';
 import { useSessionStore } from '@/lib/stores/sessionStore';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { SessionStatus } from '@/lib/types/session';
-import { AnimatedList, SkeletonCard, EmptyState, ConfirmDialog, SimplePagination, InfiniteScrollLoader, CalendarRequiredDialog } from '../shared';
+import { AnimatedList, SkeletonCard, EmptyState, ConfirmDialog, SimplePagination, InfiniteScrollLoader, CalendarRequiredDialog, NativeSelect } from '../shared';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -512,45 +512,45 @@ export function Pacientes() {
                 {/* Sort */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">{t('patients.filters.sortBy')}</label>
-                  <select
+                  <NativeSelect
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as SortOption)}
-                    className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full"
                   >
                     {sortOptions.map(option => (
                       <option key={option.value} value={option.value}>{option.label}</option>
                     ))}
-                  </select>
+                  </NativeSelect>
                 </div>
 
                 {/* Modalidad */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">{t('patients.modality.label')}</label>
-                  <select
+                  <NativeSelect
                     value={modalidadFilter}
                     onChange={(e) => setModalidadFilter(e.target.value as any)}
-                    className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full"
                   >
                     <option value="todas">{t('patients.modality.all')}</option>
                     <option value="presencial">{t('patients.modality.presential')}</option>
                     <option value="remoto">{t('patients.modality.remote')}</option>
                     <option value="mixto">{t('patients.modality.mixed')}</option>
-                  </select>
+                  </NativeSelect>
                 </div>
 
                 {/* Frecuencia */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">{t('patients.frequency.label')}</label>
-                  <select
+                  <NativeSelect
                     value={frecuenciaFilter}
                     onChange={(e) => setFrecuenciaFilter(e.target.value as any)}
-                    className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full"
                   >
                     <option value="todas">{t('patients.frequency.all')}</option>
                     <option value="semanal">{t('patients.frequency.weekly')}</option>
                     <option value="quincenal">{t('patients.frequency.biweekly')}</option>
                     <option value="mensual">{t('patients.frequency.monthly')}</option>
-                  </select>
+                  </NativeSelect>
                 </div>
 
                 {/* Sessions this week */}
@@ -593,15 +593,15 @@ export function Pacientes() {
 
             {/* Sort dropdown */}
             <div className="relative">
-              <select
+              <NativeSelect
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
-                className="h-10 pl-8 pr-3 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer min-w-[140px]"
+                className="pl-8 pr-3 cursor-pointer min-w-[140px]"
               >
                 {sortOptions.map(option => (
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
-              </select>
+              </NativeSelect>
               <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             </div>
 
@@ -636,31 +636,31 @@ export function Pacientes() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <label htmlFor="filter-modalidad" className="block text-foreground mb-2 text-sm">{t('patients.modality.label')}</label>
-              <select
+              <NativeSelect
                 id="filter-modalidad"
                 value={modalidadFilter}
                 onChange={(e) => setModalidadFilter(e.target.value as any)}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-background text-sm"
+                className="w-full"
               >
                 <option value="todas">{t('patients.modality.all')}</option>
                 <option value="presencial">{t('patients.modality.presential')}</option>
                 <option value="remoto">{t('patients.modality.remote')}</option>
                 <option value="mixto">{t('patients.modality.mixed')}</option>
-              </select>
+              </NativeSelect>
             </div>
             <div>
               <label htmlFor="filter-frecuencia" className="block text-foreground mb-2 text-sm">{t('patients.frequency.label')}</label>
-              <select
+              <NativeSelect
                 id="filter-frecuencia"
                 value={frecuenciaFilter}
                 onChange={(e) => setFrecuenciaFilter(e.target.value as any)}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-background text-sm"
+                className="w-full"
               >
                 <option value="todas">{t('patients.frequency.all')}</option>
                 <option value="semanal">{t('patients.frequency.weekly')}</option>
                 <option value="quincenal">{t('patients.frequency.biweekly')}</option>
                 <option value="mensual">{t('patients.frequency.monthly')}</option>
-              </select>
+              </NativeSelect>
             </div>
             <div className="flex items-end">
               <label className="flex items-center gap-2 cursor-pointer">

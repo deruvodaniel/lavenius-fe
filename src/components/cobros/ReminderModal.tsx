@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useResponsive } from '@/lib/hooks';
 import { usePatientStore } from '@/lib/stores/patient.store';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import {
   Drawer,
@@ -119,9 +120,9 @@ export function ReminderModal({ payment, onClose }: ReminderModalProps) {
       <label htmlFor="reminder-message" className="text-foreground text-sm block mb-2">
         {t('payments.reminderModal.message')}
       </label>
-      <textarea
+      <Textarea
         id="reminder-message"
-        className="w-full h-28 sm:h-32 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm resize-none"
+        className="w-full h-28 sm:h-32 resize-none"
         autoFocus
         value={message}
         onChange={(e) => setMessage(e.target.value)}

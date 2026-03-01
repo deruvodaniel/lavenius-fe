@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DollarSign, Calendar, FileText, Sparkles, CalendarRange, Pencil, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { BaseDrawer, DrawerBody, DrawerFooter } from '@/components/shared/BaseDrawer';
+import { BaseDrawer, DrawerBody, DrawerFooter, NativeSelect } from '@/components/shared';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { DatePicker } from '@/components/ui/date-picker';
 import { formatISODate } from '@/lib/utils/dateFormatters';
 import type { CreatePaymentDto, Payment, UpdatePaymentDto } from '@/lib/types/api.types';
@@ -396,13 +398,12 @@ export const PaymentDrawer = ({
                   <Calendar className="w-4 h-4" />
                   {t('payments.fields.session')} <span className="text-red-500">*</span>
                 </label>
-                <select
+                <NativeSelect
                   id="payment-session"
                   value={formData.sessionId}
                   onChange={(e) => setFormData({ ...formData, sessionId: e.target.value })}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    !formData.sessionId ? 'border-red-300 bg-red-50' : 'border-border'
-                  }`}
+                  className="w-full"
+                  aria-invalid={!formData.sessionId}
                   disabled={isLoading || isSaving || !!preselectedSessionId}
                   required
                 >
@@ -412,7 +413,7 @@ export const PaymentDrawer = ({
                       {formatSessionOption(session)}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
 
                 {/* Selected session preview */}
                 {selectedSession && (
@@ -440,16 +441,15 @@ export const PaymentDrawer = ({
                   <DollarSign className="w-4 h-4" />
                   {t('payments.fields.amountARS')} <span className="text-red-500">*</span>
                 </label>
-                <input
+                <Input
                   id="payment-amount"
                   type="number"
                   min="0"
                   step="0.01"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    formData.amount <= 0 ? 'border-red-300 bg-red-50' : 'border-border'
-                  }`}
+                  className="w-full"
+                  aria-invalid={formData.amount <= 0}
                   required
                   disabled={isLoading || isSaving}
                 />
@@ -488,13 +488,13 @@ export const PaymentDrawer = ({
                   <FileText className="w-4 h-4" />
                   {t('payments.fields.descriptionOptional')}
                 </label>
-                <textarea
+                <Textarea
                   id="payment-description"
                   value={formData.description || ''}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder={t('payments.fields.descriptionPlaceholder')}
                   rows={3}
-                  className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                  className="w-full resize-none"
                   disabled={isLoading || isSaving}
                 />
               </div>

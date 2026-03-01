@@ -4,8 +4,9 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { usePatientStore } from '@/lib/stores';
 import { useAuth } from '@/lib/hooks';
-import { ConfirmDialog, BaseDrawer, DrawerBody, DrawerFooter } from '@/components/shared';
+import { ConfirmDialog, BaseDrawer, DrawerBody, DrawerFooter, NativeSelect } from '@/components/shared';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
 import type { Patient } from '@/lib/types/api.types';
 import { SessionType, SessionStatus } from '@/lib/types/session';
@@ -339,13 +340,12 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               <User className="w-4 h-4" />
               {t('agenda.fields.patient')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
             </label>
-            <select
+            <NativeSelect
               id="turno-paciente"
               value={formData.pacienteId}
               onChange={(e) => setFormData({ ...formData, pacienteId: e.target.value })}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                !formData.pacienteId ? 'border-red-300 bg-red-50' : 'border-border'
-              }`}
+              className="w-full"
+              aria-invalid={!formData.pacienteId}
               required
             >
               <option value="">{t('agenda.drawer.selectPatient')}</option>
@@ -354,7 +354,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
                   {p.firstName} {p.lastName}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
             {/* Loading indicator or email status */}
             {formData.pacienteId && isLoadingPatient && (
               <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
@@ -396,16 +396,16 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
                 <Clock className="w-4 h-4" />
                 {t('agenda.fields.startTime')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
               </label>
-              <select
+              <NativeSelect
                 id="turno-hora-inicio"
                 value={formData.horaInicio}
                 onChange={(e) => handleStartTimeChange(e.target.value)}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full"
               >
                 {['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'].map((h) => (
                   <option key={h} value={h}>{h}</option>
                 ))}
-              </select>
+              </NativeSelect>
             </div>
 
             <div className="flex-1">
@@ -413,18 +413,18 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
                 <Clock className="w-4 h-4" />
                 {t('agenda.duration.label')}
               </label>
-              <select
+              <NativeSelect
                 id="turno-duration"
                 value={selectedDuration}
                 onChange={(e) => handleDurationChange(Number(e.target.value))}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full"
               >
                 {durationOptions.map(({ value, labelKey }) => (
                   <option key={value} value={value}>
                     {addMinutesToTime(formData.horaInicio, value)} ({t(labelKey)})
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </div>
           </div>
 
@@ -433,44 +433,44 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
             <label htmlFor="turno-motivo" className="block text-foreground mb-2">
               {t('agenda.fields.reason')}
             </label>
-            <input
+            <Input
               id="turno-motivo"
               type="text"
               value={formData.motivo}
               onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}
               placeholder={t('agenda.fields.reasonPlaceholder')}
-              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full"
             />
           </div>
 
           {/* Tipo de Sesi\u00F3n */}
           <div>
             <label htmlFor="turno-tipo-sesion" className="block text-foreground mb-2">{t('agenda.fields.type')}</label>
-            <select
+            <NativeSelect
               id="turno-tipo-sesion"
               value={formData.sessionType}
               onChange={(e) => setFormData({ ...formData, sessionType: e.target.value as SessionType })}
-              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full"
             >
               <option value="presential">{t('agenda.sessionTypes.presential')}</option>
               <option value="remote">{t('agenda.sessionTypes.remote')}</option>
-            </select>
+            </NativeSelect>
           </div>
 
           {/* Estado */}
           <div>
             <label htmlFor="turno-estado" className="block text-foreground mb-2">{t('agenda.fields.status')}</label>
-            <select
+            <NativeSelect
               id="turno-estado"
               value={formData.estado}
               onChange={(e) => setFormData({ ...formData, estado: e.target.value as SessionStatus })}
-              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full"
             >
               <option value="pending">{t('agenda.status.scheduled')}</option>
               <option value="confirmed">{t('agenda.status.confirmed')}</option>
               <option value="completed">{t('agenda.status.completed')}</option>
               <option value="cancelled">{t('agenda.status.cancelled')}</option>
-            </select>
+            </NativeSelect>
           </div>
 
           {/* Monto */}
@@ -478,12 +478,12 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
             <label htmlFor="turno-monto" className="block text-foreground mb-2">
               {t('agenda.fields.amount')}
             </label>
-            <input
+            <Input
               id="turno-monto"
               type="number"
               value={formData.monto}
               onChange={(e) => setFormData({ ...formData, monto: Number(e.target.value) })}
-              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full"
             />
           </div>
         </DrawerBody>

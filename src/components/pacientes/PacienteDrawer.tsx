@@ -3,6 +3,8 @@ import { User, Phone, Mail, Heart, Video, MapPin, Calendar, AlertCircle, Message
 import { useTranslation, Trans } from 'react-i18next';
 import { BaseDrawer, DrawerBody, DrawerFooter } from '../shared/BaseDrawer';
 import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
 import type { CreatePatientDto, Patient, SessionType } from '../../lib/types/api.types';
 
 type PatientSessionType = 'remote' | 'presential';
@@ -294,16 +296,15 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
               <label htmlFor="paciente-nombre" className="block text-foreground mb-2">
                 {t('patients.fields.firstName')} <span className="text-red-500">*</span>
               </label>
-              <input
+              <Input
                 id="paciente-nombre"
                 type="text"
                 value={formData.nombre}
                 onChange={(e) => handleFieldChange('nombre', e.target.value)}
                 onBlur={() => handleFieldBlur('nombre')}
                 placeholder={t('patients.drawer.placeholders.firstName')}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  errors.nombre && touched.nombre ? 'border-red-300 bg-red-50' : 'border-border'
-                }`}
+                className="w-full"
+                aria-invalid={!!(errors.nombre && touched.nombre)}
               />
               <InputError error={touched.nombre ? errors.nombre : undefined} />
             </div>
@@ -312,23 +313,22 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
               <label htmlFor="paciente-apellido" className="block text-foreground mb-2">
                 {t('patients.fields.lastName')} <span className="text-red-500">*</span>
               </label>
-              <input
+              <Input
                 id="paciente-apellido"
                 type="text"
                 value={formData.apellido}
                 onChange={(e) => handleFieldChange('apellido', e.target.value)}
                 onBlur={() => handleFieldBlur('apellido')}
                 placeholder={t('patients.drawer.placeholders.lastName')}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  errors.apellido && touched.apellido ? 'border-red-300 bg-red-50' : 'border-border'
-                }`}
+                className="w-full"
+                aria-invalid={!!(errors.apellido && touched.apellido)}
               />
               <InputError error={touched.apellido ? errors.apellido : undefined} />
             </div>
 
             <div>
               <label htmlFor="paciente-edad" className="block text-foreground mb-2">{t('patients.fields.age')}</label>
-              <input
+              <Input
                 id="paciente-edad"
                 type="number"
                 min="0"
@@ -337,9 +337,8 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 onChange={(e) => handleFieldChange('edad', e.target.value)}
                 onBlur={() => handleFieldBlur('edad')}
                 placeholder={t('patients.drawer.placeholders.age')}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  errors.edad && touched.edad ? 'border-red-300 bg-red-50' : 'border-border'
-                }`}
+                className="w-full"
+                aria-invalid={!!(errors.edad && touched.edad)}
               />
               <InputError error={touched.edad ? errors.edad : undefined} />
             </div>
@@ -349,16 +348,15 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 <Phone className="w-4 h-4" />
                 {t('patients.fields.phone')}
               </label>
-              <input
+              <Input
                 id="paciente-telefono"
                 type="tel"
                 value={formData.telefono}
                 onChange={(e) => handleFieldChange('telefono', e.target.value)}
                 onBlur={() => handleFieldBlur('telefono')}
                 placeholder={t('patients.drawer.placeholders.phone')}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  errors.telefono && touched.telefono ? 'border-red-300 bg-red-50' : 'border-border'
-                }`}
+                className="w-full"
+                aria-invalid={!!(errors.telefono && touched.telefono)}
               />
               <InputError error={touched.telefono ? errors.telefono : undefined} />
             </div>
@@ -368,16 +366,15 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 <Mail className="w-4 h-4" />
                 {t('patients.fields.email')}
               </label>
-              <input
+              <Input
                 id="paciente-email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleFieldChange('email', e.target.value)}
                 onBlur={() => handleFieldBlur('email')}
                 placeholder={t('patients.drawer.placeholders.email')}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  errors.email && touched.email ? 'border-red-300 bg-red-50' : 'border-border'
-                }`}
+                className="w-full"
+                aria-invalid={!!(errors.email && touched.email)}
               />
               <InputError error={touched.email ? errors.email : undefined} />
             </div>
@@ -387,13 +384,13 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 <Heart className="w-4 h-4" />
                 {t('patients.fields.healthInsurance')}
               </label>
-              <input
+              <Input
                 id="paciente-cobertura"
                 type="text"
                 value={formData.coberturaMedica}
                 onChange={(e) => setFormData({ ...formData, coberturaMedica: e.target.value })}
                 placeholder={t('patients.drawer.placeholders.healthInsurance')}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full"
               />
             </div>
 
@@ -510,16 +507,15 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                     <label htmlFor="paciente-frecuencia-otra" className="sr-only">
                       {t('patients.drawer.validation.specifyFrequency')}
                     </label>
-                    <input
+                    <Input
                       id="paciente-frecuencia-otra"
                       type="text"
                       value={formData.frecuenciaOtra}
                       onChange={(e) => handleFieldChange('frecuenciaOtra', e.target.value)}
                       onBlur={() => handleFieldBlur('frecuenciaOtra')}
                       placeholder={t('patients.drawer.placeholders.customFrequency')}
-                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm ${
-                        errors.frecuenciaOtra && touched.frecuenciaOtra ? 'border-red-300 bg-red-50' : 'border-border'
-                      }`}
+                      className="w-full"
+                      aria-invalid={!!(errors.frecuenciaOtra && touched.frecuenciaOtra)}
                     />
                     <InputError error={touched.frecuenciaOtra ? errors.frecuenciaOtra : undefined} />
                   </div>
@@ -536,37 +532,37 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
           <div className="space-y-4">
             <div>
               <label htmlFor="paciente-diagnostico" className="block text-foreground mb-2">{t('patients.fields.diagnosis')}</label>
-              <textarea
+              <Textarea
                 id="paciente-diagnostico"
                 value={formData.diagnostico}
                 onChange={(e) => setFormData({ ...formData, diagnostico: e.target.value })}
                 placeholder={t('patients.drawer.placeholders.diagnosis')}
                 rows={3}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                className="w-full resize-none"
               />
             </div>
 
             <div>
               <label htmlFor="paciente-tratamiento" className="block text-foreground mb-2">{t('patients.fields.currentTreatment')}</label>
-              <textarea
+              <Textarea
                 id="paciente-tratamiento"
                 value={formData.tratamientoActual}
                 onChange={(e) => setFormData({ ...formData, tratamientoActual: e.target.value })}
                 placeholder={t('patients.drawer.placeholders.currentTreatment')}
                 rows={3}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                className="w-full resize-none"
               />
             </div>
 
             <div>
               <label htmlFor="paciente-observaciones" className="block text-foreground mb-2">{t('patients.fields.observations')}</label>
-              <textarea
+              <Textarea
                 id="paciente-observaciones"
                 value={formData.observaciones}
                 onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
                 placeholder={t('patients.drawer.placeholders.observations')}
                 rows={3}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                className="w-full resize-none"
               />
             </div>
           </div>

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
+import { NativeSelect } from '@/components/shared';
 import { PaymentStatus } from '@/lib/types/api.types';
 
 // ============================================================================
@@ -253,31 +254,31 @@ export function SearchAndFilters({
       <div className="flex gap-2">
         {/* Status filter dropdown */}
         <div className="relative">
-          <select
+          <NativeSelect
             value={statusFilter}
             onChange={(e) => onStatusFilterChange(e.target.value as StatusFilterOption)}
-            className="h-10 pl-8 pr-3 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
+            className="pl-8 pr-3 cursor-pointer"
             aria-label={t('payments.filters.sortBy')}
           >
             {STATUS_FILTER_OPTIONS.map(option => (
               <option key={option.value} value={option.value}>{t(option.labelKey)}</option>
             ))}
-          </select>
+          </NativeSelect>
           <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         </div>
 
         {/* Sort dropdown */}
         <div className="relative">
-          <select
+          <NativeSelect
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as SortOption)}
-            className="h-10 pl-8 pr-3 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none cursor-pointer"
+            className="pl-8 pr-3 cursor-pointer"
             aria-label={t('payments.filters.sortBy')}
           >
             {SORT_OPTIONS.map(option => (
               <option key={option.value} value={option.value}>{t(option.labelKey)}</option>
             ))}
-          </select>
+          </NativeSelect>
           <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         </div>
       </div>

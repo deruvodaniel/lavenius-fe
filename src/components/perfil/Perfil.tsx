@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { User, Camera, Mail, Phone, FileText, Award, X, Copy, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { getNameInitials } from '@/lib/utils/nameInitials';
 import { useUser } from '@clerk/clerk-react';
@@ -132,14 +134,14 @@ const InputField = ({ label, value, onChange, placeholder, type = 'text', icon: 
             <Icon className="w-4 h-4 text-muted-foreground" />
           </div>
         )}
-        <input
+        <Input
           id={inputId}
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
-          className={`w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-muted disabled:cursor-not-allowed ${Icon ? 'pl-10' : ''}`}
+          className={`w-full ${Icon ? 'pl-10' : ''}`}
         />
       </div>
     </div>
@@ -357,13 +359,13 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
             />
             <div className="space-y-1.5">
               <label htmlFor="profile-bio" className="block text-sm font-medium text-foreground">{t('profile.professional.bio')}</label>
-              <textarea
+              <Textarea
                 id="profile-bio"
                 value={profile.bio || ''}
                 onChange={(e) => updateProfile('bio', e.target.value)}
                 placeholder={t('profile.professional.bioPlaceholder')}
                 rows={4}
-                className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                className="w-full resize-none"
               />
               <p className="text-xs text-muted-foreground">{(profile.bio || '').length}/500 {t('profile.professional.characters')}</p>
             </div>

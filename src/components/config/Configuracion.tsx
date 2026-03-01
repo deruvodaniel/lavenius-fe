@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
 import { useSearchParams } from 'react-router-dom';
 import { LanguageSwitcher, ThemeToggle } from '@/components/shared';
+import { Input } from '@/components/ui/input';
 import { Perfil, type PerfilHandle } from '@/components/perfil/Perfil';
 import { User } from 'lucide-react';
 import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
@@ -788,7 +789,7 @@ export function Configuracion() {
                 {/* Custom duration input */}
                 <div className="flex items-center gap-2">
                   <label htmlFor="custom-duration" className="text-sm text-muted-foreground">{t('settings.sessionDuration.custom')}:</label>
-                  <input
+                  <Input
                     id="custom-duration"
                     type="number"
                     min="15"
@@ -801,7 +802,7 @@ export function Configuracion() {
                         updateLocalSetting('defaultSessionDuration', val);
                       }
                     }}
-                    className="w-20 px-3 py-1.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                    className="w-20 text-center"
                   />
                   <span className="text-sm text-muted-foreground">min</span>
                 </div>
@@ -857,7 +858,7 @@ export function Configuracion() {
                           {t('settings.paymentReminders.minimumSessions')}
                         </label>
                         <div className="flex items-center gap-2">
-                          <input
+                          <Input
                             id="minimo-turnos"
                             type="number"
                             min="1"
@@ -867,7 +868,7 @@ export function Configuracion() {
                               setPaymentReminderLimit(Number(e.target.value));
                               markReminderChanged();
                             }}
-                            className="w-20 px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                            className="w-20 text-center"
                           />
                           <span className="text-sm text-muted-foreground">
                             {paymentReminderLimit === 1 ? t('settings.paymentReminders.sessionsUnpaid') : t('settings.paymentReminders.sessionsUnpaidPlural')}
@@ -913,7 +914,7 @@ export function Configuracion() {
                           {t('settings.appointmentReminders.hoursBeforeLabel')}
                         </label>
                         <div className="flex items-center gap-2">
-                          <input
+                          <Input
                             id="horas-anticipacion"
                             type="number"
                             min="1"
@@ -923,7 +924,7 @@ export function Configuracion() {
                               setSessionReminderHours(Number(e.target.value));
                               markReminderChanged();
                             }}
-                            className="w-20 px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center"
+                            className="w-20 text-center"
                           />
                           <span className="text-sm text-muted-foreground">{t('settings.appointmentReminders.hoursBeforeAppointment')}</span>
                         </div>
@@ -1135,13 +1136,13 @@ export function Configuracion() {
                     {/* Motivo */}
                     <div>
                       <label htmlFor="diaoff-motivo" className="block text-xs font-medium text-foreground mb-1">{t('settings.daysOff.reason')} ({t('common.optional')})</label>
-                      <input
+                      <Input
                         id="diaoff-motivo"
                         type="text"
                         value={newDiaOff.motivo}
                         onChange={(e) => setNewDiaOff({ ...newDiaOff, motivo: e.target.value })}
                         placeholder={t('settings.daysOff.reasonPlaceholder')}
-                        className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-background"
+                        className="w-full"
                       />
                     </div>
 
