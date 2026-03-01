@@ -24,8 +24,8 @@ export function UpcomingSessionsCard({
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <h3 className="text-gray-900 mb-4 flex items-center gap-2">
+    <div className="bg-card border rounded-lg p-6">
+      <h3 className="text-foreground mb-4 flex items-center gap-2">
         <Clock className="w-5 h-5 text-indigo-600" />
         {t('clinicalFile.sections.upcomingAppointments')}
       </h3>
@@ -43,14 +43,14 @@ export function UpcomingSessionsCard({
             
             return (
               <div key={turno.id} className="p-3 bg-indigo-50 rounded border border-indigo-100">
-                <p className="text-gray-900 text-sm mb-1">{formatFecha(fecha)}</p>
-                <p className="text-gray-600 text-sm">{hora} - {turno.sessionSummary || t('clinicalFile.defaultSession')}</p>
+                <p className="text-foreground text-sm mb-1">{formatFecha(fecha)}</p>
+                <p className="text-muted-foreground text-sm">{hora} - {turno.sessionSummary || t('clinicalFile.defaultSession')}</p>
               </div>
             );
           })}
         </div>
       ) : (
-        <p className="text-gray-500 text-sm">{t('clinicalFile.noUpcomingAppointments')}</p>
+        <p className="text-muted-foreground text-sm">{t('clinicalFile.noUpcomingAppointments')}</p>
       )}
       
       <button

@@ -175,13 +175,13 @@ interface ChartCardProps {
 }
 
 const ChartCard = ({ title, subtitle, children, className = '', onClick }: ChartCardProps) => (
-  <Card 
-    className={`p-3 sm:p-4 lg:p-6 bg-white dark:bg-gray-800 ${className} ${onClick ? 'cursor-pointer hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 transition-all' : ''}`}
+  <Card
+    className={`p-3 sm:p-4 lg:p-6 bg-card ${className} ${onClick ? 'cursor-pointer hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 transition-all' : ''}`}
     onClick={onClick}
   >
     <div className="mb-3 sm:mb-4">
-      <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
-      {subtitle && <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>}
+      <h3 className="text-sm sm:text-base font-semibold text-foreground">{title}</h3>
+      {subtitle && <p className="text-xs sm:text-sm text-muted-foreground">{subtitle}</p>}
     </div>
     {children}
   </Card>
@@ -202,8 +202,8 @@ const CustomTooltip = ({ active, payload, label, formatter }: TooltipProps) => {
   if (!active || !payload?.length) return null;
   
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-lg p-3">
-      <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">{label}</p>
+    <div className="bg-card border shadow-lg rounded-lg p-3">
+      <p className="text-sm font-medium text-foreground mb-1">{label}</p>
       {payload.map((entry, index) => (
         <p key={index} className="text-sm" style={{ color: entry.color }}>
           {entry.name}: {formatter ? formatter(entry.value) : entry.value}
@@ -252,17 +252,17 @@ const SettingsContent = ({
     {showHeader && (
       <>
         <div className="flex items-center justify-between">
-          <h4 className="font-medium text-gray-900 dark:text-gray-100">{t('dashboard.settings.title')}</h4>
+          <h4 className="font-medium text-foreground">{t('dashboard.settings.title')}</h4>
           <Button
             variant="ghost"
             size="sm"
             onClick={resetToDefaults}
-            className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="text-xs text-muted-foreground hover:text-foreground"
           >
             {t('dashboard.settings.reset')}
           </Button>
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard.settings.description')}</p>
+        <p className="text-xs text-muted-foreground">{t('dashboard.settings.description')}</p>
       </>
     )}
     <div className="space-y-3">
@@ -270,7 +270,7 @@ const SettingsContent = ({
         <div key={section.id} className="flex items-center justify-between py-1">
           <Label
             htmlFor={`section-${section.id}`}
-            className="text-sm font-normal cursor-pointer text-gray-700 dark:text-gray-300"
+            className="text-sm font-normal cursor-pointer text-foreground"
           >
             {t(SECTION_LABELS[section.id])}
           </Label>
@@ -280,9 +280,9 @@ const SettingsContent = ({
             aria-checked={section.visible}
             onClick={() => toggleSectionVisibility(section.id)}
             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 ${
-              section.visible 
-                ? 'bg-indigo-600 dark:bg-indigo-500' 
-                : 'bg-gray-200 dark:bg-gray-600'
+              section.visible
+                ? 'bg-indigo-600 dark:bg-indigo-500'
+                : 'bg-muted'
             }`}
           >
             <span
@@ -319,14 +319,14 @@ const DashboardSettingsPopover = ({ t, isMobile }: DashboardSettingsPopoverProps
 
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
           <DrawerContent className="max-h-[85vh]">
-            <DrawerHeader className="text-left border-b border-gray-100 dark:border-gray-800">
+            <DrawerHeader className="text-left border-b">
               <div className="flex items-center justify-between">
                 <DrawerTitle className="text-lg">{t('dashboard.settings.title')}</DrawerTitle>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={resetToDefaults}
-                  className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 -mr-2"
+                  className="text-xs text-muted-foreground hover:text-foreground -mr-2"
                 >
                   {t('dashboard.settings.reset')}
                 </Button>
@@ -375,7 +375,7 @@ const DashboardSettingsPopover = ({ t, isMobile }: DashboardSettingsPopoverProps
           />
           
           {/* Dropdown */}
-          <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 z-50">
+          <div className="absolute right-0 top-full mt-2 w-72 bg-card border rounded-lg shadow-lg p-4 z-50">
             <SettingsContent
               t={t}
               sections={sections}
@@ -1004,7 +1004,7 @@ export function Analitica() {
           <>
             {/* Time Range Filter - applies to stats and charts */}
             <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('analytics.title')}</h2>
+            <h2 className="text-lg font-semibold text-foreground">{t('analytics.title')}</h2>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -1013,7 +1013,7 @@ export function Analitica() {
                 disabled={isLoading}
                 title={t('analytics.refresh')}
                 aria-label={t('analytics.refresh')}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
               </Button>
@@ -1036,7 +1036,7 @@ export function Analitica() {
                       className="fixed inset-0 z-10" 
                       onClick={() => setShowRangeDropdown(false)} 
                     />
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+                    <div className="absolute right-0 mt-2 w-48 bg-card border rounded-lg shadow-lg z-20">
                       {TIME_RANGE_KEYS.map(option => (
                         <button
                           key={option.value}
@@ -1044,10 +1044,10 @@ export function Analitica() {
                             setTimeRange(option.value);
                             setShowRangeDropdown(false);
                           }}
-                          className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg ${
-                            timeRange === option.value 
-                              ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium' 
-                              : 'text-gray-700 dark:text-gray-300'
+                          className={`w-full px-4 py-2 text-left text-sm hover:bg-muted first:rounded-t-lg last:rounded-b-lg ${
+                            timeRange === option.value
+                              ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium'
+                              : 'text-foreground'
                           }`}
                         >
                           {t(option.key)}
@@ -1093,16 +1093,16 @@ export function Analitica() {
               compact={isMobile}
             />
             {/* Completion Rate with Radial Progress */}
-            <Card 
-              className="p-3 sm:p-4 bg-white dark:bg-gray-800 cursor-pointer hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 transition-all"
+            <Card
+              className="p-3 sm:p-4 bg-card cursor-pointer hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 transition-all"
               onClick={() => navigate('/dashboard/agenda')}
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="space-y-0.5 min-w-0 flex-1">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  <p className="text-xs text-muted-foreground truncate">
                     {t('analytics.stats.attendanceRate')}
                   </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     {stats.cancelledSessions} {t('analytics.stats.cancellations')}
                   </p>
                 </div>
@@ -1122,11 +1122,11 @@ export function Analitica() {
       {/* Pending Payments */}
       {isSectionVisible('pendingPayments') && (
         <AnimatedSection delay={0.25}>
-          <Card className="p-4 bg-white dark:bg-gray-800">
+          <Card className="p-4 bg-card">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('dashboard.pendingPayments.title')}</h3>
+              <h3 className="font-semibold text-foreground">{t('dashboard.pendingPayments.title')}</h3>
             </div>
             {pendingPayments.length > 0 && (
               <Badge className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800">
@@ -1140,13 +1140,13 @@ export function Analitica() {
                 <button
                   key={payment.id}
                   onClick={() => navigate('/dashboard/cobros')}
-                  className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left"
+                  className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-left"
                 >
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    <p className="text-sm font-medium text-foreground">
                       {payment.patient ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim() : 'Sin paciente'}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{formatCurrency(Number(payment.amount) || 0)}</p>
+                    <p className="text-sm text-muted-foreground">{formatCurrency(Number(payment.amount) || 0)}</p>
                   </div>
                   <Badge 
                     variant={payment.status === PaymentStatus.OVERDUE ? 'destructive' : 'secondary'}
@@ -1179,11 +1179,11 @@ export function Analitica() {
               <SwipeableCards>
                 {/* Cumpleaños próximos - Mobile */}
                 {isSectionVisible('birthdays') && (
-                  <Card className="p-4 bg-white dark:bg-gray-800">
+                  <Card className="p-4 bg-card">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <Gift className="w-5 h-5 text-pink-600 dark:text-pink-400" />
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('dashboard.birthdays.title')}</h3>
+                      <h3 className="font-semibold text-foreground">{t('dashboard.birthdays.title')}</h3>
                     </div>
                     {upcomingBirthdays.length > 0 && (
                       <Badge className="bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400 border-pink-200 dark:border-pink-800">
@@ -1197,15 +1197,15 @@ export function Analitica() {
                         <button
                           key={patient.id}
                           onClick={() => navigate(`/dashboard/pacientes/${patient.id}`)}
-                          className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left"
+                          className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-left"
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
                               <Gift className="w-4 h-4 text-pink-600 dark:text-pink-400" />
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{patient.firstName} {patient.lastName}</p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                              <p className="text-sm font-medium text-foreground">{patient.firstName} {patient.lastName}</p>
+                              <p className="text-xs text-muted-foreground">
                                 {patient.nextBirthday.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
                               </p>
                             </div>
@@ -1215,7 +1215,7 @@ export function Analitica() {
                             className={
                               formatBirthdayDay(patient.nextBirthday) === t('dashboard.birthdays.today') 
                                 ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400 border-pink-200 dark:border-pink-800' 
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                : 'bg-muted text-foreground'
                             }
                           >
                             {formatBirthdayDay(patient.nextBirthday)}
@@ -1235,11 +1235,11 @@ export function Analitica() {
 
               {/* Pacientes sin próxima cita - Mobile */}
               {isSectionVisible('patientsWithoutSession') && (
-                <Card className="p-4 bg-white dark:bg-gray-800">
+                <Card className="p-4 bg-card">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <UserX className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('dashboard.noUpcomingSession.title')}</h3>
+                      <h3 className="font-semibold text-foreground">{t('dashboard.noUpcomingSession.title')}</h3>
                     </div>
                     {patientsWithoutNextSession.length > 0 && (
                       <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800">
@@ -1253,12 +1253,12 @@ export function Analitica() {
                         <button
                           key={patient.id}
                           onClick={() => navigate(`/dashboard/pacientes/${patient.id}`)}
-                          className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left"
+                          className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-left"
                         >
                           <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{patient.firstName} {patient.lastName}</p>
+                            <p className="text-sm font-medium text-foreground">{patient.firstName} {patient.lastName}</p>
                             {patient.lastSessionDate && (
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                              <p className="text-xs text-muted-foreground">
                                 {t('dashboard.noUpcomingSession.lastSession')}: {patient.lastSessionDate.toLocaleDateString('es-AR')}
                               </p>
                             )}
@@ -1293,11 +1293,11 @@ export function Analitica() {
           <div className="hidden lg:grid lg:grid-cols-2 gap-6">
           {/* Cumpleaños próximos */}
           {isSectionVisible('birthdays') && (
-            <Card className="p-4 bg-white dark:bg-gray-800">
+            <Card className="p-4 bg-card">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Gift className="w-5 h-5 text-pink-600 dark:text-pink-400" />
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('dashboard.birthdays.title')}</h3>
+                  <h3 className="font-semibold text-foreground">{t('dashboard.birthdays.title')}</h3>
                 </div>
                 {upcomingBirthdays.length > 0 && (
                   <Badge className="bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400 border-pink-200 dark:border-pink-800">
@@ -1311,15 +1311,15 @@ export function Analitica() {
                     <button
                       key={patient.id}
                       onClick={() => navigate(`/dashboard/pacientes/${patient.id}`)}
-                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left"
+                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-left"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
                           <Gift className="w-4 h-4 text-pink-600 dark:text-pink-400" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{patient.firstName} {patient.lastName}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-sm font-medium text-foreground">{patient.firstName} {patient.lastName}</p>
+                          <p className="text-xs text-muted-foreground">
                             {patient.nextBirthday.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
                           </p>
                         </div>
@@ -1329,7 +1329,7 @@ export function Analitica() {
                         className={
                           formatBirthdayDay(patient.nextBirthday) === t('dashboard.birthdays.today') 
                             ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400 border-pink-200 dark:border-pink-800' 
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            : 'bg-muted text-foreground'
                         }
                       >
                         {formatBirthdayDay(patient.nextBirthday)}
@@ -1349,11 +1349,11 @@ export function Analitica() {
 
           {/* Pacientes sin próxima cita */}
           {isSectionVisible('patientsWithoutSession') && (
-            <Card className="p-4 bg-white dark:bg-gray-800">
+            <Card className="p-4 bg-card">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <UserX className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('dashboard.noUpcomingSession.title')}</h3>
+                  <h3 className="font-semibold text-foreground">{t('dashboard.noUpcomingSession.title')}</h3>
                 </div>
                 {patientsWithoutNextSession.length > 0 && (
                   <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800">
@@ -1367,12 +1367,12 @@ export function Analitica() {
                     <button
                       key={patient.id}
                       onClick={() => navigate(`/dashboard/pacientes/${patient.id}`)}
-                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left"
+                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-left"
                     >
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{patient.firstName} {patient.lastName}</p>
+                        <p className="text-sm font-medium text-foreground">{patient.firstName} {patient.lastName}</p>
                         {patient.lastSessionDate && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-muted-foreground">
                             {t('dashboard.noUpcomingSession.lastSession')}: {patient.lastSessionDate.toLocaleDateString('es-AR')}
                           </p>
                         )}

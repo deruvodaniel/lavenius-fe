@@ -50,15 +50,15 @@ export function TodaySummaryWidget({
     <div
       className={cn(
         'rounded-xl border border-indigo-100 dark:border-indigo-900/50',
-        'bg-gradient-to-r from-indigo-50 via-white to-purple-50',
-        'dark:from-indigo-950/30 dark:via-gray-900 dark:to-purple-950/30',
+        'bg-gradient-to-r from-indigo-50 via-background to-purple-50',
+        'dark:from-indigo-950/30 dark:via-background dark:to-purple-950/30',
         'p-4 shadow-sm',
         'animate-fade-in'
       )}
     >
       <div className="flex items-center gap-2 mb-3">
         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-        <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
           {t('dashboard.todaySummary.title')}
         </span>
       </div>
@@ -92,7 +92,7 @@ export function TodaySummaryWidget({
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
-                className="text-gray-200 dark:text-gray-700"
+                className="text-border"
               />
               <circle
                 cx="8"
@@ -109,12 +109,12 @@ export function TodaySummaryWidget({
             </svg>
           </div>
           <div className="text-left">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted-foreground">
               {t('dashboard.todaySummary.sessions')}
             </p>
-            <p className="text-lg font-bold text-gray-900 dark:text-gray-100 tabular-nums">
+            <p className="text-lg font-bold text-foreground tabular-nums">
               {sessionsCompleted}
-              <span className="text-sm font-normal text-gray-400 dark:text-gray-500">
+              <span className="text-sm font-normal text-muted-foreground">
                 /{sessionsTotal}
               </span>
             </p>
@@ -137,10 +137,10 @@ export function TodaySummaryWidget({
             <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
           </div>
           <div className="text-left">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted-foreground">
               {t('dashboard.todaySummary.income')}
             </p>
-            <p className="text-lg font-bold text-gray-900 dark:text-gray-100 tabular-nums">
+            <p className="text-lg font-bold text-foreground tabular-nums">
               {formatCurrency(incomeToday)}
             </p>
           </div>
@@ -164,10 +164,10 @@ export function TodaySummaryWidget({
               <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="text-left">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 {t('analytics.stats.patientsAttended')}
               </p>
-              <p className="text-lg font-bold text-gray-900 dark:text-gray-100 tabular-nums">
+              <p className="text-lg font-bold text-foreground tabular-nums">
                 {activePatients}
               </p>
             </div>
@@ -180,10 +180,10 @@ export function TodaySummaryWidget({
             <TrendingUp className="w-5 h-5 text-amber-600 dark:text-amber-400" />
           </div>
           <div className="text-left">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted-foreground">
               {t('analytics.stats.attendanceRate')}
             </p>
-            <p className="text-lg font-bold text-gray-900 dark:text-gray-100 tabular-nums">
+            <p className="text-lg font-bold text-foreground tabular-nums">
               {sessionProgress}%
             </p>
           </div>

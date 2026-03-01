@@ -48,7 +48,7 @@ export function CollapsibleSection({
     <Collapsible open={isOpen} onOpenChange={handleOpenChange}>
       <Card
         className={cn(
-          'bg-white dark:bg-gray-800 overflow-hidden',
+          'bg-card overflow-hidden',
           'transition-shadow duration-200 hover:shadow-md',
           className
         )}
@@ -57,7 +57,7 @@ export function CollapsibleSection({
           <button
             className={cn(
               'w-full p-4 flex items-center justify-between',
-              'hover:bg-gray-50 dark:hover:bg-gray-700/50',
+              'hover:bg-muted',
               'transition-colors duration-150',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset',
               'rounded-t-lg',
@@ -66,14 +66,14 @@ export function CollapsibleSection({
           >
             <div className="flex items-center gap-2">
               <Icon className={cn('w-5 h-5', iconColor)} />
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="font-semibold text-foreground">
                 {title}
               </h3>
               {badge}
             </div>
             <ChevronDown
               className={cn(
-                'w-5 h-5 text-gray-400 transition-transform duration-200',
+                'w-5 h-5 text-muted-foreground transition-transform duration-200',
                 isOpen && 'rotate-180'
               )}
             />

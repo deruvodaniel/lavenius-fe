@@ -38,7 +38,7 @@ function SectionToggle({ id, label, checked, onCheckedChange }: SectionTogglePro
         htmlFor={id}
         className={cn(
           'text-sm cursor-pointer flex items-center gap-2',
-          checked ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'
+          checked ? 'text-foreground' : 'text-muted-foreground'
         )}
       >
         {checked ? (
@@ -96,8 +96,8 @@ export function DashboardSettingsPopover({
           variant="ghost"
           size="icon"
           className={cn(
-            'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200',
-            'hover:bg-gray-100 dark:hover:bg-gray-800',
+            'text-muted-foreground hover:text-foreground',
+            'hover:bg-muted',
             'transition-colors duration-150',
             className
           )}
@@ -117,9 +117,9 @@ export function DashboardSettingsPopover({
         )}
       >
         {/* Header */}
-        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+        <div className="px-4 py-3 border-b">
           <div className="flex items-center justify-between">
-            <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+            <h4 className="font-semibold text-foreground">
               {t('dashboard.settings.title')}
             </h4>
             <button
@@ -134,7 +134,7 @@ export function DashboardSettingsPopover({
               {allVisible ? t('dashboard.settings.hideAll') : t('dashboard.settings.showAll')}
             </button>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {t('dashboard.settings.description')}
           </p>
         </div>
@@ -143,7 +143,7 @@ export function DashboardSettingsPopover({
         <div className="px-4 py-2">
           {/* Quick Overview Group */}
           <div className="mb-3">
-            <span className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               {t('dashboard.settings.quickOverview')}
             </span>
             <SectionToggle
@@ -167,8 +167,8 @@ export function DashboardSettingsPopover({
           </div>
 
           {/* Insights Group */}
-          <div className="mb-3 pt-2 border-t border-gray-100 dark:border-gray-800">
-            <span className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+          <div className="mb-3 pt-2 border-t">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               {t('dashboard.settings.insights')}
             </span>
             <SectionToggle
@@ -186,8 +186,8 @@ export function DashboardSettingsPopover({
           </div>
 
           {/* Analytics Group */}
-          <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
-            <span className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+          <div className="pt-2 border-t">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               {t('dashboard.settings.analytics')}
             </span>
             <SectionToggle

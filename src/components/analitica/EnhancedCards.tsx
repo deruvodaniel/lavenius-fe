@@ -18,24 +18,24 @@ interface EnhancedCardProps {
 }
 
 const variantStyles: Record<CardVariant, string> = {
-  default: 'bg-white dark:bg-gray-800',
+  default: 'bg-card',
   gradient: cn(
-    'bg-gradient-to-br from-white via-gray-50 to-indigo-50/30',
-    'dark:from-gray-800 dark:via-gray-800 dark:to-indigo-950/20',
+    'bg-gradient-to-br from-card via-muted/50 to-indigo-50/30',
+    'dark:from-card dark:via-card dark:to-indigo-950/20',
     'border-indigo-100/50 dark:border-indigo-900/30'
   ),
   outlined: cn(
     'bg-transparent border-2',
-    'border-gray-200 dark:border-gray-700',
+    'border-border',
     'hover:border-indigo-300 dark:hover:border-indigo-700'
   ),
   elevated: cn(
-    'bg-white dark:bg-gray-800',
+    'bg-card',
     'shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50',
     'border-0'
   ),
   interactive: cn(
-    'bg-white dark:bg-gray-800',
+    'bg-card',
     'card-hover-lift cursor-pointer',
     'hover:border-indigo-200 dark:hover:border-indigo-700'
   ),
@@ -93,7 +93,7 @@ interface EmptyStateProps {
  */
 export function EmptyState({
   icon: Icon,
-  iconColor = 'text-gray-300 dark:text-gray-600',
+  iconColor = 'text-muted-foreground',
   message,
   description,
   action,
@@ -103,17 +103,17 @@ export function EmptyState({
       <div
         className={cn(
           'w-14 h-14 rounded-full mb-3',
-          'bg-gray-100 dark:bg-gray-800',
+          'bg-muted',
           'flex items-center justify-center'
         )}
       >
         <Icon className={cn('w-7 h-7', iconColor)} />
       </div>
-      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <p className="text-sm font-medium text-muted-foreground">
         {message}
       </p>
       {description && (
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 max-w-[200px]">
+        <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
           {description}
         </p>
       )}
@@ -171,14 +171,14 @@ export function MetricCard({
     >
       <div className="flex items-start justify-between gap-2">
         <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
+          <p className="text-xs sm:text-sm text-muted-foreground truncate">
             {label}
           </p>
-          <p className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate tabular-nums">
+          <p className="text-lg sm:text-2xl lg:text-3xl font-bold text-foreground truncate tabular-nums">
             {value}
           </p>
           {subtitle && (
-            <p className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 truncate">
+            <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
               {subtitle}
             </p>
           )}

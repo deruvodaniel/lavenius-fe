@@ -31,9 +31,9 @@ export function SessionNotesSection({
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
+    <div className="bg-card border rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-gray-900 flex items-center gap-2">
+        <h3 className="text-foreground flex items-center gap-2">
           <FileText className="w-5 h-5 text-indigo-600" />
           {t('clinicalFile.sections.sessionNotes')}
         </h3>
@@ -51,8 +51,8 @@ export function SessionNotesSection({
       ) : error ? (
         <div className="text-center py-8">
           <FileText className="w-12 h-12 text-amber-400 mx-auto mb-3" />
-          <p className="text-gray-700 text-sm mb-1">{t('clinicalFile.notes.loadError')}</p>
-          <p className="text-gray-500 text-xs mb-3">
+          <p className="text-foreground text-sm mb-1">{t('clinicalFile.notes.loadError')}</p>
+          <p className="text-muted-foreground text-xs mb-3">
             {error.includes('validación') 
               ? t('clinicalFile.notes.canCreateNew')
               : t('clinicalFile.notes.tryAgainLater')}

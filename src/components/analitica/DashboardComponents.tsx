@@ -57,8 +57,8 @@ const variantStyles = {
     icon: 'text-green-600',
   },
   neutral: {
-    bg: 'bg-gray-100',
-    icon: 'text-gray-500',
+    bg: 'bg-muted',
+    icon: 'text-muted-foreground',
   },
   warning: {
     bg: 'bg-amber-100',
@@ -74,7 +74,7 @@ export function EmptyState({ icon: Icon, title, variant = 'neutral', className }
       <div className={cn('w-12 h-12 rounded-full flex items-center justify-center mb-3', styles.bg)}>
         <Icon className={cn('w-6 h-6', styles.icon)} />
       </div>
-      <p className="text-sm text-gray-500 text-center">{title}</p>
+      <p className="text-sm text-muted-foreground text-center">{title}</p>
     </div>
   );
 }
@@ -197,13 +197,13 @@ export function SwipeableCards({ children, peek = false }: SwipeableCardsProps) 
         disabled={currentIndex === 0}
         className={cn(
           'absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 z-10',
-          'w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center',
+          'w-8 h-8 rounded-full bg-background shadow-md flex items-center justify-center',
           'transition-opacity',
           currentIndex === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'
         )}
         aria-label="Previous card"
       >
-        <ChevronLeft className="w-5 h-5 text-gray-600" />
+        <ChevronLeft className="w-5 h-5 text-muted-foreground" />
       </button>
       
       <button
@@ -211,13 +211,13 @@ export function SwipeableCards({ children, peek = false }: SwipeableCardsProps) 
         disabled={currentIndex === totalCards - 1}
         className={cn(
           'absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 z-10',
-          'w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center',
+          'w-8 h-8 rounded-full bg-background shadow-md flex items-center justify-center',
           'transition-opacity',
           currentIndex === totalCards - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'
         )}
         aria-label="Next card"
       >
-        <ChevronRight className="w-5 h-5 text-gray-600" />
+        <ChevronRight className="w-5 h-5 text-muted-foreground" />
       </button>
 
       {/* Dots Indicator */}
@@ -230,7 +230,7 @@ export function SwipeableCards({ children, peek = false }: SwipeableCardsProps) 
               'w-2 h-2 rounded-full transition-colors',
               index === currentIndex 
                 ? 'bg-indigo-600' 
-                : 'bg-gray-300 hover:bg-gray-400'
+                : 'bg-border hover:bg-muted-foreground'
             )}
             aria-label={`Go to card ${index + 1}`}
           />
@@ -259,7 +259,7 @@ export function DashboardSkeleton() {
       </div>
 
       {/* Today's Summary Skeleton */}
-      <Card className="p-4 bg-white">
+      <Card className="p-4 bg-card">
         <div className="flex items-center gap-2 mb-4">
           <Skeleton className="h-5 w-5 rounded" />
           <Skeleton className="h-5 w-32" />
@@ -296,7 +296,7 @@ export function DashboardSkeleton() {
       {/* Stats Cards Skeleton */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map(i => (
-          <Card key={i} className="p-4 bg-white">
+          <Card key={i} className="p-4 bg-card">
             <div className="flex items-start justify-between gap-2">
               <div className="space-y-2 flex-1">
                 <Skeleton className="h-3 w-20" />
@@ -310,7 +310,7 @@ export function DashboardSkeleton() {
       </div>
 
       {/* Pending Payments Skeleton */}
-      <Card className="p-4 bg-white">
+      <Card className="p-4 bg-card">
         <div className="flex items-center gap-2 mb-4">
           <Skeleton className="h-5 w-5 rounded" />
           <Skeleton className="h-5 w-36" />
@@ -331,7 +331,7 @@ export function DashboardSkeleton() {
       {/* Charts Skeleton */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {[1, 2].map(i => (
-          <Card key={i} className="p-4 bg-white">
+          <Card key={i} className="p-4 bg-card">
             <div className="mb-4">
               <Skeleton className="h-5 w-40 mb-1" />
               <Skeleton className="h-3 w-56" />

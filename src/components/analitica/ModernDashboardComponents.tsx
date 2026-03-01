@@ -108,11 +108,11 @@ export function RadialProgress({
       </svg>
       {showValue && (
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
+          <span className="text-lg font-bold text-foreground">
             {Math.round(value)}%
           </span>
           {label && (
-            <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wide">
               {label}
             </span>
           )}
@@ -217,9 +217,9 @@ export function MiniStatCard({
   compact = false,
 }: MiniStatCardProps) {
   return (
-    <Card 
+    <Card
       className={cn(
-        'bg-white dark:bg-gray-800 transition-all duration-200',
+        'bg-card transition-all duration-200',
         compact ? 'p-3' : 'p-4',
         onClick && 'cursor-pointer hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800'
       )}
@@ -227,10 +227,10 @@ export function MiniStatCard({
     >
       <div className="flex items-start justify-between gap-2">
         <div className="space-y-0.5 min-w-0 flex-1">
-          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{title}</p>
+          <p className="text-xs text-muted-foreground truncate">{title}</p>
           <div className="flex items-baseline gap-2">
             <p className={cn(
-              'font-bold text-gray-900 dark:text-gray-100 truncate',
+              'font-bold text-foreground truncate',
               compact ? 'text-lg' : 'text-xl sm:text-2xl'
             )}>
               {value}
@@ -250,7 +250,7 @@ export function MiniStatCard({
             )}
           </div>
           {subtitle && (
-            <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">{subtitle}</p>
+            <p className="text-[10px] text-muted-foreground truncate">{subtitle}</p>
           )}
           {sparklineData && sparklineData.length > 1 && (
             <div className="mt-2">
@@ -306,15 +306,15 @@ export function AnimatedProgress({
     <div className={cn('space-y-1', className)}>
       {(label || showValue) && (
         <div className="flex justify-between items-center text-xs">
-          {label && <span className="text-gray-600 dark:text-gray-400">{label}</span>}
+          {label && <span className="text-muted-foreground">{label}</span>}
           {showValue && (
-            <span className="text-gray-900 dark:text-gray-100 font-medium">
+            <span className="text-foreground font-medium">
               {value}/{max}
             </span>
           )}
         </div>
       )}
-      <div className={cn('w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden', heightClass)}>
+      <div className={cn('w-full bg-muted rounded-full overflow-hidden', heightClass)}>
         <div 
           className={cn(
             'h-full rounded-full transition-all duration-700 ease-out',
@@ -431,7 +431,7 @@ export function QuickActionsBar({
         // When scrolled, header is ~52px, otherwise it's larger
         isScrolled ? 'top-[52px]' : 'top-0',
         isScrolled 
-          ? 'bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-sm py-3 -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8 w-[calc(100%+2rem)] md:w-[calc(100%+3rem)] lg:w-[calc(100%+4rem)] border-b border-gray-200 dark:border-gray-700 shadow-sm' 
+          ? 'bg-background/95 backdrop-blur-sm py-3 -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8 w-[calc(100%+2rem)] md:w-[calc(100%+3rem)] lg:w-[calc(100%+4rem)] border-b shadow-sm'
           : '',
         isMobile ? 'grid-cols-4' : 'grid-cols-4',
         className
@@ -442,18 +442,18 @@ export function QuickActionsBar({
           key={action.id}
           onClick={action.onClick}
           className={cn(
-            'flex items-center justify-center gap-2 rounded-lg border bg-white dark:bg-gray-800 transition-all duration-200',
+            'flex items-center justify-center gap-2 rounded-lg border bg-card transition-all duration-200',
             isScrolled || isMobile
               ? 'p-2 sm:p-2.5 flex-col sm:flex-row' 
               : 'p-3 flex-col sm:flex-row',
             action.hoverBg,
             action.hoverBorder,
-            'border-gray-200 dark:border-gray-700'
+            'border-border'
           )}
         >
           <action.icon className={cn('w-4 h-4 sm:w-5 sm:h-5', action.color)} />
           <span className={cn(
-            'text-gray-700 dark:text-gray-200',
+            'text-foreground',
             isScrolled || isMobile ? 'text-[10px] sm:text-xs' : 'text-xs sm:text-sm'
           )}>
             {(isScrolled || isMobile) && action.shortLabel ? action.shortLabel : action.label}
@@ -501,11 +501,11 @@ export function TodaySummaryWidget({
     : 0;
 
   return (
-    <Card className={cn('p-4 bg-white dark:bg-gray-800', className)}>
+    <Card className={cn('p-4 bg-card', className)}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+          <h3 className="font-semibold text-foreground">
             {t('dashboard.todaySummary.title')}
           </h3>
         </div>
@@ -529,10 +529,10 @@ export function TodaySummaryWidget({
             color={completionRate >= 75 ? '#22c55e' : completionRate >= 50 ? '#f59e0b' : '#4f46e5'}
           />
           <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted-foreground">
               {t('dashboard.todaySummary.sessions')}
             </p>
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <p className="text-sm font-semibold text-foreground">
               {data.sessionsCompleted}/{data.sessionsTotal}
             </p>
           </div>
@@ -544,10 +544,10 @@ export function TodaySummaryWidget({
             <span className="text-green-600 dark:text-green-400 text-lg font-bold">$</span>
           </div>
           <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted-foreground">
               {t('dashboard.todaySummary.income')}
             </p>
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <p className="text-sm font-semibold text-foreground">
               {formatCurrency(data.incomeToday)}
             </p>
           </div>
@@ -560,10 +560,10 @@ export function TodaySummaryWidget({
               <Clock className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 {t('dashboard.todaySummary.nextSession')}
               </p>
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+              <p className="text-sm font-semibold text-foreground truncate">
                 {data.nextSession.time} - {data.nextSession.patientName}
               </p>
               {data.nextSession.minutesUntil > 0 && (
@@ -575,14 +575,14 @@ export function TodaySummaryWidget({
           </div>
         ) : (
           <div className="flex items-center gap-3 col-span-2 sm:col-span-2">
-            <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+            <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+              <Clock className="w-5 h-5 text-muted-foreground" />
             </div>
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 {t('dashboard.todaySummary.nextSession')}
               </p>
-              <p className="text-sm text-gray-400 dark:text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 {t('dashboard.todaySummary.noMoreSessions')}
               </p>
             </div>
@@ -615,20 +615,20 @@ export function StatsOverview({
   className,
 }: StatsOverviewProps) {
   return (
-    <Card className={cn('p-4 bg-white dark:bg-gray-800', className)}>
+    <Card className={cn('p-4 bg-card', className)}>
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1 space-y-3">
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
-              <span className="text-gray-500 dark:text-gray-400">{t('analytics.labels.completed')}</span>
-              <span className="font-medium text-gray-900 dark:text-gray-100">{completedSessions}</span>
+              <span className="text-muted-foreground">{t('analytics.labels.completed')}</span>
+              <span className="font-medium text-foreground">{completedSessions}</span>
             </div>
             <Progress value={(completedSessions / totalSessions) * 100 || 0} className="h-1.5 bg-green-100" />
           </div>
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
-              <span className="text-gray-500 dark:text-gray-400">{t('analytics.labels.cancelled')}</span>
-              <span className="font-medium text-gray-900 dark:text-gray-100">{cancelledSessions}</span>
+              <span className="text-muted-foreground">{t('analytics.labels.cancelled')}</span>
+              <span className="font-medium text-foreground">{cancelledSessions}</span>
             </div>
             <Progress value={(cancelledSessions / totalSessions) * 100 || 0} className="h-1.5 bg-red-100" />
           </div>
