@@ -727,10 +727,13 @@ export function Cobros() {
             {t('payments.managePayments')}
           </p>
         </div>
-        <Button onClick={handleCreatePayment} className="w-full sm:w-auto">
-          <Plus className="h-4 w-4 mr-2" />
+        <button
+          onClick={handleCreatePayment}
+          className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors w-full sm:w-auto"
+        >
+          <Plus className="w-4 h-4" />
           {t('payments.registerPayment')}
-        </Button>
+        </button>
       </div>
 
       {/* Date Filters */}

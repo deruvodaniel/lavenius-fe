@@ -129,7 +129,7 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
                 )}
               </button>
             </TooltipTrigger>
-            <TooltipContent side="right" className="shadow-lg rounded-md text-sm font-medium">
+            <TooltipContent side="right" className="bg-gray-900 text-white border-0 shadow-lg rounded-md text-sm font-medium">
               {sidebarCollapsed ? t('navigation.expandSidebar') : t('navigation.collapseSidebar')}
             </TooltipContent>
           </Tooltip>

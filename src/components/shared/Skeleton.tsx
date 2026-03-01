@@ -15,7 +15,7 @@ export function Skeleton({
   height,
   animation = 'pulse'
 }: SkeletonProps) {
-  const baseClasses = 'bg-muted rounded';
+  const baseClasses = 'bg-muted dark:bg-white/[0.08] rounded';
 
   const variantClasses = {
     text: 'h-4',
@@ -25,7 +25,7 @@ export function Skeleton({
 
   const animationClasses = {
     pulse: 'animate-pulse',
-    wave: 'animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-muted via-background to-muted'
+    wave: 'animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-muted via-background to-muted dark:from-white/[0.06] dark:via-white/[0.14] dark:to-white/[0.06]'
   };
 
   const style: React.CSSProperties = {

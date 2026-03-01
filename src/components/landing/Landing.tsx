@@ -89,7 +89,7 @@ function NavBar() {
   ];
   
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -109,7 +109,7 @@ function NavBar() {
               <button
                 key={link.key}
                 onClick={() => scrollToSection(link.sectionId)}
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-lg transition-colors"
               >
                 {t(`landing.nav.${link.key}`)}
               </button>
@@ -211,11 +211,11 @@ function HeroSection() {
   const { t } = useTranslation();
   
   return (
-    <section className="pt-28 pb-16 lg:pt-32 lg:pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30 relative overflow-hidden">
+    <section className="pt-28 pb-16 lg:pt-32 lg:pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30 dark:from-background dark:via-indigo-950/20 dark:to-purple-950/20 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-200/30 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-200/30 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-200/30 dark:bg-purple-900/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-200/30 dark:bg-indigo-900/20 rounded-full blur-3xl" />
       </div>
       
       <div className="max-w-7xl mx-auto relative">
@@ -223,7 +223,7 @@ function HeroSection() {
           {/* Left: Text Content */}
           <div className="text-center lg:text-left">
             <AnimatedSection animation="fade" duration={400}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mb-6 shadow-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium mb-6 shadow-sm">
                 <Shield className="w-4 h-4" />
                 {t('landing.hero.badge')}
               </div>
@@ -260,7 +260,7 @@ function HeroSection() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="w-full sm:w-auto px-8 py-6 text-lg border-2 hover:bg-gray-50"
+                    className="w-full sm:w-auto px-8 py-6 text-lg border-2 hover:bg-muted"
                   >
                     {t('landing.hero.hasAccount')}
                   </Button>
@@ -412,10 +412,10 @@ function FeaturesSection() {
   ];
   
   const colorClasses = {
-    indigo: 'bg-indigo-100 text-indigo-600',
-    emerald: 'bg-emerald-100 text-emerald-600',
-    purple: 'bg-purple-100 text-purple-600',
-    blue: 'bg-blue-100 text-blue-600',
+    indigo: 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
+    emerald: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+    purple: 'bg-purple-500/15 text-purple-600 dark:text-purple-400',
+    blue: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
   };
   
   return (
@@ -598,9 +598,9 @@ function RemindersSection() {
   ];
   
   const colorClasses = {
-    green: 'bg-green-100 text-green-600',
-    amber: 'bg-amber-100 text-amber-600',
-    emerald: 'bg-emerald-100 text-emerald-600',
+    green: 'bg-green-500/15 text-green-600 dark:text-green-400',
+    amber: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+    emerald: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
   };
   
   return (
@@ -639,7 +639,7 @@ function RemindersSection() {
           {/* Text Content */}
           <AnimatedSection animation="slide-up" duration={500} className="order-1 lg:order-2">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/15 text-amber-700 dark:text-amber-300 rounded-full text-sm font-medium mb-6">
                 <Bell className="w-4 h-4" />
                 {t('landing.reminders.badge')}
               </div>
@@ -677,7 +677,7 @@ function SecuritySection() {
     <section className="py-16 px-4 sm:px-6 lg:px-8 bg-background">
       <div className="max-w-7xl mx-auto">
         <AnimatedSection animation="scale" duration={600}>
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl p-8 sm:p-12">
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 rounded-3xl p-8 sm:p-12">
             <div className="flex flex-col lg:flex-row items-center gap-8">
               <div className="w-20 h-20 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0">
                 <Shield className="w-10 h-10 text-white" />
@@ -692,11 +692,11 @@ function SecuritySection() {
               </div>
               <div className="flex items-center gap-6 text-sm">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-indigo-600">256-bit</div>
+                  <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">256-bit</div>
                   <div className="text-muted-foreground">{t('landing.security.encryption')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-indigo-600">E2E</div>
+                  <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">E2E</div>
                   <div className="text-muted-foreground">{t('landing.security.e2e')}</div>
                 </div>
               </div>
@@ -839,11 +839,11 @@ function SocialProofSection() {
   ];
   
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-background dark:via-background dark:to-background">
       <div className="max-w-7xl mx-auto">
         <AnimatedSection animation="slide-up" duration={500}>
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium mb-6">
               <Users className="w-4 h-4" />
               {t('landing.socialProof.badge')}
             </div>
@@ -929,23 +929,23 @@ function WhyLaveniusSection() {
   
   const colorClasses = {
     indigo: {
-      bg: 'bg-indigo-100',
-      text: 'text-indigo-600',
+      bg: 'bg-indigo-500/15',
+      text: 'text-indigo-600 dark:text-indigo-400',
       highlight: 'bg-indigo-500',
     },
     emerald: {
-      bg: 'bg-emerald-100',
-      text: 'text-emerald-600',
+      bg: 'bg-emerald-500/15',
+      text: 'text-emerald-600 dark:text-emerald-400',
       highlight: 'bg-emerald-500',
     },
     purple: {
-      bg: 'bg-purple-100',
-      text: 'text-purple-600',
+      bg: 'bg-purple-500/15',
+      text: 'text-purple-600 dark:text-purple-400',
       highlight: 'bg-purple-500',
     },
     amber: {
-      bg: 'bg-amber-100',
-      text: 'text-amber-600',
+      bg: 'bg-amber-500/15',
+      text: 'text-amber-600 dark:text-amber-400',
       highlight: 'bg-amber-500',
     },
   };
@@ -955,7 +955,7 @@ function WhyLaveniusSection() {
       <div className="max-w-7xl mx-auto">
         <AnimatedSection animation="slide-up" duration={500}>
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/15 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium mb-6">
               <Sparkles className="w-4 h-4" />
               {t('landing.whyLavenius.badge')}
             </div>
@@ -1093,9 +1093,9 @@ function PricingCard({
       <CardContent className={`flex flex-col h-full ${compactMobile ? 'p-5' : 'p-6'}`}>
         <div className={`text-center ${compactMobile ? 'mb-4' : 'mb-6'}`}>
           <div className={`mx-auto rounded-xl flex items-center justify-center ${compactMobile ? 'w-10 h-10 mb-3' : 'w-12 h-12 mb-4'} ${
-            plan.color === 'indigo' ? 'bg-indigo-100 text-indigo-600' :
-            plan.color === 'purple' ? 'bg-purple-100 text-purple-600' :
-            'bg-amber-100 text-amber-600'
+            plan.color === 'indigo' ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400' :
+            plan.color === 'purple' ? 'bg-purple-500/15 text-purple-600 dark:text-purple-400' :
+            'bg-amber-500/15 text-amber-600 dark:text-amber-400'
           }`}>
             <plan.icon className={compactMobile ? 'w-5 h-5' : 'w-6 h-6'} />
           </div>
@@ -1110,8 +1110,8 @@ function PricingCard({
           <ul className={`${compactMobile ? 'space-y-2.5 mb-4' : 'space-y-3 mb-6'}`}>
             {visibleFeatures.map((featureKey, i) => (
               <li key={i} className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="w-3 h-3 text-green-600" />
+                <div className="w-5 h-5 rounded-full bg-green-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
                 </div>
                 <span className="text-muted-foreground text-sm">{t(featureKey)}</span>
               </li>
@@ -1213,11 +1213,11 @@ function PricingSection() {
   ];
   
   return (
-    <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30">
+    <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30 dark:from-background dark:via-indigo-950/10 dark:to-purple-950/10">
       <div className="max-w-7xl mx-auto">
         <AnimatedSection animation="slide-up" duration={500}>
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium mb-6">
               <DollarSign className="w-4 h-4" />
               {t('landing.pricing.badge')}
             </div>
