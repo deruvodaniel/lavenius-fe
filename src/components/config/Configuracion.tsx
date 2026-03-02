@@ -630,17 +630,15 @@ export function Configuracion() {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-        {/* Header */}
-        <div className="mb-3">
-          <h1 className="text-lg font-semibold text-foreground">{t('settings.title')}</h1>
-          <p className="text-sm text-muted-foreground">{t('settings.subtitle')}</p>
-        </div>
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Fixed Header */}
+      <div className="flex-shrink-0 px-4 md:px-6 lg:px-8 pt-4 md:pt-6 lg:pt-8 pb-3">
+        <h1 className="text-lg font-semibold text-foreground">{t('settings.title')}</h1>
+        <p className="text-sm text-muted-foreground">{t('settings.subtitle')}</p>
+      </div>
 
-        {/* Main Settings Container - Notion-style side-by-side layout */}
-        <div className="flex flex-col md:flex-row gap-6 max-w-6xl">
+      {/* Main Settings Container — tabs stay fixed, only content scrolls */}
+      <div className="flex-1 flex flex-col md:flex-row md:gap-6 max-w-6xl overflow-hidden px-4 md:px-6 lg:px-8">
         {/* ============================================ */}
         {/* Left Navigation Sidebar */}
         {/* ============================================ */}
@@ -711,7 +709,7 @@ export function Configuracion() {
         {/* ============================================ */}
         {/* Right Content Area */}
         {/* ============================================ */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 overflow-y-auto pb-4 md:pb-6 lg:pb-8">
           {/* ============================================ */}
           {/* SECTION: Profile */}
           {/* ============================================ */}
@@ -1238,7 +1236,6 @@ export function Configuracion() {
           </div>
           )}
 
-        </div>
         </div>
       </div>
       {/* ============================================ */}

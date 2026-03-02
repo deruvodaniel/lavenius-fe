@@ -125,12 +125,12 @@ i18n
     
     // Language detection options
     detection: {
-      // Order of detection methods
-      order: ['localStorage', 'navigator', 'htmlTag'],
-      
+      // Only check localStorage — if no stored preference, fallbackLng ('es') is used
+      order: ['localStorage'],
+
       // Cache user language in localStorage
       caches: ['localStorage'],
-      
+
       // Key for localStorage
       lookupLocalStorage: LANGUAGE_STORAGE_KEY,
     },
