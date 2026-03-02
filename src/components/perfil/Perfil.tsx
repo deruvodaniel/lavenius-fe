@@ -265,7 +265,7 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
     <div className="space-y-4 sm:space-y-6">
       {/* Avatar, Basic Info & Share Actions */}
       <Card className="overflow-hidden">
-          <div className="p-4 sm:p-6 bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600">
+          <div className="p-4 sm:p-6 bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900">
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               {/* Avatar */}
               <div className="relative group flex-shrink-0">

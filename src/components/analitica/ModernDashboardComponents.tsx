@@ -356,7 +356,7 @@ export function CompactHeader({
   return (
     <div 
       className={cn(
-        'sticky top-0 z-50 bg-gradient-to-r from-indigo-900 via-indigo-800 to-indigo-900 text-white shadow-lg transition-all duration-300',
+        'sticky top-0 z-50 bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 text-white shadow-lg transition-all duration-300',
         isScrolled 
           ? 'rounded-none py-3 px-4 sm:px-6 -mx-4 md:-mx-6 lg:-mx-8 w-[calc(100%+2rem)] md:w-[calc(100%+3rem)] lg:w-[calc(100%+4rem)]' 
           : 'rounded-2xl p-6 sm:p-8',
