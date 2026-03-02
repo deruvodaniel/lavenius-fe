@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "@clerk/clerk-react": "^5.61.1",
+    "@clerk/localizations": "^3.37.2",
     "@fullcalendar/core": "^6.1.20",
     "@fullcalendar/daygrid": "^6.1.20",
     "@fullcalendar/interaction": "^6.1.20",
