@@ -480,7 +480,7 @@ export function FullCalendarView({
   };
 
   return (
-    <Card className="p-4 sm:p-5 relative bg-card">
+    <Card className="p-4 sm:p-5 relative bg-card gap-0">
       {/* Loading Overlay */}
       {isLoading && <LoadingOverlay message="Cargando turnos..." />}
       
@@ -694,6 +694,7 @@ export function FullCalendarView({
            ================================================================ */
         .fullcalendar-wrapper .fc-toolbar {
           background-color: var(--card);
+          padding-top: 1rem;
           margin-bottom: 1rem !important;
           gap: 0.5rem;
           flex-wrap: wrap;

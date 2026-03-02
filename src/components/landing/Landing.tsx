@@ -100,7 +100,7 @@ function NavBar() {
             <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               {t('landing.brand')}
             </span>
-            <BetaBadge />
+            <span className="max-[400px]:hidden"><BetaBadge /></span>
           </div>
           
           {/* Navigation Links - Hidden on mobile */}
@@ -133,14 +133,16 @@ function NavBar() {
                   {t('landing.cta.login')}
                 </Button>
               </SignInButton>
-              <SignUpButton mode="modal">
-                <Button 
-                  size="sm"
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md transition-all"
-                >
-                  {t('landing.hero.cta')}
-                </Button>
-              </SignUpButton>
+              <span className="max-[400px]:hidden">
+                <SignUpButton mode="modal">
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md transition-all"
+                  >
+                    {t('landing.hero.cta')}
+                  </Button>
+                </SignUpButton>
+              </span>
             </SignedOut>
             
             {/* Signed In: Show Dashboard link + User avatar */}

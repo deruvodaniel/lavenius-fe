@@ -154,7 +154,7 @@ export function Onboarding() {
   // Show loading while Clerk loads user data
   if (!isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-900 dark:via-indigo-950 dark:to-purple-950">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
       </div>
     );
@@ -651,7 +651,7 @@ export function Onboarding() {
       <div className="space-y-5">
         {/* Welcome message */}
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-stepper-check">
+          <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/50 dark:to-emerald-900/50 rounded-full flex items-center justify-center mx-auto mb-4 animate-stepper-check">
             <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
           <p className="text-muted-foreground mb-4">
@@ -661,14 +661,14 @@ export function Onboarding() {
 
         {/* Summary */}
         {filledData.length > 0 && (
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 space-y-2">
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 rounded-xl p-4 space-y-2">
             <h4 className="text-sm font-medium text-foreground mb-3">
               {t('onboarding.stepper.complete.summary')}
             </h4>
             {filledData.map((item, index) => (
               <div
                 key={index}
-                className="flex justify-between text-sm py-1 border-b border-indigo-100 last:border-0"
+                className="flex justify-between text-sm py-1 border-b border-indigo-100 dark:border-indigo-800 last:border-0"
               >
                 <span className="text-muted-foreground">{item.label}:</span>
                 <span className="text-foreground font-medium truncate ml-2 max-w-[60%]">
@@ -680,8 +680,8 @@ export function Onboarding() {
         )}
 
         {/* Tip */}
-        <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
-          <p className="text-sm text-indigo-700">
+        <div className="bg-indigo-50 dark:bg-indigo-950/40 rounded-lg p-4 border border-indigo-100 dark:border-indigo-800">
+          <p className="text-sm text-indigo-700 dark:text-indigo-300">
             <span className="font-medium">{t('onboarding.complete.tip')}</span>{' '}
             {t('onboarding.stepper.complete.tipText')}
           </p>
@@ -691,7 +691,7 @@ export function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-900 dark:via-indigo-950 dark:to-purple-950">
       <div className="w-full max-w-md">
         {/* Beta badge */}
         <div className="flex justify-center mb-4">
@@ -732,8 +732,8 @@ export function Onboarding() {
                   <div 
                     className={cn(
                       "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300",
-                      isCompleted && "bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg shadow-indigo-200",
-                      isCurrent && "bg-gradient-to-br from-indigo-600 to-purple-600 ring-4 ring-indigo-100 shadow-lg shadow-indigo-200",
+                      isCompleted && "bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50",
+                      isCurrent && "bg-gradient-to-br from-indigo-600 to-purple-600 ring-4 ring-indigo-100 dark:ring-indigo-900 shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50",
                       !isCompleted && !isCurrent && "bg-muted border-2 border-border"
                     )}
                   >
@@ -766,7 +766,7 @@ export function Onboarding() {
           >
             <CardHeader className="text-center pb-2">
               <div className={cn(
-                "w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 transition-transform duration-300",
+                "w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/60 dark:to-purple-900/60 rounded-full flex items-center justify-center mx-auto mb-4 transition-transform duration-300",
                 isLastStep && "animate-stepper-celebration"
               )}>
                 {(() => {
@@ -788,68 +788,64 @@ export function Onboarding() {
           </div>
 
           {/* Navigation buttons */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted/50">
-            {/* Back button */}
-            <div className="w-24">
-              {!isFirstStep && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handlePrev}
-                  disabled={isSubmitting}
-                  className="border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all duration-200"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-1" />
-                  {t('common.back')}
-                </Button>
-              )}
-            </div>
+          <div className="flex flex-col gap-2 px-6 py-4 border-t border-border bg-muted/50">
+            {/* Primary action — full width */}
+            {isLastStep ? (
+              <Button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50 transition-all duration-200 hover:shadow-xl hover:shadow-indigo-300 dark:hover:shadow-indigo-800/60"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {t('common.saving')}
+                  </>
+                ) : (
+                  t('onboarding.stepper.completeSetup')
+                )}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50 transition-all duration-200 hover:shadow-xl hover:shadow-indigo-300 dark:hover:shadow-indigo-800/60"
+              >
+                {t('common.next')}
+                <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
+            )}
 
-            {/* Skip button (center) */}
-            <div className="flex-1 flex justify-center">
-              {stepConfig.canSkip && !isLastStep && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={handleSkip}
-                  disabled={isSubmitting}
-                  className="text-muted-foreground hover:text-foreground transition-colors duration-200"
-                >
-                  {t('onboarding.stepper.skip')}
-                </Button>
-              )}
-            </div>
-
-            {/* Next/Complete button */}
-            <div className="w-auto">
-              {isLastStep ? (
-                <Button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200 transition-all duration-200 hover:shadow-xl hover:shadow-indigo-300"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {t('common.saving')}
-                    </>
-                  ) : (
-                    t('onboarding.stepper.completeSetup')
-                  )}
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={isSubmitting}
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200 transition-all duration-200 hover:shadow-xl hover:shadow-indigo-300"
-                >
-                  {t('common.next')}
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              )}
-            </div>
+            {/* Secondary actions row */}
+            {(!isFirstStep || (stepConfig.canSkip && !isLastStep)) && (
+              <div className="flex items-center gap-2">
+                {!isFirstStep && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handlePrev}
+                    disabled={isSubmitting}
+                    className="flex-1 border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all duration-200"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-1" />
+                    {t('common.back')}
+                  </Button>
+                )}
+                {stepConfig.canSkip && !isLastStep && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={handleSkip}
+                    disabled={isSubmitting}
+                    className="flex-1 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  >
+                    {t('onboarding.stepper.skip')}
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </Card>
 
