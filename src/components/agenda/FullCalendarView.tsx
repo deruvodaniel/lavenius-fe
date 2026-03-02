@@ -693,6 +693,7 @@ export function FullCalendarView({
            TOOLBAR — navigation buttons and title
            ================================================================ */
         .fullcalendar-wrapper .fc-toolbar {
+          background-color: var(--card);
           margin-bottom: 1rem !important;
           gap: 0.5rem;
           flex-wrap: wrap;
@@ -816,13 +817,18 @@ export function FullCalendarView({
            COLUMN HEADERS — week/day view day-of-week labels
            ================================================================ */
         .fullcalendar-wrapper .fc-col-header-cell {
-          background-color: var(--muted);
+          background-color: var(--card);
           border-color: var(--border);
           padding: 0;
         }
 
         .dark .fullcalendar-wrapper .fc-col-header-cell {
-          background-color: var(--muted);
+          background-color: var(--card);
+        }
+
+        /* Prevent today highlight from affecting column headers */
+        .fullcalendar-wrapper .fc-col-header-cell.fc-day-today {
+          background-color: var(--card) !important;
         }
 
         .fullcalendar-wrapper .fc-col-header-cell-cushion {
