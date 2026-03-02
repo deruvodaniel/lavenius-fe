@@ -630,12 +630,12 @@ export function FullCalendarView({
            ================================================================ */
         .fullcalendar-wrapper .fc {
           font-family: inherit;
-          background: var(--background);
+
           color: var(--foreground);
         }
 
         .dark .fullcalendar-wrapper .fc {
-          background: var(--background);
+
           color: var(--foreground);
         }
 
