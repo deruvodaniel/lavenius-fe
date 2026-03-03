@@ -24,12 +24,18 @@ interface CalendarState {
   calendars: CalendarInfo[];
   syncStatus: CalendarSyncStatus;
   lastSyncAt: string | null;
+  /** Reactive modal: shown when /calendars fails */
+  showCalendarModal: boolean;
+  /** Whether the user dismissed the modal this session */
+  _modalDismissed: boolean;
   
   // Actions
   checkConnection: () => Promise<void>;
   connectCalendar: () => Promise<void>;
   syncCalendar: () => Promise<void>;
   disconnectCalendar: () => Promise<void>;
+  dismissCalendarModal: () => void;
+  setShowCalendarModal: (show: boolean) => void;
 }
 
 const STORAGE_KEY = 'lavenius-calendar';
@@ -47,6 +53,16 @@ export const useCalendarStore = create<CalendarState>()(
         sessionsCalendarId: null,
       },
       lastSyncAt: null,
+      showCalendarModal: false,
+      _modalDismissed: false,
+
+  dismissCalendarModal: () => {
+    set({ showCalendarModal: false, _modalDismissed: true });
+  },
+
+  setShowCalendarModal: (show: boolean) => {
+    set({ showCalendarModal: show });
+  },
 
   checkConnection: async () => {
     // Avoid duplicate calls - if already checking, skip
@@ -82,6 +98,8 @@ export const useCalendarStore = create<CalendarState>()(
       if (statusCode !== 400) {
         console.error('Error checking calendar connection:', error);
       }
+      // Show calendar modal reactively when not connected (unless dismissed)
+      const { _modalDismissed } = useCalendarStore.getState();
       set({ 
         isConnected: false, 
         calendars: [], 
@@ -90,7 +108,8 @@ export const useCalendarStore = create<CalendarState>()(
           hasSessionsCalendar: false,
           sessionsCalendarId: null,
         },
-        isCheckingConnection: false 
+        isCheckingConnection: false,
+        showCalendarModal: !_modalDismissed,
       });
     }
   },

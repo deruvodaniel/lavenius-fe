@@ -9,19 +9,16 @@
  * - ViewModeToggle for view switching
  */
 
-import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TurnoDrawer } from './TurnoDrawer';
 import { SessionDetailsModal } from './SessionDetailsModal';
-import { ConfirmDialog, CalendarRequiredDialog } from '../shared';
+import { ConfirmDialog } from '../shared';
 import { FullCalendarView } from './FullCalendarView';
 import { FichaClinica } from '../dashboard/FichaClinica';
 import { AgendaHeader } from './AgendaHeader';
 import { AgendaSessionList } from './AgendaSessionList';
 import { LoadingSpinner } from '../shared/LoadingSpinner';
 import { useAgenda } from '@/lib/hooks/useAgenda';
-
-const CALENDAR_PROMPTED_KEY = 'lavenius-calendar-prompted';
 
 export function Agenda() {
   const { t } = useTranslation();
@@ -89,37 +86,7 @@ export function Agenda() {
     handleEventDrop,
   } = useAgenda();
 
-  const [showCalendarModal, setShowCalendarModal] = useState(false);
 
-  // Show calendar sync modal on first visit if not connected
-  useEffect(() => {
-    if (!isCalendarConnected && !localStorage.getItem(CALENDAR_PROMPTED_KEY)) {
-      const timer = window.setTimeout(() => {
-        setShowCalendarModal(true);
-      }, 0);
-      return () => window.clearTimeout(timer);
-    }
-  }, [isCalendarConnected]);
-
-  const handleDismissCalendarModal = () => {
-    localStorage.setItem(CALENDAR_PROMPTED_KEY, 'true');
-    setShowCalendarModal(false);
-  };
-
-  const handleConnectFromModal = () => {
-    localStorage.setItem(CALENDAR_PROMPTED_KEY, 'true');
-    setShowCalendarModal(false);
-    connectCalendar();
-  };
-
-  // Gate new session creation when calendar is not connected
-  const handleNewTurnoGated = () => {
-    if (!isCalendarConnected) {
-      setShowCalendarModal(true);
-      return;
-    }
-    handleNuevoTurno();
-  };
 
   // If a patient is selected, show their FichaClinica
   if (selectedPatientId !== null) {
@@ -154,7 +121,7 @@ export function Agenda() {
         lastSyncAt={lastSyncAt}
         onConnectCalendar={connectCalendar}
         onSyncCalendar={syncCalendar}
-        onNewTurno={handleNewTurnoGated}
+        onNewTurno={handleNuevoTurno}
       />
 
       {/* Layout Principal - Based on viewMode */}
@@ -181,7 +148,7 @@ export function Agenda() {
             getPaciente={getPaciente}
             isSessionPaid={isSessionPaid}
             onClearSearch={() => setSearchTerm('')}
-            onNewTurno={handleNewTurnoGated}
+            onNewTurno={handleNuevoTurno}
             onPatientClick={handleSelectPatient}
             onEditClick={(session) => {
               setSelectedSession(session);
@@ -206,10 +173,6 @@ export function Agenda() {
                   setDetailsModalOpen(true);
                 }}
                 onDateSelect={(start) => {
-                  if (!isCalendarConnected) {
-                    setShowCalendarModal(true);
-                    return;
-                  }
                   setSelectedSession(null);
                   setSelectedInitialDate(start);
                   setTurnoDrawerOpen(true);
@@ -269,12 +232,6 @@ export function Agenda() {
         isLoading={isDeleting}
       />
 
-      <CalendarRequiredDialog
-        open={showCalendarModal}
-        onOpenChange={setShowCalendarModal}
-        onLater={handleDismissCalendarModal}
-        onConnect={handleConnectFromModal}
-      />
     </div>
   );
 }

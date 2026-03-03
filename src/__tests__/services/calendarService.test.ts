@@ -117,7 +117,7 @@ describe('CalendarService', () => {
 
       const result = await calendarService.getCalendars();
 
-      expect(apiClient.get).toHaveBeenCalledWith('/internal/calendar/calendars');
+      expect(apiClient.get).toHaveBeenCalledWith('/calendar/calendars');
       expect(result).toEqual(mockCalendars);
     });
 
@@ -158,7 +158,7 @@ describe('CalendarService', () => {
       vi.mocked(apiClient.get).mockRejectedValue(apiError);
 
       await expect(calendarService.getCalendars()).rejects.toThrow('Calendar not connected');
-      expect(apiClient.get).toHaveBeenCalledWith('/internal/calendar/calendars');
+      expect(apiClient.get).toHaveBeenCalledWith('/calendar/calendars');
     });
   });
 

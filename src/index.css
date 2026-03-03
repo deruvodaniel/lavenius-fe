@@ -212,33 +212,33 @@ body {
 [data-slot="button"].bg-primary,
 button[class*="bg-indigo-600"],
 a[class*="bg-indigo-600"] {
-  background: linear-gradient(to right, #4f46e5, #6366f1, #9333ea) !important;
+  background: linear-gradient(to right, #312e81, #4338ca) !important;
   border: none;
 }
 
 [data-slot="button"].bg-primary:hover,
 button[class*="bg-indigo-600"]:hover,
 a[class*="bg-indigo-600"]:hover {
-  background: linear-gradient(to right, #4338ca, #4f46e5, #7e22ce) !important;
+  background: linear-gradient(to right, #3730a3, #4f46e5) !important;
 }
 
 [data-slot="button"].bg-primary:disabled,
 button[class*="bg-indigo-600"]:disabled,
 a[class*="bg-indigo-600"]:disabled {
-  background: linear-gradient(to right, #4f46e5, #6366f1, #9333ea) !important;
+  background: linear-gradient(to right, #312e81, #4338ca) !important;
 }
 
 /* Dark mode gradient buttons — default deep/vibrant, hover lighter */
 .dark [data-slot="button"].bg-primary,
 .dark button[class*="bg-indigo-600"],
 .dark a[class*="bg-indigo-600"] {
-  background: linear-gradient(to right, #6366f1, #8b5cf6, #a855f7) !important;
+  background: linear-gradient(to right, #3730a3, #4f46e5) !important;
 }
 
 .dark [data-slot="button"].bg-primary:hover,
 .dark button[class*="bg-indigo-600"]:hover,
 .dark a[class*="bg-indigo-600"]:hover {
-  background: linear-gradient(to right, #818cf8, #a78bfa, #c084fc) !important;
+  background: linear-gradient(to right, #4338ca, #6366f1) !important;
 }
 
 /* ==========================================================================

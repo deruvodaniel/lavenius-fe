@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { createRoot } from "react-dom/client";
+import { createRoot, type Root } from "react-dom/client";
 import { BrowserRouter } from 'react-router-dom';
-import { ClerkProvider, type ClerkProviderProps } from '@clerk/clerk-react';
+import { ClerkProvider } from '@clerk/clerk-react';
 import { esES, enUS, ptBR } from '@clerk/localizations';
 import type { LocalizationResource } from '@clerk/types';
 import { ThemeProvider } from 'next-themes';
@@ -28,9 +28,7 @@ const CLERK_LOCALES: Record<string, LocalizationResource> = {
   pt: ptBR,
 };
 
-type LocalizedClerkProviderProps = Pick<ClerkProviderProps, 'children'>;
-
-function LocalizedClerkProvider({ children }: LocalizedClerkProviderProps) {
+function RootWithClerk({ children }: { children: React.ReactNode }) {
   const [locale, setLocale] = useState<LocalizationResource>(
     () => CLERK_LOCALES[i18n.language] ?? esES
   );
@@ -42,23 +40,42 @@ function LocalizedClerkProvider({ children }: LocalizedClerkProviderProps) {
   }, []);
 
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/" localization={locale}>
+    <ClerkProvider
+      publishableKey={PUBLISHABLE_KEY}
+      afterSignOutUrl="/"
+      localization={locale}
+    >
       {children}
     </ClerkProvider>
   );
 }
 
-createRoot(document.getElementById("root")!).render(
+declare global {
+  interface Window {
+    __laveniusRoot?: Root;
+  }
+}
+
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+
+const root = window.__laveniusRoot ?? createRoot(rootElement);
+window.__laveniusRoot = root;
+
+root.render(
   <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="lavenius-theme">
     <ErrorBoundary>
-      <LocalizedClerkProvider>
+      <RootWithClerk>
         <ClerkTokenProvider>
           <BrowserRouter>
             <App />
           </BrowserRouter>
           <Toaster position="top-right" richColors closeButton />
         </ClerkTokenProvider>
-      </LocalizedClerkProvider>
+      </RootWithClerk>
     </ErrorBoundary>
   </ThemeProvider>
 );

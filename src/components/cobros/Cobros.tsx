@@ -4,7 +4,6 @@ import { Bell, Plus, DollarSign, CheckCircle2, Clock, AlertCircle, Loader2, Tras
 import { toast } from 'sonner';
 import { useSessions } from '@/lib/stores/sessionStore';
 import { usePayments } from '@/lib/hooks/usePayments';
-import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { useResponsive, usePatients } from '@/lib/hooks';
 import { PaymentStats } from './PaymentStats';
 import { PaymentDrawer } from './PaymentDrawer';
@@ -13,7 +12,7 @@ import { ReminderModal } from './ReminderModal';
 import { DateFilters, SearchAndFilters, type SortOption, type QuickFilter, type StatusFilterOption } from './PaymentFilters';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { SkeletonList, SimplePagination, InfiniteScrollLoader, ConfirmDialog, EmptyState, CalendarRequiredDialog } from '@/components/shared';
+import { SkeletonList, SimplePagination, InfiniteScrollLoader, ConfirmDialog, EmptyState } from '@/components/shared';
 import { formatCurrency } from '@/lib/utils/dateFormatters';
 import { getNameInitials } from '@/lib/utils/nameInitials';
 import type { CreatePaymentDto, Payment, UpdatePaymentDto } from '@/lib/types/api.types';
@@ -328,9 +327,7 @@ export function Cobros() {
   const { t } = useTranslation();
   const { sessionsUI, fetchUpcoming } = useSessions();
   const { fetchPatients } = usePatients();
-  const isCalendarConnected = useCalendarStore(state => state.isConnected);
-  const connectCalendar = useCalendarStore(state => state.connectCalendar);
-  const checkCalendarConnection = useCalendarStore(state => state.checkConnection);
+
   const { 
     payments,
     totals,
@@ -353,8 +350,6 @@ export function Cobros() {
   const [isDeletingPayment, setIsDeletingPayment] = useState(false);
   const [detailPayment, setDetailPayment] = useState<Payment | null>(null);
   const [editPayment, setEditPayment] = useState<Payment | null>(null);
-  const [showCalendarModal, setShowCalendarModal] = useState(false);
-
   // Filter state
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -444,7 +439,7 @@ export function Cobros() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        await Promise.all([fetchUpcoming(), fetchPatients(), checkCalendarConnection()]);
+        await Promise.all([fetchUpcoming(), fetchPatients()]);
       } catch (error) {
         console.error('Error fetching initial data:', error);
       } finally {
@@ -576,13 +571,9 @@ export function Cobros() {
 
   // Handlers
   const handleCreatePayment = useCallback(() => {
-    if (!isCalendarConnected) {
-      setShowCalendarModal(true);
-      return;
-    }
     setPreselectedSession(null);
     setIsPaymentDrawerOpen(true);
-  }, [isCalendarConnected]);
+  }, []);
 
   const handleMarkAsPaid = useCallback(async (paymentId: string) => {
     try {
@@ -700,17 +691,12 @@ export function Cobros() {
 
   // Handler to register payment for a specific session (from virtual pending item)
   const handleRegisterPaymentForSession = useCallback((sessionId: string) => {
-    if (!isCalendarConnected) {
-      setShowCalendarModal(true);
-      return;
-    }
-
     const session = sessionsUI.find(s => s.id === sessionId);
     if (session) {
       setPreselectedSession(session);
       setIsPaymentDrawerOpen(true);
     }
-  }, [isCalendarConnected, sessionsUI]);
+  }, [sessionsUI]);
 
   const hasDateFilters = dateFrom || dateTo;
   const hasAnyFilters = hasDateFilters || statusFilter !== 'all' || searchTerm;
@@ -1008,11 +994,6 @@ export function Cobros() {
         />
       )}
 
-      <CalendarRequiredDialog
-        open={showCalendarModal}
-        onOpenChange={setShowCalendarModal}
-        onConnect={connectCalendar}
-      />
     </div>
   );
 }

@@ -114,8 +114,8 @@ i18n
     // Supported languages
     supportedLngs: LANGUAGE_CODES,
     
-    // Debug mode (disable in production)
-    debug: import.meta.env.DEV,
+    // Debug mode
+    debug: false,
     
     // Interpolation settings
     interpolation: {

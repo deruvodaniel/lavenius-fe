@@ -248,7 +248,7 @@ export function DashboardSkeleton() {
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6">
       {/* Welcome Header Skeleton */}
-      <div className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 rounded-2xl p-6 sm:p-8">
+      <div className="bg-gradient-to-r from-indigo-900 to-indigo-800 rounded-2xl p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-2">
             <Skeleton className="h-4 w-32 bg-white/20" />

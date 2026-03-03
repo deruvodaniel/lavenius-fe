@@ -6,9 +6,8 @@ import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
 import { usePatients, useErrorToast, useResponsive } from '@/lib/hooks';
 import { useSessionStore } from '@/lib/stores/sessionStore';
-import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { SessionStatus } from '@/lib/types/session';
-import { AnimatedList, SkeletonCard, EmptyState, ConfirmDialog, SimplePagination, InfiniteScrollLoader, CalendarRequiredDialog, NativeSelect } from '../shared';
+import { AnimatedList, SkeletonCard, EmptyState, ConfirmDialog, SimplePagination, InfiniteScrollLoader, NativeSelect } from '../shared';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,9 +30,7 @@ export function Pacientes() {
   const { t } = useTranslation();
   const { patients, selectedPatient, isLoading, error, fetchPatients, fetchPatientById, createPatient, updatePatient, deletePatient, clearError, setSelectedPatient } = usePatients();
   const { sessions, fetchUpcoming } = useSessionStore();
-  const isCalendarConnected = useCalendarStore(state => state.isConnected);
-  const connectCalendar = useCalendarStore(state => state.connectCalendar);
-  const checkCalendarConnection = useCalendarStore(state => state.checkConnection);
+
   const { isMobile } = useResponsive();
   
   // Auto-display error toasts
@@ -58,8 +55,6 @@ export function Pacientes() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [patientToDelete, setPatientToDelete] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showCalendarModal, setShowCalendarModal] = useState(false);
-
   // Pagination state (desktop)
   const [currentPage, setCurrentPage] = useState(1);
   
@@ -159,24 +154,15 @@ export function Pacientes() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Refresh calendar connection state for action gating
-  useEffect(() => {
-    checkCalendarConnection().catch(() => {});
-  }, [checkCalendarConnection]);
-
   // Listen for openPatientDrawer event from onboarding
   React.useEffect(() => {
     const handleOpenDrawer = () => {
-      if (!isCalendarConnected) {
-        setShowCalendarModal(true);
-        return;
-      }
       setPacienteDrawerOpen(true);
     };
     
     window.addEventListener('openPatientDrawer', handleOpenDrawer);
     return () => window.removeEventListener('openPatientDrawer', handleOpenDrawer);
-  }, [isCalendarConnected]);
+  }, []);
 
   // Build a map of patient ID -> next session date for quick lookup
   const nextSessionByPatient = useMemo(() => {
@@ -232,10 +218,6 @@ export function Pacientes() {
   }, [setSelectedPatient]);
 
   const handleNuevoPaciente = () => {
-    if (!isCalendarConnected) {
-      setShowCalendarModal(true);
-      return;
-    }
     setPacienteDrawerOpen(true);
   };
 
@@ -990,11 +972,6 @@ export function Pacientes() {
         isLoading={isDeleting}
       />
 
-      <CalendarRequiredDialog
-        open={showCalendarModal}
-        onOpenChange={setShowCalendarModal}
-        onConnect={connectCalendar}
-      />
     </div>
   );
 }

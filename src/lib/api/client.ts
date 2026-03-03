@@ -299,9 +299,7 @@ export class ApiClient {
         }
       } catch (error) {
         // If Clerk token fetch fails, fall back to stored token
-        if (import.meta.env.DEV) {
-          console.warn('Failed to get Clerk token, falling back to stored token:', error);
-        }
+        void error;
         const storedToken = this.tokenStorage.getToken();
         if (storedToken) {
           config.headers.Authorization = `Bearer ${storedToken}`;
@@ -327,9 +325,7 @@ export class ApiClient {
         requestUrl.includes('/auth?') ||
         requestUrl.includes('/health');
 
-      if (!isPublicEndpoint && import.meta.env.DEV) {
-        console.warn('[ApiClient] Missing x-user-key for protected request:', requestUrl);
-      }
+      void isPublicEndpoint;
     }
 
     // Disable caching for GET requests to always fetch fresh data
@@ -344,7 +340,6 @@ export class ApiClient {
    * Handle request errors
    */
   private handleRequestError(error: unknown): Promise<never> {
-    console.error('Request error:', error);
     return Promise.reject(error);
   }
 

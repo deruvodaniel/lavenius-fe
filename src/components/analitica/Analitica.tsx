@@ -1250,10 +1250,18 @@ export function Analitica() {
                   {patientsWithoutNextSession.length > 0 ? (
                     <div className="space-y-2">
                       {patientsWithoutNextSession.slice(0, 4).map(patient => (
-                        <button
+                        <div
                           key={patient.id}
+                          role="button"
+                          tabIndex={0}
                           onClick={() => navigate(`/dashboard/pacientes/${patient.id}`)}
-                          className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-left"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              navigate(`/dashboard/pacientes/${patient.id}`);
+                            }
+                          }}
+                          className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         >
                           <div>
                             <p className="text-sm font-medium text-foreground">{patient.firstName} {patient.lastName}</p>
@@ -1274,7 +1282,7 @@ export function Analitica() {
                           >
                             <Plus className="w-4 h-4" />
                           </Button>
-                        </button>
+                        </div>
                       ))}
                     </div>
                   ) : (
@@ -1364,10 +1372,18 @@ export function Analitica() {
               {patientsWithoutNextSession.length > 0 ? (
                 <div className="space-y-2">
                   {patientsWithoutNextSession.map(patient => (
-                    <button
+                    <div
                       key={patient.id}
+                      role="button"
+                      tabIndex={0}
                       onClick={() => navigate(`/dashboard/pacientes/${patient.id}`)}
-                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-left"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          navigate(`/dashboard/pacientes/${patient.id}`);
+                        }
+                      }}
+                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     >
                       <div>
                         <p className="text-sm font-medium text-foreground">{patient.firstName} {patient.lastName}</p>
@@ -1389,7 +1405,7 @@ export function Analitica() {
                         <Plus className="w-4 h-4 mr-1" />
                         {t('dashboard.quickActions.newSession')}
                       </Button>
-                    </button>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -1419,7 +1435,7 @@ export function Analitica() {
               onClick={() => navigate('/dashboard/agenda')}
             >
               <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <LineChart data={sessionsOverTime}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
                     <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9ca3af" className="dark:stroke-gray-500" />
@@ -1455,7 +1471,7 @@ export function Analitica() {
             >
               <div className="h-64 flex items-center justify-center">
                 {sessionsByStatus.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <PieChart>
                       <Pie
                         data={sessionsByStatus}
@@ -1495,7 +1511,7 @@ export function Analitica() {
               onClick={() => navigate('/dashboard/cobros')}
             >
               <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <BarChart data={incomeOverTime}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
                     <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9ca3af" className="dark:stroke-gray-500" />
@@ -1517,7 +1533,7 @@ export function Analitica() {
             >
               <div className="h-64 flex items-center justify-center">
                 {paymentsByStatus.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <PieChart>
                       <Pie
                         data={paymentsByStatus}
@@ -1557,7 +1573,7 @@ export function Analitica() {
               onClick={() => navigate('/dashboard/agenda')}
             >
               <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <BarChart data={sessionsByHour}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
                     <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="#9ca3af" className="dark:stroke-gray-500" interval={0} angle={-45} textAnchor="end" height={50} />
@@ -1576,7 +1592,7 @@ export function Analitica() {
               onClick={() => navigate('/dashboard/agenda')}
             >
               <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <BarChart data={sessionsByWeekday}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
                     <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9ca3af" className="dark:stroke-gray-500" />
@@ -1597,7 +1613,7 @@ export function Analitica() {
           >
             <div className="h-64">
               {topPatientsBySessions.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <BarChart data={topPatientsBySessions} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
                     <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9ca3af" className="dark:stroke-gray-500" allowDecimals={false} />

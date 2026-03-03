@@ -5,7 +5,7 @@ import { useClerk } from '@clerk/clerk-react';
 import { LogOut } from 'lucide-react';
 import { AppLayout, Sidebar } from '../layout';
 import { OnboardingModal } from '../onboarding';
-import { ConfirmDialog } from '../shared';
+import { ConfirmDialog, CalendarRequiredDialog } from '../shared';
 import { useOnboarding } from '@/lib/hooks/useOnboarding';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 
@@ -16,8 +16,16 @@ export function Dashboard() {
   const { signOut } = useClerk();
   const { shouldShowOnboarding } = useOnboarding();
   const { connectCalendar } = useCalendarStore();
+  const showCalendarModal = useCalendarStore(state => state.showCalendarModal);
+  const dismissCalendarModal = useCalendarStore(state => state.dismissCalendarModal);
+  const checkConnection = useCalendarStore(state => state.checkConnection);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Check calendar connection once on Dashboard mount (reactive approach)
+  useEffect(() => {
+    checkConnection().catch(() => {});
+  }, [checkConnection]);
 
   // Show onboarding modal for first-time users
   useEffect(() => {
@@ -84,6 +92,17 @@ export function Dashboard() {
         variant="warning"
         icon={LogOut}
         onConfirm={handleLogoutConfirm}
+      />
+
+      {/* Global Calendar Required Dialog — shows reactively when /calendars fails */}
+      <CalendarRequiredDialog
+        open={showCalendarModal}
+        onOpenChange={(open) => { if (!open) dismissCalendarModal(); }}
+        onLater={dismissCalendarModal}
+        onConnect={() => {
+          dismissCalendarModal();
+          connectCalendar();
+        }}
       />
     </>
   );

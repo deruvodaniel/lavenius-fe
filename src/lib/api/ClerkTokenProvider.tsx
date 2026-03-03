@@ -36,10 +36,7 @@ export function ClerkTokenProvider({ children }: ClerkTokenProviderProps) {
       apiClient.setTokenGetter(async () => {
         try {
           return await getToken();
-        } catch (error) {
-          if (import.meta.env.DEV) {
-            console.warn('Failed to get Clerk token:', error);
-          }
+        } catch {
           return null;
         }
       });
@@ -95,9 +92,6 @@ export function ClerkTokenProvider({ children }: ClerkTokenProviderProps) {
             apiClient.setUserKey(response.userKey);
             keyFetchedForUser.current = userId;
             onboardingService.saveBackendPassphrase(userId, passphrase);
-            if (import.meta.env.DEV) {
-              console.log('Encryption key initialized for user:', userId);
-            }
             return;
           }
         } catch {
@@ -105,9 +99,6 @@ export function ClerkTokenProvider({ children }: ClerkTokenProviderProps) {
         }
       }
 
-      if (import.meta.env.DEV) {
-        console.warn('Failed to fetch encryption key during bootstrap');
-      }
     };
 
     void initializeUserKey();

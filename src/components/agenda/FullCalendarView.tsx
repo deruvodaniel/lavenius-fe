@@ -723,35 +723,35 @@ export function FullCalendarView({
 
         /* Gradient on toolbar buttons — matches app primary button style */
         .fullcalendar-wrapper .fc-button-primary {
-          background: linear-gradient(to right, #4f46e5, #6366f1, #9333ea) !important;
+          background: linear-gradient(to right, #312e81, #4338ca) !important;
           border: none !important;
-          box-shadow: 0 1px 3px rgba(79, 70, 229, 0.3);
+          box-shadow: 0 1px 3px rgba(49, 46, 129, 0.3);
         }
 
         .fullcalendar-wrapper .fc-button-primary:hover:not(:disabled) {
-          background: linear-gradient(to right, #6366f1, #818cf8, #a855f7) !important;
-          box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4);
+          background: linear-gradient(to right, #3730a3, #4f46e5) !important;
+          box-shadow: 0 2px 6px rgba(49, 46, 129, 0.4);
         }
 
         .fullcalendar-wrapper .fc-button-primary:not(:disabled).fc-button-active,
         .fullcalendar-wrapper .fc-button-primary:not(:disabled):active {
-          background: linear-gradient(to right, #4338ca, #4f46e5, #7c3aed) !important;
+          background: linear-gradient(to right, #312e81, #4338ca) !important;
           box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
         /* Dark mode gradient */
         .dark .fullcalendar-wrapper .fc-button-primary {
-          background: linear-gradient(to right, #6366f1, #8b5cf6, #a855f7) !important;
-          box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
+          background: linear-gradient(to right, #3730a3, #4f46e5) !important;
+          box-shadow: 0 1px 3px rgba(55, 48, 163, 0.3);
         }
 
         .dark .fullcalendar-wrapper .fc-button-primary:hover:not(:disabled) {
-          background: linear-gradient(to right, #818cf8, #a78bfa, #c084fc) !important;
+          background: linear-gradient(to right, #4338ca, #6366f1) !important;
         }
 
         .dark .fullcalendar-wrapper .fc-button-primary:not(:disabled).fc-button-active,
         .dark .fullcalendar-wrapper .fc-button-primary:not(:disabled):active {
-          background: linear-gradient(to right, #4f46e5, #6366f1, #9333ea) !important;
+          background: linear-gradient(to right, #3730a3, #4f46e5) !important;
         }
 
         .fullcalendar-wrapper .fc-button:focus {

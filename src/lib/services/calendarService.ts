@@ -39,7 +39,7 @@ export const calendarService = {
    * Get list of Google Calendars
    */
   async getCalendars(): Promise<GoogleCalendar[]> {
-    const response = await apiClient.get<GoogleCalendar[]>('/internal/calendar/calendars');
+    const response = await apiClient.get<GoogleCalendar[]>('/calendar/calendars');
     return response as unknown as GoogleCalendar[];
   },
 
