@@ -1,4 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
 
 interface CalendarViewProps {
   calendarDate: Date;
@@ -19,6 +21,7 @@ export function CalendarView({
   today,
   isMobile = false
 }: CalendarViewProps) {
+  const { t } = useTranslation();
   const calendarYear = calendarDate.getFullYear();
   const calendarMonth = calendarDate.getMonth();
   const firstDay = new Date(calendarYear, calendarMonth, 1);
@@ -42,31 +45,35 @@ export function CalendarView({
     <div className={isMobile ? "" : "h-full flex flex-col"}>
       {/* Calendar Header */}
       <div className="flex items-center justify-between mb-4">
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={onPreviousMonth}
-          className="p-2 hover:bg-muted rounded-lg transition-colors"
-          title="Mes anterior"
+          aria-label={t('agenda.calendar.previousMonth')}
         >
           <ChevronLeft className="w-5 h-5 text-muted-foreground" />
-        </button>
+        </Button>
         
         <div className="flex items-center gap-3">
           <h2 className="text-foreground capitalize font-medium">{monthName}</h2>
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={onToday}
-            className="text-sm px-3 py-1 bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors"
+            className="bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
           >
-            Hoy
-          </button>
+            {t('agenda.calendar.today')}
+          </Button>
         </div>
         
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={onNextMonth}
-          className="p-2 hover:bg-muted rounded-lg transition-colors"
-          title="Mes siguiente"
+          aria-label={t('agenda.calendar.nextMonth')}
         >
           <ChevronRight className="w-5 h-5 text-muted-foreground" />
-        </button>
+        </Button>
       </div>
 
       {/* Calendar Grid */}

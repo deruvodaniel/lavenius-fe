@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 import { BetaBadge } from '@/components/shared';
 
 const SIDEBAR_COLLAPSED_KEY = 'lavenius_sidebar_collapsed';
@@ -77,13 +78,15 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
       {/* Mobile Header - hidden on desktop */}
       <header className="bg-indigo-900 text-white p-4 flex items-center justify-between shadow-lg z-40 lg:hidden">
         <h1 className="text-xl font-bold flex items-center gap-2">{appName} <BetaBadge /></h1>
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => setDrawerOpen(!drawerOpen)}
-          className="p-2 hover:bg-indigo-800 rounded-lg transition-colors"
+          className="hover:bg-indigo-800 text-white"
           aria-label={t('common.toggleMenu', 'Toggle menu')}
         >
           {drawerOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        </Button>
       </header>
 
       {/* Mobile Drawer - only visible on mobile when open */}
@@ -117,9 +120,11 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
         <TooltipProvider>
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
-              <button
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={handleToggleCollapse}
-                className="absolute top-1/2 -translate-y-1/2 -right-3 z-30 w-6 h-6 bg-background rounded-full shadow-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:shadow-lg transition-all duration-200"
+                className="absolute top-1/2 -translate-y-1/2 -right-3 z-30 w-6 h-6 rounded-full shadow-md text-muted-foreground hover:text-foreground hover:shadow-lg"
                 aria-label={sidebarCollapsed ? t('navigation.expandSidebar') : t('navigation.collapseSidebar')}
               >
                 {sidebarCollapsed ? (
@@ -127,7 +132,7 @@ export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayout
                 ) : (
                   <ChevronLeft className="w-4 h-4" />
                 )}
-              </button>
+              </Button>
             </TooltipTrigger>
             <TooltipContent side="right" className="bg-gray-900 text-white border-0 shadow-lg rounded-md text-sm font-medium">
               {sidebarCollapsed ? t('navigation.expandSidebar') : t('navigation.collapseSidebar')}

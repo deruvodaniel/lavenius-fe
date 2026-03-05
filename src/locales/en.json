@@ -9,6 +9,8 @@
     "close": "Close",
     "confirm": "Confirm",
     "back": "Back",
+    "goBack": "Go back",
+    "goToHome": "Go to home",
     "next": "Next",
     "previous": "Previous",
     "search": "Search",
@@ -405,7 +407,9 @@
       "day": "Day",
       "list": "List",
       "allDay": "Day Off",
-      "loadingSessions": "Loading appointments..."
+      "loadingSessions": "Loading appointments...",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month"
     },
     "views": {
       "list": "List",
@@ -640,13 +644,17 @@
       "actions": "Actions"
     },
     "actions": {
-      "registerPayment": "Register payment",
-      "viewDetail": "View detail",
-      "sendReminder": "Send reminder",
-      "markAsCollected": "Mark as collected",
+      "collect": "Collect",
+      "connectCalendar": "Connect Google Calendar",
       "deletePayment": "Delete payment",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "markAsCollected": "Mark as collected",
+      "registerPayment": "Register payment",
+      "sendReminder": "Send reminder",
+      "syncCalendar": "Sync Google Calendar",
+      "syncing": "Syncing...",
+      "viewDetail": "View detail"
     }
   },
   "settings": {

@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/components/ui/utils';
 import { useState, useRef, useEffect } from 'react';
 
@@ -126,16 +127,14 @@ export function LanguageSwitcher({
           </span>
         )}
         {/* Trigger Button */}
-        <button
-          type="button"
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => setOpen(!open)}
           className={cn(
-            'inline-flex items-center h-9 gap-1.5 px-2.5 rounded-md',
-            'bg-background/80 backdrop-blur-md border border-border/60 shadow-sm',
-            'hover:bg-background hover:shadow-md hover:border-border',
-            'text-foreground',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1',
-            'transition-all duration-200'
+            'gap-1.5 h-9 px-2.5',
+            'bg-background/80 backdrop-blur-md border-border/60 shadow-sm',
+            'hover:bg-background hover:shadow-md hover:border-border'
           )}
           aria-label={t('common.selectLanguage', 'Select language')}
           aria-expanded={open}
@@ -150,7 +149,7 @@ export function LanguageSwitcher({
             aria-hidden="true"
           />
           <span className="sr-only">{currentLang.label}</span>
-        </button>
+        </Button>
         
         {/* Dropdown Menu */}
         {open && (
@@ -169,32 +168,28 @@ export function LanguageSwitcher({
               {languages.map((lang) => {
                 const isActive = lang.code === currentLanguage;
                 return (
-                  <button
+                  <Button
                     key={lang.code}
-                    type="button"
+                    variant="ghost"
                     role="option"
                     aria-selected={isActive}
                     onClick={() => handleLanguageChange(lang.code)}
                     className={cn(
-                      'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg',
-                      'text-sm font-medium text-left',
-                      'transition-colors duration-150',
-                      'hover:bg-muted',
-                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset',
+                      'w-full justify-start gap-3 px-3 py-2.5 h-auto',
                       isActive
-                        ? 'bg-indigo-50 text-indigo-700'
+                        ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-50'
                         : 'text-foreground'
                     )}
                   >
                     <lang.Flag className="w-5 h-4 rounded-sm" aria-hidden="true" />
-                    <span className="flex-1">{lang.label}</span>
+                    <span className="flex-1 text-left">{lang.label}</span>
                     {isActive && (
                       <Check
                         className="h-4 w-4 text-indigo-600 shrink-0"
                         aria-hidden="true"
                       />
                     )}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

@@ -36,6 +36,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
   Drawer,
   DrawerContent,
@@ -274,23 +275,11 @@ const SettingsContent = ({
           >
             {t(SECTION_LABELS[section.id])}
           </Label>
-          <button
+          <Switch
             id={`section-${section.id}`}
-            role="switch"
-            aria-checked={section.visible}
-            onClick={() => toggleSectionVisibility(section.id)}
-            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 ${
-              section.visible
-                ? 'bg-indigo-600 dark:bg-indigo-500'
-                : 'bg-muted'
-            }`}
-          >
-            <span
-              className={`pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out ${
-                section.visible ? 'translate-x-5' : 'translate-x-0'
-              }`}
-            />
-          </button>
+            checked={section.visible}
+            onCheckedChange={() => toggleSectionVisibility(section.id)}
+          />
         </div>
       ))}
     </div>
@@ -1038,20 +1027,21 @@ export function Analitica() {
                     />
                     <div className="absolute right-0 mt-2 w-48 bg-card border rounded-lg shadow-lg z-20">
                       {TIME_RANGE_KEYS.map(option => (
-                        <button
+                        <Button
                           key={option.value}
+                          variant="ghost"
                           onClick={() => {
                             setTimeRange(option.value);
                             setShowRangeDropdown(false);
                           }}
-                          className={`w-full px-4 py-2 text-left text-sm hover:bg-muted first:rounded-t-lg last:rounded-b-lg ${
+                          className={`w-full justify-start px-4 py-2 h-auto text-sm first:rounded-t-lg last:rounded-b-lg rounded-none ${
                             timeRange === option.value
                               ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium'
                               : 'text-foreground'
                           }`}
                         >
                           {t(option.key)}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </>
@@ -1137,10 +1127,11 @@ export function Analitica() {
           {pendingPayments.length > 0 ? (
             <div className="space-y-2">
               {pendingPayments.map(payment => (
-                <button
+                <Button
                   key={payment.id}
+                  variant="ghost"
                   onClick={() => navigate('/dashboard/cobros')}
-                  className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-left"
+                  className="w-full flex items-center justify-between p-3 h-auto text-left"
                 >
                   <div>
                     <p className="text-sm font-medium text-foreground">
@@ -1156,7 +1147,7 @@ export function Analitica() {
                   >
                     {payment.status === PaymentStatus.OVERDUE ? t('analytics.labels.overdue') : t('analytics.labels.pendingStatus')}
                   </Badge>
-                </button>
+                </Button>
               ))}
             </div>
           ) : (
@@ -1194,10 +1185,11 @@ export function Analitica() {
                   {upcomingBirthdays.length > 0 ? (
                     <div className="space-y-2">
                       {upcomingBirthdays.slice(0, 4).map(patient => (
-                        <button
+                        <Button
                           key={patient.id}
+                          variant="ghost"
                           onClick={() => navigate(`/dashboard/pacientes/${patient.id}`)}
-                          className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-left"
+                          className="w-full flex items-center justify-between p-3 h-auto text-left"
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
@@ -1220,7 +1212,7 @@ export function Analitica() {
                           >
                             {formatBirthdayDay(patient.nextBirthday)}
                           </Badge>
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   ) : (
@@ -1316,10 +1308,11 @@ export function Analitica() {
               {upcomingBirthdays.length > 0 ? (
                 <div className="space-y-2">
                   {upcomingBirthdays.map(patient => (
-                    <button
+                    <Button
                       key={patient.id}
+                      variant="ghost"
                       onClick={() => navigate(`/dashboard/pacientes/${patient.id}`)}
-                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-left"
+                      className="w-full flex items-center justify-between p-3 h-auto text-left"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
@@ -1342,7 +1335,7 @@ export function Analitica() {
                       >
                         {formatBirthdayDay(patient.nextBirthday)}
                       </Badge>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               ) : (

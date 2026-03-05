@@ -5,6 +5,8 @@
 
 import { useTranslation } from 'react-i18next';
 import { User, Heart, RefreshCw, Flag, Pencil } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/components/ui/utils';
 import type { Patient } from '@/lib/types/api.types';
 import { getNameInitials } from '@/lib/utils/nameInitials';
 
@@ -88,25 +90,29 @@ export function PatientHeader({
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onEditPatient}
-            className={`p-3 rounded-lg ${isFlagged ? 'hover:bg-red-600' : 'hover:bg-indigo-600'} transition-colors`}
+            className={cn(isFlagged ? 'hover:bg-red-600' : 'hover:bg-indigo-600')}
             title={t('clinicalFile.actions.editPatient')}
             aria-label={t('clinicalFile.actions.editPatient')}
           >
-            <Pencil className={`w-6 h-6 ${isFlagged ? 'text-red-200 hover:text-white' : 'text-indigo-200 hover:text-white'}`} />
-          </button>
-          <button
+            <Pencil className={cn('w-6 h-6', isFlagged ? 'text-red-200' : 'text-indigo-200')} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onToggleFlag}
             disabled={isSavingFlag}
-            className={`p-3 rounded-lg ${isFlagged ? 'hover:bg-red-600' : 'hover:bg-indigo-600'} transition-colors disabled:opacity-50`}
+            className={cn(isFlagged ? 'hover:bg-red-600' : 'hover:bg-indigo-600')}
             title={isFlagged ? t('clinicalFile.actions.removeRisk') : t('clinicalFile.actions.markHighRisk')}
             aria-label={isFlagged ? t('clinicalFile.actions.removeRisk') : t('clinicalFile.actions.markHighRisk')}
           >
             <Flag
-              className={`w-6 h-6 ${isFlagged ? 'fill-yellow-400 text-yellow-400' : 'text-indigo-200'}`}
+              className={cn('w-6 h-6', isFlagged ? 'fill-yellow-400 text-yellow-400' : 'text-indigo-200')}
             />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { FileText, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { NoteList } from '../notes/NoteList';
 import { SkeletonNotes } from '../shared/Skeleton';
 import type { Note } from '@/lib/types/api.types';
@@ -37,13 +38,10 @@ export function SessionNotesSection({
           <FileText className="w-5 h-5 text-indigo-600" />
           {t('clinicalFile.sections.sessionNotes')}
         </h3>
-        <button
-          onClick={onCreateNote}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors"
-        >
+        <Button size="sm" onClick={onCreateNote}>
           <Plus className="w-4 h-4" />
           {t('clinicalFile.newNote')}
-        </button>
+        </Button>
       </div>
       
       {isLoading ? (

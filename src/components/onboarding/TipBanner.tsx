@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { X, Lightbulb, AlertCircle, CheckCircle2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useOnboarding } from '@/lib/hooks/useOnboarding';
 
 interface TipBannerProps {
@@ -106,24 +107,28 @@ export function TipBanner({
 
           {/* Action button */}
           {action && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={action.onClick}
-              className={`mt-2 text-sm font-medium px-3 py-1.5 rounded-md transition-colors ${styles.action}`}
+              className={`mt-2 text-sm font-medium ${styles.action}`}
             >
               {action.label}
-            </button>
+            </Button>
           )}
         </div>
 
         {/* Dismiss button */}
         {dismissible && (
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleDismiss}
-            className={`flex-shrink-0 p-1 rounded-md transition-colors ${styles.dismiss}`}
+            className={`flex-shrink-0 p-1 ${styles.dismiss}`}
             aria-label={t('onboarding.tip.dismiss')}
           >
             <X className="w-4 h-4" />
-          </button>
+          </Button>
         )}
       </div>
     </div>

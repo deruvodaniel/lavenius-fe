@@ -47,7 +47,6 @@ export function SimplePagination({
           size="icon"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="h-8 w-8"
           aria-label={previousPage}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -60,7 +59,6 @@ export function SimplePagination({
           size="icon"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="h-8 w-8"
           aria-label={nextPage}
         >
           <ChevronRight className="h-4 w-4" />

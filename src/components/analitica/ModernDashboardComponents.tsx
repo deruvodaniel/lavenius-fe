@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/components/ui/utils';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { TrendingUp, TrendingDown, Clock } from 'lucide-react';
 
@@ -438,17 +439,17 @@ export function QuickActionsBar({
       )}
     >
       {actions.map(action => (
-        <button
+        <Button
           key={action.id}
+          variant="outline"
           onClick={action.onClick}
           className={cn(
-            'flex items-center justify-center gap-2 rounded-lg border bg-card transition-all duration-200',
+            'flex items-center justify-center gap-2 bg-card',
             isScrolled || isMobile
-              ? 'p-2 sm:p-2.5 flex-col sm:flex-row' 
-              : 'p-3 flex-col sm:flex-row',
+              ? 'p-2 sm:p-2.5 flex-col sm:flex-row h-auto' 
+              : 'p-3 flex-col sm:flex-row h-auto',
             action.hoverBg,
-            action.hoverBorder,
-            'border-border'
+            action.hoverBorder
           )}
         >
           <action.icon className={cn('w-4 h-4 sm:w-5 sm:h-5', action.color)} />
@@ -458,7 +459,7 @@ export function QuickActionsBar({
           )}>
             {(isScrolled || isMobile) && action.shortLabel ? action.shortLabel : action.label}
           </span>
-        </button>
+        </Button>
       ))}
     </div>
   );
@@ -510,12 +511,14 @@ export function TodaySummaryWidget({
           </h3>
         </div>
         {onViewAgenda && (
-          <button
+          <Button
+            variant="link"
+            size="sm"
             onClick={onViewAgenda}
-            className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+            className="text-xs text-indigo-600 dark:text-indigo-400 h-auto p-0"
           >
             {t('dashboard.quickActions.viewAgenda')}
-          </button>
+          </Button>
         )}
       </div>
 

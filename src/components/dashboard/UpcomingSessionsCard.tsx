@@ -5,6 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Clock, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { SkeletonSessionCard } from '../shared/Skeleton';
 import type { SessionUI } from '@/lib/types/session';
 
@@ -53,13 +54,10 @@ export function UpcomingSessionsCard({
         <p className="text-muted-foreground text-sm">{t('clinicalFile.noUpcomingAppointments')}</p>
       )}
       
-      <button
-        onClick={onScheduleClick}
-        className="w-full mt-4 flex items-center justify-center gap-2 bg-indigo-600 text-white py-2.5 rounded-lg hover:bg-indigo-700 transition-colors"
-      >
+      <Button onClick={onScheduleClick} className="w-full mt-4">
         <Plus className="w-4 h-4" />
         {t('clinicalFile.scheduleAppointment')}
-      </button>
+      </Button>
     </div>
   );
 }

@@ -298,14 +298,16 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
                   />
                 </label>
                 {profile.avatarUrl && (
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={removeAvatar}
-                    className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
                     title={t('profile.avatar.removePhoto')}
                     aria-label={t('profile.avatar.removePhoto')}
                   >
                     <X className="w-4 h-4" />
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -510,16 +512,17 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
             <p className="text-sm font-medium text-foreground">{t('profile.dangerZone.deleteAccount')}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{t('profile.dangerZone.deleteAccountDescription')}</p>
           </div>
-          <button
+          <Button
+            variant="outline"
             onClick={() => {
               setDeleteConfirmInput('');
               setShowDeleteDialog(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors flex-shrink-0"
+            className="border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 flex-shrink-0"
           >
             <Trash2 className="w-4 h-4" />
             {t('profile.dangerZone.deleteAccount')}
-          </button>
+          </Button>
         </div>
       </div>
 

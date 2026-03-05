@@ -6,6 +6,7 @@
 import { useTranslation } from 'react-i18next';
 import { FileText, Edit2, Phone, Mail, Calendar, Save, X, MessageCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface ContactInfoCardProps {
   telefono: string;
@@ -44,14 +45,16 @@ export function ContactInfoCard({
           {t('clinicalFile.sections.contactInfo')}
         </h3>
         {!isEditing && (
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onStartEdit}
-            className="p-1 hover:bg-muted rounded transition-colors"
+            className="h-7 w-7"
             title={t('clinicalFile.actions.editInfo')}
             aria-label={t('clinicalFile.actions.editInfo')}
           >
             <Edit2 className="w-4 h-4 text-muted-foreground" />
-          </button>
+          </Button>
         )}
       </div>
       <div className="space-y-4">
@@ -72,14 +75,16 @@ export function ContactInfoCard({
                 <span>{telefono || t('clinicalFile.notRegistered')}</span>
               </div>
               {telefono && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={onSendWhatsApp}
-                  className="p-1.5 text-muted-foreground hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                  className="h-7 w-7 text-muted-foreground hover:text-green-600 hover:bg-green-50"
                   title={t('clinicalFile.actions.sendWhatsApp')}
                   aria-label={t('clinicalFile.actions.sendWhatsApp')}
                 >
                   <MessageCircle className="w-4 h-4" />
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -117,20 +122,21 @@ export function ContactInfoCard({
       
       {isEditing && (
         <div className="flex gap-2 mt-4">
-          <button
+          <Button
             onClick={onSaveEdit}
-            className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition-colors"
+            className="flex-1"
           >
             <Save className="w-4 h-4" />
             <span>{t('common.save')}</span>
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="secondary"
             onClick={onCancelEdit}
-            className="flex-1 flex items-center justify-center gap-2 bg-muted text-foreground py-2 rounded hover:bg-muted/80 transition-colors"
+            className="flex-1"
           >
             <X className="w-4 h-4" />
             <span>{t('common.cancel')}</span>
-          </button>
+          </Button>
         </div>
       )}
     </div>

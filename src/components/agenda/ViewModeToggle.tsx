@@ -4,6 +4,8 @@
  */
 
 import { List, Calendar, LayoutGrid } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/components/ui/utils';
 import type { ViewMode } from '@/lib/hooks/useAgenda';
 
 interface ViewModeToggleProps {
@@ -30,22 +32,23 @@ export function ViewModeToggle({ value, onChange, isMobile, labels }: ViewModeTo
       {options.map((option) => {
         const isActive = value === option.value;
         return (
-          <button
+          <Button
             key={option.value}
+            variant="ghost"
+            size="sm"
             onClick={() => onChange(option.value)}
-            className={`
-              flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all
-              ${isActive
-                ? 'bg-background text-indigo-600 shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-              }
-            `}
+            className={cn(
+              'gap-1.5 h-auto px-3 py-1.5',
+              isActive
+                ? 'bg-background text-indigo-600 shadow-sm hover:bg-background'
+                : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
+            )}
             aria-pressed={isActive}
             aria-label={option.label}
           >
             {option.icon}
             <span className={isMobile ? 'hidden xs:inline' : ''}>{option.label}</span>
-          </button>
+          </Button>
         );
       })}
     </div>

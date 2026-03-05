@@ -9,6 +9,8 @@
     "close": "Fechar",
     "confirm": "Confirmar",
     "back": "Voltar",
+    "goBack": "Voltar",
+    "goToHome": "Ir para o início",
     "next": "Próximo",
     "previous": "Anterior",
     "search": "Pesquisar",
@@ -396,7 +398,9 @@
       "day": "Dia",
       "list": "Lista",
       "allDay": "Dia de Folga",
-      "loadingSessions": "Carregando consultas..."
+      "loadingSessions": "Carregando consultas...",
+      "previousMonth": "Mês anterior",
+      "nextMonth": "Próximo mês"
     },
     "views": {
       "list": "Lista",
@@ -631,13 +635,17 @@
       "actions": "Ações"
     },
     "actions": {
-      "registerPayment": "Registrar pagamento",
-      "viewDetail": "Ver detalhe",
-      "sendReminder": "Enviar lembrete",
-      "markAsCollected": "Marcar como recebido",
+      "collect": "Cobrar",
+      "connectCalendar": "Conectar Google Calendar",
       "deletePayment": "Excluir pagamento",
       "edit": "Editar",
-      "delete": "Excluir"
+      "delete": "Excluir",
+      "markAsCollected": "Marcar como recebido",
+      "registerPayment": "Registrar pagamento",
+      "sendReminder": "Enviar lembrete",
+      "syncCalendar": "Sincronizar Google Calendar",
+      "syncing": "Sincronizando...",
+      "viewDetail": "Ver detalhe"
     }
   },
   "settings": {
@@ -1517,8 +1525,8 @@
       "content": "Conteúdo",
       "date": "Data",
       "session": "Sessão associada"
-      },
-      "messages": {
+    },
+    "messages": {
       "createSuccess": "Anotação criada com sucesso",
       "updateSuccess": "Anotação atualizada com sucesso",
       "deleteSuccess": "Anotação excluída"

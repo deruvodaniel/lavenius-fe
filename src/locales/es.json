@@ -9,6 +9,8 @@
     "close": "Cerrar",
     "confirm": "Confirmar",
     "back": "Volver",
+    "goBack": "Volver atrás",
+    "goToHome": "Ir al inicio",
     "next": "Siguiente",
     "previous": "Anterior",
     "search": "Buscar",
@@ -405,7 +407,9 @@
       "day": "Día",
       "list": "Lista",
       "allDay": "Día Off",
-      "loadingSessions": "Cargando turnos..."
+      "loadingSessions": "Cargando turnos...",
+      "previousMonth": "Mes anterior",
+      "nextMonth": "Mes siguiente"
     },
     "views": {
       "list": "Lista",
@@ -640,13 +644,17 @@
       "actions": "Acciones"
     },
     "actions": {
-      "registerPayment": "Registrar pago",
-      "viewDetail": "Ver detalle",
-      "sendReminder": "Enviar recordatorio",
-      "markAsCollected": "Marcar como cobrado",
+      "collect": "Cobrar",
+      "connectCalendar": "Conectar Google Calendar",
       "deletePayment": "Eliminar pago",
       "edit": "Editar",
-      "delete": "Eliminar"
+      "delete": "Eliminar",
+      "markAsCollected": "Marcar como cobrado",
+      "registerPayment": "Registrar pago",
+      "sendReminder": "Enviar recordatorio",
+      "syncCalendar": "Sincronizar Google Calendar",
+      "syncing": "Sincronizando...",
+      "viewDetail": "Ver detalle"
     }
   },
   "settings": {

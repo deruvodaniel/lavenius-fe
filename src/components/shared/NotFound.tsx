@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { Home, Mail, ArrowLeft, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 
 export function NotFound() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
@@ -31,11 +33,10 @@ export function NotFound() {
 
         {/* Content */}
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
-          Pagina no encontrada
+          {t('errors.pageNotFound.title')}
         </h1>
         <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-          Lo sentimos, la pagina que buscas no existe o fue movida. 
-          Verifica la URL o vuelve al inicio.
+          {t('errors.pageNotFound.description')}
         </p>
 
         {/* Actions */}
@@ -46,14 +47,14 @@ export function NotFound() {
             className="w-full sm:w-auto"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver atras
+            {t('common.goBack')}
           </Button>
           <Button
             onClick={() => navigate('/')}
-            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
+            className="w-full sm:w-auto"
           >
             <Home className="w-4 h-4 mr-2" />
-            Ir al inicio
+            {t('common.goToHome')}
           </Button>
         </div>
 

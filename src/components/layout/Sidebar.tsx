@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { BetaBadge } from '@/components/shared';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/components/ui/utils';
 import { getNameInitials } from '@/lib/utils/nameInitials';
 
@@ -138,9 +139,10 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
           {user && (
             <Popover open={isUserMenuOpen} onOpenChange={setIsUserMenuOpen}>
               <PopoverTrigger asChild>
-                <button
+                <Button
+                  variant="ghost"
                   className={cn(
-                    'w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-800 transition-colors group',
+                    'w-full flex items-center gap-3 px-4 py-3 h-auto hover:bg-indigo-800 group',
                     collapsed && 'justify-center'
                   )}
                   aria-label={t('navigation.userMenu')}
@@ -177,7 +179,7 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
                     'w-4 h-4 text-indigo-400 group-hover:text-indigo-300 transition-colors flex-shrink-0',
                     collapsed && 'hidden'
                   )} />
-                </button>
+                </Button>
               </PopoverTrigger>
 
               <PopoverContent
@@ -210,13 +212,14 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
                 </NavLink>
 
                 <div className="border-t border-border mt-1 pt-1">
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={handleLogoutClick}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 rounded-md hover:bg-red-50 transition-colors"
+                    className="w-full justify-start gap-2 px-3 py-2 h-auto text-red-600 hover:text-red-600 hover:bg-red-50"
                   >
                     <LogOut className="w-4 h-4" />
                     {t('navigation.logout')}
-                  </button>
+                  </Button>
                 </div>
               </PopoverContent>
             </Popover>

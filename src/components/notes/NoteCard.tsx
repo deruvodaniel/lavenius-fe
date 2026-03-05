@@ -54,9 +54,9 @@ export function NoteCard({ note, onEdit, onDelete, readOnly = false }: NoteCardP
               {onEdit && (
                 <Button
                   variant="ghost"
-                  size="sm"
+                  size="icon"
                   onClick={handleEdit}
-                  className="h-7 w-7 p-0"
+                  className="h-7 w-7"
                   aria-label={t('notes.card.editNote')}
                 >
                   <Edit className="w-3.5 h-3.5" />
@@ -65,9 +65,9 @@ export function NoteCard({ note, onEdit, onDelete, readOnly = false }: NoteCardP
               {onDelete && (
                 <Button
                   variant="ghost"
-                  size="sm"
+                  size="icon"
                   onClick={handleDelete}
-                  className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+                  className="h-7 w-7 text-destructive hover:text-destructive"
                   aria-label={t('notes.card.deleteNote')}
                 >
                   <Trash2 className="w-3.5 h-3.5" />

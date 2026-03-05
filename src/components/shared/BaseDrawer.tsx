@@ -1,6 +1,7 @@
 import { ReactNode, useEffect } from 'react';
 import { X, LucideIcon } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
+import { Button } from '@/components/ui/button';
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap';
 
 // ============================================================================
@@ -86,19 +87,20 @@ function DrawerHeader({
           </div>
         </div>
         {showCloseButton && (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
             disabled={disableClose}
             className={cn(
-              'text-indigo-200 hover:text-white transition-colors',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-700 rounded',
+              'text-indigo-200 hover:text-white hover:bg-white/10 transition-colors',
+              'focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-700',
               disableClose && 'opacity-50 cursor-not-allowed'
             )}
             aria-label={closeLabel}
           >
             <X className="w-6 h-6" />
-          </button>
+          </Button>
         )}
       </div>
     </div>

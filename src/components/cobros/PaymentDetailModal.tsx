@@ -140,13 +140,15 @@ function PaymentDetailContent({
               <p className="text-indigo-200 text-sm">{formatShortDate(payment.paymentDate)}</p>
             </div>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="text-indigo-200 hover:text-white transition-colors p-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="text-indigo-200 hover:text-white"
             aria-label={t('common.close')}
           >
             <X className="w-6 h-6" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -204,8 +206,8 @@ function PaymentDetailContent({
             {t('payments.actions.edit')}
           </Button>
           <Button
-            variant="outline"
-            className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+            variant="destructive"
+            className="flex-1"
             onClick={onDelete}
           >
             <Trash2 className="w-4 h-4 mr-2" />

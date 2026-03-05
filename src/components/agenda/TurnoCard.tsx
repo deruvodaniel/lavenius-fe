@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { SESSION_STATUS_BORDER_CLASSES } from '@/lib/constants/sessionColors';
 import type { SessionResponse, SessionStatus } from '@/lib/types/session';
 import { getNameInitials } from '@/lib/utils/nameInitials';
@@ -114,9 +115,10 @@ export function TurnoCard({
         </div>
 
         {/* Avatar + Name (clickable) */}
-        <button
+        <Button
+          variant="ghost"
           onClick={() => patient && onPatientClick(patient.id)}
-          className="flex items-center gap-2 min-w-0 flex-1 text-left hover:bg-muted rounded-lg p-1 -m-1 transition-colors group"
+          className="flex items-center gap-2 min-w-0 flex-1 text-left h-auto p-1 justify-start group"
           disabled={!patient}
         >
           <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-200 transition-colors">
@@ -138,7 +140,7 @@ export function TurnoCard({
               </div>
             )}
           </div>
-        </button>
+        </Button>
 
         {/* Indicators */}
         <div className="flex items-center gap-1.5">
@@ -171,12 +173,14 @@ export function TurnoCard({
         {/* Actions Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button 
-              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer"
+            <Button 
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
               aria-label={t('agenda.card.actions')}
             >
               <MoreVertical className="w-4 h-4" />
-            </button>
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48 bg-card border border-border shadow-lg">
             <DropdownMenuItem 

@@ -201,8 +201,8 @@ const CobroCard = ({ item, onMarkAsPaid, onReminder, onDelete, onViewDetail, onR
         {!item.isVirtual && onDelete && (
           <Button 
             size="sm" 
-            variant="outline" 
-            className={`text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 ${isPaid ? 'flex-1' : ''}`}
+            variant="destructive"
+            className={isPaid ? 'flex-1' : ''}
             onClick={onDelete}
           >
             <Trash2 className="h-4 w-4" />
@@ -297,8 +297,8 @@ const PaymentCard = ({ payment, onMarkAsPaid, onReminder, onDelete, onViewDetail
         {onDelete && (
           <Button 
             size="sm" 
-            variant="outline" 
-            className={`text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 ${isPaid ? 'flex-1' : ''}`}
+            variant="destructive"
+            className={isPaid ? 'flex-1' : ''}
             onClick={onDelete}
           >
             <Trash2 className="h-4 w-4" />
@@ -713,13 +713,10 @@ export function Cobros() {
             {t('payments.managePayments')}
           </p>
         </div>
-        <button
-          onClick={handleCreatePayment}
-          className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors w-full sm:w-auto"
-        >
+        <Button onClick={handleCreatePayment} className="w-full sm:w-auto">
           <Plus className="w-4 h-4" />
           {t('payments.registerPayment')}
-        </button>
+        </Button>
       </div>
 
       {/* Date Filters */}

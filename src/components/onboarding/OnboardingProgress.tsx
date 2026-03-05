@@ -5,14 +5,15 @@ interface OnboardingProgressProps {
 
 /**
  * Indicador de progreso del onboarding (dots)
+ * Note: These are visual indicators, not interactive buttons
  */
 export function OnboardingProgress({ currentStep, totalSteps }: OnboardingProgressProps) {
   return (
     <div className="flex items-center justify-center gap-2">
       {Array.from({ length: totalSteps }, (_, index) => (
-        <button
+        <span
           key={index}
-          type="button"
+          role="presentation"
           className={`
             w-2 h-2 rounded-full transition-all duration-300
             ${index === currentStep 

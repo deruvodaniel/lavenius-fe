@@ -90,16 +90,18 @@ export function OnboardingModal({
             <div className="space-y-3">
               <Button
                 onClick={handleConnectCalendar}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                className="w-full"
               >
                 {t('onboarding.calendar.connect')}
               </Button>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleNext}
-                className="w-full text-sm text-muted-foreground hover:text-foreground py-2"
+                className="w-full text-sm text-muted-foreground hover:text-foreground"
               >
                 {t('onboarding.calendar.later')}
-              </button>
+              </Button>
             </div>
           </OnboardingStep>
         );
@@ -114,16 +116,18 @@ export function OnboardingModal({
             <div className="space-y-3">
               <Button
                 onClick={handleCreatePatient}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                className="w-full"
               >
                 {t('onboarding.patient.create')}
               </Button>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleNext}
-                className="w-full text-sm text-muted-foreground hover:text-foreground py-2"
+                className="w-full text-sm text-muted-foreground hover:text-foreground"
               >
                 {t('onboarding.patient.later')}
-              </button>
+              </Button>
             </div>
           </OnboardingStep>
         );
@@ -156,13 +160,15 @@ export function OnboardingModal({
         className="w-[calc(100%-1rem)] sm:max-w-md !bg-card p-0 gap-0 overflow-hidden flex flex-col max-h-[calc(100dvh-1rem)] sm:max-h-[90vh]"
       >
         {/* Close button */}
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={handleSkip}
-          className="absolute right-4 top-4 p-1 rounded-full hover:bg-muted transition-colors z-10"
+          className="absolute right-4 top-4 z-10"
           aria-label={t('onboarding.navigation.close')}
         >
           <X className="w-5 h-5 text-muted-foreground" />
-        </button>
+        </Button>
 
         {/* Content */}
         <div className="pt-7 sm:pt-8 pb-3 sm:pb-4 overflow-y-auto min-h-0">
@@ -175,13 +181,15 @@ export function OnboardingModal({
             {/* Back button */}
             <div className="w-20 sm:w-24">
               {currentStep > 0 && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={handlePrev}
-                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground px-0"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   {t('onboarding.navigation.back')}
-                </button>
+                </Button>
               )}
             </div>
 
@@ -194,13 +202,15 @@ export function OnboardingModal({
             {/* Next/Finish button */}
             <div className="w-20 sm:w-24 flex justify-end">
               {currentStep < totalSteps - 1 ? (
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={handleNext}
-                  className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
+                  className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 font-medium px-0"
                 >
                   {t('onboarding.navigation.next')}
                   <ChevronRight className="w-4 h-4" />
-                </button>
+                </Button>
               ) : (
                 <Button
                   onClick={handleComplete}

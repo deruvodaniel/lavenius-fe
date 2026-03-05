@@ -516,11 +516,7 @@ export const PaymentDrawer = ({
             <Button
               type="submit"
               disabled={!isFormValid || isLoading || isSaving}
-              className={`flex-1 ${
-                isFormValid && !isLoading && !isSaving
-                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  : 'bg-muted text-muted-foreground cursor-not-allowed'
-              }`}
+              className="flex-1"
             >
               {isSaving 
                 ? t('payments.drawer.saving')

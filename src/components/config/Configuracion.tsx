@@ -652,28 +652,29 @@ export function Configuracion() {
               const Icon = section.icon;
               const isActive = activeSection === section.id;
               return (
-                <button
-                  key={section.id}
-                  type="button"
-                  onClick={() => setActiveSection(section.id)}
-                  className={cn(
-                    "flex flex-col items-center gap-1 px-1 py-3 text-xs font-medium transition-all relative",
-                    isActive
-                      ? "text-indigo-600"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  <Icon className={cn(
-                    "w-5 h-5",
-                    isActive ? "text-indigo-600" : "text-muted-foreground"
-                  )} />
-                  <span className="truncate w-full text-center">{t(section.labelKey)}</span>
-                  {isActive && (
-                    <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-indigo-600 rounded-full" />
-                  )}
-                </button>
-              );
+                                <Button
+                                  key={section.id}
+                                  variant="ghost"
+                                  type="button"
+                                  onClick={() => setActiveSection(section.id)}
+                                  className={cn(
+                                    "flex flex-col items-center gap-1 px-1 py-3 h-auto text-xs font-medium transition-all relative rounded-none",
+                                    isActive
+                                      ? "text-indigo-600"
+                                      : "text-muted-foreground hover:text-foreground"
+                                  )}
+                                  aria-current={isActive ? "page" : undefined}
+                                >
+                                  <Icon className={cn(
+                                    "w-5 h-5",
+                                    isActive ? "text-indigo-600" : "text-muted-foreground"
+                                  )} />
+                                  <span className="truncate w-full text-center">{t(section.labelKey)}</span>
+                                  {isActive && (
+                                    <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-indigo-600 rounded-full" />
+                                  )}
+                                </Button>
+                              );
             })}
           </div>
 
@@ -683,12 +684,13 @@ export function Configuracion() {
               const Icon = section.icon;
               const isActive = activeSection === section.id;
               return (
-                <button
+                <Button
                   key={section.id}
+                  variant="ghost"
                   type="button"
                   onClick={() => setActiveSection(section.id)}
                   className={cn(
-                    "flex items-center gap-2.5 px-3 py-2 text-sm transition-colors w-full text-left border-l-2",
+                    "flex items-center gap-2.5 px-3 py-2 h-auto text-sm transition-colors w-full text-left justify-start border-l-2 rounded-none",
                     isActive
                       ? "border-indigo-600 text-indigo-700 font-medium"
                       : "border-transparent text-muted-foreground font-normal hover:text-foreground hover:border-border"
@@ -700,7 +702,7 @@ export function Configuracion() {
                     isActive ? "text-indigo-600" : "text-muted-foreground"
                   )} />
                   <span>{t(section.labelKey)}</span>
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -763,21 +765,20 @@ export function Configuracion() {
                   ].map(({ value, labelKey }) => {
                     const isSelected = localSettings.defaultSessionDuration === value;
                     return (
-                      <button
+                      <Button
                         key={value}
+                        variant={isSelected ? 'default' : 'outline'}
                         type="button"
                         role="radio"
                         aria-checked={isSelected}
                         onClick={() => updateLocalSetting('defaultSessionDuration', value)}
                         className={cn(
-                          "px-4 py-2 rounded-lg text-sm font-medium transition-all border",
-                          isSelected
-                            ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
-                            : "bg-card text-foreground border-border hover:border-indigo-300 hover:bg-indigo-50"
+                          "px-4 py-2",
+                          isSelected && "bg-indigo-600 hover:bg-indigo-700"
                         )}
                       >
                         {t(labelKey)}
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -1000,8 +1001,10 @@ export function Configuracion() {
                     {WEEKDAY_KEYS.map((day) => {
                       const isSelected = localSettings.workingHours.workingDays.includes(day.id);
                       return (
-                        <button
+                        <Button
                           key={day.id}
+                          variant={isSelected ? 'default' : 'secondary'}
+                          size="icon"
                           type="button"
                           onClick={() => {
                             const newDays = isSelected
@@ -1012,19 +1015,16 @@ export function Configuracion() {
                               workingDays: newDays,
                             });
                           }}
-                          className={`
-                            w-9 h-9 rounded-full text-xs font-medium transition-all
-                            ${isSelected
-                              ? 'bg-indigo-600 text-white shadow-sm'
-                              : 'bg-muted text-muted-foreground hover:bg-muted'
-                            }
-                          `}
+                          className={cn(
+                            "w-9 h-9 rounded-full text-xs",
+                            isSelected && "bg-indigo-600 hover:bg-indigo-700"
+                          )}
                           title={t(day.nameKey)}
                           aria-label={t(day.nameKey)}
                           aria-pressed={isSelected}
                         >
                           {t(day.shortKey)}
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
@@ -1073,10 +1073,12 @@ export function Configuracion() {
                                 </div>
                               </div>
                             </div>
-                            <button
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               onClick={() => handleRemoveDiaOff(dia.id)}
                               disabled={deletingDayOffId === dia.id}
-                              className="p-1.5 text-muted-foreground hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="h-7 w-7 text-muted-foreground hover:text-red-600 hover:bg-red-100 opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
                               title={t('common.delete')}
                               aria-label={t('common.delete')}
                             >
@@ -1085,7 +1087,7 @@ export function Configuracion() {
                               ) : (
                                 <X className="w-4 h-4" />
                               )}
-                            </button>
+                            </Button>
                           </div>
                         ))}
                       </div>
@@ -1143,23 +1145,21 @@ export function Configuracion() {
                       <legend className="block text-xs font-medium text-foreground mb-2">{t('settings.daysOff.blockType')}</legend>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="radiogroup" aria-label={t('settings.daysOff.blockType')}>
                         {DIA_OFF_TIPO_KEYS.map((tipo) => (
-                          <button
+                          <Button
                             key={tipo.value}
+                            variant="outline"
                             type="button"
                             onClick={() => setNewDiaOff({ ...newDiaOff, tipo: tipo.value })}
-                            className={`
-                              p-2 rounded-lg border text-left transition-all
-                              ${newDiaOff.tipo === tipo.value
-                                ? 'border-rose-500 bg-rose-50 ring-1 ring-rose-500'
-                                : 'border-border hover:border-border hover:bg-muted'
-                              }
-                            `}
+                            className={cn(
+                              "p-2 h-auto flex-col items-start text-left",
+                              newDiaOff.tipo === tipo.value && "border-rose-500 bg-rose-50 ring-1 ring-rose-500"
+                            )}
                           >
-                            <p className={`text-sm font-medium ${newDiaOff.tipo === tipo.value ? 'text-rose-700' : 'text-foreground'}`}>
+                            <p className={cn("text-sm font-medium", newDiaOff.tipo === tipo.value ? "text-rose-700" : "text-foreground")}>
                               {t(tipo.labelKey)}
                             </p>
-                            <p className="text-xs text-muted-foreground">{tipo.descriptionKey.startsWith('settings.') ? t(tipo.descriptionKey) : tipo.descriptionKey}</p>
-                          </button>
+                            <p className="text-xs text-muted-foreground font-normal">{tipo.descriptionKey.startsWith('settings.') ? t(tipo.descriptionKey) : tipo.descriptionKey}</p>
+                          </Button>
                         ))}
                       </div>
                     </fieldset>

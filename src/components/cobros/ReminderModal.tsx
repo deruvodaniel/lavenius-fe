@@ -179,13 +179,14 @@ export function ReminderModal({ payment, onClose }: ReminderModalProps) {
           <h3 id="reminder-modal-title" className="text-base sm:text-lg font-semibold text-foreground">
             {t('payments.reminderModal.title')}
           </h3>
-          <button
-            className="text-muted-foreground hover:text-foreground p-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
             aria-label={t('common.close')}
           >
             <X className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
         {messageField}
         {phoneStatus}

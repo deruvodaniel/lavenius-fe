@@ -106,13 +106,15 @@ function NavBar() {
           {/* Navigation Links - Hidden on mobile */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
-              <button
+              <Button
                 key={link.key}
+                variant="ghost"
+                size="sm"
                 onClick={() => scrollToSection(link.sectionId)}
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-lg transition-colors"
+                className="text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
               >
                 {t(`landing.nav.${link.key}`)}
-              </button>
+              </Button>
             ))}
           </div>
           
@@ -166,13 +168,15 @@ function NavBar() {
             </SignedIn>
             
             {/* Mobile menu button - Always at the end */}
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+              className="md:hidden text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50"
               aria-label="Toggle menu"
             >
               <Menu className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
         </div>
         
@@ -181,13 +185,14 @@ function NavBar() {
           <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
-                <button
+                <Button
                   key={link.key}
+                  variant="ghost"
                   onClick={() => scrollToSection(link.sectionId)}
-                  className="px-4 py-3 text-left text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                  className="justify-start px-4 py-3 h-auto text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50"
                 >
                   {t(`landing.nav.${link.key}`)}
-                </button>
+                </Button>
               ))}
               <div className="pt-2 border-t border-border mt-2">
                 <div className="px-4 py-2">
@@ -195,9 +200,12 @@ function NavBar() {
                 </div>
                 <SignedOut>
                   <SignInButton mode="modal">
-                    <button className="w-full px-4 py-3 text-left text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start px-4 py-3 h-auto text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50"
+                    >
                       {t('landing.cta.login')}
-                    </button>
+                    </Button>
                   </SignInButton>
                 </SignedOut>
               </div>

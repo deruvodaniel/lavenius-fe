@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, lazy, Suspense } from 'react';
 import { ChevronLeft, ChevronRight, LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/components/ui/utils';
 
@@ -192,33 +193,35 @@ export function SwipeableCards({ children, peek = false }: SwipeableCardsProps) 
       </div>
 
       {/* Navigation Arrows (visible on touch devices with enough space) */}
-      <button
+      <Button
+        variant="outline"
+        size="icon"
         onClick={goToPrevious}
         disabled={currentIndex === 0}
         className={cn(
           'absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 z-10',
-          'w-8 h-8 rounded-full bg-background shadow-md flex items-center justify-center',
-          'transition-opacity',
+          'w-8 h-8 rounded-full shadow-md',
           currentIndex === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'
         )}
         aria-label="Previous card"
       >
         <ChevronLeft className="w-5 h-5 text-muted-foreground" />
-      </button>
+      </Button>
       
-      <button
+      <Button
+        variant="outline"
+        size="icon"
         onClick={goToNext}
         disabled={currentIndex === totalCards - 1}
         className={cn(
           'absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 z-10',
-          'w-8 h-8 rounded-full bg-background shadow-md flex items-center justify-center',
-          'transition-opacity',
+          'w-8 h-8 rounded-full shadow-md',
           currentIndex === totalCards - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'
         )}
         aria-label="Next card"
       >
         <ChevronRight className="w-5 h-5 text-muted-foreground" />
-      </button>
+      </Button>
 
       {/* Dots Indicator */}
       <div className="flex justify-center gap-2 mt-4">

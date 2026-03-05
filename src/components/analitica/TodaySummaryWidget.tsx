@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Calendar, DollarSign, Users, TrendingUp } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
+import { Button } from '@/components/ui/button';
 
 interface TodaySummaryWidgetProps {
   /** Number of sessions completed today */
@@ -65,13 +66,12 @@ export function TodaySummaryWidget({
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {/* Sessions Metric */}
-        <button
+        <Button
+          variant="ghost"
           onClick={onSessionsClick}
           className={cn(
-            'flex items-center gap-3 p-2 rounded-lg',
+            'flex items-center gap-3 p-2 h-auto justify-start',
             'hover:bg-white/60 dark:hover:bg-gray-800/60',
-            'transition-all duration-150',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
             onSessionsClick && 'cursor-pointer'
           )}
           disabled={!onSessionsClick}
@@ -119,16 +119,15 @@ export function TodaySummaryWidget({
               </span>
             </p>
           </div>
-        </button>
+        </Button>
 
         {/* Income Metric */}
-        <button
+        <Button
+          variant="ghost"
           onClick={onIncomeClick}
           className={cn(
-            'flex items-center gap-3 p-2 rounded-lg',
+            'flex items-center gap-3 p-2 h-auto justify-start',
             'hover:bg-white/60 dark:hover:bg-gray-800/60',
-            'transition-all duration-150',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
             onIncomeClick && 'cursor-pointer'
           )}
           disabled={!onIncomeClick}
@@ -144,17 +143,16 @@ export function TodaySummaryWidget({
               {formatCurrency(incomeToday)}
             </p>
           </div>
-        </button>
+        </Button>
 
         {/* Active Patients (optional) */}
         {activePatients !== undefined && (
-          <button
+          <Button
+            variant="ghost"
             onClick={onPatientsClick}
             className={cn(
-              'flex items-center gap-3 p-2 rounded-lg',
+              'flex items-center gap-3 p-2 h-auto justify-start',
               'hover:bg-white/60 dark:hover:bg-gray-800/60',
-              'transition-all duration-150',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
               onPatientsClick && 'cursor-pointer',
               'hidden sm:flex'
             )}
@@ -171,7 +169,7 @@ export function TodaySummaryWidget({
                 {activePatients}
               </p>
             </div>
-          </button>
+          </Button>
         )}
 
         {/* Quick Status Indicator */}

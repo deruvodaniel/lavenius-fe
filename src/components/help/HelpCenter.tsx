@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 // ============================================================================
 // TYPES
@@ -219,11 +220,12 @@ const CategoryCard = ({ category, onClick }: CategoryCardProps) => {
   const articleCount = category.articles.length;
   
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={onClick}
-      className="w-full text-left p-4 bg-card rounded-lg border border-border hover:border-indigo-300 hover:shadow-md transition-all group"
+      className="w-full h-auto text-left p-4 bg-card rounded-lg border border-border hover:border-indigo-300 hover:shadow-md hover:bg-card transition-all group justify-start"
     >
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-4 w-full">
         <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-200 transition-colors">
           <Icon className="w-5 h-5 text-indigo-600" />
         </div>
@@ -240,7 +242,7 @@ const CategoryCard = ({ category, onClick }: CategoryCardProps) => {
         </div>
         <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-indigo-600 transition-colors flex-shrink-0" />
       </div>
-    </button>
+    </Button>
   );
 };
 
@@ -256,14 +258,16 @@ const ArticleList = ({ category, onBack, onSelectArticle }: ArticleListProps) =>
   
   return (
     <div className="space-y-4">
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={onBack}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-indigo-600 transition-colors"
+        className="pl-0 gap-2 text-muted-foreground hover:text-indigo-600"
       >
         <ArrowLeft className="w-4 h-4" />
         {t('help.backToCategories')}
-      </button>
-      
+      </Button>
+
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
           <Icon className="w-5 h-5 text-indigo-600" />
@@ -273,17 +277,18 @@ const ArticleList = ({ category, onBack, onSelectArticle }: ArticleListProps) =>
       
       <div className="space-y-2">
         {category.articles.map((article) => (
-          <button
+          <Button
             key={article.id}
+            variant="ghost"
             onClick={() => onSelectArticle(article)}
-            className="w-full text-left p-3 bg-card rounded-lg border border-border hover:border-indigo-300 hover:bg-indigo-50 transition-all group flex items-center gap-3"
+            className="w-full h-auto text-left p-3 bg-card rounded-lg border border-border hover:border-indigo-300 hover:bg-indigo-50 transition-all group flex items-center gap-3 justify-start"
           >
             <FileText className="w-4 h-4 text-muted-foreground group-hover:text-indigo-600 transition-colors flex-shrink-0" />
             <span className="text-foreground group-hover:text-indigo-600 transition-colors">
               {t(article.titleKey)}
             </span>
             <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-indigo-600 transition-colors ml-auto flex-shrink-0" />
-          </button>
+          </Button>
         ))}
       </div>
     </div>
@@ -303,13 +308,15 @@ const ArticleView = ({ article, categoryTitleKey, onBack }: ArticleViewProps) =>
   
   return (
     <div className="space-y-4">
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={onBack}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-indigo-600 transition-colors"
+        className="pl-0 gap-2 text-muted-foreground hover:text-indigo-600"
       >
         <ArrowLeft className="w-4 h-4" />
         {t('help.backTo', { category: t(categoryTitleKey) })}
-      </button>
+      </Button>
       
       <div className="bg-card rounded-lg border border-border p-6">
         <h2 className="text-xl font-semibold text-foreground mb-4">{t(article.titleKey)}</h2>
@@ -430,14 +437,15 @@ export function HelpCenter() {
         {searchResults.length > 0 && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-10 max-h-80 overflow-y-auto">
             {searchResults.map((result) => (
-              <button
+              <Button
                 key={`${result.category.id}-${result.id}`}
+                variant="ghost"
                 onClick={() => handleSelectSearchResult(result)}
-                className="w-full text-left p-3 hover:bg-muted border-b border-border last:border-0"
+                className="w-full h-auto text-left p-3 hover:bg-muted border-b border-border last:border-0 rounded-none flex flex-col items-start"
               >
                 <p className="font-medium text-foreground text-sm">{t(result.titleKey)}</p>
                 <p className="text-xs text-muted-foreground">{t(result.categoryTitleKey)}</p>
-              </button>
+              </Button>
             ))}
           </div>
         )}

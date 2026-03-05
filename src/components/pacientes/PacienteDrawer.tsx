@@ -579,11 +579,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
         </Button>
         <Button
           onClick={handleSave}
-          className={`flex-1 ${
-            isFormValid
-              ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-              : 'bg-muted text-muted-foreground cursor-not-allowed'
-          }`}
+          className="flex-1"
           disabled={!isFormValid}
         >
           {patient ? t('patients.drawer.buttons.update') : t('patients.drawer.buttons.create')}

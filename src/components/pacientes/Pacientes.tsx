@@ -419,13 +419,13 @@ export function Pacientes() {
               : ` ${t(filteredPacientes.length !== 1 ? 'patients.registered_plural' : 'patients.registered')}`}
           </p>
         </div>
-        <button
+        <Button
           onClick={handleNuevoPaciente}
-          className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors w-full sm:w-auto"
+          className="w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           {t('patients.newPatient')}
-        </button>
+        </Button>
       </div>
 
       {/* Search + Filters */}
@@ -443,12 +443,14 @@ export function Pacientes() {
                 className="pl-9 pr-9"
               />
               {searchTerm && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
                 >
                   <X className="h-4 w-4" />
-                </button>
+                </Button>
               )}
             </div>
             <Button
@@ -564,12 +566,14 @@ export function Pacientes() {
                 className="pl-9 pr-9"
               />
               {searchTerm && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
                 >
                   <X className="h-4 w-4" />
-                </button>
+                </Button>
               )}
             </div>
 
@@ -589,28 +593,24 @@ export function Pacientes() {
 
             {/* View toggle */}
             <div className="inline-flex items-center bg-muted rounded-lg p-1">
-              <button
+              <Button
+                variant={viewMode === 'cards' ? 'secondary' : 'ghost'}
+                size="sm"
                 onClick={() => setViewMode('cards')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                  viewMode === 'cards'
-                    ? 'bg-background text-indigo-600 shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                className={viewMode === 'cards' ? 'text-indigo-600 shadow-sm' : 'text-muted-foreground'}
               >
                 <LayoutGrid className="w-4 h-4" />
                 <span>{t('patients.view.cards')}</span>
-              </button>
-              <button
+              </Button>
+              <Button
+                variant={viewMode === 'table' ? 'secondary' : 'ghost'}
+                size="sm"
                 onClick={() => setViewMode('table')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                  viewMode === 'table'
-                    ? 'bg-background text-indigo-600 shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                className={viewMode === 'table' ? 'text-indigo-600 shadow-sm' : 'text-muted-foreground'}
               >
                 <List className="w-4 h-4" />
                 <span>{t('patients.view.table')}</span>
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -776,31 +776,35 @@ export function Pacientes() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={(e) => {
                               e.stopPropagation();
                               setEditingPatient(patient || null);
                               setPacienteDrawerOpen(true);
                             }}
-                            className="p-2 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                            className="h-8 w-8 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50"
                             title={t('patients.actions.editPatient')}
                             aria-label={t('patients.actions.editPatient')}
                           >
                             <Edit2 className="w-4 h-4" />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={(e) => {
                               e.stopPropagation();
                               if (patient) {
                                 handleDeletePaciente(patient.id, paciente.nombre);
                               }
                             }}
-                            className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="h-8 w-8 text-muted-foreground hover:text-red-600 hover:bg-red-50"
                             title={t('patients.actions.deletePatient')}
                             aria-label={t('patients.actions.deletePatient')}
                           >
                             <Trash2 className="w-4 h-4" />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -838,31 +842,35 @@ export function Pacientes() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={(e) => {
                       e.stopPropagation();
                       setEditingPatient(patient || null);
                       setPacienteDrawerOpen(true);
                     }}
-                    className="p-2 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                    className="h-8 w-8 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50"
                     title={t('patients.actions.editPatient')}
                     aria-label={t('patients.actions.editPatient')}
                   >
                     <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (patient) {
                         handleDeletePaciente(patient.id, paciente.nombre);
                       }
                     }}
-                    className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="h-8 w-8 text-muted-foreground hover:text-red-600 hover:bg-red-50"
                     title={t('patients.actions.deletePatient')}
                     aria-label={t('patients.actions.deletePatient')}
                   >
                     <Trash2 className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
 

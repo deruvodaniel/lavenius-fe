@@ -1,6 +1,7 @@
 import { useState, ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/components/ui/utils';
 
@@ -54,12 +55,11 @@ export function CollapsibleSection({
         )}
       >
         <CollapsibleTrigger asChild>
-          <button
+          <Button
+            variant="ghost"
             className={cn(
-              'w-full p-4 flex items-center justify-between',
+              'w-full p-4 h-auto flex items-center justify-between',
               'hover:bg-muted',
-              'transition-colors duration-150',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset',
               'rounded-t-lg',
               !isOpen && 'rounded-b-lg'
             )}
@@ -77,7 +77,7 @@ export function CollapsibleSection({
                 isOpen && 'rotate-180'
               )}
             />
-          </button>
+          </Button>
         </CollapsibleTrigger>
 
         <CollapsibleContent

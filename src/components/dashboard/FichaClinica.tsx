@@ -14,6 +14,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { TurnoDrawer } from '../agenda';
 import { NoteDrawer } from '../notes/NoteDrawer';
@@ -252,13 +253,14 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
       {/* Back Button */}
-      <button
+      <Button
+        variant="ghost"
         onClick={() => onBack ? onBack() : navigate(-1)}
-        className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 mb-6 transition-colors"
+        className="pl-0 gap-2 text-indigo-600 hover:text-indigo-700 mb-6"
       >
         <ArrowLeft className="w-5 h-5" />
         <span>{t('common.back')}</span>
-      </button>
+      </Button>
 
       {/* Patient Header */}
       <PatientHeader

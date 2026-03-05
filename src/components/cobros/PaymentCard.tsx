@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatDate, formatCurrency } from '@/lib/utils/dateFormatters';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -16,6 +17,7 @@ interface PaymentCardProps {
 }
 
 export const PaymentCard = ({ payment, onMarkAsPaid, onDelete }: PaymentCardProps) => {
+  const { t } = useTranslation();
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const handleDelete = () => {
@@ -35,19 +37,19 @@ export const PaymentCard = ({ payment, onMarkAsPaid, onDelete }: PaymentCardProp
     const config = {
       [PaymentStatus.PAID]: {
         variant: 'default' as const,
-        label: 'Pagado',
+        label: t('payments.paid'),
         icon: CheckCircle,
         className: 'bg-green-100 text-green-700 hover:bg-green-100',
       },
       [PaymentStatus.PENDING]: {
         variant: 'secondary' as const,
-        label: 'Pendiente',
+        label: t('payments.pending'),
         icon: Clock,
         className: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-100',
       },
       [PaymentStatus.OVERDUE]: {
         variant: 'destructive' as const,
-        label: 'Vencido',
+        label: t('payments.overdue'),
         icon: AlertTriangle,
         className: '',
       },
@@ -116,19 +118,19 @@ export const PaymentCard = ({ payment, onMarkAsPaid, onDelete }: PaymentCardProp
                 variant="outline"
                 size="sm"
                 onClick={handleMarkAsPaid}
-                title="Marcar como pagado"
+                title={t('payments.actions.markAsCollected')}
                 className="text-green-600 border-green-600 hover:bg-green-50"
               >
                 <CheckCircle className="h-4 w-4 mr-1" />
-                Cobrar
+                {t('payments.actions.collect')}
               </Button>
             )}
             <Button
               variant="ghost"
               size="icon"
               onClick={handleDelete}
-              title="Eliminar pago"
-              aria-label="Eliminar pago"
+              title={t('common.delete')}
+              aria-label={t('common.delete')}
               className="text-destructive hover:text-destructive"
             >
               <Trash2 className="h-4 w-4" />

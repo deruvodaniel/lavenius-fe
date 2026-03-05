@@ -1,4 +1,5 @@
 import { AlertTriangle, Info, HelpCircle, Trash2, LucideIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useResponsive } from '@/lib/hooks';
 import { Button } from '@/components/ui/button';
 import {
@@ -41,31 +42,34 @@ const variantConfig: Record<ConfirmDialogVariant, {
   icon: typeof AlertTriangle;
   iconBg: string;
   iconColor: string;
-  confirmButton: string;
+  buttonVariant: 'default' | 'destructive';
+  buttonClassName?: string;
 }> = {
   danger: {
     icon: Trash2,
     iconBg: 'bg-red-100',
     iconColor: 'text-red-600',
-    confirmButton: 'bg-red-600 hover:bg-red-700 text-white',
+    buttonVariant: 'destructive',
   },
   warning: {
     icon: AlertTriangle,
     iconBg: 'bg-amber-100',
     iconColor: 'text-amber-600',
-    confirmButton: 'bg-amber-600 hover:bg-amber-700 text-white',
+    buttonVariant: 'default',
+    buttonClassName: 'bg-amber-600 hover:bg-amber-700 text-white',
   },
   info: {
     icon: Info,
     iconBg: 'bg-blue-100',
     iconColor: 'text-blue-600',
-    confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white',
+    buttonVariant: 'default',
+    buttonClassName: 'bg-blue-600 hover:bg-blue-700 text-white',
   },
   default: {
     icon: HelpCircle,
     iconBg: 'bg-indigo-100',
     iconColor: 'text-indigo-600',
-    confirmButton: 'bg-indigo-600 hover:bg-indigo-700 text-white',
+    buttonVariant: 'default',
   },
 };
 
@@ -87,6 +91,7 @@ export function ConfirmDialog({
   isLoading = false,
   icon,
 }: ConfirmDialogProps) {
+  const { t } = useTranslation();
   const { isMobile } = useResponsive();
   const config = variantConfig[variant];
   const Icon = icon || config.icon;
@@ -128,11 +133,12 @@ export function ConfirmDialog({
               {cancelLabel}
             </Button>
             <Button
+              variant={config.buttonVariant}
               onClick={handleConfirm}
               disabled={isLoading}
-              className={`${config.confirmButton} w-full`}
+              className={`w-full ${config.buttonClassName ?? ''}`}
             >
-              {isLoading ? 'Procesando...' : confirmLabel}
+              {isLoading ? t('common.processing') : confirmLabel}
             </Button>
           </DrawerFooter>
         </DrawerContent>
@@ -167,9 +173,9 @@ export function ConfirmDialog({
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isLoading}
-            className={`${config.confirmButton} w-full sm:w-auto`}
+            className={`w-full sm:w-auto ${config.buttonClassName ?? ''}`}
           >
-            {isLoading ? 'Procesando...' : confirmLabel}
+            {isLoading ? t('common.processing') : confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

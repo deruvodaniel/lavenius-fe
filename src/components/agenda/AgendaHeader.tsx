@@ -5,6 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Plus, Search, X, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { TipBanner } from '@/components/onboarding';
 import { ViewModeToggle } from './ViewModeToggle';
@@ -51,13 +52,10 @@ export function AgendaHeader({
             {t('agenda.subtitle')}
           </p>
         </div>
-        <button
-          onClick={onNewTurno}
-          className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors w-full sm:w-auto"
-        >
+        <Button onClick={onNewTurno} className="w-full sm:w-auto">
           <Plus className="w-4 h-4" />
           {t('agenda.newSession')}
-        </button>
+        </Button>
       </div>
 
       {/* Search + View Toggle row */}
@@ -74,13 +72,15 @@ export function AgendaHeader({
             aria-label={t('agenda.searchPlaceholder')}
           />
           {searchTerm && (
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => onSearchChange('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
               aria-label={t('agenda.clearSearch')}
             >
               <X className="h-4 w-4" />
-            </button>
+            </Button>
           )}
         </div>
 
