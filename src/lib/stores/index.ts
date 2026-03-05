@@ -37,3 +37,11 @@ export type {
   PacientesViewMode,
   CalendarViewMode,
 } from './ui.store';
+
+// Setup Progress Store
+export {
+  useSetupProgressStore,
+  useSetupProgress,
+  useShowSetupCard,
+} from './setupProgress.store';
+export type { SetupStepId, SetupStep } from './setupProgress.store';

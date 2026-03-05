@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { User, Phone, Mail, Heart, Video, MapPin, Calendar, AlertCircle, MessageCircle } from 'lucide-react';
+import { User, Phone, Mail, Heart, Video, MapPin, Calendar, AlertCircle, MessageCircle, Loader2 } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import { BaseDrawer, DrawerBody, DrawerFooter } from '../shared/BaseDrawer';
 import { Button } from '../ui/button';
@@ -22,8 +22,9 @@ interface ValidationErrors {
 interface PacienteDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (patient: CreatePatientDto) => void;
+  onSave: (patient: CreatePatientDto) => Promise<void>;
   patient?: Patient | null;
+  isLoading?: boolean;
 }
 
 // ============================================================================
@@ -45,7 +46,7 @@ const validatePhone = (phone: string): boolean => {
 const validateAge = (age: string): boolean => {
   if (!age) return true; // Optional field
   const ageNum = parseInt(age, 10);
-  return !isNaN(ageNum) && ageNum >= 0 && ageNum <= 120;
+  return !isNaN(ageNum) && ageNum >= 1 && ageNum <= 120;
 };
 
 const validateName = (name: string): boolean => {
@@ -105,7 +106,7 @@ const getInitialFormData = () => ({
  * - Form validation with error messages
  * - Accessible with proper ARIA attributes
  */
-export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDrawerProps) {
+export function PacienteDrawer({ isOpen, onClose, onSave, patient, isLoading = false }: PacienteDrawerProps) {
   // Use a key to reset the form when the drawer opens with different patient
   // This is the React-recommended pattern for resetting state on prop change
   const formKey = isOpen ? `open-${patient?.id ?? 'new'}` : 'closed';
@@ -117,6 +118,7 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
       onClose={onClose}
       onSave={onSave}
       patient={patient}
+      isLoading={isLoading}
     />
   );
 }
@@ -124,8 +126,9 @@ export function PacienteDrawer({ isOpen, onClose, onSave, patient }: PacienteDra
 /**
  * Inner form component - gets remounted when key changes, naturally resetting state
  */
-function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawerProps) {
+function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = false }: PacienteDrawerProps) {
   const { t } = useTranslation();
+  const [isSaving, setIsSaving] = useState(false);
   
   // Compute initial form data from patient prop
   const initialFormData = useMemo(() => {
@@ -226,7 +229,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
     return !Object.values(newErrors).some(error => error);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateForm()) {
       return;
     }
@@ -251,10 +254,16 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
       whatsappOptIn: formData.whatsappOptIn,
     };
 
-    onSave(patientDto);
+    setIsSaving(true);
+    try {
+      await onSave(patientDto);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleClose = () => {
+    if (isSaving || isLoading) return;
     setErrors({});
     setTouched({});
     onClose();
@@ -264,6 +273,8 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
     !errors.nombre && !errors.apellido && !errors.email && !errors.telefono && !errors.edad &&
     (formData.frecuencia !== 'otra' || formData.frecuenciaOtra.trim());
 
+  const isSubmitting = isSaving || isLoading;
+
   return (
     <BaseDrawer
       isOpen={isOpen}
@@ -272,6 +283,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
       icon={User}
       maxWidth="md:max-w-2xl"
       closeLabel={t('patients.drawer.closePanel')}
+      disableClose={isSubmitting}
       titleId="paciente-drawer-title"
       initialFocus="#paciente-nombre"
     >
@@ -331,7 +343,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
               <Input
                 id="paciente-edad"
                 type="number"
-                min="0"
+                min="1"
                 max="120"
                 value={formData.edad}
                 onChange={(e) => handleFieldChange('edad', e.target.value)}
@@ -576,15 +588,21 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
           variant="outline"
           onClick={handleClose}
           className="flex-1"
+          disabled={isSubmitting}
         >
           {t('patients.drawer.buttons.cancel')}
         </Button>
         <Button
           onClick={handleSave}
           className="flex-1"
-          disabled={!isFormValid}
+          disabled={!isFormValid || isSubmitting}
         >
-          {patient ? t('patients.drawer.buttons.update') : t('patients.drawer.buttons.create')}
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {t('common.saving')}
+            </>
+          ) : patient ? t('patients.drawer.buttons.update') : t('patients.drawer.buttons.create')}
         </Button>
       </DrawerFooter>
     </BaseDrawer>

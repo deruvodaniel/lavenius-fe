@@ -313,7 +313,7 @@
         "lastNameRequired": "El apellido es requerido",
         "invalidEmail": "Email inválido",
         "invalidPhone": "Teléfono inválido (mínimo 8 dígitos)",
-        "invalidAge": "Edad inválida (0-120)",
+        "invalidAge": "Edad inválida (1-120)",
         "specifyFrequency": "Especifica la frecuencia"
       }
     }
@@ -473,6 +473,7 @@
       "selectTime": "Por favor seleccione hora de inicio y fin",
       "selectSessionType": "Por favor seleccione un tipo de sesión",
       "selectStatus": "Por favor seleccione un estado",
+      "enterAmount": "Por favor ingrese el monto de la sesión",
       "completeAllFields": "Por favor complete todos los campos requeridos",
       "userIdError": "Error: No se pudo obtener el ID del usuario. Por favor, inicie sesión nuevamente."
     },
@@ -1043,6 +1044,19 @@
         "birthdays": "Cumpleaños próximos",
         "patientsWithoutSession": "Pacientes sin próxima cita",
         "charts": "Gráficos y analíticas"
+      }
+    },
+    "setupProgress": {
+      "title": "Configura tu cuenta",
+      "subtitle": "Completa estos pasos para aprovechar al máximo Lavenius",
+      "progress": "{{completed}} de {{total}} completados",
+      "dismissHint": "Puedes cerrar esta tarjeta y verla luego en configuración",
+      "steps": {
+        "configureProfile": "Configurar tu perfil profesional",
+        "connectCalendar": "Conectar Google Calendar",
+        "addFirstPatient": "Agregar tu primer paciente",
+        "scheduleFirstSession": "Agendar tu primera sesión",
+        "registerFirstPayment": "Registrar tu primer cobro"
       }
     }
   },

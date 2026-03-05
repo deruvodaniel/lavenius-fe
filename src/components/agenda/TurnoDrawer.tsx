@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Calendar, Clock, User, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { usePatientStore } from '@/lib/stores';
+import { usePatientStore, useSetupProgressStore } from '@/lib/stores';
 import { useAuth } from '@/lib/hooks';
 import { ConfirmDialog, BaseDrawer, DrawerBody, DrawerFooter, NativeSelect } from '@/components/shared';
 import { Button } from '@/components/ui/button';
@@ -69,7 +69,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     motivo: '',
     sessionType: SessionType.REMOTE,
     estado: SessionStatus.PENDING,
-    monto: 8500,
+    monto: '' as string | number,
   });
 
   const [selectedDuration, setSelectedDuration] = useState(() => {
@@ -103,7 +103,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         motivo: session.sessionSummary || '',
         sessionType: session.sessionType,
         estado: session.status,
-        monto: session.cost || 8500,
+        monto: session.cost ?? '',
       });
     } else {
       // Reset form when creating new session
@@ -115,7 +115,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         motivo: '',
         sessionType: SessionType.REMOTE,
         estado: SessionStatus.PENDING,
-        monto: 8500,
+        monto: '' as string | number,
       };
       
       // Pre-fill date and time from calendar selection
@@ -219,7 +219,8 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
   const isEditing = !!session;
   
   // Validate form - also require full patient data to be loaded (with email)
-  const isFormValid = formData.pacienteId && formData.fecha && formData.horaInicio && formData.horaFin && formData.sessionType && formData.estado && fullPatientData?.email && !isLoadingPatient;
+  const isMontoValid = formData.monto !== '' && !isNaN(Number(formData.monto)) && Number(formData.monto) >= 0;
+  const isFormValid = formData.pacienteId && formData.fecha && formData.horaInicio && formData.horaFin && formData.sessionType && formData.estado && isMontoValid && fullPatientData?.email && !isLoadingPatient;
 
   const handleSave = () => {
     // Validate before showing confirmation
@@ -251,6 +252,10 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     }
     if (!formData.estado) {
       toast.error(t('agenda.validation.selectStatus'));
+      return;
+    }
+    if (formData.monto === '' || isNaN(Number(formData.monto)) || Number(formData.monto) < 0) {
+      toast.error(t('agenda.validation.enterAmount'));
       return;
     }
     
@@ -294,6 +299,15 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     setIsSaving(true);
     try {
       await onSave(sessionDto);
+      
+      // Mark onboarding step as complete when creating first session
+      if (!isEditing) {
+        const store = useSetupProgressStore.getState();
+        if (!store.isStepComplete('scheduleFirstSession')) {
+          store.markStepComplete('scheduleFirstSession');
+        }
+      }
+      
       setShowSaveConfirm(false);
       onClose();
     } catch {
@@ -477,19 +491,41 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           {/* Monto */}
           <div>
             <label htmlFor="turno-monto" className="block text-foreground mb-2">
-              {t('agenda.fields.amount')}
+              {t('agenda.fields.amount')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
             </label>
             <Input
               id="turno-monto"
               type="number"
               value={formData.monto}
-              onChange={(e) => setFormData({ ...formData, monto: Number(e.target.value) })}
-              className="w-full"
+              onChange={(e) => setFormData({ ...formData, monto: e.target.value === '' ? '' : Number(e.target.value) })}
+              className={`w-full ${!isMontoValid && formData.monto !== '' ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+              aria-invalid={!isMontoValid}
+              aria-describedby="monto-error"
+              required
+              min="0"
+              placeholder="0"
             />
+            {!isMontoValid && (
+              <p id="monto-error" className="text-sm text-red-500 mt-1">
+                {t('agenda.validation.enterAmount')}
+              </p>
+            )}
           </div>
         </DrawerBody>
 
         <DrawerFooter>
+          {/* Validation message when form is incomplete */}
+          {!isFormValid && (
+            <p className="text-sm text-amber-600 dark:text-amber-400 mb-2 text-center w-full">
+              {!formData.pacienteId ? t('agenda.validation.selectPatient') :
+               !formData.fecha ? t('agenda.validation.selectDate') :
+               !formData.horaInicio || !formData.horaFin ? t('agenda.validation.selectTime') :
+               !isMontoValid ? t('agenda.validation.enterAmount') :
+               !fullPatientData?.email ? t('agenda.messages.patientNoEmail') :
+               isLoadingPatient ? t('common.loading') :
+               t('agenda.validation.completeAllFields')}
+            </p>
+          )}
           <Button
             onClick={handleSave}
             disabled={!isFormValid}

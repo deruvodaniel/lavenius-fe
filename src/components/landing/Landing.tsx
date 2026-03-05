@@ -93,7 +93,10 @@ function NavBar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <button 
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
+          >
             <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
@@ -101,7 +104,7 @@ function NavBar() {
               {t('landing.brand')}
             </span>
             <span className="max-[400px]:hidden"><BetaBadge /></span>
-          </div>
+          </button>
           
           {/* Navigation Links - Hidden on mobile */}
           <div className="hidden md:flex items-center gap-1">
@@ -1348,12 +1351,15 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-gray-800">
           {/* Brand section */}
           <div className="flex flex-col items-center md:items-start gap-4">
-            <div className="flex items-center gap-2">
+            <button 
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
+            >
               <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <span className="text-lg font-bold text-white">{t('landing.brand')}</span>
-            </div>
+            </button>
             <p className="text-sm text-gray-500 text-center md:text-left max-w-xs">
               {t('landing.footer.tagline')}
             </p>

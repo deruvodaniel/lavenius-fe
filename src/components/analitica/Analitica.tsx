@@ -45,6 +45,7 @@ import {
   DrawerDescription,
 } from '@/components/ui/drawer';
 import { EmptyState, SwipeableCards, DashboardSkeleton, AnimatedSection } from './DashboardComponents';
+import { OnboardingProgressCard } from '@/components/dashboard';
 import { 
   useScrollPosition, 
   CompactHeader, 
@@ -974,6 +975,11 @@ export function Analitica() {
           isMobile={isMobile}
         />
       )}
+
+      {/* Onboarding Progress Card - Shows setup progress for new users */}
+      <AnimatedSection delay={0.1}>
+        <OnboardingProgressCard className="mb-4" />
+      </AnimatedSection>
 
       {/* Today's Summary Card - Enhanced */}
       {isSectionVisible('todaySummary') && (

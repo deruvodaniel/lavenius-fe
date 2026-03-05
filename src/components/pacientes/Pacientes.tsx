@@ -6,6 +6,7 @@ import { FichaClinica } from '../dashboard';
 import { PacienteDrawer } from './PacienteDrawer';
 import { usePatients, useErrorToast, useResponsive } from '@/lib/hooks';
 import { useSessionStore } from '@/lib/stores/sessionStore';
+import { useSetupProgressStore } from '@/lib/stores';
 import { SessionStatus } from '@/lib/types/session';
 import { AnimatedList, SkeletonCard, EmptyState, ConfirmDialog, SimplePagination, InfiniteScrollLoader, NativeSelect } from '../shared';
 import { Input } from '@/components/ui/input';
@@ -80,7 +81,7 @@ export function Pacientes() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Build server-side filters
+  // Build server-side filters (only search by name, other filters are client-side)
   const serverFilters = useMemo((): PatientFilters | undefined => {
     const filters: PatientFilters = {};
     
@@ -88,22 +89,12 @@ export function Pacientes() {
       filters.name = debouncedSearchTerm.trim();
     }
     
-    if (modalidadFilter !== 'todas') {
-      // Map frontend values to backend values
-      filters.sessionType = modalidadFilter === 'remoto' ? 'remote' : 'presential';
-    }
-    
-    if (frecuenciaFilter !== 'todas') {
-      filters.frequency = frecuenciaFilter;
-    }
-    
-    if (soloTurnosEstaSemana) {
-      filters.hasSessionThisWeek = true;
-    }
+    // Note: modalidad, frecuencia, and soloTurnosEstaSemana filters are applied client-side
+    // because backend filtering may not be fully implemented
     
     // Return undefined if no filters to avoid unnecessary query params
     return Object.keys(filters).length > 0 ? filters : undefined;
-  }, [debouncedSearchTerm, modalidadFilter, frecuenciaFilter, soloTurnosEstaSemana]);
+  }, [debouncedSearchTerm]);
 
   // Fetch patients when filters change (server-side filtering)
   useEffect(() => {
@@ -185,6 +176,39 @@ export function Pacientes() {
     return map;
   }, [sessions]);
 
+  // Build a Set of patient IDs that have sessions THIS WEEK (for filtering)
+  const patientsWithSessionsThisWeek = useMemo(() => {
+    const patientIds = new Set<string>();
+    const now = new Date();
+    
+    // Get start of week (Monday)
+    const startOfWeek = new Date(now);
+    const dayOfWeek = now.getDay();
+    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust for Monday start
+    startOfWeek.setDate(now.getDate() + diff);
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    // Get end of week (Sunday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+    
+    // Find all sessions within this week
+    for (const session of sessions) {
+      if (session.status === SessionStatus.CANCELLED) continue;
+      
+      const sessionDate = new Date(session.scheduledFrom);
+      if (sessionDate >= startOfWeek && sessionDate <= endOfWeek) {
+        const patientId = session.patient?.id;
+        if (patientId) {
+          patientIds.add(patientId);
+        }
+      }
+    }
+    
+    return patientIds;
+  }, [sessions]);
+
   // Get next appointment for a patient
   const getProximoTurno = useCallback((pacienteId: string): { dias: number } | null => {
     const nextDate = nextSessionByPatient.get(pacienteId);
@@ -231,6 +255,12 @@ export function Pacientes() {
         // Create new patient
         await createPatient(patientData);
         toast.success(t('patients.messages.createSuccess'));
+        
+        // Mark onboarding step as complete when adding first patient
+        const store = useSetupProgressStore.getState();
+        if (!store.isStepComplete('addFirstPatient')) {
+          store.markStepComplete('addFirstPatient');
+        }
       }
       setPacienteDrawerOpen(false);
       setEditingPatient(null);
@@ -306,10 +336,26 @@ export function Pacientes() {
     };
   });
 
-  // Filter and sort patients (filtering is now server-side, only sorting is client-side)
+  // Filter and sort patients (client-side filtering as backend filters may not be implemented)
   const filteredPacientes = useMemo(() => {
-    // Create a copy for sorting (patients are already filtered by server)
     let filtered = [...pacientes];
+
+    // Client-side filtering (fallback since backend filters may not work)
+    
+    // Filter by modalidad (session type)
+    if (modalidadFilter !== 'todas') {
+      filtered = filtered.filter(p => p.modalidad === modalidadFilter);
+    }
+    
+    // Filter by frecuencia
+    if (frecuenciaFilter !== 'todas') {
+      filtered = filtered.filter(p => p.frecuencia === frecuenciaFilter);
+    }
+    
+    // Filter by "solo turnos esta semana" - patients with sessions this week
+    if (soloTurnosEstaSemana) {
+      filtered = filtered.filter(p => patientsWithSessionsThisWeek.has(p.id));
+    }
 
     // Sort (client-side)
     filtered.sort((a, b) => {
@@ -330,7 +376,7 @@ export function Pacientes() {
     });
 
     return filtered;
-  }, [pacientes, sortBy]);
+  }, [pacientes, modalidadFilter, frecuenciaFilter, soloTurnosEstaSemana, sortBy, patientsWithSessionsThisWeek]);
 
   // Pagination for desktop, infinite scroll for mobile
   const totalPages = Math.ceil(filteredPacientes.length / ITEMS_PER_PAGE);

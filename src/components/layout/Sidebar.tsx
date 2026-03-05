@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Users, DollarSign, LogOut, Settings, ChevronUp, HelpCircle, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -106,16 +106,22 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
           'border-b border-indigo-800 transition-all duration-200 min-h-[80px] flex items-center px-4',
           collapsed && 'justify-center'
         )}>
-          {collapsed ? (
-            <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <span className="text-white text-lg font-bold">L</span>
-            </div>
-          ) : (
-            <div>
-              <h1 className="text-white text-2xl font-bold flex items-center gap-2">{t('landing.brand')} <BetaBadge className="border-amber-500/60 bg-amber-500/20 text-amber-300" /></h1>
-              <p className="text-indigo-300 text-sm mt-1">{t('landing.tagline')}</p>
-            </div>
-          )}
+          <Link 
+            to="/" 
+            className="hover:opacity-90 transition-opacity"
+            onClick={handleNavClick}
+          >
+            {collapsed ? (
+              <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-lg font-bold">L</span>
+              </div>
+            ) : (
+              <div>
+                <h1 className="text-white text-2xl font-bold flex items-center gap-2">{t('landing.brand')} <BetaBadge className="border-amber-500/60 bg-amber-500/20 text-amber-300" /></h1>
+                <p className="text-indigo-300 text-sm mt-1">{t('landing.tagline')}</p>
+              </div>
+            )}
+          </Link>
         </div>
       )}
 

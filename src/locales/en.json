@@ -313,7 +313,7 @@
         "lastNameRequired": "Last name is required",
         "invalidEmail": "Invalid email",
         "invalidPhone": "Invalid phone (minimum 8 digits)",
-        "invalidAge": "Invalid age (0-120)",
+        "invalidAge": "Invalid age (1-120)",
         "specifyFrequency": "Specify the frequency"
       }
     }
@@ -473,6 +473,7 @@
       "selectTime": "Please select start and end time",
       "selectSessionType": "Please select a session type",
       "selectStatus": "Please select a status",
+      "enterAmount": "Please enter the session amount",
       "completeAllFields": "Please complete all required fields",
       "userIdError": "Error: Could not get user ID. Please log in again."
     },
@@ -1043,6 +1044,19 @@
         "birthdays": "Upcoming Birthdays",
         "patientsWithoutSession": "Patients without upcoming session",
         "charts": "Charts & Analytics"
+      }
+    },
+    "setupProgress": {
+      "title": "Set up your account",
+      "subtitle": "Complete these steps to get the most out of Lavenius",
+      "progress": "{{completed}} of {{total}} completed",
+      "dismissHint": "You can close this card and see it later in settings",
+      "steps": {
+        "configureProfile": "Configure your professional profile",
+        "connectCalendar": "Connect Google Calendar",
+        "addFirstPatient": "Add your first patient",
+        "scheduleFirstSession": "Schedule your first session",
+        "registerFirstPayment": "Register your first payment"
       }
     }
   },

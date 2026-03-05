@@ -5,3 +5,4 @@ export { ContactInfoCard } from './ContactInfoCard';
 export { UpcomingSessionsCard } from './UpcomingSessionsCard';
 export { ClinicalSectionCard } from './ClinicalSectionCard';
 export { SessionNotesSection } from './SessionNotesSection';
+export { OnboardingProgressCard } from './OnboardingProgressCard';

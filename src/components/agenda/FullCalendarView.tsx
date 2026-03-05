@@ -157,6 +157,17 @@ export function FullCalendarView({
     }
   }, []);
 
+  // Scroll to current time (1 hour before) for time grid views
+  const scrollToCurrentTime = useCallback(() => {
+    const calendarApi = calendarRef.current?.getApi();
+    if (calendarApi) {
+      const now = new Date();
+      const scrollHour = Math.max(7, now.getHours() - 1); // Don't scroll before 7am (slotMinTime)
+      const scrollTime = `${scrollHour.toString().padStart(2, '0')}:00:00`;
+      calendarApi.scrollToTime(scrollTime);
+    }
+  }, []);
+
   // Keep day view on mobile (week view not ideal for small screens)
   // This effect only syncs with the external FullCalendar API, not React state directly
   useEffect(() => {
@@ -547,6 +558,21 @@ export function FullCalendarView({
           allDaySlot={true}
           allDayText="Día Off"
           nowIndicator={true}
+          scrollTime={(() => {
+            // Scroll to 1 hour before current time so the now indicator is visible
+            const now = new Date();
+            const scrollHour = Math.max(7, now.getHours() - 1); // Don't scroll before 7am (slotMinTime)
+            return `${scrollHour.toString().padStart(2, '0')}:00:00`;
+          })()}
+          viewDidMount={(info) => {
+            // Auto-scroll to current time when switching to time grid views
+            if (info.view.type === 'timeGridDay' || info.view.type === 'timeGridWeek') {
+              // Small delay to ensure the view is fully rendered
+              setTimeout(() => {
+                scrollToCurrentTime();
+              }, 100);
+            }
+          }}
           // Show all days - no hidden days restriction
           // Business hours kept for visual reference only (not as constraint)
         />

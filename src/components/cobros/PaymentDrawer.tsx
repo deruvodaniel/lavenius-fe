@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DollarSign, Calendar, FileText, Sparkles, CalendarRange, Pencil, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { DollarSign, Calendar, FileText, Sparkles, CalendarRange, Pencil, CheckCircle2, Clock, AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { BaseDrawer, DrawerBody, DrawerFooter, NativeSelect } from '@/components/shared';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { DatePicker } from '@/components/ui/date-picker';
 import { formatISODate } from '@/lib/utils/dateFormatters';
+import { useSetupProgressStore } from '@/lib/stores';
 import type { CreatePaymentDto, Payment, UpdatePaymentDto } from '@/lib/types/api.types';
 import { PaymentStatus } from '@/lib/types/api.types';
 import type { SessionUI } from '@/lib/types/session';
@@ -312,6 +313,12 @@ export const PaymentDrawer = ({
         };
         
         await onSave(paymentData);
+        
+        // Mark onboarding step as complete when registering first payment
+        const store = useSetupProgressStore.getState();
+        if (!store.isStepComplete('registerFirstPayment')) {
+          store.markStepComplete('registerFirstPayment');
+        }
       }
       onClose();
     } catch (error: unknown) {
@@ -518,11 +525,14 @@ export const PaymentDrawer = ({
               disabled={!isFormValid || isLoading || isSaving}
               className="flex-1"
             >
-              {isSaving 
-                ? t('payments.drawer.saving')
-                : isEditMode 
-                  ? t('payments.drawer.saveChanges') 
-                  : t('payments.registerPayment')
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {t('payments.drawer.saving')}
+                </>
+              ) : isEditMode 
+                ? t('payments.drawer.saveChanges') 
+                : t('payments.registerPayment')
               }
             </Button>
           )}
