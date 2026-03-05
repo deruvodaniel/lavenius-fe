@@ -226,21 +226,21 @@ const CategoryCard = ({ category, onClick }: CategoryCardProps) => {
       className="w-full h-auto text-left p-4 bg-card rounded-lg border border-border hover:border-indigo-300 hover:shadow-md hover:bg-card transition-all group justify-start"
     >
       <div className="flex items-start gap-4 w-full">
-        <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-200 transition-colors">
-          <Icon className="w-5 h-5 text-indigo-600" />
+        <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-950/50 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-200 dark:group-hover:bg-indigo-900/50 transition-colors">
+          <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
         </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-foreground group-hover:text-indigo-600 transition-colors">
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <h3 className="font-medium text-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
             {t(category.titleKey)}
           </h3>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
             {t(category.descriptionKey)}
           </p>
           <p className="text-xs text-muted-foreground mt-2">
             {articleCount} {t(articleCount !== 1 ? 'help.articles' : 'help.article')}
           </p>
         </div>
-        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-indigo-600 transition-colors flex-shrink-0" />
+        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex-shrink-0" />
       </div>
     </Button>
   );
@@ -262,17 +262,17 @@ const ArticleList = ({ category, onBack, onSelectArticle }: ArticleListProps) =>
         variant="ghost"
         size="sm"
         onClick={onBack}
-        className="pl-0 gap-2 text-muted-foreground hover:text-indigo-600"
+        className="pl-0 gap-2 text-muted-foreground hover:text-indigo-600 dark:hover:text-indigo-400"
       >
         <ArrowLeft className="w-4 h-4" />
         {t('help.backToCategories')}
       </Button>
 
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-          <Icon className="w-5 h-5 text-indigo-600" />
+        <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
+          <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
         </div>
-        <h2 className="text-lg font-semibold text-foreground">{t(category.titleKey)}</h2>
+        <h2 className="text-lg font-semibold text-foreground truncate">{t(category.titleKey)}</h2>
       </div>
       
       <div className="space-y-2">
@@ -281,13 +281,13 @@ const ArticleList = ({ category, onBack, onSelectArticle }: ArticleListProps) =>
             key={article.id}
             variant="ghost"
             onClick={() => onSelectArticle(article)}
-            className="w-full h-auto text-left p-3 bg-card rounded-lg border border-border hover:border-indigo-300 hover:bg-indigo-50 transition-all group flex items-center gap-3 justify-start"
+            className="w-full h-auto text-left p-3 bg-card rounded-lg border border-border hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-all group flex items-center gap-3 justify-start"
           >
-            <FileText className="w-4 h-4 text-muted-foreground group-hover:text-indigo-600 transition-colors flex-shrink-0" />
-            <span className="text-foreground group-hover:text-indigo-600 transition-colors">
+            <FileText className="w-4 h-4 text-muted-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex-shrink-0" />
+            <span className="text-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate flex-1 min-w-0">
               {t(article.titleKey)}
             </span>
-            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-indigo-600 transition-colors ml-auto flex-shrink-0" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex-shrink-0" />
           </Button>
         ))}
       </div>
@@ -312,7 +312,7 @@ const ArticleView = ({ article, categoryTitleKey, onBack }: ArticleViewProps) =>
         variant="ghost"
         size="sm"
         onClick={onBack}
-        className="pl-0 gap-2 text-muted-foreground hover:text-indigo-600"
+        className="pl-0 gap-2 text-muted-foreground hover:text-indigo-600 dark:hover:text-indigo-400"
       >
         <ArrowLeft className="w-4 h-4" />
         {t('help.backTo', { category: t(categoryTitleKey) })}
@@ -413,8 +413,8 @@ export function HelpCenter() {
     <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-3xl mx-auto">
       {/* Header */}
       <div className="text-center">
-        <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <HelpCircle className="w-7 h-7 text-indigo-600" />
+        <div className="w-14 h-14 bg-indigo-100 dark:bg-indigo-950/50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <HelpCircle className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
         </div>
         <h1 className="text-2xl font-bold text-foreground">{t('help.title')}</h1>
         <p className="text-muted-foreground mt-1">
