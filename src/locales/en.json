@@ -735,10 +735,10 @@
     },
     "paymentReminders": {
       "title": "Payment Reminders",
-      "description": "Configure notifications and messages for pending payments",
+      "description": "Configure notifications for yourself about pending payments",
       "automation": "Reminder automation",
       "enableAuto": "Enable automatic reminders for pending payments",
-      "enableAutoHint": "We'll notify you when you have sessions without marked payments",
+      "enableAutoHint": "You'll receive notifications when you have sessions without marked payments",
       "frequency": "Reminder frequency",
       "daily": "Daily",
       "weekly": "Weekly (Monday)",
@@ -755,10 +755,10 @@
     },
     "appointmentReminders": {
       "title": "Appointment Reminders",
-      "description": "Configure notifications and messages for patient appointments",
+      "description": "Configure notifications for yourself about upcoming appointments",
       "automation": "Reminder automation",
-      "enableAuto": "Enable automatic reminders for patients",
-      "enableAutoHint": "We'll notify you when it's time to remind your patients about their appointments",
+      "enableAuto": "Enable automatic appointment reminders",
+      "enableAutoHint": "You'll receive notifications when it's time to remind your patients about their appointments",
       "hoursBeforeLabel": "Hours in advance",
       "hoursBeforeAppointment": "hours before appointment",
       "example": "Example",
@@ -1617,6 +1617,7 @@
     "calendar": {
       "title": "Connect your calendar",
       "description": "Sync with Google Calendar to automatically schedule appointments and receive reminders. Your patients will also receive invitations.",
+      "workWeekTip": "Remember to configure your working days and hours in Settings > Work Schedule.",
       "connect": "Connect Google Calendar",
       "later": "I'll do it later"
     },

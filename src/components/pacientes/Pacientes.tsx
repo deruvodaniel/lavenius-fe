@@ -41,7 +41,7 @@ export function Pacientes() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [modalidadFilter, setModalidadFilter] = useState<'todas' | 'presencial' | 'remoto' | 'mixto'>('todas');
-  const [frecuenciaFilter, setFrecuenciaFilter] = useState<'todas' | 'semanal' | 'quincenal' | 'mensual'>('todas');
+  const [frecuenciaFilter, setFrecuenciaFilter] = useState<'todas' | 'semanal' | 'quincenal' | 'mensual' | 'otra'>('todas');
   const [soloTurnosEstaSemana, setSoloTurnosEstaSemana] = useState(false);
   const [pacienteDrawerOpen, setPacienteDrawerOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState<typeof patients[0] | null>(null);
@@ -374,6 +374,8 @@ export function Pacientes() {
         return t('patients.frequency.biweekly');
       case 'mensual':
         return t('patients.frequency.monthly');
+      case 'otra':
+        return t('patients.frequency.other');
       default:
         return frecuencia;
     }
@@ -534,6 +536,7 @@ export function Pacientes() {
                     <option value="semanal">{t('patients.frequency.weekly')}</option>
                     <option value="quincenal">{t('patients.frequency.biweekly')}</option>
                     <option value="mensual">{t('patients.frequency.monthly')}</option>
+                    <option value="otra">{t('patients.frequency.other')}</option>
                   </NativeSelect>
                 </div>
 
@@ -642,6 +645,7 @@ export function Pacientes() {
                 <option value="semanal">{t('patients.frequency.weekly')}</option>
                 <option value="quincenal">{t('patients.frequency.biweekly')}</option>
                 <option value="mensual">{t('patients.frequency.monthly')}</option>
+                <option value="otra">{t('patients.frequency.other')}</option>
               </NativeSelect>
             </div>
             <div className="flex items-end">

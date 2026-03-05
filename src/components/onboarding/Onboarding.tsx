@@ -403,8 +403,9 @@ export function Onboarding() {
         <Input
           id="licenseNumber"
           type="text"
+          inputMode="numeric"
           value={formData.licenseNumber}
-          onChange={(e) => handleInputChange('licenseNumber', e.target.value)}
+          onChange={(e) => handleInputChange('licenseNumber', e.target.value.replace(/\D/g, ''))}
           placeholder={t('onboarding.stepper.placeholders.licenseNumber')}
           aria-invalid={!!errors.licenseNumber}
           aria-describedby={errors.licenseNumber ? 'license-error' : undefined}
@@ -460,8 +461,9 @@ export function Onboarding() {
         <Input
           id="phone"
           type="tel"
+          inputMode="numeric"
           value={formData.phone}
-          onChange={(e) => handleInputChange('phone', e.target.value)}
+          onChange={(e) => handleInputChange('phone', e.target.value.replace(/\D/g, ''))}
           placeholder={t('onboarding.stepper.placeholders.phone')}
           aria-invalid={!!errors.phone}
           aria-describedby={errors.phone ? 'phone-error' : undefined}
@@ -488,8 +490,9 @@ export function Onboarding() {
         <Input
           id="alternativePhone"
           type="tel"
+          inputMode="numeric"
           value={formData.alternativePhone}
-          onChange={(e) => handleInputChange('alternativePhone', e.target.value)}
+          onChange={(e) => handleInputChange('alternativePhone', e.target.value.replace(/\D/g, ''))}
           placeholder={t('onboarding.stepper.placeholders.alternativePhone')}
           aria-invalid={!!errors.alternativePhone}
           aria-describedby={errors.alternativePhone ? 'alt-phone-error' : undefined}
@@ -563,6 +566,7 @@ export function Onboarding() {
           <Label htmlFor="instagram" className="flex items-center gap-2 text-foreground">
             <Instagram className="w-4 h-4 text-pink-600" />
             {t('onboarding.stepper.fields.instagram')}
+            <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
           </Label>
           <Input
             id="instagram"
@@ -580,6 +584,7 @@ export function Onboarding() {
           <Label htmlFor="linkedin" className="flex items-center gap-2 text-foreground">
             <Linkedin className="w-4 h-4 text-blue-600" />
             {t('onboarding.stepper.fields.linkedin')}
+            <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
           </Label>
           <Input
             id="linkedin"

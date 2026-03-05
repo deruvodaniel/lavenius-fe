@@ -735,10 +735,10 @@
     },
     "paymentReminders": {
       "title": "Recordatorios de Cobros",
-      "description": "Configura notificaciones y mensajes para cobros pendientes",
+      "description": "Configura notificaciones para ti sobre cobros pendientes",
       "automation": "Automatización de recordatorios",
       "enableAuto": "Activar recordatorios automáticos de cobros pendientes",
-      "enableAutoHint": "Te notificaremos cuando tengas turnos realizados sin marcar como cobrados",
+      "enableAutoHint": "Recibirás notificaciones cuando tengas turnos realizados sin marcar como cobrados",
       "frequency": "Frecuencia de recordatorio",
       "daily": "Diariamente",
       "weekly": "Semanalmente (lunes)",
@@ -755,10 +755,10 @@
     },
     "appointmentReminders": {
       "title": "Recordatorios de Turnos",
-      "description": "Configura notificaciones y mensajes para turnos de pacientes",
+      "description": "Configura notificaciones para ti sobre turnos próximos",
       "automation": "Automatización de recordatorios",
-      "enableAuto": "Activar recordatorios automáticos para pacientes",
-      "enableAutoHint": "Te avisaremos cuando sea momento de recordar a tus pacientes sus turnos",
+      "enableAuto": "Activar recordatorios automáticos de turnos",
+      "enableAutoHint": "Recibirás notificaciones cuando sea momento de recordar a tus pacientes sus turnos",
       "hoursBeforeLabel": "Horas de anticipación",
       "hoursBeforeAppointment": "horas antes del turno",
       "example": "Ejemplo",
@@ -1664,6 +1664,7 @@
     "calendar": {
       "title": "Conecta tu calendario",
       "description": "Sincroniza con Google Calendar para agendar turnos automáticamente y recibir recordatorios. Tus pacientes también recibirán invitaciones.",
+      "workWeekTip": "Recuerda configurar tus días y horarios de atención en Configuración > Horario laboral.",
       "connect": "Conectar Google Calendar",
       "later": "Lo haré más tarde"
     },

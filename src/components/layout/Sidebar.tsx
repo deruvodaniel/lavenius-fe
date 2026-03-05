@@ -99,28 +99,28 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
   };
 
   return (
-    <TooltipProvider>
-      <div className="h-full flex flex-col">
-        {/* Header - Only show on desktop */}
-        {showHeader && (
-          <div className={cn(
-            'border-b border-indigo-800 transition-all duration-200 min-h-[80px] flex items-center px-4',
-            collapsed && 'justify-center'
-          )}>
-            {collapsed ? (
-              <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white text-lg font-bold">L</span>
-              </div>
-            ) : (
-              <div>
-                <h1 className="text-white text-2xl font-bold flex items-center gap-2">{t('landing.brand')} <BetaBadge className="border-amber-500/60 bg-amber-500/20 text-amber-300" /></h1>
-                <p className="text-indigo-300 text-sm mt-1">{t('landing.tagline')}</p>
-              </div>
-            )}
-          </div>
-        )}
+    <div className="h-full flex flex-col">
+      {/* Header - Only show on desktop */}
+      {showHeader && (
+        <div className={cn(
+          'border-b border-indigo-800 transition-all duration-200 min-h-[80px] flex items-center px-4',
+          collapsed && 'justify-center'
+        )}>
+          {collapsed ? (
+            <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+              <span className="text-white text-lg font-bold">L</span>
+            </div>
+          ) : (
+            <div>
+              <h1 className="text-white text-2xl font-bold flex items-center gap-2">{t('landing.brand')} <BetaBadge className="border-amber-500/60 bg-amber-500/20 text-amber-300" /></h1>
+              <p className="text-indigo-300 text-sm mt-1">{t('landing.tagline')}</p>
+            </div>
+          )}
+        </div>
+      )}
 
-        {/* Navigation */}
+      {/* Navigation - TooltipProvider only wraps nav items that use tooltips */}
+      <TooltipProvider>
         <nav className="flex-1 space-y-2 overflow-y-auto overflow-x-hidden p-4 transition-all duration-200">
           {menuItems.map((item) => (
             <NavItemWithTooltip
@@ -133,100 +133,100 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
             />
           ))}
         </nav>
+      </TooltipProvider>
 
-        {/* User Menu Popover */}
-        <div className="border-t border-indigo-800 transition-all duration-200 p-4">
-          {user && (
-            <Popover open={isUserMenuOpen} onOpenChange={setIsUserMenuOpen}>
-              <PopoverTrigger asChild>
+      {/* User Menu Popover - Outside TooltipProvider to avoid click conflicts */}
+      <div className="border-t border-indigo-800 transition-all duration-200 p-4">
+        {user && (
+          <Popover open={isUserMenuOpen} onOpenChange={setIsUserMenuOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  'w-full flex items-center gap-3 px-4 py-3 h-auto hover:bg-indigo-800 group',
+                  collapsed && 'justify-center'
+                )}
+                aria-label={t('navigation.userMenu')}
+              >
+                <div className={cn(
+                  'bg-indigo-600 ring-2 ring-indigo-400 rounded-full flex items-center justify-center flex-shrink-0 group-hover:ring-indigo-300 transition-all duration-200 overflow-hidden',
+                  collapsed ? 'w-5 h-5 ring-1' : 'w-10 h-10'
+                )}>
+                  {user.imageUrl ? (
+                    <img
+                      src={user.imageUrl}
+                      alt={`${user.firstName} ${user.lastName}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className={cn(
+                      'text-white font-semibold',
+                      collapsed ? 'text-[10px]' : 'text-sm'
+                    )}>
+                      {getNameInitials(`${user.firstName} ${user.lastName || ''}`, 'U')}
+                    </span>
+                  )}
+                </div>
+                <div className={cn(
+                  'flex-1 min-w-0 text-left transition-opacity duration-200',
+                  collapsed ? 'sr-only' : 'opacity-100'
+                )}>
+                  <p className="text-white text-sm font-medium truncate">
+                    {user.firstName} {user.lastName}
+                  </p>
+                  <p className="text-indigo-300 text-xs truncate">{user.email}</p>
+                </div>
+                <ChevronUp className={cn(
+                  'w-4 h-4 text-indigo-400 group-hover:text-indigo-300 transition-colors flex-shrink-0',
+                  collapsed && 'hidden'
+                )} />
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent
+              side={collapsed ? 'right' : 'top'}
+              align={collapsed ? 'end' : 'start'}
+              sideOffset={8}
+              className="w-56 p-1 bg-card border border-border shadow-lg rounded-lg"
+            >
+              <div className="px-3 py-2 border-b border-border mb-1">
+                <p className="text-sm font-semibold text-foreground truncate">{user.firstName} {user.lastName}</p>
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              </div>
+
+              <NavLink
+                to="/dashboard/configuracion"
+                onClick={handleNavClick}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-muted transition-colors"
+              >
+                <Settings className="w-4 h-4" />
+                {t('navigation.settings')}
+              </NavLink>
+
+              <NavLink
+                to="/dashboard/ayuda"
+                onClick={handleNavClick}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-muted transition-colors"
+              >
+                <HelpCircle className="w-4 h-4" />
+                {t('navigation.help')}
+              </NavLink>
+
+              <div className="border-t border-border mt-1 pt-1">
                 <Button
                   variant="ghost"
-                  className={cn(
-                    'w-full flex items-center gap-3 px-4 py-3 h-auto hover:bg-indigo-800 group',
-                    collapsed && 'justify-center'
-                  )}
-                  aria-label={t('navigation.userMenu')}
+                  onClick={handleLogoutClick}
+                  className="w-full justify-start gap-2 px-3 py-2 h-auto text-red-600 hover:text-red-600 hover:bg-red-50"
                 >
-                  <div className={cn(
-                    'bg-indigo-600 ring-2 ring-indigo-400 rounded-full flex items-center justify-center flex-shrink-0 group-hover:ring-indigo-300 transition-all duration-200 overflow-hidden',
-                    collapsed ? 'w-5 h-5 ring-1' : 'w-10 h-10'
-                  )}>
-                    {user.imageUrl ? (
-                      <img
-                        src={user.imageUrl}
-                        alt={`${user.firstName} ${user.lastName}`}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className={cn(
-                        'text-white font-semibold',
-                        collapsed ? 'text-[10px]' : 'text-sm'
-                      )}>
-                        {getNameInitials(`${user.firstName} ${user.lastName || ''}`, 'U')}
-                      </span>
-                    )}
-                  </div>
-                  <div className={cn(
-                    'flex-1 min-w-0 text-left transition-opacity duration-200',
-                    collapsed ? 'sr-only' : 'opacity-100'
-                  )}>
-                    <p className="text-white text-sm font-medium truncate">
-                      {user.firstName} {user.lastName}
-                    </p>
-                    <p className="text-indigo-300 text-xs truncate">{user.email}</p>
-                  </div>
-                  <ChevronUp className={cn(
-                    'w-4 h-4 text-indigo-400 group-hover:text-indigo-300 transition-colors flex-shrink-0',
-                    collapsed && 'hidden'
-                  )} />
+                  <LogOut className="w-4 h-4" />
+                  {t('navigation.logout')}
                 </Button>
-              </PopoverTrigger>
-
-              <PopoverContent
-                side={collapsed ? 'right' : 'top'}
-                align={collapsed ? 'end' : 'start'}
-                sideOffset={8}
-                className="w-56 p-1 bg-card border border-border shadow-lg rounded-lg"
-              >
-                <div className="px-3 py-2 border-b border-border mb-1">
-                  <p className="text-sm font-semibold text-foreground truncate">{user.firstName} {user.lastName}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                </div>
-
-                <NavLink
-                  to="/dashboard/configuracion"
-                  onClick={handleNavClick}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-muted transition-colors"
-                >
-                  <Settings className="w-4 h-4" />
-                  {t('navigation.settings')}
-                </NavLink>
-
-                <NavLink
-                  to="/dashboard/ayuda"
-                  onClick={handleNavClick}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-muted transition-colors"
-                >
-                  <HelpCircle className="w-4 h-4" />
-                  {t('navigation.help')}
-                </NavLink>
-
-                <div className="border-t border-border mt-1 pt-1">
-                  <Button
-                    variant="ghost"
-                    onClick={handleLogoutClick}
-                    className="w-full justify-start gap-2 px-3 py-2 h-auto text-red-600 hover:text-red-600 hover:bg-red-50"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    {t('navigation.logout')}
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
-          )}
-        </div>
-
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
       </div>
-    </TooltipProvider>
+
+    </div>
   );
 }

@@ -38,8 +38,8 @@ const validateEmail = (email: string): boolean => {
 
 const validatePhone = (phone: string): boolean => {
   if (!phone) return true; // Optional field
-  const phoneRegex = /^[\d\s+\-()]+$/;
-  return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 8;
+  // Phone should be 8-15 digits only
+  return phone.length >= 8 && phone.length <= 15;
 };
 
 const validateAge = (age: string): boolean => {
@@ -351,8 +351,10 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
               <Input
                 id="paciente-telefono"
                 type="tel"
+                inputMode="numeric"
+                maxLength={15}
                 value={formData.telefono}
-                onChange={(e) => handleFieldChange('telefono', e.target.value)}
+                onChange={(e) => handleFieldChange('telefono', e.target.value.replace(/\D/g, ''))}
                 onBlur={() => handleFieldBlur('telefono')}
                 placeholder={t('patients.drawer.placeholders.phone')}
                 className="w-full"

@@ -386,6 +386,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               onChange={(date) => setFormData({ ...formData, fecha: date || '' })}
               placeholder={t('common.datePicker.selectDate')}
               aria-invalid={!formData.fecha}
+              fromDate={new Date()}
             />
           </div>
 

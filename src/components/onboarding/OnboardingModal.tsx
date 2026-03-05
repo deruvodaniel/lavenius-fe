@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { 
   Sparkles, 
   Calendar, 
@@ -61,7 +62,7 @@ export function OnboardingModal({
 
   const handleConnectCalendar = () => {
     onConnectCalendar?.();
-    handleNext();
+    // Don't auto-advance - let user click "Next" manually after connecting
   };
 
   const handleCreatePatient = () => {
@@ -102,6 +103,9 @@ export function OnboardingModal({
               >
                 {t('onboarding.calendar.later')}
               </Button>
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                {t('onboarding.calendar.workWeekTip')}
+              </p>
             </div>
           </OnboardingStep>
         );
@@ -142,7 +146,7 @@ export function OnboardingModal({
             <div className="bg-muted rounded-lg p-4 text-left space-y-2">
               <p className="text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">{t('onboarding.complete.tip')}</span> {t('onboarding.complete.tipText')}{' '}
-                <span className="text-indigo-600 font-medium">{t('onboarding.complete.helpSection')}</span> {t('onboarding.complete.tipSuffix')}
+                <Link to="/ayuda" onClick={onClose} className="text-indigo-600 font-medium hover:underline">{t('onboarding.complete.helpSection')}</Link> {t('onboarding.complete.tipSuffix')}
               </p>
             </div>
           </OnboardingStep>

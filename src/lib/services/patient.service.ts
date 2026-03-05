@@ -12,7 +12,7 @@ import type {
 export interface PatientFilters {
   name?: string;
   sessionType?: 'remote' | 'presential';
-  frequency?: 'semanal' | 'quincenal' | 'mensual';
+  frequency?: 'semanal' | 'quincenal' | 'mensual' | 'otra';
   hasSessionThisWeek?: boolean;
 }
 

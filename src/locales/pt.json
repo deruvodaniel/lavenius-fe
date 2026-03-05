@@ -726,10 +726,10 @@
     },
     "paymentReminders": {
       "title": "Lembretes de Pagamento",
-      "description": "Configure notificações e mensagens para pagamentos pendentes",
+      "description": "Configure notificações para você sobre pagamentos pendentes",
       "automation": "Automação de lembretes",
       "enableAuto": "Ativar lembretes automáticos de pagamentos pendentes",
-      "enableAutoHint": "Notificaremos você quando tiver sessões sem pagamentos marcados",
+      "enableAutoHint": "Você receberá notificações quando tiver sessões sem pagamentos marcados",
       "frequency": "Frequência do lembrete",
       "daily": "Diariamente",
       "weekly": "Semanalmente (segunda-feira)",
@@ -746,10 +746,10 @@
     },
     "appointmentReminders": {
       "title": "Lembretes de Consulta",
-      "description": "Configure notificações e mensagens para consultas de pacientes",
+      "description": "Configure notificações para você sobre consultas próximas",
       "automation": "Automação de lembretes",
-      "enableAuto": "Ativar lembretes automáticos para pacientes",
-      "enableAutoHint": "Notificaremos você quando for hora de lembrar seus pacientes sobre suas consultas",
+      "enableAuto": "Ativar lembretes automáticos de consultas",
+      "enableAutoHint": "Você receberá notificações quando for hora de lembrar seus pacientes sobre suas consultas",
       "hoursBeforeLabel": "Horas de antecedência",
       "hoursBeforeAppointment": "horas antes da consulta",
       "example": "Exemplo",
@@ -1609,6 +1609,7 @@
     "calendar": {
       "title": "Conecte seu calendário",
       "description": "Sincronize com o Google Calendar para agendar consultas automaticamente e receber lembretes. Seus pacientes também receberão convites.",
+      "workWeekTip": "Lembre-se de configurar seus dias e horários de atendimento em Configurações > Horário de trabalho.",
       "connect": "Conectar Google Calendar",
       "later": "Farei isso depois"
     },
