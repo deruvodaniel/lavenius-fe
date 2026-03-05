@@ -402,7 +402,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 htmlFor="paciente-whatsapp-optin"
                 className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
                   formData.whatsappOptIn
-                    ? 'border-green-500 bg-green-50'
+                    ? 'border-green-500 bg-green-50 dark:bg-green-950/50'
                     : 'border-border hover:border-green-300'
                 }`}
               >
@@ -416,7 +416,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <MessageCircle className="w-4 h-4 text-green-600" />
-                    <span className={`text-sm font-medium ${formData.whatsappOptIn ? 'text-green-700' : 'text-foreground'}`}>
+                    <span className={`text-sm font-medium ${formData.whatsappOptIn ? 'text-green-700 dark:text-green-300' : 'text-foreground'}`}>
                       {t('patients.fields.whatsappOptIn')}
                     </span>
                   </div>
@@ -424,7 +424,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                     {t('patients.fields.whatsappOptInDescription')}
                   </p>
                   {patient?.whatsappOptInDate && formData.whatsappOptIn && (
-                    <p className="text-xs text-green-600 mt-1">
+                    <p className="text-xs text-green-600 dark:text-green-400 mt-1">
                       {t('patients.fields.whatsappOptInDate', {
                         date: new Date(patient.whatsappOptInDate).toLocaleDateString()
                       })}
@@ -452,7 +452,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                   onClick={() => setFormData({ ...formData, tipoSesion: 'presential' })}
                   className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
                     formData.tipoSesion === 'presential'
-                      ? 'border-purple-600 bg-purple-50 text-purple-700'
+                      ? 'border-purple-600 bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300'
                       : 'border-border text-foreground hover:border-purple-300'
                   }`}
                 >
@@ -464,7 +464,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                   onClick={() => setFormData({ ...formData, tipoSesion: 'remote' })}
                   className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
                     formData.tipoSesion === 'remote'
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
+                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300'
                       : 'border-border text-foreground hover:border-blue-300'
                   }`}
                 >
@@ -482,7 +482,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                     key={freq}
                     className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
                       formData.frecuencia === freq
-                        ? 'border-indigo-600 bg-indigo-50'
+                        ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/50'
                         : 'border-border hover:border-indigo-300'
                     }`}
                   >
@@ -494,7 +494,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient }: PacienteDrawer
                       onChange={(e) => setFormData({ ...formData, frecuencia: e.target.value as Frecuencia })}
                       className="w-4 h-4 text-indigo-600 border-border focus:ring-indigo-500"
                     />
-                    <span className={`text-sm font-medium ${formData.frecuencia === freq ? 'text-indigo-700' : 'text-foreground'}`}>
+                    <span className={`text-sm font-medium ${formData.frecuencia === freq ? 'text-indigo-700 dark:text-indigo-300' : 'text-foreground'}`}>
                       {freq === 'semanal' && t('patients.frequency.weekly')}
                       {freq === 'quincenal' && t('patients.frequency.biweekly')}
                       {freq === 'mensual' && t('patients.frequency.monthly')}

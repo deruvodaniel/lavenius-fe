@@ -2,7 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { X, DollarSign, Calendar, FileText, User, Clock, CheckCircle2, AlertCircle, Pencil, Trash2 } from 'lucide-react';
 import { useResponsive } from '@/lib/hooks';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
   Drawer,
   DrawerContent,
@@ -244,6 +245,9 @@ export const PaymentDetailModal = (props: PaymentDetailModalProps) => {
         aria-labelledby="payment-detail-title"
         className="w-full sm:max-w-md !bg-background p-0 gap-0 rounded-xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col"
       >
+        <VisuallyHidden>
+          <DialogTitle id="payment-detail-title">Payment Details</DialogTitle>
+        </VisuallyHidden>
         <PaymentDetailContent {...props} />
       </DialogContent>
     </Dialog>

@@ -72,9 +72,9 @@ html {
     --popover: #1c2d42;
     --popover-foreground: #f8fafc;
 
-    /* Primary - Indigo 400 */
-    --primary: #818cf8;
-    --primary-foreground: #0f172a;
+    /* Primary - Indigo 500 for better contrast with white text */
+    --primary: #6366f1;
+    --primary-foreground: #ffffff;
 
     /* Secondary — one step above card for subtle surface variation */
     --secondary: #243552;
@@ -98,11 +98,11 @@ html {
     --input: #3a5068;
     /* Input background — clearly above card level so inputs are visible */
     --input-background: #2d4060;
-    --ring: #818cf8;
+    --ring: #6366f1;
     --switch-background: #64748b;
 
     /* Chart colors - brighter for dark mode */
-    --chart-1: #818cf8;
+    --chart-1: #6366f1;
     --chart-2: #22d3ee;
     --chart-3: #34d399;
     --chart-4: #fbbf24;

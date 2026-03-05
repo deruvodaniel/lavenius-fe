@@ -638,7 +638,7 @@ export function Configuracion() {
       </div>
 
       {/* Main Settings Container — tabs stay fixed, only content scrolls */}
-      <div className="flex-1 flex flex-col md:flex-row md:gap-6 max-w-6xl overflow-hidden px-4 md:px-6 lg:px-8">
+      <div className="flex-1 flex flex-col md:flex-row md:gap-6 overflow-hidden px-4 md:px-6 lg:px-8">
         {/* ============================================ */}
         {/* Left Navigation Sidebar */}
         {/* ============================================ */}
@@ -711,7 +711,8 @@ export function Configuracion() {
         {/* ============================================ */}
         {/* Right Content Area */}
         {/* ============================================ */}
-        <div className="flex-1 min-w-0 overflow-y-auto pb-4 md:pb-6 lg:pb-8">
+        <div className="flex-1 min-w-0 overflow-y-auto pb-4 md:pb-6 lg:pb-8 pr-4 md:pr-6 lg:pr-8">
+          <div className="max-w-4xl">
           {/* ============================================ */}
           {/* SECTION: Profile */}
           {/* ============================================ */}
@@ -727,8 +728,8 @@ export function Configuracion() {
             {/* Appearance / Theme */}
             <ConfigSection
               icon={Sun}
-              iconColor="text-amber-600"
-              iconBg="bg-amber-100"
+              iconColor="text-amber-600 dark:text-amber-400"
+              iconBg="bg-amber-100 dark:bg-amber-950/50"
               title={t('settings.theme.title')}
               description={t('settings.theme.description')}
             >
@@ -738,8 +739,8 @@ export function Configuracion() {
             {/* Language Section */}
             <ConfigSection
               icon={Globe}
-              iconColor="text-purple-600"
-              iconBg="bg-purple-100"
+              iconColor="text-purple-600 dark:text-purple-400"
+              iconBg="bg-purple-100 dark:bg-purple-950/50"
               title={t('settings.language')}
               description={t('settings.selectLanguage')}
             >
@@ -749,8 +750,8 @@ export function Configuracion() {
             {/* Default Session Duration */}
             <ConfigSection
               icon={Clock}
-              iconColor="text-teal-600"
-              iconBg="bg-teal-100"
+              iconColor="text-teal-600 dark:text-teal-400"
+              iconBg="bg-teal-100 dark:bg-teal-950/50"
               title={t('settings.sessionDuration.title')}
               description={t('settings.sessionDuration.description')}
             >
@@ -808,8 +809,8 @@ export function Configuracion() {
             {/* Recordatorios de Cobros */}
             <ConfigSection
               icon={DollarSign}
-              iconColor="text-orange-600"
-              iconBg="bg-orange-100"
+              iconColor="text-orange-600 dark:text-orange-400"
+              iconBg="bg-orange-100 dark:bg-orange-950/50"
               title={t('settings.paymentReminders.title')}
               description={t('settings.paymentReminders.description')}
             >
@@ -871,8 +872,8 @@ export function Configuracion() {
                           </span>
                         </div>
                       </div>
-                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                        <p className="text-xs sm:text-sm text-orange-800">
+                      <div className="bg-orange-50 dark:bg-orange-950/50 border border-orange-200 dark:border-orange-800 rounded-lg p-3">
+                        <p className="text-xs sm:text-sm text-orange-800 dark:text-orange-300">
                           <span className="font-medium">{t('settings.paymentReminders.example')}:</span> {t('settings.paymentReminders.exampleText', { count: paymentReminderLimit })}
                         </p>
                       </div>
@@ -885,8 +886,8 @@ export function Configuracion() {
             {/* Recordatorios de Turnos */}
             <ConfigSection
               icon={Bell}
-              iconColor="text-blue-600"
-              iconBg="bg-blue-100"
+              iconColor="text-blue-600 dark:text-blue-400"
+              iconBg="bg-blue-100 dark:bg-blue-950/50"
               title={t('settings.appointmentReminders.title')}
               description={t('settings.appointmentReminders.description')}
             >
@@ -925,8 +926,8 @@ export function Configuracion() {
                           <span className="text-sm text-muted-foreground">{t('settings.appointmentReminders.hoursBeforeAppointment')}</span>
                         </div>
                       </div>
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                        <p className="text-xs sm:text-sm text-blue-800">
+                      <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                        <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300">
                           <span className="font-medium">{t('settings.appointmentReminders.example')}:</span> {t('settings.appointmentReminders.exampleText', { hours: sessionReminderHours })}
                         </p>
                       </div>
@@ -949,8 +950,8 @@ export function Configuracion() {
             {/* Working Hours & Days */}
             <ConfigSection
               icon={Clock}
-              iconColor="text-indigo-600"
-              iconBg="bg-indigo-100"
+              iconColor="text-indigo-600 dark:text-indigo-400"
+              iconBg="bg-indigo-100 dark:bg-indigo-950/50"
               title={t('settings.workingHours.title')}
               description={t('settings.workingHours.description')}
             >
@@ -1038,8 +1039,8 @@ export function Configuracion() {
             {/* Días Off */}
             <ConfigSection
               icon={Calendar}
-              iconColor="text-rose-600"
-              iconBg="bg-rose-100"
+              iconColor="text-rose-600 dark:text-rose-400"
+              iconBg="bg-rose-100 dark:bg-rose-950/50"
               title={t('settings.daysOff.title')}
               description={t('settings.daysOff.description')}
             >
@@ -1236,6 +1237,7 @@ export function Configuracion() {
           </div>
           )}
 
+          </div> {/* End max-w-4xl wrapper */}
         </div>
       </div>
       {/* ============================================ */}

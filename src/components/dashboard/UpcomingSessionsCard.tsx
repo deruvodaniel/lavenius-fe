@@ -43,7 +43,7 @@ export function UpcomingSessionsCard({
             const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
             
             return (
-              <div key={turno.id} className="p-3 bg-indigo-50 rounded border border-indigo-100">
+              <div key={turno.id} className="p-3 bg-indigo-50 dark:bg-indigo-950/50 rounded border border-indigo-100 dark:border-indigo-900">
                 <p className="text-foreground text-sm mb-1">{formatFecha(fecha)}</p>
                 <p className="text-muted-foreground text-sm">{hora} - {turno.sessionSummary || t('clinicalFile.defaultSession')}</p>
               </div>

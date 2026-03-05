@@ -362,8 +362,8 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
         {/* Professional Info */}
         <ProfileSection
           icon={Award}
-          iconColor="text-indigo-600"
-          iconBg="bg-indigo-100"
+          iconColor="text-indigo-600 dark:text-indigo-400"
+          iconBg="bg-indigo-100 dark:bg-indigo-950/50"
           title={t('profile.professional.title')}
           description={t('profile.professional.description')}
         >
@@ -400,8 +400,8 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
         {/* Contact, Location & Social Media */}
         <ProfileSection
           icon={Phone}
-          iconColor="text-emerald-600"
-          iconBg="bg-emerald-100"
+          iconColor="text-emerald-600 dark:text-emerald-400"
+          iconBg="bg-emerald-100 dark:bg-emerald-950/50"
           title={t('profile.contact.title')}
           description={t('profile.contact.description')}
         >
@@ -455,8 +455,8 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
                 onChange={(v) => updateProfile('officeAddress', v)}
                 placeholder="Av. Corrientes 1234, Piso 5, CABA"
               />
-              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                <p className="text-xs text-amber-700">
+              <div className="p-3 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <p className="text-xs text-amber-700 dark:text-amber-300">
                   {t('profile.location.tip')}
                 </p>
               </div>
