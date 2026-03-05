@@ -44,10 +44,12 @@ interface CalendarSettings {
 
 const SETTINGS_KEY = 'lavenius_settings';
 
+// Default calendar display hours (8am to 8pm, all days visible)
+// Note: Working hours configuration is kept for public profile sharing only
 const defaultWorkingHours: WorkingHours = {
-  startTime: '09:00',
-  endTime: '18:00',
-  workingDays: [1, 2, 3, 4, 5], // Monday to Friday
+  startTime: '08:00',
+  endTime: '20:00',
+  workingDays: [0, 1, 2, 3, 4, 5, 6], // All days (for display purposes)
 };
 
 // Get time range for a día off based on its tipo
@@ -169,8 +171,11 @@ export function FullCalendarView({
     }
   }, [isMobile, currentView]);
 
-  // Load working hours from localStorage
+  // Note: Working hours settings are loaded but not used for restrictions
+  // They will be used for the public profile feature to share availability with patients
+  // For now, professionals can schedule at any time
   const calendarSettings = useMemo(() => loadCalendarSettings(), []);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { workingHours } = calendarSettings;
   
   // Get days off from the settings store (API)
@@ -228,20 +233,6 @@ export function FullCalendarView({
   const getDiaOffForDate = (date: Date): DiaOff | undefined => {
     const dateStr = date.toISOString().split('T')[0];
     return diasOff.find(d => d.fecha === dateStr);
-  };
-
-  // Check if a date is a non-working day
-  const isNonWorkingDay = (date: Date): boolean => {
-    const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
-    return !workingHours.workingDays.includes(dayOfWeek);
-  };
-
-  // Check if time is outside working hours
-  const isOutsideWorkingHours = (date: Date): boolean => {
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-    return timeStr < workingHours.startTime || timeStr >= workingHours.endTime;
   };
 
   // Convert sessions to FullCalendar events (filter out cancelled sessions)
@@ -385,18 +376,7 @@ export function FullCalendarView({
       return;
     }
     
-    // Check if it's a non-working day
-    if (isNonWorkingDay(selectInfo.start)) {
-      toast.warning(t('agenda.dayOff.nonWorkingDay'));
-      return;
-    }
-    
-    // Check if time is outside working hours (only for time-based selections)
-    if (!selectInfo.allDay && isOutsideWorkingHours(selectInfo.start)) {
-      toast.warning(t('agenda.dayOff.outsideWorkingHours', { start: workingHours.startTime, end: workingHours.endTime }));
-      return;
-    }
-    
+    // Allow scheduling on any day and time (restrictions removed for professional use)
     onDateSelect?.(selectInfo.start, selectInfo.end);
   };
 
@@ -424,20 +404,7 @@ export function FullCalendarView({
       return;
     }
     
-    // Check if dropped on a non-working day
-    if (isNonWorkingDay(newStart)) {
-      toast.warning(t('agenda.dayOff.cannotMoveToNonWorking'));
-      dropInfo.revert();
-      return;
-    }
-    
-    // Check if dropped outside working hours
-    if (isOutsideWorkingHours(newStart)) {
-      toast.warning(t('agenda.dayOff.cannotMoveOutsideHours', { start: workingHours.startTime, end: workingHours.endTime }));
-      dropInfo.revert();
-      return;
-    }
-    
+    // Allow dropping on any day and time (restrictions removed for professional use)
     onEventDrop?.(session.id, newStart, newEnd);
   };
 
@@ -580,16 +547,8 @@ export function FullCalendarView({
           allDaySlot={true}
           allDayText="Día Off"
           nowIndicator={true}
-          // Business hours - visually highlight working hours
-          businessHours={{
-            daysOfWeek: workingHours.workingDays,
-            startTime: workingHours.startTime,
-            endTime: workingHours.endTime,
-          }}
-          // Constrain selection to business hours
-          selectConstraint="businessHours"
-          // Hide days not in working days
-          hiddenDays={[0, 1, 2, 3, 4, 5, 6].filter(d => !workingHours.workingDays.includes(d))}
+          // Show all days - no hidden days restriction
+          // Business hours kept for visual reference only (not as constraint)
         />
       </div>
 

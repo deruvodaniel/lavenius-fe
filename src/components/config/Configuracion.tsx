@@ -947,13 +947,15 @@ export function Configuracion() {
             {/* Google Calendar Sync */}
             <CalendarSync />
 
-            {/* Working Hours & Days */}
+            {/* Working Hours & Days - Coming Soon (for public profile sharing) */}
             <ConfigSection
               icon={Clock}
               iconColor="text-indigo-600 dark:text-indigo-400"
               iconBg="bg-indigo-100 dark:bg-indigo-950/50"
               title={t('settings.workingHours.title')}
               description={t('settings.workingHours.description')}
+              comingSoon={true}
+              comingSoonText={t('common.comingSoon')}
             >
               <div className="space-y-5">
                 <fieldset className="space-y-2">
