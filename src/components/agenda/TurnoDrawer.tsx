@@ -67,8 +67,8 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     horaInicio: '08:00',
     horaFin: '09:00',
     motivo: '',
-    sessionType: SessionType.PRESENTIAL,
-    estado: SessionStatus.CONFIRMED,
+    sessionType: SessionType.REMOTE,
+    estado: SessionStatus.PENDING,
     monto: 8500,
   });
 
@@ -113,8 +113,8 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         horaInicio: '08:00',
         horaFin: '09:00',
         motivo: '',
-        sessionType: SessionType.PRESENTIAL,
-        estado: SessionStatus.CONFIRMED,
+        sessionType: SessionType.REMOTE,
+        estado: SessionStatus.PENDING,
         monto: 8500,
       };
       
