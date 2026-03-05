@@ -19,7 +19,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { useSetupProgressStore, type SetupStepId } from '@/lib/stores';
+import { useSetupProgressStore, useDashboardSettingsStore, type SetupStepId } from '@/lib/stores';
 import { usePatients } from '@/lib/hooks';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useSessionStore } from '@/lib/stores/sessionStore';
@@ -78,8 +78,11 @@ export function OnboardingProgressCard({ className = '' }: OnboardingProgressCar
   
   // Get store state with stable selectors
   const steps = useSetupProgressStore((state) => state.steps);
-  const isDismissed = useSetupProgressStore((state) => state.isDismissed);
-  const dismissCard = useSetupProgressStore((state) => state.dismissCard);
+  
+  // Use dashboard settings for visibility control
+  const sections = useDashboardSettingsStore((state) => state.sections);
+  const setSectionVisibility = useDashboardSettingsStore((state) => state.setSectionVisibility);
+  const isVisible = sections.find((s) => s.id === 'setupProgress')?.visible ?? true;
 
   // Get data for auto-detection
   const { patients } = usePatients();
@@ -134,7 +137,7 @@ export function OnboardingProgressCard({ className = '' }: OnboardingProgressCar
   }, [steps]);
 
   // Don't render if card shouldn't be shown
-  if (isDismissed || allComplete) {
+  if (!isVisible || allComplete) {
     return null;
   }
 
@@ -144,7 +147,7 @@ export function OnboardingProgressCard({ className = '' }: OnboardingProgressCar
   };
 
   const handleDismiss = () => {
-    dismissCard();
+    setSectionVisibility('setupProgress', false);
   };
 
   return (

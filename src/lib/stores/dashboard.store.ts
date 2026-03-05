@@ -9,6 +9,7 @@ import { persist } from 'zustand/middleware';
 
 // Dashboard section identifiers
 export type DashboardSectionId =
+  | 'setupProgress'
   | 'todaySummary'
   | 'quickActions'
   | 'statCards'
@@ -19,6 +20,7 @@ export type DashboardSectionId =
 
 // Default section order and visibility
 const DEFAULT_SECTIONS: DashboardSectionId[] = [
+  'setupProgress',
   'todaySummary',
   'quickActions',
   'statCards',

@@ -1037,6 +1037,7 @@
       "description": "Choose which sections to display",
       "reset": "Reset",
       "sections": {
+        "setupProgress": "Setup Progress",
         "todaySummary": "Today's Summary",
         "quickActions": "Quick Actions",
         "statCards": "Statistics Cards",
@@ -1050,7 +1051,7 @@
       "title": "Set up your account",
       "subtitle": "Complete these steps to get the most out of Lavenius",
       "progress": "{{completed}} of {{total}} completed",
-      "dismissHint": "You can close this card and see it later in settings",
+      "dismissHint": "You can show this card again from the dashboard settings menu",
       "steps": {
         "configureProfile": "Configure your professional profile",
         "connectCalendar": "Connect Google Calendar",

@@ -225,6 +225,7 @@ interface DashboardSettingsPopoverProps {
 }
 
 const SECTION_LABELS: Record<DashboardSectionId, string> = {
+  setupProgress: 'dashboard.settings.sections.setupProgress',
   todaySummary: 'dashboard.settings.sections.todaySummary',
   quickActions: 'dashboard.settings.sections.quickActions',
   statCards: 'dashboard.settings.sections.statCards',

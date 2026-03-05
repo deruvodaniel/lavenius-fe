@@ -1037,6 +1037,7 @@
       "description": "Elige qué secciones mostrar",
       "reset": "Restablecer",
       "sections": {
+        "setupProgress": "Progreso de configuración",
         "todaySummary": "Resumen de hoy",
         "quickActions": "Acciones rápidas",
         "statCards": "Tarjetas de estadísticas",
@@ -1050,7 +1051,7 @@
       "title": "Configura tu cuenta",
       "subtitle": "Completa estos pasos para aprovechar al máximo Lavenius",
       "progress": "{{completed}} de {{total}} completados",
-      "dismissHint": "Puedes cerrar esta tarjeta y verla luego en configuración",
+      "dismissHint": "Puedes volver a ver esta tarjeta desde el menú de configuración del dashboard",
       "steps": {
         "configureProfile": "Configurar tu perfil profesional",
         "connectCalendar": "Conectar Google Calendar",
