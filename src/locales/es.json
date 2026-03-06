@@ -1748,7 +1748,9 @@
         "website": "Sitio Web",
         "instagram": "Instagram",
         "linkedin": "LinkedIn",
-        "bio": "Biografía / Descripción"
+        "bio": "Biografía / Descripción",
+        "passphrase": "Passphrase",
+        "confirmPassphrase": "Confirmar passphrase"
       },
       "placeholders": {
         "licenseNumber": "Ej: MN 12345 / MP 67890",
@@ -1766,8 +1768,55 @@
         "licenseMinLength": "La matrícula debe tener al menos 3 caracteres",
         "phoneInvalid": "El teléfono debe tener al menos 8 dígitos",
         "websiteInvalid": "Ingresa una URL válida (ej: https://ejemplo.com)",
-        "bioTooLong": "La biografía no puede superar los 500 caracteres"
+        "bioTooLong": "La biografía no puede superar los 500 caracteres",
+        "passphraseMinLength": "La passphrase debe tener al menos {{count}} caracteres",
+        "passphraseMismatch": "Las passphrases no coinciden",
+        "recoveryAcknowledged": "Debes confirmar que guardaste tu frase de recuperación.",
+        "recoveryCodeUnavailable": "No pudimos generar tu frase de recuperación. Intenta nuevamente."
+      },
+      "registerError": "No pudimos registrar tu usuario en el backend. Intenta nuevamente.",
+      "recovery": {
+        "title": "Frase de recuperación (mostrar una sola vez)",
+        "description": "Guarda esta frase en un lugar seguro. Sin passphrase ni frase de recuperación, tus datos E2E no pueden recuperarse.",
+        "generate": "Generar frase de recuperación",
+        "copy": "Copiar",
+        "copied": "Copiado",
+        "download": "Descargar .txt",
+        "acknowledgement": "Entiendo que solo mi passphrase o esta frase de recuperación pueden descifrar mi información.",
+        "copyError": "No pudimos copiar la frase de recuperación.",
+        "fileTitle": "Frase de Recuperación Lavenius",
+        "fileWarning": "Importante: sin esta frase (o tu passphrase) no podrás recuperar tus datos E2E."
       }
+    }
+  },
+  "e2eUnlock": {
+    "title": {
+      "unlock": "Desbloquear información cifrada",
+      "recovery": "Recuperar acceso"
+    },
+    "description": {
+      "unlock": "Ingresa tu passphrase para cargar tus datos sensibles.",
+      "recovery": "Usa tu frase de recuperación para definir una nueva passphrase."
+    },
+    "fields": {
+      "passphrase": "Passphrase",
+      "recoveryCode": "Frase de recuperación",
+      "newPassphrase": "Nueva passphrase",
+      "confirmPassphrase": "Confirmar passphrase"
+    },
+    "actions": {
+      "unlock": "Desbloquear",
+      "unlocking": "Desbloqueando...",
+      "forgotPassphrase": "Olvidé mi passphrase",
+      "resetAndUnlock": "Restablecer y desbloquear",
+      "recovering": "Recuperando...",
+      "backToPassphrase": "Volver a passphrase"
+    },
+    "errors": {
+      "invalidCredentials": "No pudimos desbloquear tus datos. Revisa tu passphrase o frase de recuperación.",
+      "rateLimited": "Demasiados intentos. Espera un momento y vuelve a intentar.",
+      "invalidRecoveryInput": "Revisa la frase de recuperación y confirma la nueva passphrase.",
+      "generic": "No pudimos desbloquear tu información cifrada."
     }
   },
   "errors": {

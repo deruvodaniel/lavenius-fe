@@ -11,7 +11,6 @@ import type { ClerkUserSyncDto, OnboardingExtraData } from '../types/api.types';
  * User ID is appended to make it user-scoped
  */
 const ONBOARDING_EXTRA_DATA_KEY_PREFIX = 'lavenius_onboarding_extra';
-const BACKEND_PASSPHRASE_KEY_PREFIX = 'lavenius_backend_passphrase';
 
 /**
  * Result of a backend sync attempt
@@ -41,13 +40,6 @@ class OnboardingService {
   }
 
   /**
-   * Get the localStorage key for backend passphrase (therapist.id) for a Clerk user
-   */
-  private getBackendPassphraseKey(clerkUserId: string): string {
-    return `${BACKEND_PASSPHRASE_KEY_PREFIX}_${clerkUserId}`;
-  }
-
-  /**
    * Sync user data with the backend
    * This is called during onboarding to register the Clerk user with our backend
    *
@@ -59,12 +51,33 @@ class OnboardingService {
     if (!externalId) {
       return { success: false, error: 'missing_external_id' };
     }
+
+    const missingBundleData =
+      !data.encryptedUserKey ||
+      !data.salt ||
+      !data.iv ||
+      !data.recoveryEncryptedUserKey ||
+      !data.recoverySalt ||
+      !data.recoveryIv;
+
+    if (missingBundleData) {
+      return { success: false, error: 'missing_key_bundle' };
+    }
+
     const payload = {
       clerkUserId: externalId,
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
       licenseNumber: data.licenseNumber ?? '',
+      encryptedUserKey: data.encryptedUserKey,
+      salt: data.salt,
+      iv: data.iv,
+      recoveryEncryptedUserKey: data.recoveryEncryptedUserKey,
+      recoverySalt: data.recoverySalt,
+      recoveryIv: data.recoveryIv,
+      recoveryEnabled: data.recoveryEnabled ?? true,
+      userKeyBundleVersion: data.userKeyBundleVersion ?? 1,
     };
 
     try {
@@ -75,7 +88,6 @@ class OnboardingService {
 
       const backendUserId = response?.user?.id;
       if (backendUserId) {
-        this.saveBackendPassphrase(externalId, backendUserId);
         return { success: true, therapistId: backendUserId };
       }
       return { success: true };
@@ -104,7 +116,6 @@ class OnboardingService {
         if (isGenericBadRequest) {
           const existingTherapist = await this.tryFindCurrentTherapist();
           if (existingTherapist?.id) {
-            this.saveBackendPassphrase(externalId, existingTherapist.id);
             return { success: true, alreadyExists: true, therapistId: existingTherapist.id };
           }
         }
@@ -201,22 +212,6 @@ class OnboardingService {
   clearExtraData(userId: string): void {
     const key = this.getExtraDataKey(userId);
     localStorage.removeItem(key);
-  }
-
-  /**
-   * Store backend passphrase (currently therapist.id) associated with Clerk user ID
-   */
-  saveBackendPassphrase(clerkUserId: string, passphrase: string): void {
-    const key = this.getBackendPassphraseKey(clerkUserId);
-    localStorage.setItem(key, passphrase);
-  }
-
-  /**
-   * Get backend passphrase for a Clerk user ID
-   */
-  getBackendPassphrase(clerkUserId: string): string | null {
-    const key = this.getBackendPassphraseKey(clerkUserId);
-    return localStorage.getItem(key);
   }
 }
 

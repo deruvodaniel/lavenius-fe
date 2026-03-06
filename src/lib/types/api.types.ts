@@ -222,6 +222,14 @@ export type ClerkUserSyncDto = {
   lastName: string;
   phone?: string;
   licenseNumber?: string;
+  encryptedUserKey?: string;
+  salt?: string;
+  iv?: string;
+  recoveryEncryptedUserKey?: string;
+  recoverySalt?: string;
+  recoveryIv?: string;
+  recoveryEnabled?: boolean;
+  userKeyBundleVersion?: number;
 };
 
 /**
@@ -310,7 +318,28 @@ export type UpdatePaymentDto = Partial<CreatePaymentDto>;
 
 export type AuthResponse = {
   user: User;
-  userKey: string; // Base64 encoded encryption key
+};
+
+export type KeyBundleResponse = {
+  encryptedUserKey: string;
+  salt: string;
+  iv: string;
+  userKeyBundleVersion: number;
+};
+
+export type RecoveryKeyBundleResponse = {
+  recoveryEncryptedUserKey: string;
+  recoverySalt: string;
+  recoveryIv: string;
+  recoveryEnabled: boolean;
+  userKeyBundleVersion: number;
+};
+
+export type ResetPassphraseDto = {
+  encryptedUserKey: string;
+  salt: string;
+  iv: string;
+  userKeyBundleVersion: number;
 };
 
 export type PatientDetailsResponse = {

@@ -1,6 +1,7 @@
 import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { apiClient } from '../api/client';
+import { useE2EKey } from '../e2e';
 
 /**
  * Social media links stored in onboarding metadata
@@ -68,6 +69,7 @@ export interface OnboardingMetadata {
 export const useAuth = () => {
   const { isLoaded, isSignedIn, signOut } = useClerkAuth();
   const { user: clerkUser } = useUser();
+  const { isUnlocked } = useE2EKey();
   const [therapistId, setTherapistId] = useState<string | undefined>();
   const [loadingTherapistId, setLoadingTherapistId] = useState(false);
 
@@ -111,6 +113,11 @@ export const useAuth = () => {
       return;
     }
 
+    // Backend therapist profile can depend on E2E unlock in current contracts.
+    if (!isUnlocked) {
+      return;
+    }
+
     // Skip if we already have the therapist ID
     if (therapistId) {
       return;
@@ -135,7 +142,7 @@ export const useAuth = () => {
     };
 
     void fetchTherapistId();
-  }, [isLoaded, isSignedIn, clerkUser?.id, therapistId]);
+  }, [isLoaded, isSignedIn, clerkUser?.id, therapistId, isUnlocked]);
 
   return {
     user,

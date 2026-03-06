@@ -17,9 +17,6 @@ describe('ApiClient', () => {
     getToken: vi.fn(),
     setToken: vi.fn(),
     removeToken: vi.fn(),
-    getUserKey: vi.fn(),
-    setUserKey: vi.fn(),
-    removeUserKey: vi.fn(),
     clear: vi.fn(),
   });
 
@@ -59,7 +56,7 @@ describe('ApiClient', () => {
       expect(mockStorage.setToken).toHaveBeenCalledWith(clerkToken);
     });
 
-    it('should set userKey with rememberMe option', () => {
+    it('should set transient userKey in memory', () => {
       const mockStorage = createMockTokenStorage();
       
       // @ts-expect-error - private constructor access for testing
@@ -67,18 +64,20 @@ describe('ApiClient', () => {
       
       client.setUserKey('encryption-key', true);
       
-      expect(mockStorage.setUserKey).toHaveBeenCalledWith('encryption-key', true);
+      expect(client.hasUserKey()).toBe(true);
     });
 
-    it('should set userKey without rememberMe (session only)', () => {
+    it('should clear transient userKey', () => {
       const mockStorage = createMockTokenStorage();
       
       // @ts-expect-error - private constructor access for testing
       const client = new ApiClient(mockStorage);
       
       client.setUserKey('encryption-key', false);
+      expect(client.hasUserKey()).toBe(true);
       
-      expect(mockStorage.setUserKey).toHaveBeenCalledWith('encryption-key', false);
+      client.clearUserKey();
+      expect(client.hasUserKey()).toBe(false);
     });
 
     it('should set both token and userKey via setAuth', () => {
@@ -90,7 +89,7 @@ describe('ApiClient', () => {
       client.setAuth('my-token', 'my-key', true);
       
       expect(mockStorage.setToken).toHaveBeenCalledWith('my-token');
-      expect(mockStorage.setUserKey).toHaveBeenCalledWith('my-key', true);
+      expect(client.hasUserKey()).toBe(true);
     });
 
     it('should clear all auth data via clearAuth', () => {
@@ -124,10 +123,9 @@ describe('ApiClient', () => {
 
   // ==================== Authentication State Tests ====================
   describe('Authentication State', () => {
-    it('should return true for isAuthenticated when both token and userKey exist', () => {
+    it('should return true for isAuthenticated when token exists', () => {
       const mockStorage = createMockTokenStorage();
       mockStorage.getToken.mockReturnValue('valid-token');
-      mockStorage.getUserKey.mockReturnValue('valid-key');
       
       // @ts-expect-error - private constructor access for testing
       const client = new ApiClient(mockStorage);
@@ -135,32 +133,9 @@ describe('ApiClient', () => {
       expect(client.isAuthenticated()).toBe(true);
     });
 
-    it('should return false for isAuthenticated when only token exists', () => {
-      const mockStorage = createMockTokenStorage();
-      mockStorage.getToken.mockReturnValue('token');
-      mockStorage.getUserKey.mockReturnValue(null);
-      
-      // @ts-expect-error - private constructor access for testing
-      const client = new ApiClient(mockStorage);
-      
-      expect(client.isAuthenticated()).toBe(false);
-    });
-
-    it('should return false for isAuthenticated when only userKey exists', () => {
+    it('should return false for isAuthenticated when token does not exist', () => {
       const mockStorage = createMockTokenStorage();
       mockStorage.getToken.mockReturnValue(null);
-      mockStorage.getUserKey.mockReturnValue('key');
-      
-      // @ts-expect-error - private constructor access for testing
-      const client = new ApiClient(mockStorage);
-      
-      expect(client.isAuthenticated()).toBe(false);
-    });
-
-    it('should return false for isAuthenticated when neither exists', () => {
-      const mockStorage = createMockTokenStorage();
-      mockStorage.getToken.mockReturnValue(null);
-      mockStorage.getUserKey.mockReturnValue(null);
       
       // @ts-expect-error - private constructor access for testing
       const client = new ApiClient(mockStorage);
@@ -266,9 +241,6 @@ describe('ApiClient - Clerk Token Integration', () => {
     getToken: vi.fn(),
     setToken: vi.fn(),
     removeToken: vi.fn(),
-    getUserKey: vi.fn(),
-    setUserKey: vi.fn(),
-    removeUserKey: vi.fn(),
     clear: vi.fn(),
   });
 
@@ -336,7 +308,7 @@ describe('ApiClient - Clerk Token Integration', () => {
       client.setAuth(clerkToken, userKey, true);
       
       expect(mockStorage.setToken).toHaveBeenCalledWith(clerkToken);
-      expect(mockStorage.setUserKey).toHaveBeenCalledWith(userKey, true);
+      expect(client.hasUserKey()).toBe(true);
     });
   });
 
@@ -384,8 +356,15 @@ describe('Registration Data Structure', () => {
       email: 'therapist@example.com',
       firstName: 'María',
       lastName: 'García',
-      phone: '+1234567890',
       licenseNumber: 'LIC-2024-001',
+      encryptedUserKey: 'ZW5jcnlwdGVkLXVzZXIta2V5',
+      salt: 'c2FsdA==',
+      iv: 'aXY=',
+      recoveryEncryptedUserKey: 'cmVjb3ZlcnktZW5jcnlwdGVkLXVzZXIta2V5',
+      recoverySalt: 'cmVjb3Zlcnktc2FsdA==',
+      recoveryIv: 'cmVjb3ZlcnktaXY=',
+      recoveryEnabled: true,
+      userKeyBundleVersion: 1,
     };
 
     // Verify required fields
@@ -394,9 +373,14 @@ describe('Registration Data Structure', () => {
     expect(registrationData.firstName).toBeDefined();
     expect(registrationData.lastName).toBeDefined();
     
-    // Verify optional fields are allowed
-    expect(registrationData.phone).toBeDefined();
-    expect(registrationData.licenseNumber).toBeDefined();
+    // Verify E2E bundle fields
+    expect(registrationData.encryptedUserKey).toBeDefined();
+    expect(registrationData.salt).toBeDefined();
+    expect(registrationData.iv).toBeDefined();
+    expect(registrationData.recoveryEncryptedUserKey).toBeDefined();
+    expect(registrationData.recoverySalt).toBeDefined();
+    expect(registrationData.recoveryIv).toBeDefined();
+    expect(registrationData.userKeyBundleVersion).toBe(1);
   });
 
   it('should have clerkUserId as a string matching Clerk user ID format', () => {
@@ -408,18 +392,26 @@ describe('Registration Data Structure', () => {
     expect(clerkUserId.length).toBeGreaterThan(5);
   });
 
-  it('should accept minimal required fields', () => {
+  it('should include required key bundle fields', () => {
     const minimalData = {
       clerkUserId: 'user_minimal123',
       email: 'user@test.com',
       firstName: 'Test',
       lastName: 'User',
+      encryptedUserKey: 'ZW5jcnlwdGVk',
+      salt: 'c2FsdA==',
+      iv: 'aXY=',
+      recoveryEncryptedUserKey: 'cmVjb3Zlcnk=',
+      recoverySalt: 'cmVjLXNhbHQ=',
+      recoveryIv: 'cmVjLWl2',
     };
 
-    expect(Object.keys(minimalData)).toHaveLength(4);
+    expect(Object.keys(minimalData)).toHaveLength(10);
     expect(minimalData.clerkUserId).toBeTruthy();
     expect(minimalData.email).toBeTruthy();
     expect(minimalData.firstName).toBeTruthy();
     expect(minimalData.lastName).toBeTruthy();
+    expect(minimalData.encryptedUserKey).toBeTruthy();
+    expect(minimalData.recoveryEncryptedUserKey).toBeTruthy();
   });
 });

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@clerk/clerk-react';
@@ -15,7 +15,9 @@ import {
   FileText,
   ArrowLeft,
   ArrowRight,
-  PartyPopper
+  PartyPopper,
+  Copy,
+  Download
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,8 +34,14 @@ import {
 import { toast } from 'sonner';
 import { cn } from '@/components/ui/utils';
 import { onboardingService } from '@/lib/services';
-import { apiClient } from '@/lib/api/client';
 import { BetaBadge } from '@/components/shared';
+import { useE2EKey } from '@/lib/e2e';
+import {
+  generateRecoverySecret,
+  generateUserKey,
+  wrapUserKey,
+  wrapUserKeyForRecovery,
+} from '@/lib/e2e/crypto';
 import type { ClerkUserSyncDto, OnboardingExtraData } from '@/lib/types/api.types';
 
 /**
@@ -72,6 +80,10 @@ interface OnboardingFormData {
   instagram: string;
   linkedin: string;
   bio: string;
+  // Step 4: E2E setup
+  passphrase: string;
+  confirmPassphrase: string;
+  recoveryAcknowledged: boolean;
 }
 
 type StepKey = 'professional' | 'contact' | 'online' | 'complete';
@@ -125,6 +137,7 @@ export function Onboarding() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, isLoaded } = useUser();
+  const { setKeyFromOnboarding } = useE2EKey();
   
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<OnboardingFormData>({
@@ -137,8 +150,13 @@ export function Onboarding() {
     instagram: '',
     linkedin: '',
     bio: '',
+    passphrase: '',
+    confirmPassphrase: '',
+    recoveryAcknowledged: false,
   });
   const [errors, setErrors] = useState<Partial<Record<keyof OnboardingFormData, string>>>({});
+  const [recoverySecret, setRecoverySecret] = useState('');
+  const [copiedRecoveryCode, setCopiedRecoveryCode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Progress percentage
@@ -150,6 +168,9 @@ export function Onboarding() {
   const stepConfig = STEPS[currentStep];
   const isLastStep = currentStep === TOTAL_STEPS - 1;
   const isFirstStep = currentStep === 0;
+  const isPassphraseReady =
+    formData.passphrase.length >= 8 &&
+    formData.confirmPassphrase === formData.passphrase;
 
   // Show loading while Clerk loads user data
   if (!isLoaded) {
@@ -215,6 +236,24 @@ export function Onboarding() {
       }
     }
 
+    if (currentStep === 3) {
+      if (formData.passphrase.length < 8) {
+        newErrors.passphrase = t('onboarding.stepper.validation.passphraseMinLength', { count: 8 });
+      }
+
+      if (formData.confirmPassphrase !== formData.passphrase) {
+        newErrors.confirmPassphrase = t('onboarding.stepper.validation.passphraseMismatch');
+      }
+
+      if (!formData.recoveryAcknowledged) {
+        newErrors.recoveryAcknowledged = t('onboarding.stepper.validation.recoveryAcknowledged');
+      }
+
+      if (!recoverySecret) {
+        newErrors.recoveryAcknowledged = t('onboarding.stepper.validation.recoveryCodeUnavailable');
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -239,6 +278,10 @@ export function Onboarding() {
   };
 
   const handleSubmit = async () => {
+    if (!validateCurrentStep()) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -251,6 +294,10 @@ export function Onboarding() {
         return;
       }
 
+      const userKey = generateUserKey();
+      const passphraseBundle = await wrapUserKey(userKey, formData.passphrase);
+      const recoveryBundle = await wrapUserKeyForRecovery(userKey, recoverySecret);
+
       // 2. Prepare data for backend (only fields it accepts)
       const backendData: ClerkUserSyncDto = {
         clerkUserId: user.id,
@@ -260,6 +307,14 @@ export function Onboarding() {
         lastName: user.lastName || '',
         phone: formData.phone.trim() || undefined,
         licenseNumber: formData.licenseNumber.trim() || undefined,
+        encryptedUserKey: passphraseBundle.encryptedUserKey,
+        salt: passphraseBundle.salt,
+        iv: passphraseBundle.iv,
+        recoveryEncryptedUserKey: recoveryBundle.recoveryEncryptedUserKey,
+        recoverySalt: recoveryBundle.recoverySalt,
+        recoveryIv: recoveryBundle.recoveryIv,
+        recoveryEnabled: true,
+        userKeyBundleVersion: 1,
       };
 
       // 3. Prepare extra data for localStorage (fields backend doesn't accept)
@@ -286,48 +341,7 @@ export function Onboarding() {
         }
       } else {
         console.warn('Backend registration failed during onboarding:', syncResult.error);
-        toast.error('No pudimos registrar tu usuario en el backend. Intenta nuevamente.');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // 4.1 Bootstrap encryption key:
-      // Priority: register response -> stored passphrase -> /therapists lookup.
-      let backendPassphrase: string | null =
-        syncResult.therapistId || onboardingService.getBackendPassphrase(user.id);
-
-      if (!backendPassphrase) {
-        try {
-          const therapistData = await apiClient.get<{ id: string }>('/therapists');
-          if (therapistData?.id) {
-            backendPassphrase = therapistData.id;
-          }
-        } catch {
-          // fall through to error handling below
-        }
-      }
-
-      if (!backendPassphrase) {
-        toast.error('No pudimos obtener tu therapistId para inicializar cifrado.');
-        setIsSubmitting(false);
-        return;
-      }
-
-      try {
-        const authResponse = await apiClient.post<{ userKey?: string }>('/auth', {
-          passphrase: backendPassphrase,
-        });
-
-        if (authResponse?.userKey) {
-          apiClient.setUserKey(authResponse.userKey);
-          onboardingService.saveBackendPassphrase(user.id, backendPassphrase);
-        } else {
-          toast.error('No pudimos inicializar tu clave de cifrado. Intenta nuevamente.');
-          setIsSubmitting(false);
-          return;
-        }
-      } catch {
-        toast.error('No pudimos inicializar tu clave de cifrado. Intenta nuevamente.');
+        toast.error(t('onboarding.stepper.registerError'));
         setIsSubmitting(false);
         return;
       }
@@ -335,7 +349,10 @@ export function Onboarding() {
       // 5. Save extra data to localStorage (user-scoped)
       onboardingService.saveExtraData(user.id, extraData);
 
-      // 6. Update Clerk user metadata with all profile data
+      // 6. Keep E2E key in memory for current session (no local persistence).
+      setKeyFromOnboarding(userKey, 1);
+
+      // 7. Update Clerk user metadata with all profile data
       await user.update({
         unsafeMetadata: {
           ...user.unsafeMetadata,
@@ -369,11 +386,65 @@ export function Onboarding() {
   };
 
   const handleInputChange = (field: keyof OnboardingFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const nextState = { ...prev, [field]: value };
+      if (field === 'passphrase' || field === 'confirmPassphrase') {
+        nextState.recoveryAcknowledged = false;
+      }
+      return nextState;
+    });
+
+    if (field === 'passphrase' || field === 'confirmPassphrase') {
+      setRecoverySecret('');
+      setCopiedRecoveryCode(false);
+    }
+
     // Clear error when user types
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
+  };
+
+  const handleGenerateRecoveryCode = () => {
+    if (!isPassphraseReady) return;
+    setRecoverySecret(generateRecoverySecret());
+    setCopiedRecoveryCode(false);
+    setFormData((prev) => ({ ...prev, recoveryAcknowledged: false }));
+    if (errors.recoveryAcknowledged) {
+      setErrors((prev) => ({ ...prev, recoveryAcknowledged: undefined }));
+    }
+  };
+
+  const handleCopyRecoveryCode = async () => {
+    if (!recoverySecret) return;
+
+    try {
+      await navigator.clipboard.writeText(recoverySecret);
+      setCopiedRecoveryCode(true);
+      setTimeout(() => setCopiedRecoveryCode(false), 2000);
+    } catch {
+      toast.error(t('onboarding.stepper.recovery.copyError'));
+    }
+  };
+
+  const handleDownloadRecoveryCode = () => {
+    if (!recoverySecret) return;
+
+    const content = [
+      t('onboarding.stepper.recovery.fileTitle'),
+      '',
+      recoverySecret,
+      '',
+      t('onboarding.stepper.recovery.fileWarning'),
+    ].join('\n');
+
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'lavenius-recovery-phrase.txt';
+    anchor.click();
+    URL.revokeObjectURL(url);
   };
 
   const renderStepContent = () => {
@@ -690,6 +761,105 @@ export function Onboarding() {
             <span className="font-medium">{t('onboarding.complete.tip')}</span>{' '}
             {t('onboarding.stepper.complete.tipText')}
           </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="passphrase" className="text-foreground">
+            {t('onboarding.stepper.fields.passphrase')} <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="passphrase"
+            type="password"
+            autoComplete="new-password"
+            value={formData.passphrase}
+            onChange={(event) => handleInputChange('passphrase', event.target.value)}
+            disabled={isSubmitting}
+            className={cn(
+              "transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20",
+              errors.passphrase && "border-red-500 focus:ring-red-500/20"
+            )}
+          />
+          {errors.passphrase && (
+            <p className="text-sm text-red-600 animate-stepper-error">{errors.passphrase}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassphrase" className="text-foreground">
+            {t('onboarding.stepper.fields.confirmPassphrase')} <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="confirmPassphrase"
+            type="password"
+            autoComplete="new-password"
+            value={formData.confirmPassphrase}
+            onChange={(event) => handleInputChange('confirmPassphrase', event.target.value)}
+            disabled={isSubmitting}
+            className={cn(
+              "transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20",
+              errors.confirmPassphrase && "border-red-500 focus:ring-red-500/20"
+            )}
+          />
+          {errors.confirmPassphrase && (
+            <p className="text-sm text-red-600 animate-stepper-error">{errors.confirmPassphrase}</p>
+          )}
+        </div>
+
+        <div className="space-y-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30">
+          <div>
+            <p className="text-sm font-medium text-amber-800 dark:text-amber-200">{t('onboarding.stepper.recovery.title')}</p>
+            <p className="text-xs text-amber-700 dark:text-amber-300">
+              {t('onboarding.stepper.recovery.description')}
+            </p>
+          </div>
+
+          {!recoverySecret ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleGenerateRecoveryCode}
+              disabled={isSubmitting || !isPassphraseReady}
+            >
+              {t('onboarding.stepper.recovery.generate')}
+            </Button>
+          ) : (
+            <Input
+              readOnly
+              value={recoverySecret}
+              className="font-mono text-xs bg-white dark:bg-slate-900"
+            />
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <Button type="button" variant="outline" onClick={handleCopyRecoveryCode} disabled={!recoverySecret || isSubmitting}>
+              <Copy className="w-4 h-4 mr-2" />
+              {copiedRecoveryCode ? t('onboarding.stepper.recovery.copied') : t('onboarding.stepper.recovery.copy')}
+            </Button>
+            <Button type="button" variant="outline" onClick={handleDownloadRecoveryCode} disabled={!recoverySecret || isSubmitting}>
+              <Download className="w-4 h-4 mr-2" />
+              {t('onboarding.stepper.recovery.download')}
+            </Button>
+          </div>
+
+          <label className="flex items-start gap-2 text-sm text-amber-900 dark:text-amber-200">
+            <input
+              type="checkbox"
+              checked={formData.recoveryAcknowledged}
+              onChange={(event) => {
+                setFormData((prev) => ({ ...prev, recoveryAcknowledged: event.target.checked }));
+                if (errors.recoveryAcknowledged) {
+                  setErrors((prev) => ({ ...prev, recoveryAcknowledged: undefined }));
+                }
+              }}
+              disabled={isSubmitting}
+              className="mt-0.5"
+            />
+            {t('onboarding.stepper.recovery.acknowledgement')}
+          </label>
+
+          {errors.recoveryAcknowledged && (
+            <p className="text-sm text-red-600 animate-stepper-error">{errors.recoveryAcknowledged}</p>
+          )}
         </div>
       </div>
     );

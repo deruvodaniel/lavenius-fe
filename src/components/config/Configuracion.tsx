@@ -17,7 +17,7 @@ import { User } from 'lucide-react';
 import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
 import { type DayOffConfig, type DayOffSetting } from '@/lib/types/setting.types';
 import { cn } from '@/components/ui/utils';
-import { apiClient } from '@/lib/api/client';
+import { useE2EKey } from '@/lib/e2e';
 
 // ============================================================================
 // NAVIGATION SECTIONS
@@ -314,6 +314,7 @@ const ToggleRow = ({ checked, onChange, label, description }: ToggleRowProps) =>
 
 export function Configuracion() {
   const { t, i18n } = useTranslation();
+  const { isUnlocked } = useE2EKey();
   
   // Navigation state - read initial tab from URL query params
   const [searchParams] = useSearchParams();
@@ -386,37 +387,15 @@ export function Configuracion() {
     endTime: '18:00',
   });
   
-  // Fetch settings on mount
+  // Fetch settings once E2E key is unlocked.
   useEffect(() => {
-    let cancelled = false;
-    const maxAttempts = 30; // ~9s
-    let attempts = 0;
+    if (!isUnlocked) return;
 
-    const tryFetchSettings = () => {
-      if (cancelled) return;
-
-      if (!apiClient.hasUserKey()) {
-        attempts += 1;
-        if (attempts < maxAttempts) {
-          setTimeout(tryFetchSettings, 300);
-        } else {
-          console.warn('[Configuracion] Skipping /settings fetch: userKey not initialized');
-        }
-        return;
-      }
-
-      useSettingStore.getState().fetchSettings().catch((error) => {
-        console.error('Failed to fetch settings:', error);
-        // Don't show toast on initial load failure - graceful degradation
-      });
-    };
-
-    tryFetchSettings();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    useSettingStore.getState().fetchSettings().catch((error) => {
+      console.error('Failed to fetch settings:', error);
+      // Don't show toast on initial load failure - graceful degradation
+    });
+  }, [isUnlocked]);
 
   // Sync reminder state from backend settings when they load
   useEffect(() => {

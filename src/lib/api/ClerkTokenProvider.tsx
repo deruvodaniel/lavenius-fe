@@ -1,9 +1,7 @@
 /**
  * ClerkTokenProvider
  *
- * Initializes the API client with Clerk's token getter and automatically
- * fetches the E2E encryption key (userKey) after sign-in by calling POST /auth
- * with backend passphrase (therapistId) saved during register.
+ * Initializes the API client with Clerk's token getter.
  *
  * Usage:
  * ```tsx
@@ -16,8 +14,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { useAuth, useUser } from '@clerk/clerk-react';
-import { onboardingService } from '../services';
+import { useAuth } from '@clerk/clerk-react';
 import { apiClient } from './client';
 
 interface ClerkTokenProviderProps {
@@ -25,10 +22,8 @@ interface ClerkTokenProviderProps {
 }
 
 export function ClerkTokenProvider({ children }: ClerkTokenProviderProps) {
-  const { getToken, isLoaded, isSignedIn, userId } = useAuth();
-  const { user } = useUser();
+  const { getToken, isLoaded } = useAuth();
   const tokenInitialized = useRef(false);
-  const keyFetchedForUser = useRef<string | null>(null);
 
   // Initialize Clerk token getter (once)
   useEffect(() => {
@@ -43,66 +38,6 @@ export function ClerkTokenProvider({ children }: ClerkTokenProviderProps) {
       tokenInitialized.current = true;
     }
   }, [getToken, isLoaded]);
-
-  // Fetch E2E encryption userKey after sign-in (once per session per user)
-  useEffect(() => {
-    if (!isLoaded || !isSignedIn || !userId) return;
-    if (keyFetchedForUser.current === userId) return;
-
-    const initializeUserKey = async () => {
-      // If key already exists in storage (session/local), avoid re-bootstrap.
-      if (apiClient.hasUserKey()) {
-        keyFetchedForUser.current = userId;
-        return;
-      }
-
-      const storedBackendPassphrase = onboardingService.getBackendPassphrase(userId);
-      const unsafeMetadata = user?.unsafeMetadata as Record<string, unknown> | undefined;
-      const onboardingComplete = unsafeMetadata?.onboardingComplete === true;
-
-      // During onboarding, backend user may not exist yet.
-      // Skip /auth bootstrap until onboarding completes or we already know a backend passphrase.
-      if (!storedBackendPassphrase && !onboardingComplete) {
-        return;
-      }
-
-      const passphraseCandidates: string[] = [];
-      if (storedBackendPassphrase) {
-        passphraseCandidates.push(storedBackendPassphrase);
-      }
-
-      // Recovery path for existing users that don't have the passphrase in local storage.
-      // Backend currently uses therapistId as bootstrap passphrase.
-      if (!storedBackendPassphrase && onboardingComplete) {
-        try {
-          const therapistData = await apiClient.get<{ id?: string }>('/therapists');
-          if (therapistData?.id) {
-            passphraseCandidates.push(therapistData.id);
-            onboardingService.saveBackendPassphrase(userId, therapistData.id);
-          }
-        } catch {
-          // Continue; /auth bootstrap below will fail and emit a dev warning.
-        }
-      }
-
-      for (const passphrase of passphraseCandidates) {
-        try {
-          const response = await apiClient.post<{ user: { id: string }; userKey: string }>('/auth', { passphrase });
-          if (response?.userKey) {
-            apiClient.setUserKey(response.userKey);
-            keyFetchedForUser.current = userId;
-            onboardingService.saveBackendPassphrase(userId, passphrase);
-            return;
-          }
-        } catch {
-          // try next candidate
-        }
-      }
-
-    };
-
-    void initializeUserKey();
-  }, [isLoaded, isSignedIn, userId, user]);
 
   return <>{children}</>;
 }

@@ -1701,7 +1701,9 @@
         "website": "Website",
         "instagram": "Instagram",
         "linkedin": "LinkedIn",
-        "bio": "Bio / Description"
+        "bio": "Bio / Description",
+        "passphrase": "Passphrase",
+        "confirmPassphrase": "Confirm passphrase"
       },
       "placeholders": {
         "licenseNumber": "e.g.: LIC 12345 / PSY 67890",
@@ -1719,8 +1721,55 @@
         "licenseMinLength": "License must have at least 3 characters",
         "phoneInvalid": "Phone must have at least 8 digits",
         "websiteInvalid": "Enter a valid URL (e.g.: https://example.com)",
-        "bioTooLong": "Bio cannot exceed 500 characters"
+        "bioTooLong": "Bio cannot exceed 500 characters",
+        "passphraseMinLength": "Passphrase must be at least {{count}} characters",
+        "passphraseMismatch": "Passphrases do not match",
+        "recoveryAcknowledged": "You must confirm you saved your recovery phrase.",
+        "recoveryCodeUnavailable": "We could not generate your recovery phrase. Try again."
+      },
+      "registerError": "We could not register your backend user. Please try again.",
+      "recovery": {
+        "title": "Recovery phrase (display once)",
+        "description": "Save this phrase in a secure place. Without passphrase or recovery phrase, your E2E data cannot be recovered.",
+        "generate": "Generate recovery phrase",
+        "copy": "Copy",
+        "copied": "Copied",
+        "download": "Download .txt",
+        "acknowledgement": "I understand that only my passphrase or this recovery phrase can decrypt my information.",
+        "copyError": "Could not copy recovery phrase.",
+        "fileTitle": "Lavenius Recovery Phrase",
+        "fileWarning": "Important: without this phrase (or your passphrase) you cannot recover your E2E data."
       }
+    }
+  },
+  "e2eUnlock": {
+    "title": {
+      "unlock": "Unlock encrypted information",
+      "recovery": "Recover access"
+    },
+    "description": {
+      "unlock": "Enter your passphrase to load your sensitive data.",
+      "recovery": "Use your recovery phrase to set a new passphrase."
+    },
+    "fields": {
+      "passphrase": "Passphrase",
+      "recoveryCode": "Recovery phrase",
+      "newPassphrase": "New passphrase",
+      "confirmPassphrase": "Confirm passphrase"
+    },
+    "actions": {
+      "unlock": "Unlock",
+      "unlocking": "Unlocking...",
+      "forgotPassphrase": "I forgot my passphrase",
+      "resetAndUnlock": "Reset and unlock",
+      "recovering": "Recovering...",
+      "backToPassphrase": "Back to passphrase"
+    },
+    "errors": {
+      "invalidCredentials": "Could not unlock your data. Check your passphrase or recovery phrase.",
+      "rateLimited": "Too many attempts. Please wait and try again.",
+      "invalidRecoveryInput": "Check the recovery phrase and confirm the new passphrase.",
+      "generic": "Could not unlock your encrypted information."
     }
   },
   "errors": {

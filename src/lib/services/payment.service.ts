@@ -1,4 +1,6 @@
 import { apiClient } from '../api/client';
+import { decryptField } from '../e2e/crypto';
+import { getE2EKeyState } from '../e2e/keyManager';
 import type {
   Payment,
   CreatePaymentDto,
@@ -47,13 +49,53 @@ export interface PaymentTotals {
  */
 export interface BackendPaymentResponse {
   payments: {
-    data: Payment[];
+    data: PaymentApiResponse[];
     pagination: PaginationInfo;
   };
   total: number;
   totalPaid: number;
   totalPending: number;
   totalOverdue: number;
+}
+
+type PaymentPatientApi = NonNullable<Payment['patient']> & {
+  encryptedLastName?: string;
+  lastNameIv?: string;
+};
+
+type PaymentApiResponse = Omit<Payment, 'patient'> & {
+  patient?: PaymentPatientApi;
+};
+
+async function mapPayment(payment: PaymentApiResponse): Promise<Payment> {
+  if (!payment.patient?.encryptedLastName || !payment.patient.lastNameIv) {
+    return payment;
+  }
+
+  const userKey = getE2EKeyState().userKey;
+  if (!userKey) {
+    return payment;
+  }
+
+  try {
+    const decryptedLastName = await decryptField(
+      payment.patient.encryptedLastName,
+      payment.patient.lastNameIv,
+      userKey
+    );
+    return {
+      ...payment,
+      patient: {
+        ...payment.patient,
+        lastName: decryptedLastName,
+      },
+    };
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.warn('Failed to decrypt payment patient lastName', error);
+    }
+    return payment;
+  }
 }
 
 /**
@@ -109,10 +151,10 @@ class PaymentService {
     const queryString = params.toString();
     const url = queryString ? `${this.basePath}?${queryString}` : this.basePath;
     
-    const response = await apiClient.get<Payment[] | BackendPaymentResponse>(url);
+    const response = await apiClient.get<PaymentApiResponse[] | BackendPaymentResponse>(url);
     
     // Handle both array response (legacy) and structured object response (current backend)
-    let paymentsData: Payment[];
+    let paymentsData: PaymentApiResponse[];
     let serverPagination: PaginationInfo | null = null;
     let serverTotals: { total: number; totalPaid: number; totalPending: number; totalOverdue: number } | null = null;
     
@@ -134,14 +176,16 @@ class PaymentService {
       paymentsData = [];
     }
     
+    const mappedPayments = await Promise.all(paymentsData.map((payment) => mapPayment(payment)));
+
     // Use server totals if available, otherwise calculate from data
     let totals: PaymentTotals;
     
     if (serverTotals) {
       // Use accurate server-calculated totals (includes all matching payments, not just current page)
-      const paidPayments = paymentsData.filter(p => p.status === PaymentStatus.PAID);
-      const pendingPayments = paymentsData.filter(p => p.status === PaymentStatus.PENDING);
-      const overduePayments = paymentsData.filter(p => p.status === PaymentStatus.OVERDUE);
+      const paidPayments = mappedPayments.filter(p => p.status === PaymentStatus.PAID);
+      const pendingPayments = mappedPayments.filter(p => p.status === PaymentStatus.PENDING);
+      const overduePayments = mappedPayments.filter(p => p.status === PaymentStatus.OVERDUE);
       
       totals = {
         totalAmount: serverTotals.total,
@@ -149,23 +193,23 @@ class PaymentService {
         pendingAmount: serverTotals.totalPending,
         overdueAmount: serverTotals.totalOverdue,
         // Counts are from current page data (for display purposes)
-        totalCount: serverPagination?.total ?? paymentsData.length,
+        totalCount: serverPagination?.total ?? mappedPayments.length,
         paidCount: paidPayments.length,
         pendingCount: pendingPayments.length,
         overdueCount: overduePayments.length,
       };
     } else {
       // Fallback: Calculate totals from data
-      const paidPayments = paymentsData.filter(p => p.status === PaymentStatus.PAID);
-      const pendingPayments = paymentsData.filter(p => p.status === PaymentStatus.PENDING);
-      const overduePayments = paymentsData.filter(p => p.status === PaymentStatus.OVERDUE);
+      const paidPayments = mappedPayments.filter(p => p.status === PaymentStatus.PAID);
+      const pendingPayments = mappedPayments.filter(p => p.status === PaymentStatus.PENDING);
+      const overduePayments = mappedPayments.filter(p => p.status === PaymentStatus.OVERDUE);
       
       totals = {
-        totalAmount: paymentsData.reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
+        totalAmount: mappedPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
         paidAmount: paidPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
         pendingAmount: pendingPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
         overdueAmount: overduePayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
-        totalCount: paymentsData.length,
+        totalCount: mappedPayments.length,
         paidCount: paidPayments.length,
         pendingCount: pendingPayments.length,
         overdueCount: overduePayments.length,
@@ -173,11 +217,11 @@ class PaymentService {
     }
     
     return {
-      payments: paymentsData,
+      payments: mappedPayments,
       pagination: serverPagination ?? {
         page: 1,
-        limit: paymentsData.length,
-        total: paymentsData.length,
+        limit: mappedPayments.length,
+        total: mappedPayments.length,
         totalPages: 1,
       },
       totals,
@@ -209,24 +253,27 @@ class PaymentService {
       payload.paidDate = data.paidDate;
     }
     
-    return apiClient.post<Payment>(this.basePath, payload);
+    const response = await apiClient.post<PaymentApiResponse>(this.basePath, payload);
+    return mapPayment(response);
   }
 
   /**
    * Mark a payment as paid
    */
   async markAsPaid(id: string): Promise<Payment> {
-    return apiClient.patch<Payment, Record<string, never>>(
+    const response = await apiClient.patch<PaymentApiResponse, Record<string, never>>(
       `${this.basePath}/${id}/pay`,
       {}
     );
+    return mapPayment(response);
   }
 
   /**
    * Update an existing payment
    */
   async update(id: string, data: UpdatePaymentDto): Promise<Payment> {
-    return apiClient.patch<Payment, UpdatePaymentDto>(`${this.basePath}/${id}`, data);
+    const response = await apiClient.patch<PaymentApiResponse, UpdatePaymentDto>(`${this.basePath}/${id}`, data);
+    return mapPayment(response);
   }
 
   /**

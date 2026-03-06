@@ -9,3 +9,4 @@ export { useLanguage } from './useLanguage';
 export type { UseLanguageReturn } from './useLanguage';
 export { useFocusTrap } from './useFocusTrap';
 export type { UseFocusTrapOptions } from './useFocusTrap';
+export { useE2EKey } from '../e2e';

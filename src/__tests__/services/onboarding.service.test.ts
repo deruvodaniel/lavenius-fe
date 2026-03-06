@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { onboardingService, OnboardingService } from '../../lib/services/onboarding.service';
+import { onboardingService } from '../../lib/services/onboarding.service';
 import { apiClient, ApiClientError } from '../../lib/api/client';
 import type { ClerkUserSyncDto, OnboardingExtraData } from '../../lib/types/api.types';
 
@@ -19,6 +19,17 @@ vi.mock('../../lib/api/client', async (importOriginal) => {
 });
 
 describe('OnboardingService', () => {
+  const mockBundleFields = {
+    encryptedUserKey: 'ZW5jcnlwdGVkLXVzZXIta2V5',
+    salt: 'c2FsdA==',
+    iv: 'aXY=',
+    recoveryEncryptedUserKey: 'cmVjb3ZlcnktZW5jcnlwdGVkLXVzZXIta2V5',
+    recoverySalt: 'cmVjb3Zlcnktc2FsdA==',
+    recoveryIv: 'cmVjb3ZlcnktaXY=',
+    recoveryEnabled: true,
+    userKeyBundleVersion: 1,
+  } as const;
+
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
@@ -35,8 +46,8 @@ describe('OnboardingService', () => {
       email: 'test@example.com',
       firstName: 'Test',
       lastName: 'User',
-      phone: '+1234567890',
       licenseNumber: 'LIC-001',
+      ...mockBundleFields,
     };
 
     it('should call /auth/register with user data', async () => {
@@ -47,8 +58,12 @@ describe('OnboardingService', () => {
       expect(apiClient.post).toHaveBeenCalledWith(
         '/auth/register',
         expect.objectContaining({
-          ...mockUserData,
-          externalId: mockUserData.clerkUserId,
+          clerkUserId: mockUserData.clerkUserId,
+          email: mockUserData.email,
+          firstName: mockUserData.firstName,
+          lastName: mockUserData.lastName,
+          licenseNumber: mockUserData.licenseNumber,
+          ...mockBundleFields,
         })
       );
       expect(apiClient.post).toHaveBeenCalledTimes(1);
@@ -115,24 +130,16 @@ describe('OnboardingService', () => {
       expect(result).toEqual({ success: false, error: 'unknown_error' });
     });
 
-    it('should handle minimal user data (only required fields)', async () => {
+    it('should return validation error when bundle fields are missing', async () => {
       const minimalData: ClerkUserSyncDto = {
         clerkUserId: 'user_minimal123',
         email: 'minimal@example.com',
         firstName: 'Minimal',
         lastName: 'User',
       };
-      vi.mocked(apiClient.post).mockResolvedValue(undefined);
-
-      await onboardingService.syncUserWithBackend(minimalData);
-
-      expect(apiClient.post).toHaveBeenCalledWith(
-        '/auth/register',
-        expect.objectContaining({
-          ...minimalData,
-          externalId: minimalData.clerkUserId,
-        })
-      );
+      const result = await onboardingService.syncUserWithBackend(minimalData);
+      expect(result).toEqual({ success: false, error: 'missing_key_bundle' });
+      expect(apiClient.post).not.toHaveBeenCalled();
     });
 
     it('should include optional fields when provided', async () => {
@@ -141,8 +148,8 @@ describe('OnboardingService', () => {
         email: 'full@example.com',
         firstName: 'Full',
         lastName: 'User',
-        phone: '+0987654321',
         licenseNumber: 'LIC-999',
+        ...mockBundleFields,
       };
       vi.mocked(apiClient.post).mockResolvedValue(undefined);
 
@@ -151,8 +158,12 @@ describe('OnboardingService', () => {
       expect(apiClient.post).toHaveBeenCalledWith(
         '/auth/register',
         expect.objectContaining({
-          ...fullData,
-          externalId: fullData.clerkUserId,
+          clerkUserId: fullData.clerkUserId,
+          email: fullData.email,
+          firstName: fullData.firstName,
+          lastName: fullData.lastName,
+          licenseNumber: fullData.licenseNumber,
+          ...mockBundleFields,
         })
       );
     });
@@ -304,7 +315,7 @@ describe('OnboardingService', () => {
         email: 'integration@test.com',
         firstName: 'Integration',
         lastName: 'Test',
-        phone: '+1234567890',
+        ...mockBundleFields,
       };
       const extraData: OnboardingExtraData = {
         specialty: 'Integration Testing',
@@ -331,6 +342,7 @@ describe('OnboardingService', () => {
         email: 'existing@test.com',
         firstName: 'Existing',
         lastName: 'User',
+        ...mockBundleFields,
       };
 
       // Simulate 409 Conflict (user created via webhook)
@@ -350,6 +362,7 @@ describe('OnboardingService', () => {
         email: 'offline@test.com',
         firstName: 'Offline',
         lastName: 'User',
+        ...mockBundleFields,
       };
 
       vi.mocked(apiClient.post).mockRejectedValue(

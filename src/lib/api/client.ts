@@ -143,21 +143,15 @@ interface TokenStorage {
   getToken(): string | null;
   setToken(token: string): void;
   removeToken(): void;
-  getUserKey(): string | null;
-  setUserKey(key: string, rememberMe?: boolean): void;
-  removeUserKey(): void;
   clear(): void;
-  isRememberMeEnabled?(): boolean;
 }
 
 /**
  * Default Token Storage Implementation
- * Token persists across sessions, userKey persists based on "Remember Me" preference
+ * Token persists across sessions.
  */
 class DefaultTokenStorage implements TokenStorage {
   private readonly TOKEN_KEY = 'access_token';
-  private readonly USER_KEY = 'userKey';
-  private readonly REMEMBER_ME_KEY = 'rememberMe';
 
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
@@ -171,49 +165,8 @@ class DefaultTokenStorage implements TokenStorage {
     localStorage.removeItem(this.TOKEN_KEY);
   }
 
-  getUserKey(): string | null {
-    // Check if "Remember Me" was enabled - if so, look in localStorage first
-    const rememberMe = localStorage.getItem(this.REMEMBER_ME_KEY) === 'true';
-    if (rememberMe) {
-      return localStorage.getItem(this.USER_KEY);
-    }
-    // Otherwise, only check sessionStorage (more secure, clears on browser close)
-    return sessionStorage.getItem(this.USER_KEY);
-  }
-
-  setUserKey(key: string, rememberMe: boolean = false): void {
-    // Store the preference
-    localStorage.setItem(this.REMEMBER_ME_KEY, String(rememberMe));
-    
-    if (rememberMe) {
-      // Persist in localStorage (survives browser close)
-      localStorage.setItem(this.USER_KEY, key);
-      // Clear from sessionStorage if it was there
-      sessionStorage.removeItem(this.USER_KEY);
-    } else {
-      // Store in sessionStorage only (clears on browser close)
-      sessionStorage.setItem(this.USER_KEY, key);
-      // Clear from localStorage if it was there
-      localStorage.removeItem(this.USER_KEY);
-    }
-  }
-
-  removeUserKey(): void {
-    sessionStorage.removeItem(this.USER_KEY);
-    localStorage.removeItem(this.USER_KEY);
-    localStorage.removeItem(this.REMEMBER_ME_KEY);
-  }
-
   clear(): void {
     this.removeToken();
-    this.removeUserKey();
-  }
-  
-  /**
-   * Check if "Remember Me" is enabled
-   */
-  isRememberMeEnabled(): boolean {
-    return localStorage.getItem(this.REMEMBER_ME_KEY) === 'true';
   }
 }
 
@@ -228,6 +181,7 @@ export class ApiClient {
   private tokenStorage: TokenStorage;
   private tokenGetter: TokenGetter | null = null;
   private onUnauthorizedCallback?: () => void;
+  private transientUserKey: string | null = null;
 
   private constructor(tokenStorage?: TokenStorage) {
     this.tokenStorage = tokenStorage || new DefaultTokenStorage();
@@ -313,19 +267,9 @@ export class ApiClient {
       }
     }
 
-    // Add user key header if present
-    const userKey = this.tokenStorage.getUserKey();
-    if (userKey) {
-      config.headers['x-user-key'] = userKey;
-    } else {
-      const isPublicEndpoint =
-        requestUrl.includes('/auth/login') ||
-        requestUrl.includes('/auth/register') ||
-        requestUrl.endsWith('/auth') ||
-        requestUrl.includes('/auth?') ||
-        requestUrl.includes('/health');
-
-      void isPublicEndpoint;
+    // Transitional endpoint only: keep X-USER-KEY scoped to export path.
+    if (requestUrl.includes('/therapists/export/excel') && this.transientUserKey) {
+      config.headers['x-user-key'] = this.transientUserKey;
     }
 
     // Disable caching for GET requests to always fetch fresh data
@@ -412,26 +356,25 @@ export class ApiClient {
   }
 
   /**
-   * Set user encryption key
-   * @param userKey - The encryption key
-   * @param rememberMe - If true, persists in localStorage; if false, only in sessionStorage
+   * Set transient user encryption key in memory (used for scoped transitional endpoints).
    */
   setUserKey(userKey: string, rememberMe: boolean = false): void {
-    this.tokenStorage.setUserKey(userKey, rememberMe);
+    void rememberMe;
+    this.transientUserKey = userKey;
   }
 
   /**
    * Clear only user encryption key (keeps token getter/session intact)
    */
   clearUserKey(): void {
-    this.tokenStorage.removeUserKey();
+    this.transientUserKey = null;
   }
 
   /**
-   * Set both token and userKey
+   * Set both token and transient userKey
    * @param token - The access token
-   * @param userKey - The encryption key  
-   * @param rememberMe - If true, persists userKey in localStorage
+   * @param userKey - The encryption key
+   * @param rememberMe - Ignored (kept for backward compatibility)
    */
   setAuth(token: string, userKey: string, rememberMe: boolean = false): void {
     this.setToken(token);
@@ -443,23 +386,23 @@ export class ApiClient {
    */
   clearAuth(): void {
     this.tokenStorage.clear();
+    this.transientUserKey = null;
   }
 
   /**
    * Check if user is authenticated
-   * Requires both token AND userKey to be present
+   * Uses token presence only.
    */
   isAuthenticated(): boolean {
     const hasToken = !!this.tokenStorage.getToken();
-    const hasUserKey = !!this.tokenStorage.getUserKey();
-    return hasToken && hasUserKey;
+    return hasToken;
   }
 
   /**
    * Check if encryption key is present in storage
    */
   hasUserKey(): boolean {
-    return !!this.tokenStorage.getUserKey();
+    return !!this.transientUserKey;
   }
 
   /**

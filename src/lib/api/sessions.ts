@@ -1,5 +1,51 @@
 import { apiClient } from './client';
+import { decryptField } from '../e2e/crypto';
+import { getE2EKeyState } from '../e2e/keyManager';
 import type { CreateSessionDto, SessionResponse, UpdateSessionDto } from '../types/session';
+
+type SessionPatientApi = NonNullable<SessionResponse['patient']> & {
+  encryptedLastName?: string;
+  lastNameIv?: string;
+};
+
+type SessionApiResponse = Omit<SessionResponse, 'patient'> & {
+  patient?: SessionPatientApi;
+};
+
+async function decryptSessionPatient(patient?: SessionPatientApi): Promise<SessionResponse['patient']> {
+  if (!patient) {
+    return patient;
+  }
+
+  if (!patient.encryptedLastName || !patient.lastNameIv) {
+    return patient;
+  }
+
+  const userKey = getE2EKeyState().userKey;
+  if (!userKey) {
+    return patient;
+  }
+
+  try {
+    const lastName = await decryptField(patient.encryptedLastName, patient.lastNameIv, userKey);
+    return {
+      ...patient,
+      lastName,
+    };
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.warn('Failed to decrypt session patient lastName', error);
+    }
+    return patient;
+  }
+}
+
+async function mapSession(response: SessionApiResponse): Promise<SessionResponse> {
+  return {
+    ...response,
+    patient: await decryptSessionPatient(response.patient),
+  };
+}
 
 /**
  * Session Service
@@ -13,8 +59,8 @@ export const sessionService = {
    * @returns Sesión creada con eventId de Google Calendar si aplica
    */
   async create(data: CreateSessionDto): Promise<SessionResponse> {
-    const response = await apiClient.post<SessionResponse>('/sessions', data);
-    return response as unknown as SessionResponse;
+    const response = await apiClient.post<SessionApiResponse>('/sessions', data);
+    return mapSession(response);
   },
 
   /**
@@ -22,9 +68,10 @@ export const sessionService = {
    * @returns Lista de las próximas 10 sesiones
    */
   async getUpcoming(): Promise<SessionResponse[]> {
-    const response = await apiClient.get<SessionResponse[]>('/sessions/upcoming');
+    const response = await apiClient.get<SessionApiResponse[]>('/sessions/upcoming');
     // Asegurar que siempre devolvemos un array
-    return Array.isArray(response) ? response : [];
+    if (!Array.isArray(response)) return [];
+    return Promise.all(response.map((session) => mapSession(session)));
   },
 
   /**
@@ -34,9 +81,10 @@ export const sessionService = {
    * @returns Lista de sesiones del mes
    */
   async getMonthly(year: number, month: number): Promise<SessionResponse[]> {
-    const response = await apiClient.get<SessionResponse[]>(`/sessions/monthly/${year}/${month}`);
+    const response = await apiClient.get<SessionApiResponse[]>(`/sessions/monthly/${year}/${month}`);
     // Asegurar que siempre devolvemos un array
-    return Array.isArray(response) ? response : [];
+    if (!Array.isArray(response)) return [];
+    return Promise.all(response.map((session) => mapSession(session)));
   },
 
   /**
@@ -45,8 +93,8 @@ export const sessionService = {
    * @returns Detalles completos de la sesión
    */
   async getById(id: string): Promise<SessionResponse> {
-    const response = await apiClient.get<SessionResponse>(`/sessions/${id}`);
-    return response as unknown as SessionResponse;
+    const response = await apiClient.get<SessionApiResponse>(`/sessions/${id}`);
+    return mapSession(response);
   },
 
   /**
@@ -56,8 +104,8 @@ export const sessionService = {
    * @returns Sesión actualizada
    */
   async update(id: string, data: UpdateSessionDto): Promise<SessionResponse> {
-    const response = await apiClient.patch<SessionResponse>(`/sessions/${id}`, data);
-    return response as unknown as SessionResponse;
+    const response = await apiClient.patch<SessionApiResponse>(`/sessions/${id}`, data);
+    return mapSession(response);
   },
 
   /**
@@ -66,8 +114,8 @@ export const sessionService = {
    * @returns Sesión con status COMPLETED
    */
   async markAsCompleted(id: string): Promise<SessionResponse> {
-    const response = await apiClient.patch<SessionResponse>(`/sessions/${id}/complete`);
-    return response as unknown as SessionResponse;
+    const response = await apiClient.patch<SessionApiResponse>(`/sessions/${id}/complete`);
+    return mapSession(response);
   },
 
   /**

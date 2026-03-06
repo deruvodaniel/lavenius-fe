@@ -9,6 +9,7 @@ import { Toaster } from 'sonner';
 import App from "./App.tsx";
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
 import { ClerkTokenProvider } from './lib/api/ClerkTokenProvider';
+import { E2EKeyProvider } from './lib/e2e';
 
 // Initialize i18n - must be imported before App to ensure translations are ready
 import i18n from './lib/i18n';
@@ -70,10 +71,12 @@ root.render(
     <ErrorBoundary>
       <RootWithClerk>
         <ClerkTokenProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-          <Toaster position="top-right" richColors closeButton />
+          <E2EKeyProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+            <Toaster position="top-right" richColors closeButton />
+          </E2EKeyProvider>
         </ClerkTokenProvider>
       </RootWithClerk>
     </ErrorBoundary>

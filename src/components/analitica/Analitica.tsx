@@ -57,10 +57,10 @@ import {
 import { usePayments } from '@/lib/hooks/usePayments';
 import { usePatients, useResponsive } from '@/lib/hooks';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useE2EKey } from '@/lib/e2e';
 import { SessionStatus } from '@/lib/types/session';
 import { PaymentStatus } from '@/lib/types/api.types';
 import { sessionService } from '@/lib/api/sessions';
-import { apiClient } from '@/lib/api/client';
 import type { SessionResponse } from '@/lib/types/session';
 import { 
   useDashboardSettingsStore, 
@@ -387,6 +387,7 @@ const DashboardSettingsPopover = ({ t, isMobile }: DashboardSettingsPopoverProps
 export function Analitica() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { isUnlocked } = useE2EKey();
   const { payments, fetchPayments } = usePayments();
   const { patients, fetchPatients } = usePatients();
   const { isMobile } = useResponsive();
@@ -421,19 +422,13 @@ export function Analitica() {
   // Fetch all data on mount and when time range changes
   useEffect(() => {
     let isMounted = true;
+    if (!isUnlocked) return () => {
+      isMounted = false;
+    };
     
     const loadData = async () => {
       setIsLoading(true);
       try {
-        // Ensure encryption key is initialized before protected endpoints.
-        // Without userKey, backend guards can return 401 and the dashboard stays in zero state.
-        const maxAttempts = 30; // ~9 seconds
-        let attempts = 0;
-        while (isMounted && !apiClient.hasUserKey() && attempts < maxAttempts) {
-          await new Promise(resolve => setTimeout(resolve, 300));
-          attempts += 1;
-        }
-
         const { start, end } = getDateRange(timeRange);
         
         // Format dates for API (YYYY-MM-DD) in local time to avoid timezone day shifts
@@ -509,7 +504,7 @@ export function Analitica() {
       isMounted = false;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timeRange, refreshKey]);
+  }, [timeRange, refreshKey, isUnlocked]);
 
   // Transform sessions to UI-friendly format
   const sessionsUI = useMemo(() => {

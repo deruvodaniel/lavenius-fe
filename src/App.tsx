@@ -5,6 +5,7 @@ import { Landing } from './components/landing';
 import { Dashboard } from './components/dashboard';
 import { Onboarding } from './components/onboarding';
 import { NotFound, LoadingOverlay } from './components/shared';
+import { E2EUnlockGate } from './components/auth/E2EUnlockGate';
 
 // Lazy load dashboard views
 const Agenda = lazy(() => import('./components/agenda/Agenda').then(m => ({ default: m.Agenda })));
@@ -71,7 +72,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     <>
       <SignedIn>
         {hasCompletedOnboarding ? (
-          children
+          <E2EUnlockGate>{children}</E2EUnlockGate>
         ) : (
           <Navigate to="/onboarding" replace />
         )}

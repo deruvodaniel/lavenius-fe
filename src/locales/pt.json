@@ -1693,7 +1693,9 @@
         "website": "Site",
         "instagram": "Instagram",
         "linkedin": "LinkedIn",
-        "bio": "Bio / Descrição"
+        "bio": "Bio / Descrição",
+        "passphrase": "Passphrase",
+        "confirmPassphrase": "Confirmar passphrase"
       },
       "placeholders": {
         "licenseNumber": "Ex: CRP 12345 / CRM 67890",
@@ -1711,8 +1713,55 @@
         "licenseMinLength": "O registro deve ter pelo menos 3 caracteres",
         "phoneInvalid": "O telefone deve ter pelo menos 8 dígitos",
         "websiteInvalid": "Digite uma URL válida (ex: https://exemplo.com)",
-        "bioTooLong": "A bio não pode exceder 500 caracteres"
+        "bioTooLong": "A bio não pode exceder 500 caracteres",
+        "passphraseMinLength": "A passphrase deve ter pelo menos {{count}} caracteres",
+        "passphraseMismatch": "As passphrases não coincidem",
+        "recoveryAcknowledged": "Você deve confirmar que salvou sua frase de recuperação.",
+        "recoveryCodeUnavailable": "Não foi possível gerar sua frase de recuperação. Tente novamente."
+      },
+      "registerError": "Não conseguimos registrar seu usuário no backend. Tente novamente.",
+      "recovery": {
+        "title": "Frase de recuperação (exibida uma vez)",
+        "description": "Guarde esta frase em local seguro. Sem passphrase ou frase de recuperação, seus dados E2E não podem ser recuperados.",
+        "generate": "Gerar frase de recuperação",
+        "copy": "Copiar",
+        "copied": "Copiado",
+        "download": "Baixar .txt",
+        "acknowledgement": "Entendo que apenas minha passphrase ou esta frase de recuperação podem descriptografar minhas informações.",
+        "copyError": "Não foi possível copiar a frase de recuperação.",
+        "fileTitle": "Frase de Recuperação Lavenius",
+        "fileWarning": "Importante: sem esta frase (ou sua passphrase) você não poderá recuperar seus dados E2E."
       }
+    }
+  },
+  "e2eUnlock": {
+    "title": {
+      "unlock": "Desbloquear informações criptografadas",
+      "recovery": "Recuperar acesso"
+    },
+    "description": {
+      "unlock": "Digite sua passphrase para carregar seus dados sensíveis.",
+      "recovery": "Use sua frase de recuperação para definir uma nova passphrase."
+    },
+    "fields": {
+      "passphrase": "Passphrase",
+      "recoveryCode": "Frase de recuperação",
+      "newPassphrase": "Nova passphrase",
+      "confirmPassphrase": "Confirmar passphrase"
+    },
+    "actions": {
+      "unlock": "Desbloquear",
+      "unlocking": "Desbloqueando...",
+      "forgotPassphrase": "Esqueci minha passphrase",
+      "resetAndUnlock": "Redefinir e desbloquear",
+      "recovering": "Recuperando...",
+      "backToPassphrase": "Voltar para passphrase"
+    },
+    "errors": {
+      "invalidCredentials": "Não foi possível desbloquear seus dados. Verifique sua passphrase ou frase de recuperação.",
+      "rateLimited": "Muitas tentativas. Aguarde um momento e tente novamente.",
+      "invalidRecoveryInput": "Verifique a frase de recuperação e confirme a nova passphrase.",
+      "generic": "Não foi possível desbloquear suas informações criptografadas."
     }
   },
   "errors": {
