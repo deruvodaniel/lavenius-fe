@@ -339,7 +339,6 @@ export function Onboarding() {
       await user.update({
         unsafeMetadata: {
           ...user.unsafeMetadata,
-          licenseNumber: formData.licenseNumber.trim(),
           specialty: formData.specialty || undefined,
           phone: formData.phone.trim() || undefined,
           alternativePhone: formData.alternativePhone.trim() || undefined,

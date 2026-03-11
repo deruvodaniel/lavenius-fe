@@ -35,7 +35,6 @@ export interface User {
  * Onboarding metadata stored in Clerk's unsafeMetadata
  */
 export interface OnboardingMetadata {
-  licenseNumber?: string;
   specialty?: string;
   phone?: string;
   alternativePhone?: string;
@@ -88,8 +87,6 @@ export const useAuth = () => {
     phone: clerkUser.primaryPhoneNumber?.phoneNumber || onboardingMetadata?.phone,
     // Alternative phone from onboarding metadata
     alternativePhone: onboardingMetadata?.alternativePhone,
-    // licenseNumber from unsafeMetadata (set during onboarding)
-    licenseNumber: onboardingMetadata?.licenseNumber,
     // specialty from unsafeMetadata (set during onboarding)
     specialty: onboardingMetadata?.specialty,
     // Office address from onboarding metadata

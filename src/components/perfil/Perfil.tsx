@@ -207,15 +207,6 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
     try {
       saveProfile(profile);
 
-      if (clerkUser && profile.licenseNumber !== user?.licenseNumber) {
-        await clerkUser.update({
-          unsafeMetadata: {
-            ...clerkUser.unsafeMetadata,
-            licenseNumber: profile.licenseNumber?.trim(),
-          },
-        });
-      }
-
       setHasChanges(false);
       toast.success(t('profile.messages.saveSuccess'));
     } catch {

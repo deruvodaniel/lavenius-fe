@@ -214,7 +214,6 @@ export function OnboardingStepper() {
       await user.update({
         unsafeMetadata: {
           ...user.unsafeMetadata,
-          licenseNumber: formData.licenseNumber.trim(),
           specialty: formData.specialty || undefined,
           phone: formData.phone.trim() || undefined,
           altPhone: formData.altPhone.trim() || undefined,
