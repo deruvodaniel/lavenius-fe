@@ -12,7 +12,7 @@ import { usePayments } from '@/lib/hooks/usePayments';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { patientService } from '@/lib/services/patient.service';
 import { formatTurnoReminderMessage, openWhatsApp } from '@/lib/utils/whatsappTemplates';
-import { getErrorMessage } from '@/lib/utils/error';
+import { getErrorMessage, isConflictError } from '@/lib/utils/error';
 import type { CreateSessionDto, SessionResponse, UpdateSessionDto, SessionDeleteScope } from '@/lib/types/session';
 import type { Patient } from '@/lib/types/api.types';
 
@@ -333,17 +333,21 @@ export function useAgenda() {
       console.error('Error saving session:', error);
 
       let errorMessage = t('agenda.messages.saveError');
-      const errMsg = getErrorMessage(error, '');
 
-      if (errMsg.includes('already exists')) {
-        errorMessage = t('agenda.messages.conflictError');
-      } else if (errMsg) {
-        errorMessage = errMsg;
+      if (isConflictError(error)) {
+        const paciente = pacientes.find(p => p.id === sessionData.patientId);
+        const patientName = paciente?.nombre || '';
+        errorMessage = patientName
+          ? t('agenda.messages.conflictErrorWithPatient', { patientName })
+          : t('agenda.messages.conflictError');
+      } else {
+        const errMsg = getErrorMessage(error, '');
+        if (errMsg) errorMessage = errMsg;
       }
 
       toast.error(errorMessage);
     }
-  }, [selectedSession, updateSession, createSession, fetchUpcoming, fetchMonthly, fetchPayments, t]);
+  }, [selectedSession, updateSession, createSession, fetchUpcoming, fetchMonthly, fetchPayments, pacientes, t]);
 
   const handleDeleteTurno = useCallback(async (sessionId: string, scope?: SessionDeleteScope) => {
     try {

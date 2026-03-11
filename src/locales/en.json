@@ -390,6 +390,7 @@
       "rescheduleSuccess": "Appointment rescheduled successfully",
       "rescheduleError": "Error rescheduling appointment",
       "conflictError": "There is already a session at this time. Please choose another time.",
+      "conflictErrorWithPatient": "{{patientName}} already has a session at this time. Please choose another time.",
       "scheduleConflict": "Schedule conflict. You already have a session scheduled at this time.",
       "pastDateError": "Cannot schedule appointments in the past. Please select a future date.",
       "patientNotFound": "Patient not found",

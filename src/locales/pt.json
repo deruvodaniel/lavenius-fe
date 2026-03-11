@@ -381,6 +381,7 @@
       "rescheduleSuccess": "Consulta reagendada com sucesso",
       "rescheduleError": "Erro ao reagendar consulta",
       "conflictError": "Já existe uma sessão neste horário. Por favor escolha outro horário.",
+      "conflictErrorWithPatient": "{{patientName}} já tem uma sessão neste horário. Por favor escolha outro horário.",
       "scheduleConflict": "Conflito de horários. Você já tem uma sessão agendada neste momento.",
       "pastDateError": "Não é possível agendar consultas no passado. Por favor selecione uma data futura.",
       "patientNotFound": "Paciente não encontrado",

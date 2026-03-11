@@ -390,6 +390,7 @@
       "rescheduleSuccess": "Turno reagendado exitosamente",
       "rescheduleError": "Error al reagendar el turno",
       "conflictError": "Ya existe una sesión en este horario. Por favor elige otro horario.",
+      "conflictErrorWithPatient": "{{patientName}} ya tiene una sesión en este horario. Por favor elige otro horario.",
       "scheduleConflict": "Conflicto de horarios. Ya tienes una sesión programada en este momento.",
       "pastDateError": "No se pueden agendar turnos en fechas pasadas. Por favor seleccione una fecha futura.",
       "patientNotFound": "No se encontró el paciente",
