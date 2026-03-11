@@ -340,8 +340,18 @@ export function Pacientes() {
   const filteredPacientes = useMemo(() => {
     let filtered = [...pacientes];
 
+    // Client-side search filter (complements server-side search)
+    if (searchTerm.trim()) {
+      const lower = searchTerm.toLowerCase();
+      filtered = filtered.filter(p =>
+        p.nombre.toLowerCase().includes(lower) ||
+        p.email.toLowerCase().includes(lower) ||
+        p.telefono.includes(lower)
+      );
+    }
+
     // Client-side filtering (fallback since backend filters may not work)
-    
+
     // Filter by modalidad (session type)
     if (modalidadFilter !== 'todas') {
       filtered = filtered.filter(p => p.modalidad === modalidadFilter);
@@ -376,7 +386,7 @@ export function Pacientes() {
     });
 
     return filtered;
-  }, [pacientes, modalidadFilter, frecuenciaFilter, soloTurnosEstaSemana, sortBy, patientsWithSessionsThisWeek]);
+  }, [pacientes, searchTerm, modalidadFilter, frecuenciaFilter, soloTurnosEstaSemana, sortBy, patientsWithSessionsThisWeek]);
 
   // Pagination for desktop, infinite scroll for mobile
   const totalPages = Math.ceil(filteredPacientes.length / ITEMS_PER_PAGE);
