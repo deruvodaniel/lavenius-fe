@@ -379,6 +379,7 @@
     },
     "messages": {
       "createSuccess": "Appointment created successfully",
+      "createRecurringSuccess": "Recurring sessions created successfully",
       "updateSuccess": "Appointment updated successfully",
       "deleteSuccess": "Appointment deleted successfully",
       "cancelSuccess": "Appointment cancelled",
@@ -457,6 +458,7 @@
     },
     "details": {
       "title": "Session Details",
+      "description": "Complete session information",
       "patient": "Patient",
       "noPatient": "No patient",
       "editSession": "Edit Session",
@@ -501,6 +503,47 @@
       "ninetyMin": "1.5 hours",
       "twoHours": "2 hours",
       "custom": "Custom"
+    },
+    "recurrence": {
+      "enableRecurrence": "Repeat session",
+      "enableRecurrenceDescription": "Create multiple sessions with this pattern",
+      "type": "Recurrence type",
+      "types": {
+        "workingDays": "Working days (Monday to Friday)",
+        "weekly": "Weekly",
+        "biweekly": "Biweekly (every 2 weeks)",
+        "monthly": "Monthly"
+      },
+      "until": "Repeat until",
+      "untilPlaceholder": "Select end date",
+      "untilHelp": "Sessions will be created until this date",
+      "daysOfWeek": {
+        "label": "Days of the week",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "sessionDay": "session day",
+      "validation": {
+        "mustIncludeSessionDay": "Must include the selected session day"
+      }
+    },
+    "deleteScope": {
+      "title": "Delete recurring sessions",
+      "description": "This session is part of a series. What would you like to delete?",
+      "single": {
+        "title": "Only this session",
+        "description": "Delete only this session. Other sessions in the series will not be affected."
+      },
+      "thisAndFuture": {
+        "title": "This and following sessions",
+        "description": "Delete this session and all future ones in the series. Past sessions will not be affected."
+      },
+      "hint": "Tip: Past sessions are never automatically deleted."
     }
   },
   "payments": {

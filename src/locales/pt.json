@@ -370,6 +370,7 @@
     },
     "messages": {
       "createSuccess": "Consulta criada com sucesso",
+      "createRecurringSuccess": "Sessões recorrentes criadas com sucesso",
       "updateSuccess": "Consulta atualizada com sucesso",
       "deleteSuccess": "Consulta excluída com sucesso",
       "cancelSuccess": "Consulta cancelada",
@@ -448,6 +449,7 @@
     },
     "details": {
       "title": "Detalhes da Sessão",
+      "description": "Informações completas da sessão",
       "patient": "Paciente",
       "noPatient": "Sem paciente",
       "editSession": "Editar Sessão",
@@ -492,6 +494,47 @@
       "ninetyMin": "1,5 horas",
       "twoHours": "2 horas",
       "custom": "Personalizado"
+    },
+    "recurrence": {
+      "enableRecurrence": "Repetir sessão",
+      "enableRecurrenceDescription": "Criar múltiplas sessões com este padrão",
+      "type": "Tipo de recorrência",
+      "types": {
+        "workingDays": "Dias úteis (Segunda a Sexta)",
+        "weekly": "Semanal",
+        "biweekly": "Quinzenal (a cada 2 semanas)",
+        "monthly": "Mensal"
+      },
+      "until": "Repetir até",
+      "untilPlaceholder": "Selecionar data final",
+      "untilHelp": "As sessões serão criadas até esta data",
+      "daysOfWeek": {
+        "label": "Dias da semana",
+        "monday": "Segunda",
+        "tuesday": "Terça",
+        "wednesday": "Quarta",
+        "thursday": "Quinta",
+        "friday": "Sexta",
+        "saturday": "Sábado",
+        "sunday": "Domingo"
+      },
+      "sessionDay": "dia da sessão",
+      "validation": {
+        "mustIncludeSessionDay": "Deve incluir o dia da sessão selecionada"
+      }
+    },
+    "deleteScope": {
+      "title": "Excluir sessões recorrentes",
+      "description": "Esta sessão faz parte de uma série. O que você deseja excluir?",
+      "single": {
+        "title": "Apenas esta sessão",
+        "description": "Excluir apenas esta sessão. As outras sessões da série não serão afetadas."
+      },
+      "thisAndFuture": {
+        "title": "Esta e as seguintes sessões",
+        "description": "Excluir esta sessão e todas as futuras da série. As sessões passadas não serão afetadas."
+      },
+      "hint": "Dica: As sessões passadas nunca são excluídas automaticamente."
     }
   },
   "payments": {

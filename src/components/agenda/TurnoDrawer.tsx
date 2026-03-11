@@ -8,9 +8,11 @@ import { ConfirmDialog, BaseDrawer, DrawerBody, DrawerFooter, NativeSelect } fro
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
+import { RecurrenceSelector } from '@/components/agenda/RecurrenceSelector';
+import { DeleteScopeDialog } from '@/components/agenda/DeleteScopeDialog';
 import type { Patient } from '@/lib/types/api.types';
-import { SessionType, SessionStatus } from '@/lib/types/session';
-import type { CreateSessionDto, SessionResponse } from '@/lib/types/session';
+import { SessionType, SessionStatus, SessionDeleteScope } from '@/lib/types/session';
+import type { CreateSessionDto, SessionResponse, SessionRecurrence } from '@/lib/types/session';
 
 // Format date-time keeping the user's local offset so the backend stores the expected slot
 const formatLocalDateTime = (date: Date) => {
@@ -38,7 +40,7 @@ interface TurnoDrawerProps {
   pacienteId?: string | number;
   initialDate?: Date; // Pre-fill date when creating from calendar selection
   onSave: (session: CreateSessionDto) => Promise<void>;
-  onDelete?: (sessionId: string) => Promise<void>;
+  onDelete?: (sessionId: string, scope?: SessionDeleteScope) => Promise<void>;
 }
 
 /**
@@ -70,6 +72,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     sessionType: SessionType.REMOTE,
     estado: SessionStatus.PENDING,
     monto: '' as string | number,
+    recurrence: undefined as SessionRecurrence | undefined,
   });
 
   const [selectedDuration, setSelectedDuration] = useState(() => {
@@ -83,8 +86,14 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     return 60;
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteScopeDialog, setShowDeleteScopeDialog] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Memoized callback to prevent RecurrenceSelector infinite loop
+  const handleRecurrenceChange = useCallback((recurrence: SessionRecurrence | undefined) => {
+    setFormData(prev => ({ ...prev, recurrence }));
+  }, []);
 
   // Load session data when editing
   useEffect(() => {
@@ -104,6 +113,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         sessionType: session.sessionType,
         estado: session.status,
         monto: session.cost ?? '',
+        recurrence: undefined, // Not editable when updating existing sessions
       });
     } else {
       // Reset form when creating new session
@@ -116,6 +126,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         sessionType: SessionType.REMOTE,
         estado: SessionStatus.PENDING,
         monto: '' as string | number,
+        recurrence: undefined as SessionRecurrence | undefined,
       };
       
       // Pre-fill date and time from calendar selection
@@ -294,7 +305,17 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       type: formData.sessionType,
       status: formData.estado,
       cost: typeof formData.monto === 'number' && !isNaN(formData.monto) ? formData.monto : undefined,
+      recurrence: formData.recurrence,
     };
+
+    // Debug: log recurrence payload
+    if (formData.recurrence) {
+      console.log('🔄 Creating recurring session:', {
+        recurrence: formData.recurrence,
+        sessionDate: formData.fecha,
+        fullPayload: sessionDto
+      });
+    }
 
     setIsSaving(true);
     try {
@@ -319,6 +340,15 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     }
   };
 
+  const handleDeleteClick = () => {
+    // If session has recurrenceId, show scope dialog
+    if (session?.recurrenceId) {
+      setShowDeleteScopeDialog(true);
+    } else {
+      setShowDeleteConfirm(true);
+    }
+  };
+
   const confirmDelete = async () => {
     if (session && onDelete) {
       setIsSaving(true);
@@ -329,6 +359,22 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       } catch {
         // Error is handled by parent component
         setShowDeleteConfirm(false);
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  };
+
+  const confirmDeleteWithScope = async (scope: SessionDeleteScope) => {
+    if (session && onDelete) {
+      setIsSaving(true);
+      try {
+        await onDelete(session.id, scope);
+        setShowDeleteScopeDialog(false);
+        onClose();
+      } catch {
+        // Error is handled by parent component
+        setShowDeleteScopeDialog(false);
       } finally {
         setIsSaving(false);
       }
@@ -511,6 +557,15 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               </p>
             )}
           </div>
+
+          {/* Recurrence (only when creating new sessions) */}
+          {!isEditing && (
+            <RecurrenceSelector
+              value={formData.recurrence}
+              onChange={handleRecurrenceChange}
+              sessionDate={formData.fecha}
+            />
+          )}
         </DrawerBody>
 
         <DrawerFooter>
@@ -536,7 +591,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           {isEditing && onDelete && (
             <Button
               variant="destructive"
-              onClick={() => setShowDeleteConfirm(true)}
+              onClick={handleDeleteClick}
               className="px-6"
             >
               {t('common.delete')}
@@ -563,7 +618,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         isLoading={isSaving}
       />
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation Dialog (for non-recurring sessions) */}
       <ConfirmDialog
         open={showDeleteConfirm}
         onOpenChange={setShowDeleteConfirm}
@@ -573,6 +628,14 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         cancelLabel={t('common.cancel')}
         variant="danger"
         onConfirm={confirmDelete}
+        isLoading={isSaving}
+      />
+
+      {/* Delete Scope Dialog (for recurring sessions) */}
+      <DeleteScopeDialog
+        open={showDeleteScopeDialog}
+        onOpenChange={setShowDeleteScopeDialog}
+        onConfirm={confirmDeleteWithScope}
         isLoading={isSaving}
       />
     </>

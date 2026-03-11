@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { sessionService } from '../api/sessions';
 import { getErrorMessage, getErrorStatusCode } from '../utils/error';
-import type { CreateSessionDto, SessionResponse, SessionUI, UpdateSessionDto } from '../types/session';
+import type { CreateSessionDto, SessionResponse, SessionUI, UpdateSessionDto, SessionDeleteScope } from '../types/session';
 
 interface SessionState {
   sessions: SessionResponse[];
@@ -13,7 +13,7 @@ interface SessionState {
   fetchMonthly: (year: number, month: number) => Promise<void>;
   createSession: (data: CreateSessionDto) => Promise<SessionResponse>;
   updateSession: (id: string, data: UpdateSessionDto) => Promise<SessionResponse>;
-  deleteSession: (id: string) => Promise<void>;
+  deleteSession: (id: string, scope?: SessionDeleteScope) => Promise<void>;
   markAsCompleted: (id: string) => Promise<void>;
   clearError: () => void;
 }
@@ -112,12 +112,16 @@ export const useSessionStore = create<SessionState>((set, _get) => ({
 
   /**
    * Eliminar sesión
+   * @param scope - Alcance de eliminación para sesiones recurrentes (opcional)
    */
-  deleteSession: async (id: string) => {
+  deleteSession: async (id: string, scope?: SessionDeleteScope) => {
     set({ isLoading: true, error: null });
     try {
-      await sessionService.delete(id);
-      
+      await sessionService.delete(id, scope);
+
+      // Note: Si scope es 'this_and_future', el backend eliminará múltiples sesiones
+      // Por ahora solo removemos la sesión actual del estado local
+      // Considera refrescar la lista completa después para mantener sincronización
       set((state) => ({
         sessions: state.sessions.filter((s) => s.id !== id),
         isLoading: false

@@ -21,6 +21,36 @@ export enum SessionType {
 }
 
 /**
+ * Session Recurrence Type
+ * Tipo de recurrencia para sesiones periódicas
+ */
+export enum SessionRecurrenceType {
+  WORKING_DAYS = 'working_days',
+  WEEKLY = 'weekly',
+  BIWEEKLY = 'biweekly',
+  MONTHLY = 'monthly'
+}
+
+/**
+ * Session Delete Scope
+ * Alcance de eliminación para sesiones recurrentes
+ */
+export enum SessionDeleteScope {
+  SINGLE = 'single',
+  THIS_AND_FUTURE = 'this_and_future'
+}
+
+/**
+ * Session Recurrence Configuration
+ * Configuración de recurrencia para crear sesiones periódicas
+ */
+export interface SessionRecurrence {
+  type: SessionRecurrenceType;
+  until: string; // ISO 8601 date string
+  daysOfWeek?: number[]; // Array of numbers 1-7 (1=Monday, 7=Sunday)
+}
+
+/**
  * Session Response
  * Estructura de respuesta del backend para una sesión
  */
@@ -35,6 +65,9 @@ export interface SessionResponse {
   cost?: number;
   sessionType: SessionType;
   meetLink?: string; // Only for remote sessions
+  recurrenceId?: string; // ID del grupo de recurrencia
+  recurrenceUntil?: string; // ISO 8601 date string - fecha hasta la cual se repite
+  recurrenceRule?: string; // Regla de recurrencia en formato legible
   createdAt: string;
   updatedAt: string;
   therapist?: TherapistInfo;
@@ -55,6 +88,7 @@ export interface CreateSessionDto {
   sessionSummary?: string;
   type: SessionType;
   cost?: number;
+  recurrence?: SessionRecurrence; // Configuración de recurrencia opcional
 }
 
 /**

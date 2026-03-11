@@ -379,6 +379,7 @@
     },
     "messages": {
       "createSuccess": "Turno creado exitosamente",
+      "createRecurringSuccess": "Sesiones recurrentes creadas exitosamente",
       "updateSuccess": "Turno actualizado exitosamente",
       "deleteSuccess": "Turno eliminado exitosamente",
       "cancelSuccess": "Turno cancelado",
@@ -457,6 +458,7 @@
     },
     "details": {
       "title": "Detalles de la Sesión",
+      "description": "Información completa de la sesión",
       "patient": "Paciente",
       "noPatient": "Sin paciente",
       "editSession": "Editar Sesión",
@@ -501,6 +503,47 @@
       "ninetyMin": "1.5 horas",
       "twoHours": "2 horas",
       "custom": "Personalizado"
+    },
+    "recurrence": {
+      "enableRecurrence": "Repetir sesión",
+      "enableRecurrenceDescription": "Crear múltiples sesiones con este patrón",
+      "type": "Tipo de repetición",
+      "types": {
+        "workingDays": "Días hábiles (Lunes a Viernes)",
+        "weekly": "Semanal",
+        "biweekly": "Quincenal (cada 2 semanas)",
+        "monthly": "Mensual"
+      },
+      "until": "Repetir hasta",
+      "untilPlaceholder": "Seleccionar fecha final",
+      "untilHelp": "Las sesiones se crearán hasta esta fecha",
+      "daysOfWeek": {
+        "label": "Días de la semana",
+        "monday": "Lunes",
+        "tuesday": "Martes",
+        "wednesday": "Miércoles",
+        "thursday": "Jueves",
+        "friday": "Viernes",
+        "saturday": "Sábado",
+        "sunday": "Domingo"
+      },
+      "sessionDay": "día de sesión",
+      "validation": {
+        "mustIncludeSessionDay": "Debe incluir el día de la sesión seleccionada"
+      }
+    },
+    "deleteScope": {
+      "title": "Eliminar sesiones recurrentes",
+      "description": "Esta sesión es parte de una serie. ¿Qué deseas eliminar?",
+      "single": {
+        "title": "Solo esta sesión",
+        "description": "Eliminar únicamente esta sesión. Las demás sesiones de la serie no se verán afectadas."
+      },
+      "thisAndFuture": {
+        "title": "Esta y siguientes sesiones",
+        "description": "Eliminar esta sesión y todas las futuras de la serie. Las sesiones pasadas no se verán afectadas."
+      },
+      "hint": "Tip: Las sesiones pasadas nunca se eliminan automáticamente."
     }
   },
   "payments": {

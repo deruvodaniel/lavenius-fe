@@ -249,6 +249,19 @@ export function FullCalendarView({
   // Convert sessions to FullCalendar events (filter out cancelled sessions)
   const sessionEvents = useMemo(() => {
     if (!sessions || !Array.isArray(sessions)) return [];
+
+    // Debug: Log sessions to check dates
+    console.log('📅 Calendar rendering', sessions.length, 'sessions');
+    const recurringSessions = sessions.filter(s => s.recurrenceId);
+    if (recurringSessions.length > 0) {
+      console.log('🔄 Recurring sessions found:', recurringSessions.map(s => ({
+        id: s.id.substring(0, 8),
+        scheduledFrom: s.scheduledFrom,
+        recurrenceId: s.recurrenceId?.substring(0, 8),
+        patient: s.patient?.firstName
+      })));
+    }
+
     return sessions
       .filter(session => session.status !== SessionStatus.CANCELLED)
       .map(session => {
@@ -259,10 +272,10 @@ export function FullCalendarView({
 
         const isPaid = isSessionPaid?.(session.id) ?? false;
         const className = `session-${session.status}`;
-        
+
         // Try to get patient name from session, or use fallback
-        const patientName = session.patientName 
-          || getPatientNameFallback?.(session.patient?.id) 
+        const patientName = session.patientName
+          || getPatientNameFallback?.(session.patient?.id)
           || t('agenda.details.noPatient');
 
         return {

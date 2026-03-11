@@ -13,7 +13,7 @@ import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { patientService } from '@/lib/services/patient.service';
 import { formatTurnoReminderMessage, openWhatsApp } from '@/lib/utils/whatsappTemplates';
 import { getErrorMessage } from '@/lib/utils/error';
-import type { CreateSessionDto, SessionResponse, UpdateSessionDto } from '@/lib/types/session';
+import type { CreateSessionDto, SessionResponse, UpdateSessionDto, SessionDeleteScope } from '@/lib/types/session';
 import type { Patient } from '@/lib/types/api.types';
 
 export type ViewMode = 'list' | 'calendar' | 'both';
@@ -50,7 +50,7 @@ const sanitizeString = (value: string | undefined): string => {
 
 export function useAgenda() {
   const { t } = useTranslation();
-  const { sessionsUI, isLoading, error, fetchUpcoming, createSession, updateSession, deleteSession, clearError } = useSessions();
+  const { sessionsUI, isLoading, error, fetchUpcoming, fetchMonthly, createSession, updateSession, deleteSession, clearError } = useSessions();
   const { patients, selectedPatient, fetchPatients, fetchPatientById, setSelectedPatient } = usePatients();
   const { isSessionPaid, fetchPayments } = usePayments();
   const { isMobile, isDesktop } = useResponsive();
@@ -307,8 +307,25 @@ export function useAgenda() {
         await Promise.all([fetchUpcoming(), fetchPayments(true)]);
       } else {
         await createSession(sessionData);
-        toast.success(t('agenda.messages.createSuccess'));
-        await Promise.all([fetchUpcoming(), fetchPayments(true)]);
+
+        // If creating recurring sessions, show specific success message
+        if (sessionData.recurrence) {
+          toast.success(t('agenda.messages.createRecurringSuccess') || 'Sesiones recurrentes creadas exitosamente');
+
+          // Refresh both current month and upcoming to show all recurring sessions
+          const now = new Date();
+          const currentYear = now.getFullYear();
+          const currentMonth = now.getMonth() + 1;
+
+          await Promise.all([
+            fetchUpcoming(),
+            fetchMonthly(currentYear, currentMonth),
+            fetchPayments(true)
+          ]);
+        } else {
+          toast.success(t('agenda.messages.createSuccess'));
+          await Promise.all([fetchUpcoming(), fetchPayments(true)]);
+        }
       }
       setTurnoDrawerOpen(false);
       setSelectedSession(null);
@@ -326,13 +343,15 @@ export function useAgenda() {
 
       toast.error(errorMessage);
     }
-  }, [selectedSession, updateSession, createSession, fetchUpcoming, fetchPayments, t]);
+  }, [selectedSession, updateSession, createSession, fetchUpcoming, fetchMonthly, fetchPayments, t]);
 
-  const handleDeleteTurno = useCallback(async (sessionId: string) => {
+  const handleDeleteTurno = useCallback(async (sessionId: string, scope?: SessionDeleteScope) => {
     try {
-      await deleteSession(sessionId);
+      await deleteSession(sessionId, scope);
       toast.success(t('agenda.messages.deleteSuccess'));
       setTurnoDrawerOpen(false);
+      // When deleting with scope 'this_and_future', multiple sessions are deleted
+      // Refresh both upcoming and monthly views to sync state
       await Promise.all([fetchUpcoming(), fetchPayments(true)]);
     } catch (error: unknown) {
       console.error('Error deleting session:', error);

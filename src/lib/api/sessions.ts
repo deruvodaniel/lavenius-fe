@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { CreateSessionDto, SessionResponse, UpdateSessionDto } from '../types/session';
+import type { CreateSessionDto, SessionResponse, UpdateSessionDto, SessionDeleteScope } from '../types/session';
 
 /**
  * Session Service
@@ -74,8 +74,12 @@ export const sessionService = {
    * Eliminar sesión
    * También elimina el evento de Google Calendar si existe
    * @param id - ID de la sesión
+   * @param scope - Alcance de eliminación para sesiones recurrentes (opcional)
    */
-  async delete(id: string): Promise<void> {
-    await apiClient.delete(`/sessions/${id}`);
+  async delete(id: string, scope?: SessionDeleteScope): Promise<void> {
+    const url = scope
+      ? `/sessions/${id}?scope=${scope}`
+      : `/sessions/${id}`;
+    await apiClient.delete(url);
   }
 };
