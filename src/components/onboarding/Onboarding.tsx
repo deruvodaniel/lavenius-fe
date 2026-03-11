@@ -357,6 +357,7 @@ export function Onboarding() {
             linkedin: formData.linkedin.trim() || undefined,
           },
           bio: formData.bio.trim() || undefined,
+          zkConsent: true,
           zkConsentAcceptedAt: new Date().toISOString(),
           onboardingComplete: true,
           onboardingCompletedAt: new Date().toISOString(),
