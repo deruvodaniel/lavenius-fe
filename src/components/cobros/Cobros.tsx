@@ -417,18 +417,20 @@ export function Cobros() {
       page: currentPage,
       limit: ITEMS_PER_PAGE,
     };
-    
-    if (dateFrom) {
-      filters.from = dateFrom;
+
+    if (quickFilter === 'all') {
+      // Backend applies default week range when no dates sent,
+      // so explicitly request a wide range to get all payments
+      filters.from = '2020-01-01';
+      const nextYear = new Date().getFullYear() + 1;
+      filters.to = `${nextYear}-12-31`;
+    } else {
+      if (dateFrom) filters.from = dateFrom;
+      if (dateTo) filters.to = dateTo;
     }
-    if (dateTo) {
-      filters.to = dateTo;
-    }
-    // Status filter could be server-side if backend supports it
-    // For now we do it client-side
-    
+
     return filters;
-  }, [dateFrom, dateTo, currentPage]);
+  }, [dateFrom, dateTo, quickFilter, currentPage]);
 
   // Fetch payments when server filters change
   useEffect(() => {
