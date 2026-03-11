@@ -2,9 +2,9 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@clerk/clerk-react';
-import { 
-  Award, 
-  Stethoscope, 
+import {
+  Award,
+  Stethoscope,
   Phone,
   Loader2,
   CheckCircle2,
@@ -15,13 +15,15 @@ import {
   FileText,
   ArrowLeft,
   ArrowRight,
-  PartyPopper
+  PartyPopper,
+  ShieldCheck
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -63,6 +65,7 @@ interface OnboardingFormData {
   // Step 1: Professional Info
   licenseNumber: string;
   specialty: Specialty | '';
+  zkConsent: boolean;
   // Step 2: Contact Info
   phone: string;
   alternativePhone: string;
@@ -130,6 +133,7 @@ export function Onboarding() {
   const [formData, setFormData] = useState<OnboardingFormData>({
     licenseNumber: '',
     specialty: '',
+    zkConsent: false,
     phone: '',
     alternativePhone: '',
     officeAddress: '',
@@ -182,6 +186,10 @@ export function Onboarding() {
         newErrors.licenseNumber = t('onboarding.stepper.validation.licenseRequired');
       } else if (formData.licenseNumber.trim().length < 3) {
         newErrors.licenseNumber = t('onboarding.stepper.validation.licenseMinLength');
+      }
+      // ZK consent is mandatory
+      if (!formData.zkConsent) {
+        newErrors.zkConsent = t('onboarding.stepper.validation.consentRequired');
       }
     }
 
@@ -349,6 +357,7 @@ export function Onboarding() {
             linkedin: formData.linkedin.trim() || undefined,
           },
           bio: formData.bio.trim() || undefined,
+          zkConsentAcceptedAt: new Date().toISOString(),
           onboardingComplete: true,
           onboardingCompletedAt: new Date().toISOString(),
         },
@@ -444,6 +453,55 @@ export function Onboarding() {
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      {/* ZK Encryption Consent - Required */}
+      <div className="space-y-3">
+        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/40 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+          <div className="flex items-start gap-3 mb-3">
+            <ShieldCheck className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
+            <div>
+              <h4 className="text-sm font-semibold text-foreground">
+                {t('onboarding.stepper.consent.title')}
+              </h4>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                {t('onboarding.stepper.consent.description')}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 ml-0.5">
+            <Checkbox
+              id="zk-consent"
+              checked={formData.zkConsent}
+              onCheckedChange={(checked) => {
+                setFormData(prev => ({ ...prev, zkConsent: checked === true }));
+                if (errors.zkConsent) {
+                  setErrors(prev => ({ ...prev, zkConsent: undefined }));
+                }
+              }}
+              disabled={isSubmitting}
+              aria-invalid={!!errors.zkConsent}
+              aria-describedby={errors.zkConsent ? 'consent-error' : undefined}
+              className={cn(
+                "mt-0.5",
+                errors.zkConsent && "border-red-500"
+              )}
+            />
+            <Label
+              htmlFor="zk-consent"
+              className="text-sm text-foreground leading-snug cursor-pointer"
+            >
+              {t('onboarding.stepper.consent.label')}
+              <span className="text-red-500 ml-1">*</span>
+            </Label>
+          </div>
+          {errors.zkConsent && (
+            <p id="consent-error" className="text-sm text-red-600 animate-stepper-error mt-2 ml-0.5">
+              {errors.zkConsent}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

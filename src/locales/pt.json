@@ -1769,7 +1769,13 @@
         "licenseMinLength": "O registro deve ter pelo menos 3 caracteres",
         "phoneInvalid": "O telefone deve ter pelo menos 8 dígitos",
         "websiteInvalid": "Digite uma URL válida (ex: https://exemplo.com)",
-        "bioTooLong": "A bio não pode exceder 500 caracteres"
+        "bioTooLong": "A bio não pode exceder 500 caracteres",
+        "consentRequired": "Você deve aceitar os termos de privacidade e criptografia para continuar"
+      },
+      "consent": {
+        "title": "Proteção de Dados com Criptografia de Ponta a Ponta",
+        "description": "O Lavenius utiliza criptografia de ponta a ponta para proteger os dados sensíveis dos seus pacientes. Isso significa que somente você pode acessar as informações clínicas — nem mesmo nós podemos lê-las.",
+        "label": "Aceito que meus dados clínicos serão protegidos com criptografia de ponta a ponta e entendo que sou o único responsável pela minha chave de acesso."
       }
     }
   },

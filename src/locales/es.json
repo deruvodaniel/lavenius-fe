@@ -1824,7 +1824,13 @@
         "licenseMinLength": "La matrícula debe tener al menos 3 caracteres",
         "phoneInvalid": "El teléfono debe tener al menos 8 dígitos",
         "websiteInvalid": "Ingresa una URL válida (ej: https://ejemplo.com)",
-        "bioTooLong": "La biografía no puede superar los 500 caracteres"
+        "bioTooLong": "La biografía no puede superar los 500 caracteres",
+        "consentRequired": "Debes aceptar los términos de privacidad y cifrado para continuar"
+      },
+      "consent": {
+        "title": "Protección de Datos con Cifrado de Extremo a Extremo",
+        "description": "Lavenius utiliza cifrado de extremo a extremo para proteger los datos sensibles de tus pacientes. Esto significa que solo tú puedes acceder a la información clínica: ni siquiera nosotros podemos leerla.",
+        "label": "Acepto que mis datos clínicos serán protegidos con cifrado de extremo a extremo y entiendo que soy el único responsable de mi clave de acceso."
       }
     }
   },

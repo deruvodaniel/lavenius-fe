@@ -1777,7 +1777,13 @@
         "licenseMinLength": "License must have at least 3 characters",
         "phoneInvalid": "Phone must have at least 8 digits",
         "websiteInvalid": "Enter a valid URL (e.g.: https://example.com)",
-        "bioTooLong": "Bio cannot exceed 500 characters"
+        "bioTooLong": "Bio cannot exceed 500 characters",
+        "consentRequired": "You must accept the privacy and encryption terms to continue"
+      },
+      "consent": {
+        "title": "Data Protection with End-to-End Encryption",
+        "description": "Lavenius uses end-to-end encryption to protect your patients' sensitive data. This means only you can access the clinical information — not even we can read it.",
+        "label": "I accept that my clinical data will be protected with end-to-end encryption and I understand that I am solely responsible for my access key."
       }
     }
   },
