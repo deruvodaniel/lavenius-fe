@@ -151,18 +151,45 @@ function buildDayOffDescription(diaOff: DiaOffUI): string {
 }
 
 /**
- * Convert UI day off to API format (DayOffConfig)
- * BE uses fromDate/toDate, UI uses fechaInicio/fechaFin with tipo
+ * Converts a local date + time string to an ISO UTC string.
+ * Needed because the backend always compares session dates in UTC.
+ */
+function toUtcIso(dateStr: string, timeStr: string): string {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  return new Date(year, month - 1, day, hours, minutes, 0, 0).toISOString();
+}
+
+/**
+ * Convert UI day off to API format (DayOffConfig).
+ * BE uses fromDate/toDate as ISO UTC strings.
  */
 function uiToApiDayOff(diaOff: DiaOffUI): { config: DayOffConfig; description: string } {
-  // Map UI dates to API format
-  const config: DayOffConfig = {
-    fromDate: diaOff.fechaInicio,
-    toDate: diaOff.fechaFin,
-  };
-  
+  let fromDate: string;
+  let toDate: string;
+
+  switch (diaOff.tipo) {
+    case 'morning':
+      fromDate = toUtcIso(diaOff.fechaInicio, '00:00');
+      toDate   = toUtcIso(diaOff.fechaFin,    '12:00');
+      break;
+    case 'afternoon':
+      fromDate = toUtcIso(diaOff.fechaInicio, '12:00');
+      toDate   = toUtcIso(diaOff.fechaFin,    '23:59');
+      break;
+    case 'custom':
+      fromDate = toUtcIso(diaOff.fechaInicio, diaOff.startTime || '09:00');
+      toDate   = toUtcIso(diaOff.fechaFin,    diaOff.endTime   || '18:00');
+      break;
+    case 'full':
+    default:
+      fromDate = toUtcIso(diaOff.fechaInicio, '00:00');
+      toDate   = toUtcIso(diaOff.fechaFin,    '23:59');
+      break;
+  }
+
+  const config: DayOffConfig = { fromDate, toDate };
   const description = buildDayOffDescription(diaOff);
-  
   return { config, description };
 }
 
