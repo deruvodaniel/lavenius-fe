@@ -213,14 +213,17 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       const [sh, sm] = formData.horaInicio.split(':').map(Number);
       const [eh, em] = formData.horaFin.split(':').map(Number);
       const diff = (eh * 60 + em) - (sh * 60 + sm);
-      if ([30, 45, 60, 90, 120].includes(diff)) {
+      if ([15, 20, 30, 40, 45, 60, 90, 120].includes(diff)) {
         setSelectedDuration(diff);
       }
     }
   }, [session, formData.horaInicio, formData.horaFin]);
 
   const durationOptions = [
+    { value: 15, labelKey: 'agenda.duration.fifteenMin' },
+    { value: 20, labelKey: 'agenda.duration.twentyMin' },
     { value: 30, labelKey: 'agenda.duration.thirtyMin' },
+    { value: 40, labelKey: 'agenda.duration.fortyMin' },
     { value: 45, labelKey: 'agenda.duration.fortyFiveMin' },
     { value: 60, labelKey: 'agenda.duration.oneHour' },
     { value: 90, labelKey: 'agenda.duration.ninetyMin' },
@@ -463,7 +466,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
                 onChange={(e) => handleStartTimeChange(e.target.value)}
                 className="w-full"
               >
-                {['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00'].map((h) => (
+                {['08:00', '08:15', '08:30', '08:45', '09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00', '16:15', '16:30', '16:45', '17:00', '17:15', '17:30', '17:45', '18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30', '19:45', '20:00'].map((h) => (
                   <option key={h} value={h}>{h}</option>
                 ))}
               </NativeSelect>

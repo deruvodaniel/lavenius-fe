@@ -497,7 +497,10 @@
     },
     "duration": {
       "label": "Duration",
+      "fifteenMin": "15 min",
+      "twentyMin": "20 min",
       "thirtyMin": "30 min",
+      "fortyMin": "40 min",
       "fortyFiveMin": "45 min",
       "oneHour": "1 hour",
       "ninetyMin": "1.5 hours",
@@ -1407,8 +1410,8 @@
     },
     "security": {
       "title": "Clinical-grade security",
-      "description": "All your patient data is protected with AES-256-GCM encryption end-to-end. We comply with the highest security standards to protect sensitive information.",
-      "encryption": "AES-256-GCM encryption",
+      "description": "All your patient data is protected with end-to-end encryption. We comply with the highest security standards to protect sensitive information.",
+      "encryption": "End-to-end encryption",
       "e2e": "End-to-end"
     },
     "socialProof": {
@@ -1452,8 +1455,8 @@
         },
         "encryption": {
           "title": "Real encryption",
-          "description": "AES-256-GCM end-to-end. Not just a HIPAA logo at the bottom of the page, but real protection.",
-          "highlight": "AES-256-GCM"
+          "description": "End-to-end encryption. Not just a HIPAA logo at the bottom of the page, but real protection.",
+          "highlight": "E2E Encryption"
         },
         "localPricing": {
           "title": "Transparent pricing",
@@ -1474,7 +1477,7 @@
       "questions": {
         "security": {
           "question": "Is my data and my patients' data secure?",
-          "answer": "Yes, 100%. We use AES-256-GCM end-to-end encryption. That means even we can't read your clinical notes. Only you with your passphrase can access sensitive information."
+          "answer": "Yes, 100%. We use end-to-end encryption. That means even we can't read your clinical notes. Only you with your passphrase can access sensitive information."
         },
         "cancel": {
           "question": "Can I cancel anytime?",
@@ -1525,7 +1528,7 @@
       "popular": "Most Popular",
       "cta": "Get started",
       "trustBadges": {
-        "encryption": "AES-256 Encryption",
+        "encryption": "E2E Encryption",
         "cancelAnytime": "Cancel anytime",
         "freeTrial": "14-day free trial"
       },

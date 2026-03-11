@@ -497,7 +497,10 @@
     },
     "duration": {
       "label": "Duración",
+      "fifteenMin": "15 min",
+      "twentyMin": "20 min",
       "thirtyMin": "30 min",
+      "fortyMin": "40 min",
       "fortyFiveMin": "45 min",
       "oneHour": "1 hora",
       "ninetyMin": "1.5 horas",
@@ -1372,7 +1375,7 @@
       "cta": "Comenzar gratis",
       "hasAccount": "Ya tengo cuenta",
       "noCreditCard": "Sin tarjeta de crédito",
-      "dataEncrypted": "Cifrado real (AES-256)",
+      "dataEncrypted": "Cifrado de extremo a extremo",
       "supportIncluded": "Soporte en español",
       "preview": {
         "income": "Ingresos",
@@ -1454,8 +1457,8 @@
     },
     "security": {
       "title": "Tus datos, realmente protegidos",
-      "description": "Todos los datos de tus pacientes están protegidos con cifrado AES-256-GCM de extremo a extremo. No es solo un cumplimiento normativo, es seguridad real en cada nota que escribes.",
-      "encryption": "Cifrado AES-256-GCM",
+      "description": "Todos los datos de tus pacientes están protegidos con cifrado de extremo a extremo. No es solo un cumplimiento normativo, es seguridad real en cada nota que escribes.",
+      "encryption": "Cifrado de extremo a extremo",
       "e2e": "Extremo a extremo"
     },
     "socialProof": {
@@ -1499,8 +1502,8 @@
         },
         "encryption": {
           "title": "Cifrado real",
-          "description": "AES-256-GCM de extremo a extremo. No es solo un cumplimiento normativo, es protección genuina para tus datos sensibles.",
-          "highlight": "AES-256-GCM"
+          "description": "Cifrado de extremo a extremo. No es solo un cumplimiento normativo, es protección genuina para tus datos sensibles.",
+          "highlight": "Cifrado E2E"
         },
         "localPricing": {
           "title": "Precios en moneda local",
@@ -1521,7 +1524,7 @@
       "questions": {
         "security": {
           "question": "¿Mis datos y los de mis pacientes están seguros?",
-          "answer": "Absolutamente. Usamos cifrado AES-256-GCM de extremo a extremo. Esto significa que ni siquiera nosotros podemos leer tus notas clínicas. Solo tú con tu passphrase puedes acceder a la información sensible."
+          "answer": "Absolutamente. Usamos cifrado de extremo a extremo. Esto significa que ni siquiera nosotros podemos leer tus notas clínicas. Solo tú con tu passphrase puedes acceder a la información sensible."
         },
         "cancel": {
           "question": "¿Puedo cancelar cuando quiera?",
@@ -1572,7 +1575,7 @@
       "popular": "Más elegido",
       "cta": "Comenzar ahora",
       "trustBadges": {
-        "encryption": "Cifrado AES-256",
+        "encryption": "Cifrado E2E",
         "cancelAnytime": "Cancela cuando quieras",
         "freeTrial": "14 días gratis"
       },
