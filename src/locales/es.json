@@ -845,6 +845,12 @@
       "custom": "Personalizado",
       "customMinutes": "minutos"
     },
+    "defaultCost": {
+      "title": "Precio por defecto de sesión",
+      "description": "Se usará como valor inicial al agendar un nuevo turno. Puedes cambiarlo por sesión.",
+      "placeholder": "Ej: 5000",
+      "hint": "Dejar vacío para no usar valor por defecto"
+    },
     "theme": {
       "title": "Apariencia",
       "description": "Elige cómo se ve Lavenius en tu dispositivo.",

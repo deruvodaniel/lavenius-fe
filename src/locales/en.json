@@ -845,6 +845,12 @@
       "custom": "Custom",
       "customMinutes": "minutes"
     },
+    "defaultCost": {
+      "title": "Default Session Price",
+      "description": "Will be used as the initial value when scheduling a new appointment. You can change it per session.",
+      "placeholder": "e.g. 50",
+      "hint": "Leave empty for no default"
+    },
     "theme": {
       "title": "Appearance",
       "description": "Choose how Lavenius looks on your device.",

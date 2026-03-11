@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Calendar, Clock, User, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -85,6 +85,16 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     } catch { /* use fallback */ }
     return 60;
   });
+  const defaultSessionCost = useMemo(() => {
+    try {
+      const stored = localStorage.getItem('lavenius_settings');
+      if (stored) {
+        const settings = JSON.parse(stored);
+        if (settings.defaultSessionCost != null) return settings.defaultSessionCost as number;
+      }
+    } catch { /* ignore */ }
+    return null;
+  }, []);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showDeleteScopeDialog, setShowDeleteScopeDialog] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
@@ -125,7 +135,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         motivo: '',
         sessionType: SessionType.REMOTE,
         estado: SessionStatus.PENDING,
-        monto: '' as string | number,
+        monto: (defaultSessionCost ?? '') as string | number,
         recurrence: undefined as SessionRecurrence | undefined,
       };
       
@@ -552,7 +562,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               aria-describedby="monto-error"
               required
               min="0"
-              placeholder="0"
+              placeholder={defaultSessionCost != null ? String(defaultSessionCost) : '0'}
             />
             {!isMontoValid && (
               <p id="monto-error" className="text-sm text-red-500 mt-1">

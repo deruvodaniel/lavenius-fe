@@ -86,6 +86,7 @@ interface WorkingHours {
 interface LocalSettings {
   workingHours: WorkingHours;
   defaultSessionDuration: number; // minutes: 30, 45, 60, 90, 120
+  defaultSessionCost: number | null; // null = no default
 }
 
 const defaultLocalSettings: LocalSettings = {
@@ -95,6 +96,7 @@ const defaultLocalSettings: LocalSettings = {
     workingDays: [1, 2, 3, 4, 5], // Monday to Friday
   },
   defaultSessionDuration: 60,
+  defaultSessionCost: null,
 };
 
 const loadLocalSettings = (): LocalSettings => {
@@ -830,6 +832,32 @@ export function Configuracion() {
                   />
                   <span className="text-sm text-muted-foreground">min</span>
                 </div>
+              </div>
+            </ConfigSection>
+
+            {/* Precio por defecto de sesión */}
+            <ConfigSection
+              icon={DollarSign}
+              iconColor="text-green-600 dark:text-green-400"
+              iconBg="bg-green-100 dark:bg-green-950/50"
+              title={t('settings.defaultCost.title')}
+              description={t('settings.defaultCost.description')}
+            >
+              <div className="flex items-center gap-3">
+                <Input
+                  id="default-session-cost"
+                  type="number"
+                  min="0"
+                  step="100"
+                  value={localSettings.defaultSessionCost ?? ''}
+                  onChange={(e) => {
+                    const val = e.target.value === '' ? null : Number(e.target.value);
+                    updateLocalSetting('defaultSessionCost', val);
+                  }}
+                  placeholder={t('settings.defaultCost.placeholder')}
+                  className="w-40"
+                />
+                <span className="text-sm text-muted-foreground">{t('settings.defaultCost.hint')}</span>
               </div>
             </ConfigSection>
 

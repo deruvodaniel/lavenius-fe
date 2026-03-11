@@ -836,6 +836,12 @@
       "custom": "Personalizado",
       "customMinutes": "minutos"
     },
+    "defaultCost": {
+      "title": "Preço padrão da sessão",
+      "description": "Será usado como valor inicial ao agendar uma nova consulta. Você pode alterá-lo por sessão.",
+      "placeholder": "Ex: 150",
+      "hint": "Deixe vazio para não usar valor padrão"
+    },
     "theme": {
       "title": "Aparência",
       "description": "Escolha como o Lavenius aparece no seu dispositivo.",
