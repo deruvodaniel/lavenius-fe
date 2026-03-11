@@ -445,7 +445,9 @@
       "saving": "Guardando...",
       "deleting": "Eliminando...",
       "deleteConfirmTitle": "¿Eliminar turno?",
-      "deleteConfirmDescription": "Esta acción no se puede deshacer. El turno será eliminado permanentemente."
+      "deleteConfirmDescription": "Esta acción no se puede deshacer. El turno será eliminado permanentemente.",
+      "createPatient": "Crear nuevo paciente",
+      "patientCreated": "Paciente creado y seleccionado"
     },
     "card": {
       "paid": "Pagado",

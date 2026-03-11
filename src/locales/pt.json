@@ -436,7 +436,9 @@
       "saving": "Salvando...",
       "deleting": "Excluindo...",
       "deleteConfirmTitle": "Excluir consulta?",
-      "deleteConfirmDescription": "Esta ação não pode ser desfeita. A consulta será excluída permanentemente."
+      "deleteConfirmDescription": "Esta ação não pode ser desfeita. A consulta será excluída permanentemente.",
+      "createPatient": "Criar novo paciente",
+      "patientCreated": "Paciente criado e selecionado"
     },
     "card": {
       "paid": "Pago",

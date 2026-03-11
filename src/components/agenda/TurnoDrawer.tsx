@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Calendar, Clock, User, Loader2 } from 'lucide-react';
+import { Calendar, Clock, User, UserPlus, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { usePatientStore, useSetupProgressStore } from '@/lib/stores';
@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
 import { RecurrenceSelector } from '@/components/agenda/RecurrenceSelector';
 import { DeleteScopeDialog } from '@/components/agenda/DeleteScopeDialog';
-import type { Patient } from '@/lib/types/api.types';
+import { PacienteDrawer } from '@/components/pacientes/PacienteDrawer';
+import type { Patient, CreatePatientDto } from '@/lib/types/api.types';
 import { SessionType, SessionStatus, SessionDeleteScope } from '@/lib/types/session';
 import type { CreateSessionDto, SessionResponse, SessionRecurrence } from '@/lib/types/session';
 
@@ -58,6 +59,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
   const { user } = useAuth();
   const fetchPatientById = usePatientStore(state => state.fetchPatientById);
   const selectedPatientFromStore = usePatientStore(state => state.selectedPatient);
+  const createPatient = usePatientStore(state => state.createPatient);
   
   // Store the full patient data (with email) when a patient is selected
   const [fullPatientData, setFullPatientData] = useState<Patient | null>(null);
@@ -110,6 +112,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [showOutsideHoursAlert, setShowOutsideHoursAlert] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showNewPatientDrawer, setShowNewPatientDrawer] = useState(false);
 
   // Memoized callback to prevent RecurrenceSelector infinite loop
   const handleRecurrenceChange = useCallback((recurrence: SessionRecurrence | undefined) => {
@@ -417,6 +420,14 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     }
   };
 
+  const handleInlineCreatePatient = async (patientDto: CreatePatientDto) => {
+    const newPatient = await createPatient(patientDto);
+    // Auto-select the newly created patient
+    setFormData(prev => ({ ...prev, pacienteId: newPatient.id }));
+    setShowNewPatientDrawer(false);
+    toast.success(t('agenda.drawer.patientCreated'));
+  };
+
   return (
     <>
       <BaseDrawer
@@ -436,21 +447,34 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               <User className="w-4 h-4" />
               {t('agenda.fields.patient')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
             </label>
-            <NativeSelect
-              id="turno-paciente"
-              value={formData.pacienteId}
-              onChange={(e) => setFormData({ ...formData, pacienteId: e.target.value })}
-              className="w-full"
-              aria-invalid={!formData.pacienteId}
-              required
-            >
-              <option value="">{t('agenda.drawer.selectPatient')}</option>
-              {patients.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.firstName} {p.lastName}
-                </option>
-              ))}
-            </NativeSelect>
+            <div className="flex gap-2">
+              <NativeSelect
+                id="turno-paciente"
+                value={formData.pacienteId}
+                onChange={(e) => setFormData({ ...formData, pacienteId: e.target.value })}
+                className="flex-1"
+                aria-invalid={!formData.pacienteId}
+                required
+              >
+                <option value="">{t('agenda.drawer.selectPatient')}</option>
+                {patients.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.firstName} {p.lastName}
+                  </option>
+                ))}
+              </NativeSelect>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setShowNewPatientDrawer(true)}
+                title={t('agenda.drawer.createPatient')}
+                aria-label={t('agenda.drawer.createPatient')}
+                className="shrink-0"
+              >
+                <UserPlus className="w-4 h-4" />
+              </Button>
+            </div>
             {/* Loading indicator or email status */}
             {formData.pacienteId && isLoadingPatient && (
               <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
@@ -692,6 +716,13 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         onOpenChange={setShowDeleteScopeDialog}
         onConfirm={confirmDeleteWithScope}
         isLoading={isSaving}
+      />
+
+      {/* Inline Patient Creation Drawer */}
+      <PacienteDrawer
+        isOpen={showNewPatientDrawer}
+        onClose={() => setShowNewPatientDrawer(false)}
+        onSave={handleInlineCreatePatient}
       />
     </>
   );

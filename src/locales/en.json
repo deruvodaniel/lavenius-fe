@@ -445,7 +445,9 @@
       "saving": "Saving...",
       "deleting": "Deleting...",
       "deleteConfirmTitle": "Delete appointment?",
-      "deleteConfirmDescription": "This action cannot be undone. The appointment will be permanently deleted."
+      "deleteConfirmDescription": "This action cannot be undone. The appointment will be permanently deleted.",
+      "createPatient": "Create new patient",
+      "patientCreated": "Patient created and selected"
     },
     "card": {
       "paid": "Paid",
