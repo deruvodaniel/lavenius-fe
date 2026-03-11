@@ -230,6 +230,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
   };
 
   const handleSave = async () => {
+    if (isSaving || isLoading) return;
     if (!validateForm()) {
       return;
     }
