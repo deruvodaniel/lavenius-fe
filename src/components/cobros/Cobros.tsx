@@ -576,6 +576,7 @@ export function Cobros() {
   }, []);
 
   const handleMarkAsPaid = useCallback(async (paymentId: string) => {
+    if (markingAsPaidId) return;
     try {
       setMarkingAsPaidId(paymentId);
       await markAsPaid(paymentId);
@@ -588,11 +589,11 @@ export function Cobros() {
     } finally {
       setMarkingAsPaidId(null);
     }
-  }, [markAsPaid, fetchPayments, serverFilters, t]);
+  }, [markingAsPaidId, markAsPaid, fetchPayments, serverFilters, t]);
 
   const handleDeletePayment = useCallback(async () => {
-    if (!deletePaymentData) return;
-    
+    if (!deletePaymentData || isDeletingPayment) return;
+
     try {
       setIsDeletingPayment(true);
       await deletePayment(deletePaymentData.id);
@@ -606,7 +607,7 @@ export function Cobros() {
     } finally {
       setIsDeletingPayment(false);
     }
-  }, [deletePaymentData, deletePayment, fetchPayments, serverFilters, t]);
+  }, [deletePaymentData, isDeletingPayment, deletePayment, fetchPayments, serverFilters, t]);
 
   const handleSavePayment = useCallback(async (data: CreatePaymentDto) => {
     try {

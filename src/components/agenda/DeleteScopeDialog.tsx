@@ -68,6 +68,7 @@ export function DeleteScopeDialog({
   };
 
   const handleConfirm = async () => {
+    if (isLoading) return;
     await onConfirm(selectedScope);
   };
 
