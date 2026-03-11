@@ -491,6 +491,11 @@
       "morning": "Morning",
       "afternoon": "Afternoon"
     },
+    "outsideHours": {
+      "title": "Outside working hours",
+      "description": "You are scheduling outside your configured working hours ({{start}} - {{end}}). Do you want to continue anyway?",
+      "confirm": "Schedule anyway"
+    },
     "legend": {
       "scheduled": "Scheduled",
       "confirmed": "Confirmed",

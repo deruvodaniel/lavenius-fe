@@ -95,9 +95,20 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     } catch { /* ignore */ }
     return null;
   }, []);
+  const workingHours = useMemo(() => {
+    try {
+      const stored = localStorage.getItem('lavenius_settings');
+      if (stored) {
+        const settings = JSON.parse(stored);
+        if (settings.workingHours) return settings.workingHours as { startTime: string; endTime: string; workingDays: number[] };
+      }
+    } catch { /* ignore */ }
+    return { startTime: '09:00', endTime: '18:00', workingDays: [1, 2, 3, 4, 5] };
+  }, []);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showDeleteScopeDialog, setShowDeleteScopeDialog] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const [showOutsideHoursAlert, setShowOutsideHoursAlert] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   // Memoized callback to prevent RecurrenceSelector infinite loop
@@ -282,7 +293,19 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       toast.error(t('agenda.validation.enterAmount'));
       return;
     }
-    
+
+    // Check if booking is outside working hours (warn, don't block)
+    if (!session) {
+      const selectedDay = new Date(`${formData.fecha}T12:00:00`).getDay();
+      const isNonWorkingDay = !workingHours.workingDays.includes(selectedDay);
+      const isOutsideHours = formData.horaInicio < workingHours.startTime || formData.horaFin > workingHours.endTime;
+
+      if (isNonWorkingDay || isOutsideHours) {
+        setShowOutsideHoursAlert(true);
+        return;
+      }
+    }
+
     setShowSaveConfirm(true);
   };
 
@@ -612,6 +635,25 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           )}
         </DrawerFooter>
       </BaseDrawer>
+
+      {/* Outside Working Hours Alert */}
+      <ConfirmDialog
+        open={showOutsideHoursAlert}
+        onOpenChange={setShowOutsideHoursAlert}
+        title={t('agenda.outsideHours.title')}
+        description={t('agenda.outsideHours.description', {
+          start: workingHours.startTime,
+          end: workingHours.endTime,
+        })}
+        confirmLabel={t('agenda.outsideHours.confirm')}
+        cancelLabel={t('common.cancel')}
+        variant="default"
+        icon={Clock}
+        onConfirm={() => {
+          setShowOutsideHoursAlert(false);
+          setShowSaveConfirm(true);
+        }}
+      />
 
       {/* Save Confirmation Dialog */}
       <ConfirmDialog

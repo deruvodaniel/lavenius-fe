@@ -482,6 +482,11 @@
       "morning": "Manhã",
       "afternoon": "Tarde"
     },
+    "outsideHours": {
+      "title": "Fora do horário de trabalho",
+      "description": "Você está agendando fora do seu horário de trabalho configurado ({{start}} - {{end}}). Deseja continuar mesmo assim?",
+      "confirm": "Agendar mesmo assim"
+    },
     "legend": {
       "scheduled": "Agendada",
       "confirmed": "Confirmada",

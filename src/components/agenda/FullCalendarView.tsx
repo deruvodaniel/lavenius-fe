@@ -143,7 +143,7 @@ export function FullCalendarView({
   const { t } = useTranslation();
   const calendarRef = useRef<FullCalendar>(null);
   const { isMobile } = useResponsive();
-  
+
   // Default to day view on both mobile and desktop
   const defaultView = 'timeGridDay';
   const [currentView, setCurrentView] = useState(defaultView);
@@ -182,11 +182,8 @@ export function FullCalendarView({
     }
   }, [isMobile, currentView]);
 
-  // Note: Working hours settings are loaded but not used for restrictions
-  // They will be used for the public profile feature to share availability with patients
-  // For now, professionals can schedule at any time
+  // Working hours from user settings — used for businessHours display (graying non-work time)
   const calendarSettings = useMemo(() => loadCalendarSettings(), []);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { workingHours } = calendarSettings;
   
   // Get days off from the settings store (API)
@@ -554,6 +551,11 @@ export function FullCalendarView({
             week: 'Semana',
             day: 'Día',
             list: 'Lista',
+          }}
+          businessHours={{
+            daysOfWeek: workingHours.workingDays,
+            startTime: workingHours.startTime,
+            endTime: workingHours.endTime,
           }}
           slotMinTime="07:00:00"
           slotMaxTime="22:00:00"
