@@ -15,6 +15,7 @@ import {
   X,
   ChevronRight,
   Sparkles,
+  PartyPopper,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -144,8 +145,8 @@ export function OnboardingProgressCard({ className = '' }: OnboardingProgressCar
     });
   }, [steps]);
 
-  // Don't render if card shouldn't be shown
-  if (!isVisible || allComplete) {
+  // Don't render if hidden via dashboard settings
+  if (!isVisible) {
     return null;
   }
 
@@ -158,11 +159,69 @@ export function OnboardingProgressCard({ className = '' }: OnboardingProgressCar
     setSectionVisibility('setupProgress', false);
   };
 
+  // Celebration state when all steps are complete
+  if (allComplete) {
+    return (
+      <Card className={`p-4 sm:p-6 bg-white dark:bg-card relative overflow-hidden ${className}`}>
+        {/* Decorative gradient background */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-100/50 to-transparent dark:from-green-900/20 rounded-bl-full pointer-events-none" />
+
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <PartyPopper className="w-5 h-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">
+                {t('dashboard.setupProgress.completeTitle')}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t('dashboard.setupProgress.completeSubtitle')}
+              </p>
+            </div>
+          </div>
+
+          {/* Dismiss button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleDismiss}
+            className="shrink-0 h-8 w-8 text-muted-foreground hover:text-foreground -mt-1 -mr-2"
+            aria-label={t('common.close')}
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Full progress bar */}
+        <div className="mt-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-green-700 dark:text-green-400">
+              {t('dashboard.setupProgress.progress', { completed, total })}
+            </span>
+            <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+              100%
+            </span>
+          </div>
+          <Progress
+            value={100}
+            className="h-2 bg-gray-100 dark:bg-gray-800"
+          />
+        </div>
+
+        {/* Footer */}
+        <p className="text-xs text-muted-foreground mt-3 text-center">
+          {t('dashboard.setupProgress.dismissHint')}
+        </p>
+      </Card>
+    );
+  }
+
   return (
     <Card className={`p-4 sm:p-6 bg-white dark:bg-card relative overflow-hidden ${className}`}>
       {/* Decorative gradient background */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-100/50 to-transparent dark:from-indigo-900/20 rounded-bl-full pointer-events-none" />
-      
+
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="flex items-center gap-3">
@@ -178,7 +237,7 @@ export function OnboardingProgressCard({ className = '' }: OnboardingProgressCar
             </p>
           </div>
         </div>
-        
+
         {/* Dismiss button */}
         <Button
           variant="ghost"
@@ -201,8 +260,8 @@ export function OnboardingProgressCard({ className = '' }: OnboardingProgressCar
             {percentage}%
           </span>
         </div>
-        <Progress 
-          value={percentage} 
+        <Progress
+          value={percentage}
           className="h-2 bg-gray-100 dark:bg-gray-800"
         />
       </div>

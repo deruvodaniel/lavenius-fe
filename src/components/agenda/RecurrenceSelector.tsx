@@ -70,7 +70,10 @@ export function RecurrenceSelector({
     if (value) {
       setEnabled(true);
       setRecurrenceType(value.type);
-      setUntilDate(value.until);
+      // Store only the date portion (YYYY-MM-DD) for the DatePicker.
+      // The parent emits ISO datetime like "2026-04-15T23:59:59Z" but
+      // DatePicker only understands plain "YYYY-MM-DD" format.
+      setUntilDate(value.until ? value.until.split('T')[0] : '');
       setDaysOfWeek(value.daysOfWeek || []);
     } else {
       setEnabled(false);

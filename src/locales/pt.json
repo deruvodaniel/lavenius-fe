@@ -1103,6 +1103,8 @@
       "title": "Configure sua conta",
       "subtitle": "Complete estes passos para aproveitar ao máximo o Lavenius",
       "progress": "{{completed}} de {{total}} completados",
+      "completeTitle": "Configuração concluída!",
+      "completeSubtitle": "Tudo pronto. Aproveite o Lavenius!",
       "dismissHint": "Você pode mostrar este cartão novamente no menu de configurações do dashboard",
       "steps": {
         "configureProfile": "Configurar seu perfil profissional",

@@ -570,7 +570,7 @@ export function Pacientes() {
                   <label className="block text-sm font-medium text-foreground mb-2">{t('patients.modality.label')}</label>
                   <NativeSelect
                     value={modalidadFilter}
-                    onChange={(e) => setModalidadFilter(e.target.value as any)}
+                    onChange={(e) => setModalidadFilter(e.target.value as typeof modalidadFilter)}
                     className="w-full"
                   >
                     <option value="todas">{t('patients.modality.all')}</option>
@@ -585,7 +585,7 @@ export function Pacientes() {
                   <label className="block text-sm font-medium text-foreground mb-2">{t('patients.frequency.label')}</label>
                   <NativeSelect
                     value={frecuenciaFilter}
-                    onChange={(e) => setFrecuenciaFilter(e.target.value as any)}
+                    onChange={(e) => setFrecuenciaFilter(e.target.value as typeof frecuenciaFilter)}
                     className="w-full"
                   >
                     <option value="todas">{t('patients.frequency.all')}</option>
@@ -694,7 +694,7 @@ export function Pacientes() {
               <NativeSelect
                 id="filter-frecuencia"
                 value={frecuenciaFilter}
-                onChange={(e) => setFrecuenciaFilter(e.target.value as any)}
+                onChange={(e) => setFrecuenciaFilter(e.target.value as typeof frecuenciaFilter)}
                 className="w-full"
               >
                 <option value="todas">{t('patients.frequency.all')}</option>
