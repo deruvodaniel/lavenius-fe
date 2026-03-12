@@ -64,10 +64,9 @@ export interface SessionResponse {
   externalEventId?: string; // Google Calendar event ID
   cost?: number;
   sessionType: SessionType;
-  meetLink?: string; // Only for remote sessions
-  recurrenceId?: string; // ID del grupo de recurrencia
-  recurrenceUntil?: string; // ISO 8601 date string - fecha hasta la cual se repite
-  recurrenceRule?: string; // Regla de recurrencia en formato legible
+  recurrenceId?: string | null; // ID del grupo de recurrencia
+  recurrenceUntil?: string | null; // ISO 8601 date string - fecha hasta la cual se repite
+  recurrenceRule?: Record<string, unknown> | null; // Regla de recurrencia (JSON del backend)
   createdAt: string;
   updatedAt: string;
   therapist?: TherapistInfo;

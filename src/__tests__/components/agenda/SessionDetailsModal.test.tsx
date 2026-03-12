@@ -64,7 +64,6 @@ const mockRemoteSession: SessionUI = {
   ...mockSession,
   id: 'session-2',
   sessionType: SessionType.REMOTE,
-  meetLink: 'https://meet.google.com/abc-defg-hij',
 };
 
 const mockPendingSession: SessionUI = {

@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { sessionService } from '../api/sessions';
 import { getErrorMessage, getErrorStatusCode } from '../utils/error';
-import type { CreateSessionDto, SessionResponse, SessionUI, UpdateSessionDto, SessionDeleteScope } from '../types/session';
+import { SessionDeleteScope } from '../types/session';
+import type { CreateSessionDto, SessionResponse, SessionUI, UpdateSessionDto } from '../types/session';
 
 interface SessionState {
   sessions: SessionResponse[];
@@ -119,13 +120,28 @@ export const useSessionStore = create<SessionState>((set, _get) => ({
     try {
       await sessionService.delete(id, scope);
 
-      // Note: Si scope es 'this_and_future', el backend eliminará múltiples sesiones
-      // Por ahora solo removemos la sesión actual del estado local
-      // Considera refrescar la lista completa después para mantener sincronización
-      set((state) => ({
-        sessions: state.sessions.filter((s) => s.id !== id),
-        isLoading: false
-      }));
+      set((state) => {
+        // When deleting with scope 'this_and_future', remove all sessions
+        // with the same recurrenceId that are on or after the deleted session
+        if (scope === SessionDeleteScope.THIS_AND_FUTURE) {
+          const deletedSession = state.sessions.find((s) => s.id === id);
+          if (deletedSession?.recurrenceId) {
+            const deletedDate = new Date(deletedSession.scheduledFrom);
+            return {
+              sessions: state.sessions.filter((s) =>
+                s.recurrenceId !== deletedSession.recurrenceId ||
+                new Date(s.scheduledFrom) < deletedDate
+              ),
+              isLoading: false,
+            };
+          }
+        }
+        // Default: remove only the single session
+        return {
+          sessions: state.sessions.filter((s) => s.id !== id),
+          isLoading: false,
+        };
+      });
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error, 'Error al eliminar sesión');
       set({ error: errorMessage, isLoading: false });
