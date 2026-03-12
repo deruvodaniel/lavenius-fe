@@ -84,6 +84,7 @@ export function Agenda() {
     handleSelectPatient,
     handleBackFromFicha,
     handleEventDrop,
+    handleDatesSet,
   } = useAgenda();
 
 
@@ -178,6 +179,7 @@ export function Agenda() {
                   setTurnoDrawerOpen(true);
                 }}
                 onEventDrop={handleEventDrop}
+                onDatesSet={handleDatesSet}
               />
             </div>
           </div>

@@ -319,14 +319,23 @@ export function useAgenda() {
         if (sessionData.recurrence) {
           toast.success(t('agenda.messages.createRecurringSuccess') || 'Sesiones recurrentes creadas exitosamente');
 
-          // Refresh both current month and upcoming to show all recurring sessions
-          const now = new Date();
-          const currentYear = now.getFullYear();
-          const currentMonth = now.getMonth() + 1;
+          // Fetch all months the recurrence spans so the calendar shows every occurrence
+          const startDate = new Date(sessionData.scheduledFrom);
+          const endDate = sessionData.recurrence.until
+            ? new Date(sessionData.recurrence.until)
+            : new Date(startDate.getFullYear(), startDate.getMonth() + 2, 0);
+
+          const monthFetches: Promise<void>[] = [];
+          const cursor = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+          const endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+          while (cursor <= endMonth) {
+            monthFetches.push(fetchMonthly(cursor.getFullYear(), cursor.getMonth() + 1));
+            cursor.setMonth(cursor.getMonth() + 1);
+          }
 
           await Promise.all([
             fetchUpcoming(),
-            fetchMonthly(currentYear, currentMonth),
+            ...monthFetches,
             fetchPayments(true)
           ]);
         } else {
@@ -461,6 +470,23 @@ export function useAgenda() {
     }
   }, [updateSession, fetchUpcoming, t]);
 
+  /**
+   * Fetch monthly sessions for every month visible in the calendar.
+   * Called by FullCalendar's datesSet callback when the user navigates.
+   */
+  const handleDatesSet = useCallback(async (start: Date, end: Date) => {
+    const cursor = new Date(start.getFullYear(), start.getMonth(), 1);
+    const endMonth = new Date(end.getFullYear(), end.getMonth(), 1);
+
+    const fetches: Promise<void>[] = [];
+    while (cursor <= endMonth) {
+      fetches.push(fetchMonthly(cursor.getFullYear(), cursor.getMonth() + 1));
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+
+    await Promise.all(fetches);
+  }, [fetchMonthly]);
+
   return {
     // State
     isLoading,
@@ -524,5 +550,6 @@ export function useAgenda() {
     handleSelectPatient,
     handleBackFromFicha,
     handleEventDrop,
+    handleDatesSet,
   };
 }

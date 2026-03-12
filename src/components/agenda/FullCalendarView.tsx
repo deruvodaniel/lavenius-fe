@@ -126,17 +126,20 @@ interface FullCalendarViewProps {
   onEventClick?: (session: SessionUI) => void;
   onDateSelect?: (start: Date, end: Date) => void;
   onEventDrop?: (sessionId: string, newStart: Date, newEnd: Date) => void;
+  /** Called when the visible date range changes (month navigation) */
+  onDatesSet?: (start: Date, end: Date) => void;
   isSessionPaid?: (sessionId: string) => boolean;
   /** Fallback function to get patient name when session.patientName is not available */
   getPatientNameFallback?: (patientId: string | undefined) => string | undefined;
 }
 
-export function FullCalendarView({ 
-  sessions, 
+export function FullCalendarView({
+  sessions,
   isLoading = false,
-  onEventClick, 
+  onEventClick,
   onDateSelect,
   onEventDrop,
+  onDatesSet,
   isSessionPaid,
   getPatientNameFallback
 }: FullCalendarViewProps) {
@@ -209,11 +212,10 @@ export function FullCalendarView({
       .flatMap(convertApiDayOffToCalendarFormat);
   }, [allSettings, fetchStatus]);
 
-  // Generate a key based on sessions data to force FullCalendar to re-render when sessions change
-  const calendarKey = useMemo(() => {
-    if (!sessions || !Array.isArray(sessions)) return 'empty';
-    return sessions.map(s => `${s.id}-${s.status}-${s.scheduledFrom}`).join('|');
-  }, [sessions]);
+  // Stable key — FullCalendar updates events reactively via the `events` prop.
+  // Using a data-derived key forces a full re-mount on every session change,
+  // losing navigation state (current month/view). A static key avoids this.
+  const calendarKey = 'agenda-calendar';
 
   // Check if a date is a día off (returns the día off if it matches date AND time)
   const isDiaOff = (date: Date): DiaOff | undefined => {
@@ -246,18 +248,6 @@ export function FullCalendarView({
   // Convert sessions to FullCalendar events (filter out cancelled sessions)
   const sessionEvents = useMemo(() => {
     if (!sessions || !Array.isArray(sessions)) return [];
-
-    // Debug: Log sessions to check dates
-    console.log('📅 Calendar rendering', sessions.length, 'sessions');
-    const recurringSessions = sessions.filter(s => s.recurrenceId);
-    if (recurringSessions.length > 0) {
-      console.log('🔄 Recurring sessions found:', recurringSessions.map(s => ({
-        id: s.id.substring(0, 8),
-        scheduledFrom: s.scheduledFrom,
-        recurrenceId: s.recurrenceId?.substring(0, 8),
-        patient: s.patient?.firstName
-      })));
-    }
 
     return sessions
       .filter(session => session.status !== SessionStatus.CANCELLED)
@@ -538,6 +528,7 @@ export function FullCalendarView({
           eventClick={handleEventClick}
           select={handleDateSelect}
           eventDrop={handleEventDrop}
+          datesSet={(dateInfo) => onDatesSet?.(dateInfo.start, dateInfo.end)}
           selectable={true}
           selectMirror={true}
           dayMaxEvents={true}

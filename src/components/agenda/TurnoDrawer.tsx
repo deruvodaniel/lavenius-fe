@@ -347,15 +347,6 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       recurrence: formData.recurrence,
     };
 
-    // Debug: log recurrence payload
-    if (formData.recurrence) {
-      console.log('🔄 Creating recurring session:', {
-        recurrence: formData.recurrence,
-        sessionDate: formData.fecha,
-        fullPayload: sessionDto
-      });
-    }
-
     setIsSaving(true);
     try {
       await onSave(sessionDto);
