@@ -326,7 +326,7 @@ const getPaymentPatientName = (payment: Payment, fallback: string): string => {
 export function Cobros() {
   const { t } = useTranslation();
   const { sessionsUI, fetchUpcoming } = useSessions();
-  const { fetchPatients } = usePatients();
+  const { patients, fetchPatients } = usePatients();
 
   const { 
     payments,
@@ -339,7 +339,17 @@ export function Cobros() {
     deletePayment,
   } = usePayments();
   const { isMobile } = useResponsive();
-  
+
+  // Lookup map: patientId → full name (from patients store, always decrypted)
+  const patientNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const p of patients) {
+      const name = `${p.firstName} ${p.lastName || ''}`.trim();
+      if (name) map.set(p.id, name);
+    }
+    return map;
+  }, [patients]);
+
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isPaymentDrawerOpen, setIsPaymentDrawerOpen] = useState(false);
@@ -460,7 +470,7 @@ export function Cobros() {
   // Create virtual pending items from sessions without payment (only past/completed sessions)
   const virtualPendingItems = useMemo((): CobroItem[] => {
     const now = new Date();
-    
+
     return sessionsUI
       .filter(session => {
         // Only include past sessions (completed or past date)
@@ -468,41 +478,57 @@ export function Cobros() {
         const isPast = sessionDate < now || session.status === 'completed';
         // Exclude sessions that already have a payment
         const hasPayment = sessionIdsWithPayment.has(session.id);
-        // Only include if session has a cost
-        const hasCost = session.cost && session.cost > 0;
-        
-        return isPast && !hasPayment && hasCost;
+        // Only include if session has a cost (TypeORM returns decimal as string)
+        const cost = Number(session.cost) || 0;
+
+        return isPast && !hasPayment && cost > 0;
       })
-      .map(session => ({
-        id: `virtual-${session.id}`,
-        isVirtual: true,
-        status: PaymentStatus.PENDING,
-        amount: session.cost || 0,
-        date: session.scheduledFrom,
-        patientName: session.patientName || t('payments.noPatient'),
-        patientId: session.patient?.id,
-        sessionId: session.id,
-        description: session.sessionSummary || t('payments.virtual.sessionUnpaid'),
-      }));
-  }, [sessionsUI, sessionIdsWithPayment, t]);
+      .map(session => {
+        // Resolve patient name: session embedded data → patients store lookup → fallback
+        const patientId = session.patient?.id;
+        const resolvedName = session.patientName
+          || (patientId ? patientNameMap.get(patientId) : undefined)
+          || t('payments.noPatient');
+
+        return {
+          id: `virtual-${session.id}`,
+          isVirtual: true,
+          status: PaymentStatus.PENDING,
+          amount: Number(session.cost) || 0,
+          date: session.scheduledFrom,
+          patientName: resolvedName,
+          patientId,
+          sessionId: session.id,
+          description: session.sessionSummary || t('payments.virtual.sessionUnpaid'),
+        };
+      });
+  }, [sessionsUI, sessionIdsWithPayment, patientNameMap, t]);
 
   // Convert real payments to CobroItems
   const realPaymentItems = useMemo((): CobroItem[] => {
-    return payments.map(payment => ({
-      id: payment.id,
-      isVirtual: false,
-      status: payment.status,
-      amount: payment.amount,
-      date: payment.paymentDate,
-      patientName: payment.patient 
+    return payments.map(payment => {
+      const patientId = payment.patient?.id;
+      const embeddedName = payment.patient
         ? `${payment.patient.firstName} ${payment.patient.lastName || ''}`.trim()
-        : 'Sin paciente',
-      patientId: payment.patient?.id,
-      sessionId: payment.sessionId,
-      description: payment.description,
-      payment,
-    }));
-  }, [payments]);
+        : '';
+      const resolvedName = embeddedName
+        || (patientId ? patientNameMap.get(patientId) : undefined)
+        || t('payments.noPatient');
+
+      return {
+        id: payment.id,
+        isVirtual: false,
+        status: payment.status,
+        amount: Number(payment.amount) || 0,
+        date: payment.paymentDate,
+        patientName: resolvedName,
+        patientId,
+        sessionId: payment.sessionId,
+        description: payment.description,
+        payment,
+      };
+    });
+  }, [payments, patientNameMap, t]);
 
   // Unified list of all cobro items (real payments + virtual pending)
   const allCobroItems = useMemo((): CobroItem[] => {
@@ -854,16 +880,18 @@ export function Cobros() {
                           <div className="flex items-center justify-end gap-1">
                             {/* Virtual items: Register Payment button */}
                             {item.isVirtual && isPending && item.sessionId && (
-                              <button
+                              <Button
+                                size="sm"
+                                variant="outline"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleRegisterPaymentForSession(item.sessionId!);
                                 }}
-                                className="p-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors"
                                 title={t('payments.actions.registerPayment')}
                               >
-                                <DollarSign className="w-4 h-4" />
-                              </button>
+                                <DollarSign className="w-4 h-4 mr-1" />
+                                {t('payments.registerPayment')}
+                              </Button>
                             )}
                             {/* Real payments: View detail button */}
                             {!item.isVirtual && item.payment && (
@@ -872,7 +900,7 @@ export function Cobros() {
                                   e.stopPropagation();
                                   handleViewDetail(item.payment!);
                                 }}
-                                className="p-2 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                className="p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-colors"
                                 title={t('payments.actions.viewDetail')}
                               >
                                 <Eye className="w-4 h-4" />
@@ -886,7 +914,7 @@ export function Cobros() {
                                     e.stopPropagation();
                                     setReminderPayment(item.payment!);
                                   }}
-                                  className="p-2 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                  className="p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-colors"
                                   title={t('payments.actions.sendReminder')}
                                 >
                                   <Bell className="w-4 h-4" />
@@ -896,7 +924,7 @@ export function Cobros() {
                                     e.stopPropagation();
                                     handleMarkAsPaid(item.payment!.id);
                                   }}
-                                  className="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors"
+                                  className="p-2 text-green-600 hover:text-green-700 hover:bg-green-100/50 dark:hover:bg-green-900/30 rounded-lg transition-colors"
                                   title={t('payments.actions.markAsCollected')}
                                   disabled={markingAsPaidId === item.payment!.id}
                                 >
@@ -915,7 +943,7 @@ export function Cobros() {
                                   e.stopPropagation();
                                   setDeletePaymentData(item.payment!);
                                 }}
-                                className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
                                 title={t('payments.actions.deletePayment')}
                               >
                                 <Trash2 className="w-4 h-4" />

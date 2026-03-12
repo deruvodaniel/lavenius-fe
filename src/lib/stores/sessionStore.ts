@@ -259,11 +259,16 @@ export const useSessions = () => {
     const scheduledTo = new Date(session.scheduledTo);
     const now = new Date();
 
+    // Build patient name from embedded data (may be empty if encryption fails)
+    const patientName = session.patient
+      ? `${session.patient.firstName || ''} ${session.patient.lastName || ''}`.trim() || undefined
+      : undefined;
+
     return {
       ...session,
-      patientName: session.patient
-        ? `${session.patient.firstName} ${session.patient.lastName || ''}`.trim()
-        : undefined,
+      // Normalize cost: TypeORM returns decimal columns as strings
+      cost: Number(session.cost) || undefined,
+      patientName,
       duration: session.actualDuration ||
         Math.round((scheduledTo.getTime() - scheduledFrom.getTime()) / (1000 * 60)),
       isPast: scheduledTo < now,
