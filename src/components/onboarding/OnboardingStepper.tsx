@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { PhoneInput } from '@/components/shared';
 import {
   Select,
   SelectContent,
@@ -333,11 +334,10 @@ export function OnboardingStepper() {
                     icon={Phone}
                     error={errors.phone}
                   >
-                    <Input
+                    <PhoneInput
                       id="phone"
-                      type="tel"
                       value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      onChange={(phone) => handleInputChange('phone', phone)}
                       placeholder={t('onboarding.profile.placeholders.phone')}
                       aria-invalid={!!errors.phone}
                       disabled={isSubmitting}
@@ -351,11 +351,10 @@ export function OnboardingStepper() {
                     icon={Phone}
                     error={errors.altPhone}
                   >
-                    <Input
+                    <PhoneInput
                       id="altPhone"
-                      type="tel"
                       value={formData.altPhone}
-                      onChange={(e) => handleInputChange('altPhone', e.target.value)}
+                      onChange={(phone) => handleInputChange('altPhone', phone)}
                       placeholder={t('onboarding.profile.placeholders.altPhone')}
                       aria-invalid={!!errors.altPhone}
                       disabled={isSubmitting}

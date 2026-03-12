@@ -15,3 +15,4 @@ export { AuthHeader, AuthButtons } from './AuthHeader';
 export { BetaBadge } from './BetaBadge';
 export { ThemeToggle } from './ThemeToggle';
 export { NativeSelect } from './NativeSelect';
+export { PhoneInput } from './PhoneInput';

@@ -24,6 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { PhoneInput } from '@/components/shared';
 import {
   Select,
   SelectContent,
@@ -194,16 +195,17 @@ export function Onboarding() {
     }
 
     if (currentStep === 1) {
-      // Step 2: Contact Info - Phone validation (optional but must be valid if provided)
-      if (formData.phone && formData.phone.trim().length > 0) {
+      // Step 2: Contact Info - Phone in E.164 format from PhoneInput
+      // Only validate if user typed something beyond the dial code (min ~8 digits total)
+      if (formData.phone) {
         const phoneDigits = formData.phone.replace(/\D/g, '');
-        if (phoneDigits.length < 8) {
+        if (phoneDigits.length > 0 && phoneDigits.length < 8) {
           newErrors.phone = t('onboarding.stepper.validation.phoneInvalid');
         }
       }
-      if (formData.alternativePhone && formData.alternativePhone.trim().length > 0) {
+      if (formData.alternativePhone) {
         const phoneDigits = formData.alternativePhone.replace(/\D/g, '');
-        if (phoneDigits.length < 8) {
+        if (phoneDigits.length > 0 && phoneDigits.length < 8) {
           newErrors.alternativePhone = t('onboarding.stepper.validation.phoneInvalid');
         }
       }
@@ -542,20 +544,14 @@ export function Onboarding() {
           {t('onboarding.stepper.fields.phone')}
           <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
-        <Input
+        <PhoneInput
           id="phone"
-          type="tel"
-          inputMode="numeric"
           value={formData.phone}
-          onChange={(e) => handleInputChange('phone', e.target.value.replace(/\D/g, ''))}
+          onChange={(phone) => handleInputChange('phone', phone)}
           placeholder={t('onboarding.stepper.placeholders.phone')}
           aria-invalid={!!errors.phone}
           aria-describedby={errors.phone ? 'phone-error' : undefined}
           disabled={isSubmitting}
-          className={cn(
-            "transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20",
-            errors.phone && "border-red-500 focus:ring-red-500/20"
-          )}
         />
         {errors.phone && (
           <p id="phone-error" className="text-sm text-red-600 animate-stepper-error">
@@ -571,20 +567,14 @@ export function Onboarding() {
           {t('onboarding.stepper.fields.alternativePhone')}
           <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
-        <Input
+        <PhoneInput
           id="alternativePhone"
-          type="tel"
-          inputMode="numeric"
           value={formData.alternativePhone}
-          onChange={(e) => handleInputChange('alternativePhone', e.target.value.replace(/\D/g, ''))}
+          onChange={(phone) => handleInputChange('alternativePhone', phone)}
           placeholder={t('onboarding.stepper.placeholders.alternativePhone')}
           aria-invalid={!!errors.alternativePhone}
           aria-describedby={errors.alternativePhone ? 'alt-phone-error' : undefined}
           disabled={isSubmitting}
-          className={cn(
-            "transition-all duration-200 focus:ring-2 focus:ring-emerald-500/20",
-            errors.alternativePhone && "border-red-500 focus:ring-red-500/20"
-          )}
         />
         {errors.alternativePhone && (
           <p id="alt-phone-error" className="text-sm text-red-600 animate-stepper-error">

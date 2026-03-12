@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { User, Phone, Mail, Heart, Video, MapPin, Calendar, AlertCircle, MessageCircle, Loader2 } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
-import { BaseDrawer, DrawerBody, DrawerFooter } from '../shared/BaseDrawer';
+import { BaseDrawer, DrawerBody, DrawerFooter, PhoneInput } from '../shared';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
@@ -361,16 +361,11 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
                 <Phone className="w-4 h-4" />
                 {t('patients.fields.phone')}
               </label>
-              <Input
+              <PhoneInput
                 id="paciente-telefono"
-                type="tel"
-                inputMode="numeric"
-                maxLength={15}
                 value={formData.telefono}
-                onChange={(e) => handleFieldChange('telefono', e.target.value.replace(/\D/g, ''))}
-                onBlur={() => handleFieldBlur('telefono')}
+                onChange={(phone) => handleFieldChange('telefono', phone)}
                 placeholder={t('patients.drawer.placeholders.phone')}
-                className="w-full"
                 aria-invalid={!!(errors.telefono && touched.telefono)}
               />
               <InputError error={touched.telefono ? errors.telefono : undefined} />
