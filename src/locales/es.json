@@ -673,7 +673,8 @@
       "monthlyDiscount": "Descuento plan mensual (10%)",
       "totalMonthlyPlan": "Total plan mensual",
       "saveChanges": "Guardar Cambios",
-      "saving": "Guardando..."
+      "saving": "Guardando...",
+      "sessionNotFound": "Sesión no encontrada"
     },
     "comingSoon": {
       "title": "Próximamente",
@@ -1774,6 +1775,7 @@
       "completeSetup": "Completar Configuración",
       "success": "¡Perfil configurado correctamente!",
       "error": "Error al guardar los datos. Por favor intenta nuevamente.",
+      "errorClerk": "No se pudo actualizar tu perfil. Verifica tu conexión e intenta de nuevo.",
       "stepNames": {
         "professional": "Profesional",
         "contact": "Contacto",

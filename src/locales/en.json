@@ -673,7 +673,8 @@
       "monthlyDiscount": "Monthly plan discount (10%)",
       "totalMonthlyPlan": "Total monthly plan",
       "saveChanges": "Save Changes",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "sessionNotFound": "Session not found"
     },
     "comingSoon": {
       "title": "Coming Soon",
@@ -1727,6 +1728,7 @@
       "completeSetup": "Complete Setup",
       "success": "Profile configured successfully!",
       "error": "Error saving data. Please try again.",
+      "errorClerk": "Could not update your profile. Check your connection and try again.",
       "stepNames": {
         "professional": "Professional",
         "contact": "Contact",

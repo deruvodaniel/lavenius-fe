@@ -341,31 +341,57 @@ export function Onboarding() {
       }
 
       // 5. Save extra data to localStorage (user-scoped)
-      onboardingService.saveExtraData(user.id, extraData);
+      try {
+        onboardingService.saveExtraData(user.id, extraData);
+      } catch (storageError) {
+        // localStorage might be full on mobile — log but continue
+        console.warn('Could not save extra data to localStorage:', storageError);
+      }
 
       // 6. Update Clerk user metadata with all profile data
-      await user.update({
-        unsafeMetadata: {
-          ...user.unsafeMetadata,
-          specialty: formData.specialty || undefined,
-          phone: formData.phone.trim() || undefined,
-          alternativePhone: formData.alternativePhone.trim() || undefined,
-          officeAddress: formData.officeAddress.trim() || undefined,
-          website: formData.website.trim() || undefined,
-          socialMedia: {
-            instagram: formData.instagram.trim() || undefined,
-            linkedin: formData.linkedin.trim() || undefined,
+      try {
+        await user.update({
+          unsafeMetadata: {
+            ...user.unsafeMetadata,
+            specialty: formData.specialty || undefined,
+            phone: formData.phone.trim() || undefined,
+            alternativePhone: formData.alternativePhone.trim() || undefined,
+            officeAddress: formData.officeAddress.trim() || undefined,
+            website: formData.website.trim() || undefined,
+            socialMedia: {
+              instagram: formData.instagram.trim() || undefined,
+              linkedin: formData.linkedin.trim() || undefined,
+            },
+            bio: formData.bio.trim() || undefined,
+            zkConsent: true,
+            zkConsentAcceptedAt: new Date().toISOString(),
+            onboardingComplete: true,
+            onboardingCompletedAt: new Date().toISOString(),
           },
-          bio: formData.bio.trim() || undefined,
-          zkConsent: true,
-          zkConsentAcceptedAt: new Date().toISOString(),
-          onboardingComplete: true,
-          onboardingCompletedAt: new Date().toISOString(),
-        },
-      });
+        });
+      } catch (clerkError) {
+        console.error('Clerk user.update() failed:', clerkError);
+        // Retry once — mobile networks can be flaky
+        try {
+          await user.update({
+            unsafeMetadata: {
+              ...user.unsafeMetadata,
+              zkConsent: true,
+              zkConsentAcceptedAt: new Date().toISOString(),
+              onboardingComplete: true,
+              onboardingCompletedAt: new Date().toISOString(),
+            },
+          });
+        } catch (retryError) {
+          console.error('Clerk user.update() retry failed:', retryError);
+          toast.error(t('onboarding.stepper.errorClerk'));
+          setIsSubmitting(false);
+          return;
+        }
+      }
 
       toast.success(t('onboarding.stepper.success'));
-      
+
       // Small delay for user to see success message
       setTimeout(() => {
         navigate('/dashboard');

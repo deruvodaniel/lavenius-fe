@@ -399,46 +399,75 @@ export const PaymentDrawer = ({
           {/* Single Payment Form */}
           {(isEditMode || paymentType === 'single') && (
             <>
-              {/* Session Selector */}
+              {/* Session Selector (create) / Session Preview (edit) */}
               <div>
                 <label htmlFor="payment-session" className="flex items-center gap-2 text-foreground mb-2">
                   <Calendar className="w-4 h-4" />
-                  {t('payments.fields.session')} <span className="text-red-500">*</span>
+                  {t('payments.fields.session')} {!isEditMode && <span className="text-red-500">*</span>}
                 </label>
-                <NativeSelect
-                  id="payment-session"
-                  value={formData.sessionId}
-                  onChange={(e) => setFormData({ ...formData, sessionId: e.target.value })}
-                  className="w-full"
-                  aria-invalid={!formData.sessionId}
-                  disabled={isLoading || isSaving || !!preselectedSessionId}
-                  required
-                >
-                  <option value="">{t('payments.drawer.selectSession')}</option>
-                  {sessions.map((session) => (
-                    <option key={session.id} value={session.id}>
-                      {formatSessionOption(session)}
-                    </option>
-                  ))}
-                </NativeSelect>
 
-                {/* Selected session preview */}
-                {selectedSession && (
-                  <div className="mt-3 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
-                    <p className="font-medium text-indigo-900">
-                      {selectedSession.patientName || selectedSession.patient?.firstName}
+                {isEditMode ? (
+                  /* Edit mode: read-only session preview */
+                  selectedSession ? (
+                    <div className="p-3 bg-muted/50 border border-border rounded-lg">
+                      <p className="font-medium text-foreground">
+                        {selectedSession.patientName || selectedSession.patient?.firstName}
+                      </p>
+                      <p className="text-muted-foreground text-sm mt-0.5">
+                        {new Date(selectedSession.scheduledFrom).toLocaleDateString('es-AR', {
+                          weekday: 'long',
+                          day: 'numeric',
+                          month: 'long',
+                        })} - {selectedSession.formattedTime || new Date(selectedSession.scheduledFrom).toLocaleTimeString('es-AR', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic p-3">
+                      {t('payments.drawer.sessionNotFound')}
                     </p>
-                    <p className="text-indigo-700 text-sm mt-0.5">
-                      {new Date(selectedSession.scheduledFrom).toLocaleDateString('es-AR', {
-                        weekday: 'long',
-                        day: 'numeric',
-                        month: 'long',
-                      })} - {selectedSession.formattedTime || new Date(selectedSession.scheduledFrom).toLocaleTimeString('es-AR', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </p>
-                  </div>
+                  )
+                ) : (
+                  /* Create mode: editable session selector */
+                  <>
+                    <NativeSelect
+                      id="payment-session"
+                      value={formData.sessionId}
+                      onChange={(e) => setFormData({ ...formData, sessionId: e.target.value })}
+                      className="w-full"
+                      aria-invalid={!formData.sessionId}
+                      disabled={isLoading || isSaving || !!preselectedSessionId}
+                      required
+                    >
+                      <option value="">{t('payments.drawer.selectSession')}</option>
+                      {sessions.map((session) => (
+                        <option key={session.id} value={session.id}>
+                          {formatSessionOption(session)}
+                        </option>
+                      ))}
+                    </NativeSelect>
+
+                    {/* Selected session preview */}
+                    {selectedSession && (
+                      <div className="mt-3 p-3 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+                        <p className="font-medium text-indigo-900 dark:text-indigo-300">
+                          {selectedSession.patientName || selectedSession.patient?.firstName}
+                        </p>
+                        <p className="text-indigo-700 dark:text-indigo-400 text-sm mt-0.5">
+                          {new Date(selectedSession.scheduledFrom).toLocaleDateString('es-AR', {
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'long',
+                          })} - {selectedSession.formattedTime || new Date(selectedSession.scheduledFrom).toLocaleTimeString('es-AR', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 

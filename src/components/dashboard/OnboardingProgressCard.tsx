@@ -23,6 +23,7 @@ import { useSetupProgressStore, useDashboardSettingsStore, type SetupStepId } fr
 import { usePatients } from '@/lib/hooks';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useSessionStore } from '@/lib/stores/sessionStore';
+import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { usePayments } from '@/lib/hooks/usePayments';
 import { useMemo, useEffect, useRef } from 'react';
 
@@ -89,29 +90,36 @@ export function OnboardingProgressCard({ className = '' }: OnboardingProgressCar
   const { user, hasCompletedOnboarding } = useAuth();
   const sessions = useSessionStore((state) => state.sessions);
   const { payments } = usePayments();
+  const isCalendarConnected = useCalendarStore((state) => state.isConnected);
+  const checkCalendarConnection = useCalendarStore((state) => state.checkConnection);
   
   // Track if we've synced to avoid loops
   const hasSynced = useRef(false);
   
+  // Ensure calendar connection status is fresh on mount
+  useEffect(() => {
+    checkCalendarConnection();
+  }, [checkCalendarConnection]);
+
   // Sync progress based on existing data (run once on mount)
   useEffect(() => {
     if (hasSynced.current) return;
-    
+
     // Wait until we have some data loaded
     const hasLoadedData = patients !== undefined || sessions !== undefined || payments !== undefined;
     if (!hasLoadedData) return;
-    
+
     hasSynced.current = true;
-    
+
     const store = useSetupProgressStore.getState();
     store.syncFromData({
       hasPatients: patients && patients.length > 0,
       hasSessions: sessions && sessions.length > 0,
       hasPayments: payments && payments.length > 0,
       hasProfile: hasCompletedOnboarding || !!user?.licenseNumber,
-      hasCalendar: false, // Calendar connection would need to be checked separately
+      hasCalendar: isCalendarConnected,
     });
-  }, [patients, sessions, payments, hasCompletedOnboarding, user?.licenseNumber]);
+  }, [patients, sessions, payments, hasCompletedOnboarding, user?.licenseNumber, isCalendarConnected]);
 
   // Calculate progress
   const { completed, total, percentage } = useMemo(() => {
