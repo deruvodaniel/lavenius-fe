@@ -643,10 +643,17 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           )}
           <Button
             onClick={handleSave}
-            disabled={!isFormValid}
+            disabled={!isFormValid || isSaving}
             className="flex-1"
           >
-            {isEditing ? t('agenda.drawer.saveChanges') : t('agenda.drawer.createAppointment')}
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                {t('common.saving')}
+              </>
+            ) : (
+              isEditing ? t('agenda.drawer.saveChanges') : t('agenda.drawer.createAppointment')
+            )}
           </Button>
           {isEditing && onDelete && (
             <Button

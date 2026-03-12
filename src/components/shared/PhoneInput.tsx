@@ -2,20 +2,53 @@
  * PhoneInput — International phone number input with country selector
  *
  * Uses react-international-phone headless hook integrated with shadcn/ui Input.
- * Features: country flags, auto-formatting, E.164 output, country guessing.
+ * Features: country flags, E.164 output, country guessing, paste-safe.
+ *
+ * Argentina mask fix: the default mask for /^9/ (mobile) only allows 10 digits
+ * but AR mobile numbers have 11 digits after +54 (e.g. 9 2235 831983).
+ * We patch the AR country data to fix this.
  */
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback, useMemo } from 'react';
 import {
   usePhoneInput,
   FlagImage,
   defaultCountries,
   parseCountry,
+  buildCountryData,
 } from 'react-international-phone';
-import type { CountryIso2 } from 'react-international-phone';
+import type { CountryIso2, CountryData } from 'react-international-phone';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/components/ui/utils';
 import { ChevronDown } from 'lucide-react';
+
+/**
+ * Patch Argentina country data with corrected phone masks.
+ * Default library masks for AR /^9/ only allow 10 digits, but Argentine
+ * mobile numbers have 11 digits after country code:
+ *   +54 9 11 XXXX-XXXX     (Buenos Aires mobile)
+ *   +54 9 2235 83-1983      (Mar del Plata mobile)
+ *   +54 9 2944 90-7473      (San Martín de los Andes mobile)
+ */
+const patchedCountries: CountryData[] = defaultCountries.map((country) => {
+  const parsed = parseCountry(country);
+  if (parsed.iso2 === 'ar') {
+    return buildCountryData({
+      name: parsed.name,
+      iso2: parsed.iso2,
+      dialCode: parsed.dialCode,
+      format: {
+        default: '(..) .... ....',
+        '/^9/': '(.) .... ......',   // 1+4+6 = 11 digits (mobile with 9 prefix)
+        '/^11/': '(..) .... ....',   // 2+4+4 = 10 digits (Buenos Aires landline)
+        '/^(2|3|4|5)/': '(.) .... ....', // 1+4+4 = 9 digits (provincial landline)
+      },
+      priority: parsed.priority ?? 0,
+      areaCodes: parsed.areaCodes,
+    });
+  }
+  return country;
+});
 
 interface PhoneInputProps {
   /** Phone value in E.164 format (e.g. "+5491112345678") */
@@ -63,7 +96,7 @@ export function PhoneInput({
   } = usePhoneInput({
     defaultCountry,
     value,
-    countries: defaultCountries,
+    countries: patchedCountries,
     preferredCountries: PREFERRED_COUNTRIES,
     forceDialCode: true,
     onChange: (data) => {
@@ -71,6 +104,27 @@ export function PhoneInput({
     },
     inputRef,
   });
+
+  /**
+   * Handle paste events — strip country code prefix if present.
+   * When forceDialCode is true, the input already shows "+54 ".
+   * If the user pastes "+54 9 2235 831983", without this handler
+   * it would result in "+54 +54 9 2235 831983" (duplicated).
+   */
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedText = e.clipboardData.getData('text').trim();
+
+    // Only intercept if the pasted text starts with "+" (full E.164 number)
+    if (!pastedText.startsWith('+')) return;
+
+    e.preventDefault();
+
+    // Strip all non-digit characters except the leading +
+    const cleaned = '+' + pastedText.slice(1).replace(/\D/g, '');
+
+    // Let the library handle the full E.164 value via the onChange prop
+    onChange(cleaned);
+  }, [onChange]);
 
   const handleCountrySelect = (iso2: CountryIso2) => {
     setCountry(iso2, { focusOnInput: true });
@@ -129,6 +183,7 @@ export function PhoneInput({
           type="tel"
           value={inputValue}
           onChange={handlePhoneValueChange}
+          onPaste={handlePaste}
           placeholder={placeholder}
           disabled={disabled}
           className="rounded-l-none"

@@ -97,6 +97,8 @@ export interface CreateSessionDto {
 export interface UpdateSessionDto {
   scheduledFrom?: string;
   scheduledTo?: string;
+  patientId?: string;
+  attendeeEmail?: string;
   status?: SessionStatus;
   sessionSummary?: string;
   cost?: number;

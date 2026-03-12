@@ -297,6 +297,13 @@ export function useAgenda() {
           updateData.scheduledTo = sessionData.scheduledTo;
         }
 
+        // Include patientId + attendeeEmail when patient changed
+        const patientChanged = sessionData.patientId !== selectedSession.patient?.id;
+        if (patientChanged) {
+          updateData.patientId = sessionData.patientId;
+          updateData.attendeeEmail = sessionData.attendeeEmail;
+        }
+
         if (sessionData.status) updateData.status = sessionData.status;
         if (sessionData.sessionSummary !== undefined) updateData.sessionSummary = sessionData.sessionSummary;
         if (sessionData.cost !== undefined) updateData.cost = sessionData.cost;
