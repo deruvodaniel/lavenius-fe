@@ -1337,7 +1337,14 @@
       "features": "Features",
       "pricing": "Pricing",
       "faq": "FAQ",
-      "contact": "Contact"
+      "contact": "Contact",
+      "privacyPolicy": "Privacy Policy"
+    },
+    "purpose": {
+      "title": "What Lavenius is for",
+      "description": "Lavenius is a web application for mental health professionals to manage patients, schedule sessions, write clinical notes, track payments, and send reminders from one secure platform.",
+      "privacyLabel": "Read our",
+      "privacyLink": "Privacy Policy"
     },
     "hero": {
       "badge": "Smart management for mental health professionals",
