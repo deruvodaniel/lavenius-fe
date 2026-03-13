@@ -316,7 +316,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const userKey = sessionStorage.getItem('userKey');
     
     if (token && userKey) {
-      // TODO: Validar token con el backend
+      // TODO: Validar token con el backend.
       // Por ahora asumimos que es válido
       setIsLoading(false);
     } else {
