@@ -1576,6 +1576,7 @@
     "footer": {
       "rights": "Todos los derechos reservados.",
       "tagline": "Simplificando la gestión de tu práctica terapéutica.",
+      "privacyPolicy": "Política de Privacidad",
       "contact": {
         "title": "Contacto"
       },
@@ -1646,6 +1647,141 @@
             "dedicatedSupport": "Soporte dedicado 24/7"
           }
         }
+      }
+    }
+  },
+  "privacyPolicy": {
+    "badge": "Legal",
+    "title": "Política de Privacidad",
+    "backToHome": "Volver al inicio",
+    "lastUpdated": "Última actualización: 13 de marzo de 2026",
+    "intro": "En Lavenius nos comprometemos a proteger la privacidad y seguridad de la información de terapeutas y pacientes.",
+    "sections": {
+      "whoWeAre": {
+        "title": "1. Quiénes somos",
+        "description": "Lavenius es una plataforma de gestión para profesionales de la salud mental (turnos, sesiones, notas, pagos y recordatorios).",
+        "controllerLabel": "Responsable del tratamiento",
+        "controllerValue": "Lavenius",
+        "emailLabel": "Email de contacto de privacidad",
+        "emailValue": "laveniut.net@gmail.com",
+        "addressLabel": "Domicilio",
+        "addressValue": "No informado actualmente"
+      },
+      "dataCollected": {
+        "title": "2. Qué datos recopilamos",
+        "therapists": {
+          "title": "2.1 Datos de terapeutas",
+          "items": [
+            "Nombre, apellido, email y matrícula/licencia.",
+            "Identificadores de autenticación (Clerk).",
+            "Configuración de cuenta y preferencias.",
+            "Datos de integración con calendario (Google), cuando el terapeuta conecta su cuenta."
+          ]
+        },
+        "patients": {
+          "title": "2.2 Datos de pacientes",
+          "items": [
+            "Datos operativos: nombre, teléfono y email.",
+            "Datos clínicos/sensibles cargados por el terapeuta (por ejemplo: notas, diagnóstico, observaciones y otros campos clínicos)."
+          ]
+        },
+        "security": {
+          "title": "2.3 Datos técnicos y de seguridad",
+          "items": [
+            "Registros técnicos y de auditoría (por ejemplo: acción/API invocada, actor y resultado).",
+            "Datos de prevención de abuso y seguridad (por ejemplo: controles de rate limiting y telemetría de seguridad)."
+          ]
+        }
+      },
+      "usage": {
+        "title": "3. Cómo usamos los datos",
+        "items": [
+          "Brindar funcionalidades de gestión clínica y administrativa.",
+          "Coordinar sesiones y recordatorios.",
+          "Enviar notificaciones operativas (incluyendo WhatsApp cuando corresponda).",
+          "Proteger la seguridad de la plataforma y prevenir abuso.",
+          "Cumplir obligaciones legales o regulatorias aplicables."
+        ],
+        "noSale": "No vendemos datos personales."
+      },
+      "googleOAuth": {
+        "title": "4. Integración con Google (OAuth)",
+        "description": "Si conectás tu cuenta de Google, usamos datos de Google únicamente para funcionalidades de calendario solicitadas por el usuario.",
+        "items": [
+          "Solicitamos solo los permisos necesarios.",
+          "No usamos datos de Google para publicidad.",
+          "No vendemos datos obtenidos de APIs de Google.",
+          "El uso de datos de Google se realiza conforme a la Google API Services User Data Policy, incluyendo requisitos de Limited Use."
+        ],
+        "policyLink": "Google API Services User Data Policy"
+      },
+      "processors": {
+        "title": "5. Terceros y encargados",
+        "description": "Podemos utilizar proveedores para operar el servicio, por ejemplo:",
+        "items": [
+          "Clerk (autenticación).",
+          "APIs de Google (calendario).",
+          "Proveedor de mensajería/WhatsApp.",
+          "Infraestructura de hosting, base de datos y observabilidad."
+        ]
+      },
+      "security": {
+        "title": "6. Seguridad de la información",
+        "items": [
+          "Cifrado en tránsito (HTTPS/TLS).",
+          "Cifrado en base de datos para campos operativos (at-rest).",
+          "Cifrado extremo a extremo (E2E) para campos sensibles definidos.",
+          "Controles de acceso, auditoría y rate limiting.",
+          "Minimización de exposición de datos en logs."
+        ]
+      },
+      "retention": {
+        "title": "7. Retención y eliminación de datos",
+        "general": {
+          "title": "7.1 Retención general",
+          "description": "Conservamos datos durante el tiempo necesario para operar el servicio y cumplir obligaciones legales aplicables."
+        },
+        "deletion": {
+          "title": "7.2 Eliminación de cuenta de terapeuta",
+          "items": [
+            "Se realiza soft-delete transaccional.",
+            "Los datos quedan inaccesibles en flujos normales.",
+            "Se mantiene una ventana de retención de 30 días.",
+            "Finalizado ese plazo, se ejecuta purga definitiva (hard delete) mediante proceso automático."
+          ]
+        },
+        "audit": {
+          "title": "7.3 Auditoría",
+          "description": "Los registros de auditoría se conservan por 5 años (configuración actual de la plataforma)."
+        }
+      },
+      "rights": {
+        "title": "8. Derechos del titular",
+        "items": [
+          "Acceso, rectificación y actualización.",
+          "Eliminación cuando corresponda.",
+          "Portabilidad de datos cuando sea técnicamente viable."
+        ],
+        "contact": "Para ejercer estos derechos: laveniut.net@gmail.com"
+      },
+      "transfers": {
+        "title": "9. Transferencias internacionales",
+        "description": "Algunos proveedores pueden procesar datos fuera del país de residencia del usuario. En esos casos, se aplican medidas contractuales y de seguridad razonables para su protección."
+      },
+      "minors": {
+        "title": "10. Menores de edad",
+        "description": "La plataforma está orientada al uso profesional por terapeutas. El uso y carga de datos de pacientes debe realizarse conforme a normativa aplicable y responsabilidad profesional del terapeuta."
+      },
+      "changes": {
+        "title": "11. Cambios a esta política",
+        "description": "Podemos actualizar esta Política de Privacidad. Publicaremos la versión vigente en esta página e indicaremos la fecha de última actualización."
+      },
+      "contact": {
+        "title": "12. Contacto",
+        "emailLabel": "Email",
+        "emailValue": "laveniut.net@gmail.com",
+        "controllerLabel": "Responsable",
+        "controllerValue": "Lavenius"
       }
     }
   },

@@ -1413,6 +1413,13 @@ function Footer() {
         {/* Copyright */}
         <div className="pt-8 text-center text-sm">
           © {currentYear} {t('landing.brand')}. {t('landing.footer.rights')}
+          <span className="mx-2 text-gray-600">•</span>
+          <a
+            href="/privacy-policy"
+            className="text-indigo-400 hover:text-indigo-300 transition-colors"
+          >
+            {t('landing.footer.privacyPolicy')}
+          </a>
         </div>
       </div>
     </footer>

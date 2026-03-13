@@ -1521,6 +1521,7 @@
     "footer": {
       "rights": "Todos os direitos reservados.",
       "tagline": "Simplificando a gestão da sua prática terapêutica.",
+      "privacyPolicy": "Política de Privacidade",
       "contact": {
         "title": "Contato"
       },
@@ -1591,6 +1592,141 @@
             "dedicatedSupport": "Suporte dedicado 24/7"
           }
         }
+      }
+    }
+  },
+  "privacyPolicy": {
+    "badge": "Legal",
+    "title": "Política de Privacidade",
+    "backToHome": "Voltar ao início",
+    "lastUpdated": "Última atualização: 13 de março de 2026",
+    "intro": "Na Lavenius, estamos comprometidos em proteger a privacidade e a segurança das informações de terapeutas e pacientes.",
+    "sections": {
+      "whoWeAre": {
+        "title": "1. Quem somos",
+        "description": "Lavenius é uma plataforma de gestão para profissionais de saúde mental (consultas, sessões, notas, pagamentos e lembretes).",
+        "controllerLabel": "Responsável pelo tratamento",
+        "controllerValue": "Lavenius",
+        "emailLabel": "Email de contato de privacidade",
+        "emailValue": "laveniut.net@gmail.com",
+        "addressLabel": "Endereço",
+        "addressValue": "Atualmente não informado"
+      },
+      "dataCollected": {
+        "title": "2. Quais dados coletamos",
+        "therapists": {
+          "title": "2.1 Dados de terapeutas",
+          "items": [
+            "Nome, sobrenome, email e registro/licença profissional.",
+            "Identificadores de autenticação (Clerk).",
+            "Configuração de conta e preferências.",
+            "Dados de integração com calendário (Google), quando o terapeuta conecta a conta."
+          ]
+        },
+        "patients": {
+          "title": "2.2 Dados de pacientes",
+          "items": [
+            "Dados operacionais: nome, telefone e email.",
+            "Dados clínicos/sensíveis inseridos pelo terapeuta (por exemplo: notas, diagnóstico, observações e outros campos clínicos)."
+          ]
+        },
+        "security": {
+          "title": "2.3 Dados técnicos e de segurança",
+          "items": [
+            "Registros técnicos e de auditoria (por exemplo: ação/API invocada, ator e resultado).",
+            "Dados de prevenção de abuso e segurança (por exemplo: controles de rate limiting e telemetria de segurança)."
+          ]
+        }
+      },
+      "usage": {
+        "title": "3. Como usamos os dados",
+        "items": [
+          "Fornecer funcionalidades de gestão clínica e administrativa.",
+          "Coordenar sessões e lembretes.",
+          "Enviar notificações operacionais (incluindo WhatsApp quando aplicável).",
+          "Proteger a segurança da plataforma e prevenir abuso.",
+          "Cumprir obrigações legais ou regulatórias aplicáveis."
+        ],
+        "noSale": "Não vendemos dados pessoais."
+      },
+      "googleOAuth": {
+        "title": "4. Integração com Google (OAuth)",
+        "description": "Se você conectar sua conta Google, usamos dados do Google somente para funcionalidades de calendário solicitadas pelo usuário.",
+        "items": [
+          "Solicitamos apenas as permissões necessárias.",
+          "Não usamos dados do Google para publicidade.",
+          "Não vendemos dados obtidos de APIs do Google.",
+          "O uso de dados do Google segue a Google API Services User Data Policy, incluindo requisitos de Limited Use."
+        ],
+        "policyLink": "Google API Services User Data Policy"
+      },
+      "processors": {
+        "title": "5. Terceiros e operadores",
+        "description": "Podemos usar provedores para operar o serviço, por exemplo:",
+        "items": [
+          "Clerk (autenticação).",
+          "APIs do Google (calendário).",
+          "Provedor de mensagens/WhatsApp.",
+          "Infraestrutura de hospedagem, banco de dados e observabilidade."
+        ]
+      },
+      "security": {
+        "title": "6. Segurança da informação",
+        "items": [
+          "Criptografia em trânsito (HTTPS/TLS).",
+          "Criptografia em banco de dados para campos operacionais (at rest).",
+          "Criptografia ponta a ponta (E2E) para campos sensíveis definidos.",
+          "Controles de acesso, auditoria e rate limiting.",
+          "Minimização da exposição de dados em logs."
+        ]
+      },
+      "retention": {
+        "title": "7. Retenção e eliminação de dados",
+        "general": {
+          "title": "7.1 Retenção geral",
+          "description": "Mantemos os dados pelo tempo necessário para operar o serviço e cumprir obrigações legais aplicáveis."
+        },
+        "deletion": {
+          "title": "7.2 Exclusão de conta de terapeuta",
+          "items": [
+            "É realizado soft-delete transacional.",
+            "Os dados ficam inacessíveis nos fluxos normais.",
+            "Mantemos uma janela de retenção de 30 dias.",
+            "Após esse prazo, é executada a purga definitiva (hard delete) por processo automático."
+          ]
+        },
+        "audit": {
+          "title": "7.3 Auditoria",
+          "description": "Os registros de auditoria são mantidos por 5 anos (configuração atual da plataforma)."
+        }
+      },
+      "rights": {
+        "title": "8. Direitos do titular",
+        "items": [
+          "Acesso, retificação e atualização.",
+          "Eliminação quando aplicável.",
+          "Portabilidade de dados quando tecnicamente viável."
+        ],
+        "contact": "Para exercer esses direitos: laveniut.net@gmail.com"
+      },
+      "transfers": {
+        "title": "9. Transferências internacionais",
+        "description": "Alguns provedores podem processar dados fora do país de residência do usuário. Nesses casos, aplicamos medidas contratuais e de segurança razoáveis para proteção."
+      },
+      "minors": {
+        "title": "10. Menores de idade",
+        "description": "A plataforma é voltada ao uso profissional por terapeutas. O uso e cadastro de dados de pacientes deve seguir a regulamentação aplicável e a responsabilidade profissional do terapeuta."
+      },
+      "changes": {
+        "title": "11. Alterações nesta política",
+        "description": "Podemos atualizar esta Política de Privacidade. Publicaremos a versão vigente nesta página e indicaremos a data da última atualização."
+      },
+      "contact": {
+        "title": "12. Contato",
+        "emailLabel": "Email",
+        "emailValue": "laveniut.net@gmail.com",
+        "controllerLabel": "Responsável",
+        "controllerValue": "Lavenius"
       }
     }
   },

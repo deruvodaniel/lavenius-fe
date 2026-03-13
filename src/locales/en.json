@@ -1529,6 +1529,7 @@
     "footer": {
       "rights": "All rights reserved.",
       "tagline": "Simplifying your therapy practice management.",
+      "privacyPolicy": "Privacy Policy",
       "contact": {
         "title": "Contact"
       },
@@ -1599,6 +1600,141 @@
             "dedicatedSupport": "Dedicated 24/7 support"
           }
         }
+      }
+    }
+  },
+  "privacyPolicy": {
+    "badge": "Legal",
+    "title": "Privacy Policy",
+    "backToHome": "Back to home",
+    "lastUpdated": "Last updated: March 13, 2026",
+    "intro": "At Lavenius, we are committed to protecting the privacy and security of therapists' and patients' information.",
+    "sections": {
+      "whoWeAre": {
+        "title": "1. Who we are",
+        "description": "Lavenius is a management platform for mental health professionals (appointments, sessions, notes, payments, and reminders).",
+        "controllerLabel": "Data controller",
+        "controllerValue": "Lavenius",
+        "emailLabel": "Privacy contact email",
+        "emailValue": "laveniut.net@gmail.com",
+        "addressLabel": "Address",
+        "addressValue": "Currently not provided"
+      },
+      "dataCollected": {
+        "title": "2. What data we collect",
+        "therapists": {
+          "title": "2.1 Therapist data",
+          "items": [
+            "First name, last name, email, and professional license.",
+            "Authentication identifiers (Clerk).",
+            "Account settings and preferences.",
+            "Calendar integration data (Google), when the therapist connects their account."
+          ]
+        },
+        "patients": {
+          "title": "2.2 Patient data",
+          "items": [
+            "Operational data: first name, phone, and email.",
+            "Clinical/sensitive data entered by the therapist (for example: notes, diagnosis, observations, and other clinical fields)."
+          ]
+        },
+        "security": {
+          "title": "2.3 Technical and security data",
+          "items": [
+            "Technical and audit logs (for example: action/API invoked, actor, and result).",
+            "Abuse prevention and security data (for example: rate limiting controls and security telemetry)."
+          ]
+        }
+      },
+      "usage": {
+        "title": "3. How we use data",
+        "items": [
+          "Provide clinical and administrative management features.",
+          "Coordinate sessions and reminders.",
+          "Send operational notifications (including WhatsApp when applicable).",
+          "Protect platform security and prevent abuse.",
+          "Comply with applicable legal or regulatory obligations."
+        ],
+        "noSale": "We do not sell personal data."
+      },
+      "googleOAuth": {
+        "title": "4. Google integration (OAuth)",
+        "description": "If you connect your Google account, we use Google data only for calendar functionality requested by the user.",
+        "items": [
+          "We request only the permissions required.",
+          "We do not use Google data for advertising.",
+          "We do not sell data obtained from Google APIs.",
+          "Use of Google data follows the Google API Services User Data Policy, including Limited Use requirements."
+        ],
+        "policyLink": "Google API Services User Data Policy"
+      },
+      "processors": {
+        "title": "5. Third parties and processors",
+        "description": "We may use service providers to operate the service, for example:",
+        "items": [
+          "Clerk (authentication).",
+          "Google APIs (calendar).",
+          "Messaging/WhatsApp provider.",
+          "Hosting, database, and observability infrastructure."
+        ]
+      },
+      "security": {
+        "title": "6. Information security",
+        "items": [
+          "Encryption in transit (HTTPS/TLS).",
+          "Database encryption for operational fields (at rest).",
+          "End-to-end encryption (E2E) for defined sensitive fields.",
+          "Access controls, auditing, and rate limiting.",
+          "Minimization of data exposure in logs."
+        ]
+      },
+      "retention": {
+        "title": "7. Data retention and deletion",
+        "general": {
+          "title": "7.1 General retention",
+          "description": "We retain data for as long as needed to operate the service and comply with applicable legal obligations."
+        },
+        "deletion": {
+          "title": "7.2 Therapist account deletion",
+          "items": [
+            "A transactional soft-delete is performed.",
+            "Data becomes inaccessible in normal flows.",
+            "A 30-day retention window is maintained.",
+            "After that period, final purge (hard delete) is executed through an automated process."
+          ]
+        },
+        "audit": {
+          "title": "7.3 Audit",
+          "description": "Audit records are retained for 5 years (current platform configuration)."
+        }
+      },
+      "rights": {
+        "title": "8. Data subject rights",
+        "items": [
+          "Access, rectification, and updates.",
+          "Deletion where applicable.",
+          "Data portability when technically feasible."
+        ],
+        "contact": "To exercise these rights: laveniut.net@gmail.com"
+      },
+      "transfers": {
+        "title": "9. International transfers",
+        "description": "Some providers may process data outside the user's country of residence. In such cases, reasonable contractual and security safeguards are applied."
+      },
+      "minors": {
+        "title": "10. Minors",
+        "description": "The platform is intended for professional use by therapists. Use and entry of patient data must comply with applicable regulations and the therapist's professional responsibility."
+      },
+      "changes": {
+        "title": "11. Changes to this policy",
+        "description": "We may update this Privacy Policy. We will publish the current version on this page and indicate the last updated date."
+      },
+      "contact": {
+        "title": "12. Contact",
+        "emailLabel": "Email",
+        "emailValue": "laveniut.net@gmail.com",
+        "controllerLabel": "Controller",
+        "controllerValue": "Lavenius"
       }
     }
   },

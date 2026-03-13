@@ -6,6 +6,7 @@ import { Dashboard } from './components/dashboard';
 import { Onboarding } from './components/onboarding';
 import { NotFound, LoadingOverlay } from './components/shared';
 import { E2EUnlockGate } from './components/auth/E2EUnlockGate';
+import { PrivacyPolicy } from './components/public';
 
 // Lazy load dashboard views
 const Agenda = lazy(() => import('./components/agenda/Agenda').then(m => ({ default: m.Agenda })));
@@ -142,6 +143,9 @@ export default function App() {
           </OnboardingRoute>
         }
       />
+
+      {/* Public legal route */}
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       
       {/* TODO: Custom Clerk Auth routes for future implementation
        * Uncomment when switching from Clerk Account Portal to custom pages
