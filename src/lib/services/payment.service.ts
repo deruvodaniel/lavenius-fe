@@ -1,6 +1,7 @@
 import { apiClient } from '../api/client';
 import { decryptField } from '../e2e/crypto';
 import { getE2EKeyState } from '../e2e/keyManager';
+import { parseAmount } from '../utils/money';
 import type {
   Payment,
   CreatePaymentDto,
@@ -64,17 +65,26 @@ type PaymentPatientApi = NonNullable<Payment['patient']> & {
 };
 
 type PaymentApiResponse = Omit<Payment, 'patient'> & {
+  amount: number | string;
   patient?: PaymentPatientApi;
 };
 
 async function mapPayment(payment: PaymentApiResponse): Promise<Payment> {
+  const normalizedAmount = parseAmount(payment.amount);
+
   if (!payment.patient?.encryptedLastName || !payment.patient.lastNameIv) {
-    return payment;
+    return {
+      ...payment,
+      amount: normalizedAmount,
+    };
   }
 
   const userKey = getE2EKeyState().userKey;
   if (!userKey) {
-    return payment;
+    return {
+      ...payment,
+      amount: normalizedAmount,
+    };
   }
 
   try {
@@ -85,6 +95,7 @@ async function mapPayment(payment: PaymentApiResponse): Promise<Payment> {
     );
     return {
       ...payment,
+      amount: normalizedAmount,
       patient: {
         ...payment.patient,
         lastName: decryptedLastName,
@@ -94,7 +105,10 @@ async function mapPayment(payment: PaymentApiResponse): Promise<Payment> {
     if (import.meta.env.DEV) {
       console.warn('Failed to decrypt payment patient lastName', error);
     }
-    return payment;
+    return {
+      ...payment,
+      amount: normalizedAmount,
+    };
   }
 }
 
