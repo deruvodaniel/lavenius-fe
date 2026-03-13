@@ -1356,8 +1356,8 @@
     },
     "security": {
       "title": "Segurança de nível clínico",
-      "description": "Todos os dados dos seus pacientes são protegidos com criptografia AES-256-GCM de ponta a ponta. Cumprimos os mais altos padrões de segurança para proteger informações sensíveis.",
-      "encryption": "Criptografia AES-256-GCM",
+      "description": "Todos os dados dos seus pacientes são protegidos com criptografia AES de ponta a ponta. Cumprimos os mais altos padrões de segurança para proteger informações sensíveis.",
+      "encryption": "Criptografia AES",
       "e2e": "Ponta a ponta"
     },
     "socialProof": {
@@ -1401,8 +1401,8 @@
         },
         "encryption": {
           "title": "Criptografia de verdade",
-          "description": "AES-256-GCM de ponta a ponta. Não é só um logo de HIPAA no rodapé, é proteção real.",
-          "highlight": "AES-256-GCM"
+          "description": "AES de ponta a ponta. Não é só um logo de HIPAA no rodapé, é proteção real.",
+          "highlight": "AES"
         },
         "localPricing": {
           "title": "Preços transparentes",
@@ -1423,7 +1423,7 @@
       "questions": {
         "security": {
           "question": "Meus dados e dos meus pacientes estão seguros?",
-          "answer": "Sim, 100%. Usamos criptografia AES-256-GCM de ponta a ponta. Isso significa que nem nós podemos ler suas anotações clínicas. Só você com sua passphrase pode acessar as informações sensíveis."
+          "answer": "Sim, 100%. Usamos criptografia AES de ponta a ponta. Isso significa que nem nós podemos ler suas anotações clínicas. Só você com sua passphrase pode acessar as informações sensíveis."
         },
         "cancel": {
           "question": "Posso cancelar quando quiser?",
@@ -1474,7 +1474,7 @@
       "popular": "Mais Popular",
       "cta": "Começar agora",
       "trustBadges": {
-        "encryption": "Criptografia AES-256",
+        "encryption": "Criptografia AES",
         "cancelAnytime": "Cancele quando quiser",
         "freeTrial": "14 dias de teste grátis"
       },
@@ -1684,6 +1684,7 @@
         "summary": "Resumo do seu perfil:",
         "tipText": "Você pode editar essas informações a qualquer momento no seu perfil."
       },
+      "passphraseInfo": "Defina uma senha mestra forte (recomendado 12+ caracteres, com letras, números e símbolos). Ela protege seus dados E2E; sem ela, você só poderá recuperar o acesso com sua frase de recuperação.",
       "fields": {
         "licenseNumber": "Registro Profissional",
         "specialty": "Especialidade",
@@ -1724,6 +1725,7 @@
         "title": "Frase de recuperação (exibida uma vez)",
         "description": "Guarde esta frase em local seguro. Sem passphrase ou frase de recuperação, seus dados E2E não podem ser recuperados.",
         "generate": "Gerar frase de recuperação",
+        "generateHint": "Para gerar, primeiro defina e confirme sua senha mestra.",
         "copy": "Copiar",
         "copied": "Copiado",
         "download": "Baixar .txt",

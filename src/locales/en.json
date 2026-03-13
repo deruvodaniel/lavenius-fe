@@ -1364,8 +1364,8 @@
     },
     "security": {
       "title": "Clinical-grade security",
-      "description": "All your patient data is protected with AES-256-GCM encryption end-to-end. We comply with the highest security standards to protect sensitive information.",
-      "encryption": "AES-256-GCM encryption",
+      "description": "All your patient data is protected with end-to-end encryption. We comply with the highest security standards to protect sensitive information.",
+      "encryption": "AES encryption",
       "e2e": "End-to-end"
     },
     "socialProof": {
@@ -1409,8 +1409,8 @@
         },
         "encryption": {
           "title": "Real encryption",
-          "description": "AES-256-GCM end-to-end. Not just a HIPAA logo at the bottom of the page, but real protection.",
-          "highlight": "AES-256-GCM"
+          "description": "AES encryption end-to-end. Not just a HIPAA logo at the bottom of the page, but real protection.",
+          "highlight": "AES"
         },
         "localPricing": {
           "title": "Transparent pricing",
@@ -1431,7 +1431,7 @@
       "questions": {
         "security": {
           "question": "Is my data and my patients' data secure?",
-          "answer": "Yes, 100%. We use AES-256-GCM end-to-end encryption. That means even we can't read your clinical notes. Only you with your passphrase can access sensitive information."
+          "answer": "Yes, 100%. We use AES end-to-end encryption. That means even we can't read your clinical notes. Only you with your passphrase can access sensitive information."
         },
         "cancel": {
           "question": "Can I cancel anytime?",
@@ -1482,7 +1482,7 @@
       "popular": "Most Popular",
       "cta": "Get started",
       "trustBadges": {
-        "encryption": "AES-256 Encryption",
+        "encryption": "AES Encryption",
         "cancelAnytime": "Cancel anytime",
         "freeTrial": "14-day free trial"
       },
@@ -1692,6 +1692,7 @@
         "summary": "Your profile summary:",
         "tipText": "You can edit this information at any time from your profile."
       },
+      "passphraseInfo": "Set a strong master password (12+ characters recommended, with letters, numbers and symbols). It protects your E2E data; without it, you can only recover access with your recovery phrase.",
       "fields": {
         "licenseNumber": "Professional License",
         "specialty": "Specialty",
@@ -1732,6 +1733,7 @@
         "title": "Recovery phrase (display once)",
         "description": "Save this phrase in a secure place. Without passphrase or recovery phrase, your E2E data cannot be recovered.",
         "generate": "Generate recovery phrase",
+        "generateHint": "To generate it, first set and confirm your master password.",
         "copy": "Copy",
         "copied": "Copied",
         "download": "Download .txt",

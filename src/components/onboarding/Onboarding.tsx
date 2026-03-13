@@ -158,6 +158,10 @@ export function Onboarding() {
   const [recoverySecret, setRecoverySecret] = useState('');
   const [copiedRecoveryCode, setCopiedRecoveryCode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [passphraseTouched, setPassphraseTouched] = useState(false);
+  const [confirmPassphraseTouched, setConfirmPassphraseTouched] = useState(false);
+  const [isPassphraseFocused, setIsPassphraseFocused] = useState(false);
+  const [isConfirmPassphraseFocused, setIsConfirmPassphraseFocused] = useState(false);
 
   // Progress percentage
   const progressPercentage = useMemo(() => {
@@ -168,6 +172,11 @@ export function Onboarding() {
   const stepConfig = STEPS[currentStep];
   const isLastStep = currentStep === TOTAL_STEPS - 1;
   const isFirstStep = currentStep === 0;
+  const hasPassphraseInput = formData.passphrase.length > 0;
+  const hasConfirmPassphraseInput = formData.confirmPassphrase.length > 0;
+  const isPassphraseTooShort = hasPassphraseInput && formData.passphrase.length < 8;
+  const isPassphraseMismatch =
+    hasConfirmPassphraseInput && formData.confirmPassphrase !== formData.passphrase;
   const isPassphraseReady =
     formData.passphrase.length >= 8 &&
     formData.confirmPassphrase === formData.passphrase;
@@ -773,6 +782,11 @@ export function Onboarding() {
             autoComplete="new-password"
             value={formData.passphrase}
             onChange={(event) => handleInputChange('passphrase', event.target.value)}
+            onFocus={() => setIsPassphraseFocused(true)}
+            onBlur={() => {
+              setIsPassphraseFocused(false);
+              setPassphraseTouched(true);
+            }}
             disabled={isSubmitting}
             className={cn(
               "transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20",
@@ -782,6 +796,14 @@ export function Onboarding() {
           {errors.passphrase && (
             <p className="text-sm text-red-600 animate-stepper-error">{errors.passphrase}</p>
           )}
+          {!errors.passphrase && passphraseTouched && !isPassphraseFocused && isPassphraseTooShort && (
+            <p className="text-sm text-red-600 animate-stepper-error">
+              {t('onboarding.stepper.validation.passphraseMinLength', { count: 8 })}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            {t('onboarding.stepper.passphraseInfo')}
+          </p>
         </div>
 
         <div className="space-y-2">
@@ -794,6 +816,11 @@ export function Onboarding() {
             autoComplete="new-password"
             value={formData.confirmPassphrase}
             onChange={(event) => handleInputChange('confirmPassphrase', event.target.value)}
+            onFocus={() => setIsConfirmPassphraseFocused(true)}
+            onBlur={() => {
+              setIsConfirmPassphraseFocused(false);
+              setConfirmPassphraseTouched(true);
+            }}
             disabled={isSubmitting}
             className={cn(
               "transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20",
@@ -802,6 +829,14 @@ export function Onboarding() {
           />
           {errors.confirmPassphrase && (
             <p className="text-sm text-red-600 animate-stepper-error">{errors.confirmPassphrase}</p>
+          )}
+          {!errors.confirmPassphrase &&
+            confirmPassphraseTouched &&
+            !isConfirmPassphraseFocused &&
+            isPassphraseMismatch && (
+            <p className="text-sm text-red-600 animate-stepper-error">
+              {t('onboarding.stepper.validation.passphraseMismatch')}
+            </p>
           )}
         </div>
 
@@ -814,14 +849,21 @@ export function Onboarding() {
           </div>
 
           {!recoverySecret ? (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleGenerateRecoveryCode}
-              disabled={isSubmitting || !isPassphraseReady}
-            >
-              {t('onboarding.stepper.recovery.generate')}
-            </Button>
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGenerateRecoveryCode}
+                disabled={isSubmitting || !isPassphraseReady}
+              >
+                {t('onboarding.stepper.recovery.generate')}
+              </Button>
+              {!isPassphraseReady && (
+                <p className="text-xs text-amber-800 dark:text-amber-300">
+                  {t('onboarding.stepper.recovery.generateHint')}
+                </p>
+              )}
+            </>
           ) : (
             <Input
               readOnly

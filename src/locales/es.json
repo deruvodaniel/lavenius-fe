@@ -89,7 +89,7 @@
     "logout": "Cerrar sesión",
     "email": "Correo electrónico",
     "password": "Contraseña",
-    "passphrase": "Passphrase (Encriptación)",
+    "passphrase": "Contraseña maestra (Encriptación)",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "noAccount": "¿No tienes cuenta?",
     "hasAccount": "¿Ya tienes cuenta?",
@@ -122,7 +122,7 @@
     "licenseNumberOptional": "Matrícula (opcional)",
     "enterPhone": "+54 11 1234-5678",
     "enterLicense": "MN 12345",
-    "passphraseHelp": "Esta frase se usará para cifrar los datos sensibles de tus pacientes.",
+    "passphraseHelp": "Esta contraseña maestra se usará para cifrar los datos sensibles de tus pacientes.",
     "passphraseWarning": "No la olvides",
     "passphraseCannotRecover": "no podrá ser recuperada.",
     "createAccount": "Crear Cuenta",
@@ -152,7 +152,7 @@
       "passwordLowercase": "Debe incluir al menos una letra minúscula",
       "passwordNumber": "Debe incluir al menos un número",
       "passwordSpecial": "Debe incluir al menos un carácter especial (!@#$%^&*...)",
-      "passphraseMinLength": "La passphrase debe tener al menos {{count}} caracteres",
+      "passphraseMinLength": "La contraseña maestra debe tener al menos {{count}} caracteres",
       "firstNameRequired": "El nombre es requerido",
       "firstNameMinLength": "El nombre debe tener al menos {{count}} caracteres",
       "lastNameRequired": "El apellido es requerido",
@@ -1329,7 +1329,7 @@
       "cta": "Comenzar gratis",
       "hasAccount": "Ya tengo cuenta",
       "noCreditCard": "Sin tarjeta de crédito",
-      "dataEncrypted": "Cifrado real (AES-256)",
+      "dataEncrypted": "Cifrado real (AES)",
       "supportIncluded": "Soporte en español",
       "preview": {
         "income": "Ingresos",
@@ -1355,7 +1355,7 @@
       },
       "records": {
         "title": "Fichas Clínicas Seguras",
-        "description": "Historias clínicas digitales con cifrado de extremo a extremo. Tus notas, siempre protegidas."
+        "description": "Historias clínicas digitales con cifrado AES de extremo a extremo. Tus notas, siempre protegidas."
       },
       "calendar": {
         "title": "Sincronización Total",
@@ -1411,8 +1411,8 @@
     },
     "security": {
       "title": "Tus datos, realmente protegidos",
-      "description": "Todos los datos de tus pacientes están protegidos con cifrado AES-256-GCM de extremo a extremo. No es solo un cumplimiento normativo, es seguridad real en cada nota que escribes.",
-      "encryption": "Cifrado AES-256-GCM",
+      "description": "Todos los datos de tus pacientes están protegidos con cifrado AES de extremo a extremo. No es solo un cumplimiento normativo, es seguridad real en cada nota que escribes.",
+      "encryption": "Cifrado AES",
       "e2e": "Extremo a extremo"
     },
     "socialProof": {
@@ -1456,8 +1456,8 @@
         },
         "encryption": {
           "title": "Cifrado real",
-          "description": "AES-256-GCM de extremo a extremo. No es solo un cumplimiento normativo, es protección genuina para tus datos sensibles.",
-          "highlight": "AES-256-GCM"
+          "description": "AES de extremo a extremo. No es solo un cumplimiento normativo, es protección genuina para tus datos sensibles.",
+          "highlight": "AES"
         },
         "localPricing": {
           "title": "Precios en moneda local",
@@ -1478,7 +1478,7 @@
       "questions": {
         "security": {
           "question": "¿Mis datos y los de mis pacientes están seguros?",
-          "answer": "Absolutamente. Usamos cifrado AES-256-GCM de extremo a extremo. Esto significa que ni siquiera nosotros podemos leer tus notas clínicas. Solo tú con tu passphrase puedes acceder a la información sensible."
+          "answer": "Absolutamente. Usamos cifrado de extremo a extremo. Esto significa que ni siquiera nosotros podemos leer tus notas clínicas. Solo tú con tu contraseña maestra puedes acceder a la información sensible."
         },
         "cancel": {
           "question": "¿Puedo cancelar cuando quiera?",
@@ -1529,7 +1529,7 @@
       "popular": "Más elegido",
       "cta": "Comenzar ahora",
       "trustBadges": {
-        "encryption": "Cifrado AES-256",
+        "encryption": "Cifrado AES",
         "cancelAnytime": "Cancela cuando quieras",
         "freeTrial": "14 días gratis"
       },
@@ -1739,6 +1739,7 @@
         "summary": "Resumen de tu perfil:",
         "tipText": "Puedes editar esta información en cualquier momento desde tu perfil."
       },
+      "passphraseInfo": "Define una contraseña maestra segura (recomendado 12+ caracteres, con letras, números y símbolos). Protege tus datos E2E; sin ella, solo podrás recuperar acceso con tu frase de recuperación.",
       "fields": {
         "licenseNumber": "Matrícula Profesional",
         "specialty": "Especialidad",
@@ -1749,8 +1750,8 @@
         "instagram": "Instagram",
         "linkedin": "LinkedIn",
         "bio": "Biografía / Descripción",
-        "passphrase": "Passphrase",
-        "confirmPassphrase": "Confirmar passphrase"
+        "passphrase": "Contraseña maestra",
+        "confirmPassphrase": "Confirmar contraseña maestra"
       },
       "placeholders": {
         "licenseNumber": "Ej: MN 12345 / MP 67890",
@@ -1769,23 +1770,24 @@
         "phoneInvalid": "El teléfono debe tener al menos 8 dígitos",
         "websiteInvalid": "Ingresa una URL válida (ej: https://ejemplo.com)",
         "bioTooLong": "La biografía no puede superar los 500 caracteres",
-        "passphraseMinLength": "La passphrase debe tener al menos {{count}} caracteres",
-        "passphraseMismatch": "Las passphrases no coinciden",
+        "passphraseMinLength": "La contraseña maestra debe tener al menos {{count}} caracteres",
+        "passphraseMismatch": "Las contraseñas maestras no coinciden",
         "recoveryAcknowledged": "Debes confirmar que guardaste tu frase de recuperación.",
         "recoveryCodeUnavailable": "No pudimos generar tu frase de recuperación. Intenta nuevamente."
       },
       "registerError": "No pudimos registrar tu usuario en el backend. Intenta nuevamente.",
       "recovery": {
         "title": "Frase de recuperación (mostrar una sola vez)",
-        "description": "Guarda esta frase en un lugar seguro. Sin passphrase ni frase de recuperación, tus datos E2E no pueden recuperarse.",
+        "description": "Guarda esta frase en un lugar seguro. Sin contraseña maestra ni frase de recuperación, tus datos E2E no pueden recuperarse.",
         "generate": "Generar frase de recuperación",
+        "generateHint": "Para generarla, primero define y confirma tu contraseña maestra.",
         "copy": "Copiar",
         "copied": "Copiado",
         "download": "Descargar .txt",
-        "acknowledgement": "Entiendo que solo mi passphrase o esta frase de recuperación pueden descifrar mi información.",
+        "acknowledgement": "Entiendo que solo mi contraseña maestra o esta frase de recuperación pueden descifrar mi información.",
         "copyError": "No pudimos copiar la frase de recuperación.",
         "fileTitle": "Frase de Recuperación Lavenius",
-        "fileWarning": "Importante: sin esta frase (o tu passphrase) no podrás recuperar tus datos E2E."
+        "fileWarning": "Importante: sin esta frase (o tu contraseña maestra) no podrás recuperar tus datos E2E."
       }
     }
   },
@@ -1795,27 +1797,27 @@
       "recovery": "Recuperar acceso"
     },
     "description": {
-      "unlock": "Ingresa tu passphrase para cargar tus datos sensibles.",
-      "recovery": "Usa tu frase de recuperación para definir una nueva passphrase."
+      "unlock": "Ingresa tu contraseña maestra para cargar tus datos sensibles.",
+      "recovery": "Usa tu frase de recuperación para definir una nueva contraseña maestra."
     },
     "fields": {
-      "passphrase": "Passphrase",
+      "passphrase": "Contraseña maestra",
       "recoveryCode": "Frase de recuperación",
-      "newPassphrase": "Nueva passphrase",
-      "confirmPassphrase": "Confirmar passphrase"
+      "newPassphrase": "Nueva contraseña maestra",
+      "confirmPassphrase": "Confirmar contraseña maestra"
     },
     "actions": {
       "unlock": "Desbloquear",
       "unlocking": "Desbloqueando...",
-      "forgotPassphrase": "Olvidé mi passphrase",
+      "forgotPassphrase": "Olvidé mi contraseña maestra",
       "resetAndUnlock": "Restablecer y desbloquear",
       "recovering": "Recuperando...",
-      "backToPassphrase": "Volver a passphrase"
+      "backToPassphrase": "Volver a contraseña maestra"
     },
     "errors": {
-      "invalidCredentials": "No pudimos desbloquear tus datos. Revisa tu passphrase o frase de recuperación.",
+      "invalidCredentials": "No pudimos desbloquear tus datos. Revisa tu contraseña maestra o frase de recuperación.",
       "rateLimited": "Demasiados intentos. Espera un momento y vuelve a intentar.",
-      "invalidRecoveryInput": "Revisa la frase de recuperación y confirma la nueva passphrase.",
+      "invalidRecoveryInput": "Revisa la frase de recuperación y confirma la nueva contraseña maestra.",
       "generic": "No pudimos desbloquear tu información cifrada."
     }
   },
