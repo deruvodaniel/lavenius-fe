@@ -143,39 +143,56 @@ export const useCalendarStore = create<CalendarState>()(
       });
 
       let messageReceived = false;
+      let flowResolved = false;
+
+      const maybeAutoSyncSessionsCalendar = async () => {
+        const state = useCalendarStore.getState();
+        if (state.isConnected && !state.syncStatus.hasSessionsCalendar) {
+          toast.info('Creando calendario de sesiones...', {
+            description: 'Sincronizando automáticamente'
+          });
+          await useCalendarStore.getState().syncCalendar();
+        }
+      };
+
+      const finalizeSuccess = async (closePopup: boolean) => {
+        if (flowResolved) return;
+        flowResolved = true;
+
+        if (closePopup && popup && !popup.closed) {
+          popup.close();
+        }
+
+        window.removeEventListener('message', handleMessage);
+
+        toast.success('¡Conectado exitosamente!', {
+          description: 'Google Calendar se conectó correctamente'
+        });
+
+        set({ isConnected: true });
+        await useCalendarStore.getState().checkConnection();
+        await maybeAutoSyncSessionsCalendar();
+      };
+
+      const finalizeError = (errorMessage?: string) => {
+        if (flowResolved) return;
+        flowResolved = true;
+        window.removeEventListener('message', handleMessage);
+
+        toast.error('Error al conectar', {
+          description: errorMessage || 'No se pudo conectar con Google Calendar'
+        });
+      };
 
       // Listen for message from popup
       const handleMessage = async (event: MessageEvent) => {
         // Verify message origin if needed
         if (event.data.type === 'GOOGLE_CALENDAR_SUCCESS') {
           messageReceived = true;
-          window.removeEventListener('message', handleMessage);
-          
-          toast.success('¡Conectado exitosamente!', {
-            description: 'Google Calendar se conectó correctamente'
-          });
-          
-          // Update connection status
-          set({ isConnected: true });
-          
-          // Refresh calendar list and auto-sync
-          await useCalendarStore.getState().checkConnection();
-          
-          // Auto-sync to create "Sesiones" calendar
-          const state = useCalendarStore.getState();
-          if (state.isConnected && !state.syncStatus.hasSessionsCalendar) {
-            toast.info('Creando calendario de sesiones...', {
-              description: 'Sincronizando automáticamente'
-            });
-            await useCalendarStore.getState().syncCalendar();
-          }
+          await finalizeSuccess(false);
         } else if (event.data.type === 'GOOGLE_CALENDAR_ERROR') {
           messageReceived = true;
-          window.removeEventListener('message', handleMessage);
-          
-          toast.error('Error al conectar', {
-            description: event.data.error || 'No se pudo conectar con Google Calendar'
-          });
+          finalizeError(event.data.error);
         }
       };
 
@@ -183,6 +200,11 @@ export const useCalendarStore = create<CalendarState>()(
 
       // Poll to check if popup was closed (fallback when postMessage doesn't work)
       const checkPopupClosed = setInterval(() => {
+        if (flowResolved) {
+          clearInterval(checkPopupClosed);
+          return;
+        }
+
         if (popup.closed) {
           clearInterval(checkPopupClosed);
           window.removeEventListener('message', handleMessage);
@@ -192,11 +214,11 @@ export const useCalendarStore = create<CalendarState>()(
           if (!messageReceived) {
             // Small delay to allow backend to process the OAuth callback
             setTimeout(async () => {
-              await useCalendarStore.getState().checkConnection();
-              
-              // Auto-sync after successful connection to create "Sesiones" calendar
-              const state = useCalendarStore.getState();
-              if (state.isConnected && !state.syncStatus.hasSessionsCalendar) {
+                await useCalendarStore.getState().checkConnection();
+                
+                // Auto-sync after successful connection to create "Sesiones" calendar
+                const state = useCalendarStore.getState();
+                if (state.isConnected && !state.syncStatus.hasSessionsCalendar) {
                 toast.info('Creando calendario de sesiones...', {
                   description: 'Sincronizando automáticamente'
                 });
@@ -207,9 +229,31 @@ export const useCalendarStore = create<CalendarState>()(
         }
       }, 500);
 
+      // Additional fallback: some backend callbacks don't postMessage/close popup.
+      // If connection is completed, detect it and close popup automatically.
+      const checkConnectedWhileOpen = setInterval(async () => {
+        if (flowResolved || messageReceived || popup.closed) {
+          clearInterval(checkConnectedWhileOpen);
+          return;
+        }
+
+        try {
+          await useCalendarStore.getState().checkConnection();
+          const state = useCalendarStore.getState();
+          if (state.isConnected) {
+            clearInterval(checkConnectedWhileOpen);
+            clearInterval(checkPopupClosed);
+            await finalizeSuccess(true);
+          }
+        } catch {
+          // Ignore transient checks while OAuth flow is in progress.
+        }
+      }, 2000);
+
       // Cleanup after 5 minutes (in case popup is closed without completing)
       setTimeout(() => {
         clearInterval(checkPopupClosed);
+        clearInterval(checkConnectedWhileOpen);
         window.removeEventListener('message', handleMessage);
         }, 5 * 60 * 1000);
     } catch (error: unknown) {
