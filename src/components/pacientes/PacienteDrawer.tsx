@@ -37,10 +37,26 @@ const validateEmail = (email: string): boolean => {
   return emailRegex.test(email);
 };
 
+const normalizeOptionalPhone = (phone: string): string => {
+  const trimmed = phone.trim();
+  if (!trimmed) return '';
+
+  const compact = trimmed.replace(/[\s()-]/g, '');
+  // Treat "dial-code only" (e.g. +54) as empty when field is optional.
+  if (/^\+\d{1,3}$/.test(compact)) {
+    return '';
+  }
+
+  return trimmed;
+};
+
 const validatePhone = (phone: string): boolean => {
-  if (!phone) return true; // Optional field
-  // Phone should be 8-15 digits only
-  return phone.length >= 8 && phone.length <= 15;
+  const normalizedPhone = normalizeOptionalPhone(phone);
+  if (!normalizedPhone) return true; // Optional field
+
+  const digitsOnly = normalizedPhone.replace(/\D/g, '');
+  // Phone should be 8-15 digits
+  return digitsOnly.length >= 8 && digitsOnly.length <= 15;
 };
 
 const validateAge = (age: string): boolean => {
@@ -239,12 +255,13 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
     const frequency = formData.frecuencia === 'otra' 
       ? formData.frecuenciaOtra 
       : formData.frecuencia;
+    const normalizedPhone = normalizeOptionalPhone(formData.telefono);
 
     const patientDto: CreatePatientDto = {
       firstName: formData.nombre.trim(),
       lastName: formData.apellido.trim(),
       email: formData.email.trim() || undefined,
-      phone: formData.telefono.trim() || undefined,
+      phone: normalizedPhone || undefined,
       age: formData.edad ? Number(formData.edad) : undefined,
       healthInsurance: formData.coberturaMedica.trim() || undefined,
       sessionType: formData.tipoSesion as SessionType,

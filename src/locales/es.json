@@ -1839,7 +1839,7 @@
         "recoveryAcknowledged": "Debes confirmar que guardaste tu frase de recuperación.",
         "consentRequired": "Debes aceptar los términos de privacidad y cifrado para continuar"
       },
-      "registerError": "No pudimos registrar tu usuario en el backend. Intenta nuevamente.",
+      "registerError": "No pudimos registrar tu usuario en el servidor. Intenta nuevamente.",
       "recovery": {
         "title": "Frase de recuperación (mostrar una sola vez)",
         "description": "Guarda esta frase en un lugar seguro. Sin contraseña maestra ni frase de recuperación, tus datos E2E no pueden recuperarse.",

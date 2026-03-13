@@ -184,6 +184,22 @@ export function Onboarding() {
   const isPassphraseReady =
     formData.passphrase.length >= 8 &&
     formData.confirmPassphrase === formData.passphrase;
+  const canCompleteSetup =
+    isPassphraseReady &&
+    Boolean(recoverySecret) &&
+    formData.recoveryAcknowledged;
+  
+  const normalizeOptionalPhone = (phone: string): string => {
+    const trimmed = phone.trim();
+    if (!trimmed) return '';
+
+    const compact = trimmed.replace(/[\s()-]/g, '');
+    // Treat "dial-code only" as empty when field is optional (e.g. +54).
+    if (/^\+\d{1,3}$/.test(compact)) {
+      return '';
+    }
+    return trimmed;
+  };
 
   // Show loading while Clerk loads user data
   if (!isLoaded) {
@@ -226,14 +242,17 @@ export function Onboarding() {
     if (currentStep === 1) {
       // Step 2: Contact Info - Phone in E.164 format from PhoneInput
       // Only validate if user typed something beyond the dial code (min ~8 digits total)
-      if (formData.phone) {
-        const phoneDigits = formData.phone.replace(/\D/g, '');
+      const normalizedPhone = normalizeOptionalPhone(formData.phone);
+      const normalizedAlternativePhone = normalizeOptionalPhone(formData.alternativePhone);
+
+      if (normalizedPhone) {
+        const phoneDigits = normalizedPhone.replace(/\D/g, '');
         if (phoneDigits.length > 0 && phoneDigits.length < 8) {
           newErrors.phone = t('onboarding.stepper.validation.phoneInvalid');
         }
       }
-      if (formData.alternativePhone) {
-        const phoneDigits = formData.alternativePhone.replace(/\D/g, '');
+      if (normalizedAlternativePhone) {
+        const phoneDigits = normalizedAlternativePhone.replace(/\D/g, '');
         if (phoneDigits.length > 0 && phoneDigits.length < 8) {
           newErrors.alternativePhone = t('onboarding.stepper.validation.phoneInvalid');
         }
@@ -315,6 +334,8 @@ export function Onboarding() {
       const userKey = generateUserKey();
       const passphraseBundle = await wrapUserKey(userKey, formData.passphrase);
       const recoveryBundle = await wrapUserKeyForRecovery(userKey, recoverySecret);
+      const normalizedPhone = normalizeOptionalPhone(formData.phone);
+      const normalizedAlternativePhone = normalizeOptionalPhone(formData.alternativePhone);
 
       // 2. Prepare data for backend (only fields it accepts)
       const backendData: ClerkUserSyncDto = {
@@ -323,7 +344,7 @@ export function Onboarding() {
         email,
         firstName: user.firstName || '',
         lastName: user.lastName || '',
-        phone: formData.phone.trim() || undefined,
+        phone: normalizedPhone || undefined,
         licenseNumber: formData.licenseNumber.trim() || undefined,
         encryptedUserKey: passphraseBundle.encryptedUserKey,
         salt: passphraseBundle.salt,
@@ -338,7 +359,7 @@ export function Onboarding() {
       // 3. Prepare extra data for localStorage (fields backend doesn't accept)
       const extraData: OnboardingExtraData = {
         specialty: formData.specialty || undefined,
-        alternativePhone: formData.alternativePhone.trim() || undefined,
+        alternativePhone: normalizedAlternativePhone || undefined,
         officeAddress: formData.officeAddress.trim() || undefined,
         website: formData.website.trim() || undefined,
         socialMedia: {
@@ -383,8 +404,8 @@ export function Onboarding() {
             ...user.unsafeMetadata,
             licenseNumber: formData.licenseNumber.trim(),
             specialty: formData.specialty || undefined,
-            phone: formData.phone.trim() || undefined,
-            alternativePhone: formData.alternativePhone.trim() || undefined,
+            phone: normalizedPhone || undefined,
+            alternativePhone: normalizedAlternativePhone || undefined,
             officeAddress: formData.officeAddress.trim() || undefined,
             website: formData.website.trim() || undefined,
             socialMedia: {
@@ -795,12 +816,15 @@ export function Onboarding() {
   );
 
   const renderCompleteStep = () => {
+    const normalizedPhone = normalizeOptionalPhone(formData.phone);
+    const normalizedAlternativePhone = normalizeOptionalPhone(formData.alternativePhone);
+
     // Collect filled data for summary
     const filledData = [
       { label: t('onboarding.stepper.fields.licenseNumber'), value: formData.licenseNumber },
       formData.specialty && { label: t('onboarding.stepper.fields.specialty'), value: t(`onboarding.profile.specialties.${formData.specialty}`) },
-      formData.phone && { label: t('onboarding.stepper.fields.phone'), value: formData.phone },
-      formData.alternativePhone && { label: t('onboarding.stepper.fields.alternativePhone'), value: formData.alternativePhone },
+      normalizedPhone && { label: t('onboarding.stepper.fields.phone'), value: normalizedPhone },
+      normalizedAlternativePhone && { label: t('onboarding.stepper.fields.alternativePhone'), value: normalizedAlternativePhone },
       formData.officeAddress && { label: t('onboarding.stepper.fields.officeAddress'), value: formData.officeAddress },
       formData.website && { label: t('onboarding.stepper.fields.website'), value: formData.website },
       formData.instagram && { label: 'Instagram', value: formData.instagram },
@@ -1087,7 +1111,7 @@ export function Onboarding() {
               <Button
                 type="button"
                 onClick={handleSubmit}
-                disabled={isSubmitting}
+                disabled={isSubmitting || !canCompleteSetup}
                 className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50 transition-all duration-200 hover:shadow-xl hover:shadow-indigo-300 dark:hover:shadow-indigo-800/60"
               >
                 {isSubmitting ? (

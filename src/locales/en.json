@@ -1792,7 +1792,7 @@
         "recoveryAcknowledged": "You must confirm you saved your recovery phrase.",
         "consentRequired": "You must accept the privacy and encryption terms to continue"
       },
-      "registerError": "We could not register your backend user. Please try again.",
+      "registerError": "We could not register your user on the server. Please try again.",
       "recovery": {
         "title": "Recovery phrase (display once)",
         "description": "Save this phrase in a secure place. Without passphrase or recovery phrase, your E2E data cannot be recovered.",
