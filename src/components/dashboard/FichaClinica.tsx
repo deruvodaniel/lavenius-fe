@@ -64,6 +64,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   const [isTurnoDrawerOpen, setIsTurnoDrawerOpen] = useState(false);
   const [isNoteDrawerOpen, setIsNoteDrawerOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [isDeletingNote, setIsDeletingNote] = useState(false);
 
   // Update flag when patient changes
   useEffect(() => {
@@ -192,12 +193,16 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
   };
 
   const handleDeleteNote = async (id: string) => {
+    if (isDeletingNote) return;
+    setIsDeletingNote(true);
     try {
       await deleteNote(id);
       toast.success(t('clinicalFile.messages.noteDeleteSuccess'));
     } catch (error: unknown) {
       console.error('Error deleting note:', error);
       toast.error(t('clinicalFile.messages.noteDeleteError'));
+    } finally {
+      setIsDeletingNote(false);
     }
   };
 

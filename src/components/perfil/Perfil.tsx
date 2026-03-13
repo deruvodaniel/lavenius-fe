@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { PhoneInput } from '@/components/shared';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -207,15 +208,6 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
     try {
       saveProfile(profile);
 
-      if (clerkUser && profile.licenseNumber !== user?.licenseNumber) {
-        await clerkUser.update({
-          unsafeMetadata: {
-            ...clerkUser.unsafeMetadata,
-            licenseNumber: profile.licenseNumber?.trim(),
-          },
-        });
-      }
-
       setHasChanges(false);
       toast.success(t('profile.messages.saveSuccess'));
     } catch {
@@ -408,22 +400,28 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
           <div className="space-y-6">
             {/* Phone & Email */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField
-                label={t('profile.contact.primaryPhone')}
-                value={profile.phone || ''}
-                onChange={(v) => updateProfile('phone', v)}
-                placeholder="+54 11 1234-5678"
-                type="tel"
-                icon={Phone}
-              />
-              <InputField
-                label={t('profile.contact.alternativePhone')}
-                value={profile.alternativePhone || ''}
-                onChange={(v) => updateProfile('alternativePhone', v)}
-                placeholder="+54 11 8765-4321"
-                type="tel"
-                icon={Phone}
-              />
+              <div className="space-y-1.5">
+                <label htmlFor="profile-phone" className="block text-sm font-medium text-foreground">
+                  {t('profile.contact.primaryPhone')}
+                </label>
+                <PhoneInput
+                  id="profile-phone"
+                  value={profile.phone || ''}
+                  onChange={(phone) => updateProfile('phone', phone)}
+                  placeholder="+54 11 1234-5678"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="profile-alt-phone" className="block text-sm font-medium text-foreground">
+                  {t('profile.contact.alternativePhone')}
+                </label>
+                <PhoneInput
+                  id="profile-alt-phone"
+                  value={profile.alternativePhone || ''}
+                  onChange={(phone) => updateProfile('alternativePhone', phone)}
+                  placeholder="+54 11 8765-4321"
+                />
+              </div>
               <InputField
                 label={t('profile.contact.email')}
                 value={user?.email || ''}

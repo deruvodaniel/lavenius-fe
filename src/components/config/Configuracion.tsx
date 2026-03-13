@@ -86,6 +86,7 @@ interface WorkingHours {
 interface LocalSettings {
   workingHours: WorkingHours;
   defaultSessionDuration: number; // minutes: 30, 45, 60, 90, 120
+  defaultSessionCost: number | null; // null = no default
 }
 
 const defaultLocalSettings: LocalSettings = {
@@ -95,6 +96,7 @@ const defaultLocalSettings: LocalSettings = {
     workingDays: [1, 2, 3, 4, 5], // Monday to Friday
   },
   defaultSessionDuration: 60,
+  defaultSessionCost: null,
 };
 
 const loadLocalSettings = (): LocalSettings => {
@@ -151,18 +153,45 @@ function buildDayOffDescription(diaOff: DiaOffUI): string {
 }
 
 /**
- * Convert UI day off to API format (DayOffConfig)
- * BE uses fromDate/toDate, UI uses fechaInicio/fechaFin with tipo
+ * Converts a local date + time string to an ISO UTC string.
+ * Needed because the backend always compares session dates in UTC.
+ */
+function toUtcIso(dateStr: string, timeStr: string): string {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  return new Date(year, month - 1, day, hours, minutes, 0, 0).toISOString();
+}
+
+/**
+ * Convert UI day off to API format (DayOffConfig).
+ * BE uses fromDate/toDate as ISO UTC strings.
  */
 function uiToApiDayOff(diaOff: DiaOffUI): { config: DayOffConfig; description: string } {
-  // Map UI dates to API format
-  const config: DayOffConfig = {
-    fromDate: diaOff.fechaInicio,
-    toDate: diaOff.fechaFin,
-  };
-  
+  let fromDate: string;
+  let toDate: string;
+
+  switch (diaOff.tipo) {
+    case 'morning':
+      fromDate = toUtcIso(diaOff.fechaInicio, '00:00');
+      toDate   = toUtcIso(diaOff.fechaFin,    '12:00');
+      break;
+    case 'afternoon':
+      fromDate = toUtcIso(diaOff.fechaInicio, '12:00');
+      toDate   = toUtcIso(diaOff.fechaFin,    '23:59');
+      break;
+    case 'custom':
+      fromDate = toUtcIso(diaOff.fechaInicio, diaOff.startTime || '09:00');
+      toDate   = toUtcIso(diaOff.fechaFin,    diaOff.endTime   || '18:00');
+      break;
+    case 'full':
+    default:
+      fromDate = toUtcIso(diaOff.fechaInicio, '00:00');
+      toDate   = toUtcIso(diaOff.fechaFin,    '23:59');
+      break;
+  }
+
+  const config: DayOffConfig = { fromDate, toDate };
   const description = buildDayOffDescription(diaOff);
-  
   return { config, description };
 }
 
@@ -785,6 +814,32 @@ export function Configuracion() {
               </div>
             </ConfigSection>
 
+            {/* Precio por defecto de sesión */}
+            <ConfigSection
+              icon={DollarSign}
+              iconColor="text-green-600 dark:text-green-400"
+              iconBg="bg-green-100 dark:bg-green-950/50"
+              title={t('settings.defaultCost.title')}
+              description={t('settings.defaultCost.description')}
+            >
+              <div className="flex items-center gap-3">
+                <Input
+                  id="default-session-cost"
+                  type="number"
+                  min="0"
+                  step="100"
+                  value={localSettings.defaultSessionCost ?? ''}
+                  onChange={(e) => {
+                    const val = e.target.value === '' ? null : Number(e.target.value);
+                    updateLocalSetting('defaultSessionCost', val);
+                  }}
+                  placeholder={t('settings.defaultCost.placeholder')}
+                  className="w-40"
+                />
+                <span className="text-sm text-muted-foreground">{t('settings.defaultCost.hint')}</span>
+              </div>
+            </ConfigSection>
+
             {/* Recordatorios de Cobros */}
             <ConfigSection
               icon={DollarSign}
@@ -926,15 +981,13 @@ export function Configuracion() {
             {/* Google Calendar Sync */}
             <CalendarSync />
 
-            {/* Working Hours & Days - Coming Soon (for public profile sharing) */}
+            {/* Working Hours & Days */}
             <ConfigSection
               icon={Clock}
               iconColor="text-indigo-600 dark:text-indigo-400"
               iconBg="bg-indigo-100 dark:bg-indigo-950/50"
               title={t('settings.workingHours.title')}
               description={t('settings.workingHours.description')}
-              comingSoon={true}
-              comingSoonText={t('common.comingSoon')}
             >
               <div className="space-y-5">
                 <fieldset className="space-y-2">

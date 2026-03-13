@@ -1,29 +1,9 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useUser } from '@clerk/clerk-react';
-import { 
-  Award, 
-  Stethoscope, 
-  Phone,
-  Loader2,
-  CheckCircle2,
-  MapPin,
-  Globe,
-  Instagram,
-  Linkedin,
-  FileText,
-  ArrowLeft,
-  ArrowRight,
-  PartyPopper,
-  Copy,
-  Download
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { BetaBadge, PhoneInput } from '@/components/shared';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -31,10 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/components/ui/utils';
-import { onboardingService } from '@/lib/services';
-import { BetaBadge } from '@/components/shared';
 import { useE2EKey } from '@/lib/e2e';
 import {
   generateRecoverySecret,
@@ -42,7 +20,31 @@ import {
   wrapUserKey,
   wrapUserKeyForRecovery,
 } from '@/lib/e2e/crypto';
+import { onboardingService } from '@/lib/services';
 import type { ClerkUserSyncDto, OnboardingExtraData } from '@/lib/types/api.types';
+import { useUser } from '@clerk/clerk-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Award,
+  CheckCircle2,
+  Copy,
+  Download,
+  FileText,
+  Globe,
+  Instagram,
+  Linkedin,
+  Loader2,
+  MapPin,
+  PartyPopper,
+  Phone,
+  ShieldCheck,
+  Stethoscope
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 /**
  * List of common therapy specialties
@@ -71,6 +73,7 @@ interface OnboardingFormData {
   // Step 1: Professional Info
   licenseNumber: string;
   specialty: Specialty | '';
+  zkConsent: boolean;
   // Step 2: Contact Info
   phone: string;
   alternativePhone: string;
@@ -143,6 +146,7 @@ export function Onboarding() {
   const [formData, setFormData] = useState<OnboardingFormData>({
     licenseNumber: '',
     specialty: '',
+    zkConsent: false,
     phone: '',
     alternativePhone: '',
     officeAddress: '',
@@ -213,19 +217,24 @@ export function Onboarding() {
       } else if (formData.licenseNumber.trim().length < 3) {
         newErrors.licenseNumber = t('onboarding.stepper.validation.licenseMinLength');
       }
+      // ZK consent is mandatory
+      if (!formData.zkConsent) {
+        newErrors.zkConsent = t('onboarding.stepper.validation.consentRequired');
+      }
     }
 
     if (currentStep === 1) {
-      // Step 2: Contact Info - Phone validation (optional but must be valid if provided)
-      if (formData.phone && formData.phone.trim().length > 0) {
+      // Step 2: Contact Info - Phone in E.164 format from PhoneInput
+      // Only validate if user typed something beyond the dial code (min ~8 digits total)
+      if (formData.phone) {
         const phoneDigits = formData.phone.replace(/\D/g, '');
-        if (phoneDigits.length < 8) {
+        if (phoneDigits.length > 0 && phoneDigits.length < 8) {
           newErrors.phone = t('onboarding.stepper.validation.phoneInvalid');
         }
       }
-      if (formData.alternativePhone && formData.alternativePhone.trim().length > 0) {
+      if (formData.alternativePhone) {
         const phoneDigits = formData.alternativePhone.replace(/\D/g, '');
-        if (phoneDigits.length < 8) {
+        if (phoneDigits.length > 0 && phoneDigits.length < 8) {
           newErrors.alternativePhone = t('onboarding.stepper.validation.phoneInvalid');
         }
       }
@@ -356,33 +365,63 @@ export function Onboarding() {
       }
 
       // 5. Save extra data to localStorage (user-scoped)
-      onboardingService.saveExtraData(user.id, extraData);
+      try {
+        onboardingService.saveExtraData(user.id, extraData);
+      } catch (storageError) {
+        // localStorage might be full on mobile — log but continue
+        console.warn('Could not save extra data to localStorage:', storageError);
+      }
 
       // 6. Keep E2E key in memory for current session (no local persistence).
       setKeyFromOnboarding(userKey, 1);
 
       // 7. Update Clerk user metadata with all profile data
-      await user.update({
-        unsafeMetadata: {
-          ...user.unsafeMetadata,
-          licenseNumber: formData.licenseNumber.trim(),
-          specialty: formData.specialty || undefined,
-          phone: formData.phone.trim() || undefined,
-          alternativePhone: formData.alternativePhone.trim() || undefined,
-          officeAddress: formData.officeAddress.trim() || undefined,
-          website: formData.website.trim() || undefined,
-          socialMedia: {
-            instagram: formData.instagram.trim() || undefined,
-            linkedin: formData.linkedin.trim() || undefined,
+      try {
+        const consentAcceptedAt = new Date().toISOString();
+        await user.update({
+          unsafeMetadata: {
+            ...user.unsafeMetadata,
+            licenseNumber: formData.licenseNumber.trim(),
+            specialty: formData.specialty || undefined,
+            phone: formData.phone.trim() || undefined,
+            alternativePhone: formData.alternativePhone.trim() || undefined,
+            officeAddress: formData.officeAddress.trim() || undefined,
+            website: formData.website.trim() || undefined,
+            socialMedia: {
+              instagram: formData.instagram.trim() || undefined,
+              linkedin: formData.linkedin.trim() || undefined,
+            },
+            bio: formData.bio.trim() || undefined,
+            zkConsent: true,
+            zkConsentAcceptedAt: consentAcceptedAt,
+            onboardingComplete: true,
+            onboardingCompletedAt: consentAcceptedAt,
+            hasCompletedPassphraseSetup: true,
           },
-          bio: formData.bio.trim() || undefined,
-          onboardingComplete: true,
-          onboardingCompletedAt: new Date().toISOString(),
-        },
-      });
+        });
+      } catch (clerkError) {
+        console.error('Clerk user.update() failed:', clerkError);
+        // Retry once — mobile networks can be flaky
+        try {
+          await user.update({
+            unsafeMetadata: {
+              ...user.unsafeMetadata,
+              zkConsent: true,
+              zkConsentAcceptedAt: new Date().toISOString(),
+              onboardingComplete: true,
+              onboardingCompletedAt: new Date().toISOString(),
+            },
+          });
+        } catch (retryError) {
+          console.error('Clerk user.update() retry failed:', retryError);
+          toast.error(t('onboarding.stepper.errorClerk'));
+          setIsSubmitting(false);
+          return;
+        }
+      }
 
       toast.success(t('onboarding.stepper.success'));
-      
+
       // Small delay for user to see success message
       setTimeout(() => {
         navigate('/dashboard');
@@ -526,6 +565,55 @@ export function Onboarding() {
           </SelectContent>
         </Select>
       </div>
+
+      {/* ZK Encryption Consent - Required */}
+      <div className="space-y-3">
+        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/40 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+          <div className="flex items-start gap-3 mb-3">
+            <ShieldCheck className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
+            <div>
+              <h4 className="text-sm font-semibold text-foreground">
+                {t('onboarding.stepper.consent.title')}
+              </h4>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                {t('onboarding.stepper.consent.description')}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 ml-0.5">
+            <Checkbox
+              id="zk-consent"
+              checked={formData.zkConsent}
+              onCheckedChange={(checked) => {
+                setFormData(prev => ({ ...prev, zkConsent: checked === true }));
+                if (errors.zkConsent) {
+                  setErrors(prev => ({ ...prev, zkConsent: undefined }));
+                }
+              }}
+              disabled={isSubmitting}
+              aria-invalid={!!errors.zkConsent}
+              aria-describedby={errors.zkConsent ? 'consent-error' : undefined}
+              className={cn(
+                "mt-0.5",
+                errors.zkConsent && "border-red-500"
+              )}
+            />
+            <Label
+              htmlFor="zk-consent"
+              className="text-sm text-foreground leading-snug cursor-pointer"
+            >
+              {t('onboarding.stepper.consent.label')}
+              <span className="text-red-500 ml-1">*</span>
+            </Label>
+          </div>
+          {errors.zkConsent && (
+            <p id="consent-error" className="text-sm text-red-600 animate-stepper-error mt-2 ml-0.5">
+              {errors.zkConsent}
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 
@@ -538,20 +626,14 @@ export function Onboarding() {
           {t('onboarding.stepper.fields.phone')}
           <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
-        <Input
+        <PhoneInput
           id="phone"
-          type="tel"
-          inputMode="numeric"
           value={formData.phone}
-          onChange={(e) => handleInputChange('phone', e.target.value.replace(/\D/g, ''))}
+          onChange={(phone) => handleInputChange('phone', phone)}
           placeholder={t('onboarding.stepper.placeholders.phone')}
           aria-invalid={!!errors.phone}
           aria-describedby={errors.phone ? 'phone-error' : undefined}
           disabled={isSubmitting}
-          className={cn(
-            "transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20",
-            errors.phone && "border-red-500 focus:ring-red-500/20"
-          )}
         />
         {errors.phone && (
           <p id="phone-error" className="text-sm text-red-600 animate-stepper-error">
@@ -567,20 +649,14 @@ export function Onboarding() {
           {t('onboarding.stepper.fields.alternativePhone')}
           <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
-        <Input
+        <PhoneInput
           id="alternativePhone"
-          type="tel"
-          inputMode="numeric"
           value={formData.alternativePhone}
-          onChange={(e) => handleInputChange('alternativePhone', e.target.value.replace(/\D/g, ''))}
+          onChange={(phone) => handleInputChange('alternativePhone', phone)}
           placeholder={t('onboarding.stepper.placeholders.alternativePhone')}
           aria-invalid={!!errors.alternativePhone}
           aria-describedby={errors.alternativePhone ? 'alt-phone-error' : undefined}
           disabled={isSubmitting}
-          className={cn(
-            "transition-all duration-200 focus:ring-2 focus:ring-emerald-500/20",
-            errors.alternativePhone && "border-red-500 focus:ring-red-500/20"
-          )}
         />
         {errors.alternativePhone && (
           <p id="alt-phone-error" className="text-sm text-red-600 animate-stepper-error">

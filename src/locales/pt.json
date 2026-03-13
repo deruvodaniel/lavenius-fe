@@ -370,6 +370,7 @@
     },
     "messages": {
       "createSuccess": "Consulta criada com sucesso",
+      "createRecurringSuccess": "Sessões recorrentes criadas com sucesso",
       "updateSuccess": "Consulta atualizada com sucesso",
       "deleteSuccess": "Consulta excluída com sucesso",
       "cancelSuccess": "Consulta cancelada",
@@ -380,6 +381,7 @@
       "rescheduleSuccess": "Consulta reagendada com sucesso",
       "rescheduleError": "Erro ao reagendar consulta",
       "conflictError": "Já existe uma sessão neste horário. Por favor escolha outro horário.",
+      "conflictErrorWithPatient": "{{patientName}} já tem uma sessão neste horário. Por favor escolha outro horário.",
       "scheduleConflict": "Conflito de horários. Você já tem uma sessão agendada neste momento.",
       "pastDateError": "Não é possível agendar consultas no passado. Por favor selecione uma data futura.",
       "patientNotFound": "Paciente não encontrado",
@@ -434,7 +436,9 @@
       "saving": "Salvando...",
       "deleting": "Excluindo...",
       "deleteConfirmTitle": "Excluir consulta?",
-      "deleteConfirmDescription": "Esta ação não pode ser desfeita. A consulta será excluída permanentemente."
+      "deleteConfirmDescription": "Esta ação não pode ser desfeita. A consulta será excluída permanentemente.",
+      "createPatient": "Criar novo paciente",
+      "patientCreated": "Paciente criado e selecionado"
     },
     "card": {
       "paid": "Pago",
@@ -448,6 +452,7 @@
     },
     "details": {
       "title": "Detalhes da Sessão",
+      "description": "Informações completas da sessão",
       "patient": "Paciente",
       "noPatient": "Sem paciente",
       "editSession": "Editar Sessão",
@@ -479,6 +484,11 @@
       "morning": "Manhã",
       "afternoon": "Tarde"
     },
+    "outsideHours": {
+      "title": "Fora do horário de trabalho",
+      "description": "Você está agendando fora do seu horário de trabalho configurado ({{start}} - {{end}}). Deseja continuar mesmo assim?",
+      "confirm": "Agendar mesmo assim"
+    },
     "legend": {
       "scheduled": "Agendada",
       "confirmed": "Confirmada",
@@ -486,12 +496,56 @@
     },
     "duration": {
       "label": "Duração",
+      "fifteenMin": "15 min",
+      "twentyMin": "20 min",
       "thirtyMin": "30 min",
+      "fortyMin": "40 min",
       "fortyFiveMin": "45 min",
       "oneHour": "1 hora",
       "ninetyMin": "1,5 horas",
       "twoHours": "2 horas",
       "custom": "Personalizado"
+    },
+    "recurrence": {
+      "enableRecurrence": "Repetir sessão",
+      "enableRecurrenceDescription": "Criar múltiplas sessões com este padrão",
+      "type": "Tipo de recorrência",
+      "types": {
+        "workingDays": "Dias úteis (Segunda a Sexta)",
+        "weekly": "Semanal",
+        "biweekly": "Quinzenal (a cada 2 semanas)",
+        "monthly": "Mensal"
+      },
+      "until": "Repetir até",
+      "untilPlaceholder": "Selecionar data final",
+      "untilHelp": "As sessões serão criadas até esta data",
+      "daysOfWeek": {
+        "label": "Dias da semana",
+        "monday": "Segunda",
+        "tuesday": "Terça",
+        "wednesday": "Quarta",
+        "thursday": "Quinta",
+        "friday": "Sexta",
+        "saturday": "Sábado",
+        "sunday": "Domingo"
+      },
+      "sessionDay": "dia da sessão",
+      "validation": {
+        "mustIncludeSessionDay": "Deve incluir o dia da sessão selecionada"
+      }
+    },
+    "deleteScope": {
+      "title": "Excluir sessões recorrentes",
+      "description": "Esta sessão faz parte de uma série. O que você deseja excluir?",
+      "single": {
+        "title": "Apenas esta sessão",
+        "description": "Excluir apenas esta sessão. As outras sessões da série não serão afetadas."
+      },
+      "thisAndFuture": {
+        "title": "Esta e as seguintes sessões",
+        "description": "Excluir esta sessão e todas as futuras da série. As sessões passadas não serão afetadas."
+      },
+      "hint": "Dica: As sessões passadas nunca são excluídas automaticamente."
     }
   },
   "payments": {
@@ -610,7 +664,8 @@
       "monthlyDiscount": "Desconto plano mensal (10%)",
       "totalMonthlyPlan": "Total plano mensal",
       "saveChanges": "Salvar Alterações",
-      "saving": "Salvando..."
+      "saving": "Salvando...",
+      "sessionNotFound": "Sessão não encontrada"
     },
     "comingSoon": {
       "title": "Em breve",
@@ -788,6 +843,12 @@
       "description": "As sessões usarão esta duração por padrão. Você pode alterá-la por sessão.",
       "custom": "Personalizado",
       "customMinutes": "minutos"
+    },
+    "defaultCost": {
+      "title": "Preço padrão da sessão",
+      "description": "Será usado como valor inicial ao agendar uma nova consulta. Você pode alterá-lo por sessão.",
+      "placeholder": "Ex: 150",
+      "hint": "Deixe vazio para não usar valor padrão"
     },
     "theme": {
       "title": "Aparência",
@@ -1042,6 +1103,8 @@
       "title": "Configure sua conta",
       "subtitle": "Complete estes passos para aproveitar ao máximo o Lavenius",
       "progress": "{{completed}} de {{total}} completados",
+      "completeTitle": "Configuração concluída!",
+      "completeSubtitle": "Tudo pronto. Aproveite o Lavenius!",
       "dismissHint": "Você pode mostrar este cartão novamente no menu de configurações do dashboard",
       "steps": {
         "configureProfile": "Configurar seu perfil profissional",
@@ -1356,8 +1419,8 @@
     },
     "security": {
       "title": "Segurança de nível clínico",
-      "description": "Todos os dados dos seus pacientes são protegidos com criptografia AES de ponta a ponta. Cumprimos os mais altos padrões de segurança para proteger informações sensíveis.",
-      "encryption": "Criptografia AES",
+      "description": "Todos os dados dos seus pacientes são protegidos com criptografia de ponta a ponta. Cumprimos os mais altos padrões de segurança para proteger informações sensíveis.",
+      "encryption": "Criptografia de ponta a ponta",
       "e2e": "Ponta a ponta"
     },
     "socialProof": {
@@ -1401,8 +1464,8 @@
         },
         "encryption": {
           "title": "Criptografia de verdade",
-          "description": "AES de ponta a ponta. Não é só um logo de HIPAA no rodapé, é proteção real.",
-          "highlight": "AES"
+          "description": "Criptografia de ponta a ponta. Não é só um logo de HIPAA no rodapé, é proteção real.",
+          "highlight": "Criptografia E2E"
         },
         "localPricing": {
           "title": "Preços transparentes",
@@ -1423,7 +1486,7 @@
       "questions": {
         "security": {
           "question": "Meus dados e dos meus pacientes estão seguros?",
-          "answer": "Sim, 100%. Usamos criptografia AES de ponta a ponta. Isso significa que nem nós podemos ler suas anotações clínicas. Só você com sua passphrase pode acessar as informações sensíveis."
+          "answer": "Sim, 100%. Usamos criptografia de ponta a ponta. Isso significa que nem nós podemos ler suas anotações clínicas. Só você com sua passphrase pode acessar as informações sensíveis."
         },
         "cancel": {
           "question": "Posso cancelar quando quiser?",
@@ -1474,7 +1537,7 @@
       "popular": "Mais Popular",
       "cta": "Começar agora",
       "trustBadges": {
-        "encryption": "Criptografia AES",
+        "encryption": "Criptografia E2E",
         "cancelAnytime": "Cancele quando quiser",
         "freeTrial": "14 dias de teste grátis"
       },
@@ -1659,6 +1722,7 @@
       "completeSetup": "Concluir Configuração",
       "success": "Perfil configurado com sucesso!",
       "error": "Erro ao salvar os dados. Por favor, tente novamente.",
+      "errorClerk": "Não foi possível atualizar seu perfil. Verifique sua conexão e tente novamente.",
       "stepNames": {
         "professional": "Profissional",
         "contact": "Contato",
@@ -1718,7 +1782,7 @@
         "passphraseMinLength": "A passphrase deve ter pelo menos {{count}} caracteres",
         "passphraseMismatch": "As passphrases não coincidem",
         "recoveryAcknowledged": "Você deve confirmar que salvou sua frase de recuperação.",
-        "recoveryCodeUnavailable": "Não foi possível gerar sua frase de recuperação. Tente novamente."
+        "consentRequired": "Você deve aceitar os termos de privacidade e criptografia para continuar"
       },
       "registerError": "Não conseguimos registrar seu usuário no backend. Tente novamente.",
       "recovery": {
@@ -1733,6 +1797,11 @@
         "copyError": "Não foi possível copiar a frase de recuperação.",
         "fileTitle": "Frase de Recuperação Lavenius",
         "fileWarning": "Importante: sem esta frase (ou sua passphrase) você não poderá recuperar seus dados E2E."
+      },
+      "consent": {
+        "title": "Proteção de Dados com Criptografia de Ponta a Ponta",
+        "description": "O Lavenius utiliza criptografia de ponta a ponta para proteger os dados sensíveis dos seus pacientes. Isso significa que somente você pode acessar as informações clínicas — nem mesmo nós podemos lê-las.",
+        "label": "Aceito que meus dados clínicos serão protegidos com criptografia de ponta a ponta e entendo que sou o único responsável pela minha chave de acesso."
       }
     }
   },

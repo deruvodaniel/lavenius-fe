@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Calendar, Clock, User, Loader2 } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Calendar, Clock, User, UserPlus, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { usePatientStore, useSetupProgressStore } from '@/lib/stores';
@@ -8,9 +8,12 @@ import { ConfirmDialog, BaseDrawer, DrawerBody, DrawerFooter, NativeSelect } fro
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
-import type { Patient } from '@/lib/types/api.types';
-import { SessionType, SessionStatus } from '@/lib/types/session';
-import type { CreateSessionDto, SessionResponse } from '@/lib/types/session';
+import { RecurrenceSelector } from '@/components/agenda/RecurrenceSelector';
+import { DeleteScopeDialog } from '@/components/agenda/DeleteScopeDialog';
+import { PacienteDrawer } from '@/components/pacientes/PacienteDrawer';
+import type { Patient, CreatePatientDto } from '@/lib/types/api.types';
+import { SessionType, SessionStatus, SessionDeleteScope } from '@/lib/types/session';
+import type { CreateSessionDto, SessionResponse, SessionRecurrence } from '@/lib/types/session';
 
 // Format date-time keeping the user's local offset so the backend stores the expected slot
 const formatLocalDateTime = (date: Date) => {
@@ -38,7 +41,7 @@ interface TurnoDrawerProps {
   pacienteId?: string | number;
   initialDate?: Date; // Pre-fill date when creating from calendar selection
   onSave: (session: CreateSessionDto) => Promise<void>;
-  onDelete?: (sessionId: string) => Promise<void>;
+  onDelete?: (sessionId: string, scope?: SessionDeleteScope) => Promise<void>;
 }
 
 /**
@@ -56,6 +59,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
   const { user } = useAuth();
   const fetchPatientById = usePatientStore(state => state.fetchPatientById);
   const selectedPatientFromStore = usePatientStore(state => state.selectedPatient);
+  const createPatient = usePatientStore(state => state.createPatient);
   
   // Store the full patient data (with email) when a patient is selected
   const [fullPatientData, setFullPatientData] = useState<Patient | null>(null);
@@ -70,6 +74,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     sessionType: SessionType.REMOTE,
     estado: SessionStatus.PENDING,
     monto: '' as string | number,
+    recurrence: undefined as SessionRecurrence | undefined,
   });
 
   const [selectedDuration, setSelectedDuration] = useState(() => {
@@ -82,9 +87,37 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     } catch { /* use fallback */ }
     return 60;
   });
+  const defaultSessionCost = useMemo(() => {
+    try {
+      const stored = localStorage.getItem('lavenius_settings');
+      if (stored) {
+        const settings = JSON.parse(stored);
+        if (settings.defaultSessionCost != null) return settings.defaultSessionCost as number;
+      }
+    } catch { /* ignore */ }
+    return null;
+  }, []);
+  const workingHours = useMemo(() => {
+    try {
+      const stored = localStorage.getItem('lavenius_settings');
+      if (stored) {
+        const settings = JSON.parse(stored);
+        if (settings.workingHours) return settings.workingHours as { startTime: string; endTime: string; workingDays: number[] };
+      }
+    } catch { /* ignore */ }
+    return { startTime: '09:00', endTime: '18:00', workingDays: [1, 2, 3, 4, 5] };
+  }, []);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteScopeDialog, setShowDeleteScopeDialog] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const [showOutsideHoursAlert, setShowOutsideHoursAlert] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showNewPatientDrawer, setShowNewPatientDrawer] = useState(false);
+
+  // Memoized callback to prevent RecurrenceSelector infinite loop
+  const handleRecurrenceChange = useCallback((recurrence: SessionRecurrence | undefined) => {
+    setFormData(prev => ({ ...prev, recurrence }));
+  }, []);
 
   // Load session data when editing
   useEffect(() => {
@@ -104,6 +137,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         sessionType: session.sessionType,
         estado: session.status,
         monto: session.cost ?? '',
+        recurrence: undefined, // Not editable when updating existing sessions
       });
     } else {
       // Reset form when creating new session
@@ -115,7 +149,8 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         motivo: '',
         sessionType: SessionType.REMOTE,
         estado: SessionStatus.PENDING,
-        monto: '' as string | number,
+        monto: (defaultSessionCost ?? '') as string | number,
+        recurrence: undefined as SessionRecurrence | undefined,
       };
       
       // Pre-fill date and time from calendar selection
@@ -202,14 +237,17 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       const [sh, sm] = formData.horaInicio.split(':').map(Number);
       const [eh, em] = formData.horaFin.split(':').map(Number);
       const diff = (eh * 60 + em) - (sh * 60 + sm);
-      if ([30, 45, 60, 90, 120].includes(diff)) {
+      if ([15, 20, 30, 40, 45, 60, 90, 120].includes(diff)) {
         setSelectedDuration(diff);
       }
     }
   }, [session, formData.horaInicio, formData.horaFin]);
 
   const durationOptions = [
+    { value: 15, labelKey: 'agenda.duration.fifteenMin' },
+    { value: 20, labelKey: 'agenda.duration.twentyMin' },
     { value: 30, labelKey: 'agenda.duration.thirtyMin' },
+    { value: 40, labelKey: 'agenda.duration.fortyMin' },
     { value: 45, labelKey: 'agenda.duration.fortyFiveMin' },
     { value: 60, labelKey: 'agenda.duration.oneHour' },
     { value: 90, labelKey: 'agenda.duration.ninetyMin' },
@@ -258,7 +296,19 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       toast.error(t('agenda.validation.enterAmount'));
       return;
     }
-    
+
+    // Check if booking is outside working hours (warn, don't block)
+    if (!session) {
+      const selectedDay = new Date(`${formData.fecha}T12:00:00`).getDay();
+      const isNonWorkingDay = !workingHours.workingDays.includes(selectedDay);
+      const isOutsideHours = formData.horaInicio < workingHours.startTime || formData.horaFin > workingHours.endTime;
+
+      if (isNonWorkingDay || isOutsideHours) {
+        setShowOutsideHoursAlert(true);
+        return;
+      }
+    }
+
     setShowSaveConfirm(true);
   };
 
@@ -294,6 +344,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
       type: formData.sessionType,
       status: formData.estado,
       cost: typeof formData.monto === 'number' && !isNaN(formData.monto) ? formData.monto : undefined,
+      recurrence: formData.recurrence,
     };
 
     setIsSaving(true);
@@ -319,6 +370,15 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
     }
   };
 
+  const handleDeleteClick = () => {
+    // If session has recurrenceId, show scope dialog
+    if (session?.recurrenceId) {
+      setShowDeleteScopeDialog(true);
+    } else {
+      setShowDeleteConfirm(true);
+    }
+  };
+
   const confirmDelete = async () => {
     if (session && onDelete) {
       setIsSaving(true);
@@ -333,6 +393,30 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         setIsSaving(false);
       }
     }
+  };
+
+  const confirmDeleteWithScope = async (scope: SessionDeleteScope) => {
+    if (session && onDelete) {
+      setIsSaving(true);
+      try {
+        await onDelete(session.id, scope);
+        setShowDeleteScopeDialog(false);
+        onClose();
+      } catch {
+        // Error is handled by parent component
+        setShowDeleteScopeDialog(false);
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  };
+
+  const handleInlineCreatePatient = async (patientDto: CreatePatientDto) => {
+    const newPatient = await createPatient(patientDto);
+    // Auto-select the newly created patient
+    setFormData(prev => ({ ...prev, pacienteId: newPatient.id }));
+    setShowNewPatientDrawer(false);
+    toast.success(t('agenda.drawer.patientCreated'));
   };
 
   return (
@@ -354,21 +438,34 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               <User className="w-4 h-4" />
               {t('agenda.fields.patient')} <span className="text-red-500">{t('agenda.drawer.required')}</span>
             </label>
-            <NativeSelect
-              id="turno-paciente"
-              value={formData.pacienteId}
-              onChange={(e) => setFormData({ ...formData, pacienteId: e.target.value })}
-              className="w-full"
-              aria-invalid={!formData.pacienteId}
-              required
-            >
-              <option value="">{t('agenda.drawer.selectPatient')}</option>
-              {patients.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.firstName} {p.lastName}
-                </option>
-              ))}
-            </NativeSelect>
+            <div className="flex gap-2">
+              <NativeSelect
+                id="turno-paciente"
+                value={formData.pacienteId}
+                onChange={(e) => setFormData({ ...formData, pacienteId: e.target.value })}
+                className="flex-1"
+                aria-invalid={!formData.pacienteId}
+                required
+              >
+                <option value="">{t('agenda.drawer.selectPatient')}</option>
+                {patients.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.firstName} {p.lastName}
+                  </option>
+                ))}
+              </NativeSelect>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setShowNewPatientDrawer(true)}
+                title={t('agenda.drawer.createPatient')}
+                aria-label={t('agenda.drawer.createPatient')}
+                className="shrink-0"
+              >
+                <UserPlus className="w-4 h-4" />
+              </Button>
+            </div>
             {/* Loading indicator or email status */}
             {formData.pacienteId && isLoadingPatient && (
               <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
@@ -417,7 +514,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
                 onChange={(e) => handleStartTimeChange(e.target.value)}
                 className="w-full"
               >
-                {['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00'].map((h) => (
+                {['08:00', '08:15', '08:30', '08:45', '09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00', '16:15', '16:30', '16:45', '17:00', '17:15', '17:30', '17:45', '18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30', '19:45', '20:00'].map((h) => (
                   <option key={h} value={h}>{h}</option>
                 ))}
               </NativeSelect>
@@ -503,7 +600,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               aria-describedby="monto-error"
               required
               min="0"
-              placeholder="0"
+              placeholder={defaultSessionCost != null ? String(defaultSessionCost) : '0'}
             />
             {!isMontoValid && (
               <p id="monto-error" className="text-sm text-red-500 mt-1">
@@ -511,6 +608,15 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               </p>
             )}
           </div>
+
+          {/* Recurrence (only when creating new sessions) */}
+          {!isEditing && (
+            <RecurrenceSelector
+              value={formData.recurrence}
+              onChange={handleRecurrenceChange}
+              sessionDate={formData.fecha}
+            />
+          )}
         </DrawerBody>
 
         <DrawerFooter>
@@ -528,15 +634,22 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           )}
           <Button
             onClick={handleSave}
-            disabled={!isFormValid}
+            disabled={!isFormValid || isSaving}
             className="flex-1"
           >
-            {isEditing ? t('agenda.drawer.saveChanges') : t('agenda.drawer.createAppointment')}
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                {t('common.saving')}
+              </>
+            ) : (
+              isEditing ? t('agenda.drawer.saveChanges') : t('agenda.drawer.createAppointment')
+            )}
           </Button>
           {isEditing && onDelete && (
             <Button
               variant="destructive"
-              onClick={() => setShowDeleteConfirm(true)}
+              onClick={handleDeleteClick}
               className="px-6"
             >
               {t('common.delete')}
@@ -544,6 +657,25 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
           )}
         </DrawerFooter>
       </BaseDrawer>
+
+      {/* Outside Working Hours Alert */}
+      <ConfirmDialog
+        open={showOutsideHoursAlert}
+        onOpenChange={setShowOutsideHoursAlert}
+        title={t('agenda.outsideHours.title')}
+        description={t('agenda.outsideHours.description', {
+          start: workingHours.startTime,
+          end: workingHours.endTime,
+        })}
+        confirmLabel={t('agenda.outsideHours.confirm')}
+        cancelLabel={t('common.cancel')}
+        variant="default"
+        icon={Clock}
+        onConfirm={() => {
+          setShowOutsideHoursAlert(false);
+          setShowSaveConfirm(true);
+        }}
+      />
 
       {/* Save Confirmation Dialog */}
       <ConfirmDialog
@@ -563,7 +695,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         isLoading={isSaving}
       />
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation Dialog (for non-recurring sessions) */}
       <ConfirmDialog
         open={showDeleteConfirm}
         onOpenChange={setShowDeleteConfirm}
@@ -574,6 +706,21 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
         variant="danger"
         onConfirm={confirmDelete}
         isLoading={isSaving}
+      />
+
+      {/* Delete Scope Dialog (for recurring sessions) */}
+      <DeleteScopeDialog
+        open={showDeleteScopeDialog}
+        onOpenChange={setShowDeleteScopeDialog}
+        onConfirm={confirmDeleteWithScope}
+        isLoading={isSaving}
+      />
+
+      {/* Inline Patient Creation Drawer */}
+      <PacienteDrawer
+        isOpen={showNewPatientDrawer}
+        onClose={() => setShowNewPatientDrawer(false)}
+        onSave={handleInlineCreatePatient}
       />
     </>
   );

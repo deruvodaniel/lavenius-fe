@@ -379,6 +379,7 @@
     },
     "messages": {
       "createSuccess": "Appointment created successfully",
+      "createRecurringSuccess": "Recurring sessions created successfully",
       "updateSuccess": "Appointment updated successfully",
       "deleteSuccess": "Appointment deleted successfully",
       "cancelSuccess": "Appointment cancelled",
@@ -389,6 +390,7 @@
       "rescheduleSuccess": "Appointment rescheduled successfully",
       "rescheduleError": "Error rescheduling appointment",
       "conflictError": "There is already a session at this time. Please choose another time.",
+      "conflictErrorWithPatient": "{{patientName}} already has a session at this time. Please choose another time.",
       "scheduleConflict": "Schedule conflict. You already have a session scheduled at this time.",
       "pastDateError": "Cannot schedule appointments in the past. Please select a future date.",
       "patientNotFound": "Patient not found",
@@ -443,7 +445,9 @@
       "saving": "Saving...",
       "deleting": "Deleting...",
       "deleteConfirmTitle": "Delete appointment?",
-      "deleteConfirmDescription": "This action cannot be undone. The appointment will be permanently deleted."
+      "deleteConfirmDescription": "This action cannot be undone. The appointment will be permanently deleted.",
+      "createPatient": "Create new patient",
+      "patientCreated": "Patient created and selected"
     },
     "card": {
       "paid": "Paid",
@@ -457,6 +461,7 @@
     },
     "details": {
       "title": "Session Details",
+      "description": "Complete session information",
       "patient": "Patient",
       "noPatient": "No patient",
       "editSession": "Edit Session",
@@ -488,6 +493,11 @@
       "morning": "Morning",
       "afternoon": "Afternoon"
     },
+    "outsideHours": {
+      "title": "Outside working hours",
+      "description": "You are scheduling outside your configured working hours ({{start}} - {{end}}). Do you want to continue anyway?",
+      "confirm": "Schedule anyway"
+    },
     "legend": {
       "scheduled": "Scheduled",
       "confirmed": "Confirmed",
@@ -495,12 +505,56 @@
     },
     "duration": {
       "label": "Duration",
+      "fifteenMin": "15 min",
+      "twentyMin": "20 min",
       "thirtyMin": "30 min",
+      "fortyMin": "40 min",
       "fortyFiveMin": "45 min",
       "oneHour": "1 hour",
       "ninetyMin": "1.5 hours",
       "twoHours": "2 hours",
       "custom": "Custom"
+    },
+    "recurrence": {
+      "enableRecurrence": "Repeat session",
+      "enableRecurrenceDescription": "Create multiple sessions with this pattern",
+      "type": "Recurrence type",
+      "types": {
+        "workingDays": "Working days (Monday to Friday)",
+        "weekly": "Weekly",
+        "biweekly": "Biweekly (every 2 weeks)",
+        "monthly": "Monthly"
+      },
+      "until": "Repeat until",
+      "untilPlaceholder": "Select end date",
+      "untilHelp": "Sessions will be created until this date",
+      "daysOfWeek": {
+        "label": "Days of the week",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "sessionDay": "session day",
+      "validation": {
+        "mustIncludeSessionDay": "Must include the selected session day"
+      }
+    },
+    "deleteScope": {
+      "title": "Delete recurring sessions",
+      "description": "This session is part of a series. What would you like to delete?",
+      "single": {
+        "title": "Only this session",
+        "description": "Delete only this session. Other sessions in the series will not be affected."
+      },
+      "thisAndFuture": {
+        "title": "This and following sessions",
+        "description": "Delete this session and all future ones in the series. Past sessions will not be affected."
+      },
+      "hint": "Tip: Past sessions are never automatically deleted."
     }
   },
   "payments": {
@@ -619,7 +673,8 @@
       "monthlyDiscount": "Monthly plan discount (10%)",
       "totalMonthlyPlan": "Total monthly plan",
       "saveChanges": "Save Changes",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "sessionNotFound": "Session not found"
     },
     "comingSoon": {
       "title": "Coming Soon",
@@ -797,6 +852,12 @@
       "description": "Sessions will use this duration by default. You can change it per session.",
       "custom": "Custom",
       "customMinutes": "minutes"
+    },
+    "defaultCost": {
+      "title": "Default Session Price",
+      "description": "Will be used as the initial value when scheduling a new appointment. You can change it per session.",
+      "placeholder": "e.g. 50",
+      "hint": "Leave empty for no default"
     },
     "theme": {
       "title": "Appearance",
@@ -1051,6 +1112,8 @@
       "title": "Set up your account",
       "subtitle": "Complete these steps to get the most out of Lavenius",
       "progress": "{{completed}} of {{total}} completed",
+      "completeTitle": "Setup complete!",
+      "completeSubtitle": "You're all set. Enjoy using Lavenius!",
       "dismissHint": "You can show this card again from the dashboard settings menu",
       "steps": {
         "configureProfile": "Configure your professional profile",
@@ -1365,7 +1428,7 @@
     "security": {
       "title": "Clinical-grade security",
       "description": "All your patient data is protected with end-to-end encryption. We comply with the highest security standards to protect sensitive information.",
-      "encryption": "AES encryption",
+      "encryption": "End-to-end encryption",
       "e2e": "End-to-end"
     },
     "socialProof": {
@@ -1409,8 +1472,8 @@
         },
         "encryption": {
           "title": "Real encryption",
-          "description": "AES encryption end-to-end. Not just a HIPAA logo at the bottom of the page, but real protection.",
-          "highlight": "AES"
+          "description": "End-to-end encryption. Not just a HIPAA logo at the bottom of the page, but real protection.",
+          "highlight": "E2E Encryption"
         },
         "localPricing": {
           "title": "Transparent pricing",
@@ -1482,7 +1545,7 @@
       "popular": "Most Popular",
       "cta": "Get started",
       "trustBadges": {
-        "encryption": "AES Encryption",
+        "encryption": "E2E Encryption",
         "cancelAnytime": "Cancel anytime",
         "freeTrial": "14-day free trial"
       },
@@ -1667,6 +1730,7 @@
       "completeSetup": "Complete Setup",
       "success": "Profile configured successfully!",
       "error": "Error saving data. Please try again.",
+      "errorClerk": "Could not update your profile. Check your connection and try again.",
       "stepNames": {
         "professional": "Professional",
         "contact": "Contact",
@@ -1726,7 +1790,7 @@
         "passphraseMinLength": "Passphrase must be at least {{count}} characters",
         "passphraseMismatch": "Passphrases do not match",
         "recoveryAcknowledged": "You must confirm you saved your recovery phrase.",
-        "recoveryCodeUnavailable": "We could not generate your recovery phrase. Try again."
+        "consentRequired": "You must accept the privacy and encryption terms to continue"
       },
       "registerError": "We could not register your backend user. Please try again.",
       "recovery": {
@@ -1741,6 +1805,11 @@
         "copyError": "Could not copy recovery phrase.",
         "fileTitle": "Lavenius Recovery Phrase",
         "fileWarning": "Important: without this phrase (or your passphrase) you cannot recover your E2E data."
+      },
+      "consent": {
+        "title": "Data Protection with End-to-End Encryption",
+        "description": "Lavenius uses end-to-end encryption to protect your patients' sensitive data. This means only you can access the clinical information — not even we can read it.",
+        "label": "I accept that my clinical data will be protected with end-to-end encryption and I understand that I am solely responsible for my access key."
       }
     }
   },

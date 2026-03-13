@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useResponsive } from '@/lib/hooks';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import {
@@ -174,6 +174,9 @@ export function SessionDetailsModal({
             <span>{t('agenda.details.title')}</span>
             {statusBadge}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            {t('agenda.details.description')}
+          </DialogDescription>
         </DialogHeader>
         <SessionDetailsContent session={session} isPaid={isPaid} />
         {actionButtons}

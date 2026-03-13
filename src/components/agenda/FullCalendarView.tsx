@@ -126,24 +126,27 @@ interface FullCalendarViewProps {
   onEventClick?: (session: SessionUI) => void;
   onDateSelect?: (start: Date, end: Date) => void;
   onEventDrop?: (sessionId: string, newStart: Date, newEnd: Date) => void;
+  /** Called when the visible date range changes (month navigation) */
+  onDatesSet?: (start: Date, end: Date) => void;
   isSessionPaid?: (sessionId: string) => boolean;
   /** Fallback function to get patient name when session.patientName is not available */
   getPatientNameFallback?: (patientId: string | undefined) => string | undefined;
 }
 
-export function FullCalendarView({ 
-  sessions, 
+export function FullCalendarView({
+  sessions,
   isLoading = false,
-  onEventClick, 
+  onEventClick,
   onDateSelect,
   onEventDrop,
+  onDatesSet,
   isSessionPaid,
   getPatientNameFallback
 }: FullCalendarViewProps) {
   const { t } = useTranslation();
   const calendarRef = useRef<FullCalendar>(null);
   const { isMobile } = useResponsive();
-  
+
   // Default to day view on both mobile and desktop
   const defaultView = 'timeGridDay';
   const [currentView, setCurrentView] = useState(defaultView);
@@ -182,11 +185,8 @@ export function FullCalendarView({
     }
   }, [isMobile, currentView]);
 
-  // Note: Working hours settings are loaded but not used for restrictions
-  // They will be used for the public profile feature to share availability with patients
-  // For now, professionals can schedule at any time
+  // Working hours from user settings — used for businessHours display (graying non-work time)
   const calendarSettings = useMemo(() => loadCalendarSettings(), []);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { workingHours } = calendarSettings;
   
   // Get days off from the settings store (API)
@@ -212,11 +212,10 @@ export function FullCalendarView({
       .flatMap(convertApiDayOffToCalendarFormat);
   }, [allSettings, fetchStatus]);
 
-  // Generate a key based on sessions data to force FullCalendar to re-render when sessions change
-  const calendarKey = useMemo(() => {
-    if (!sessions || !Array.isArray(sessions)) return 'empty';
-    return sessions.map(s => `${s.id}-${s.status}-${s.scheduledFrom}`).join('|');
-  }, [sessions]);
+  // Stable key — FullCalendar updates events reactively via the `events` prop.
+  // Using a data-derived key forces a full re-mount on every session change,
+  // losing navigation state (current month/view). A static key avoids this.
+  const calendarKey = 'agenda-calendar';
 
   // Check if a date is a día off (returns the día off if it matches date AND time)
   const isDiaOff = (date: Date): DiaOff | undefined => {
@@ -249,6 +248,7 @@ export function FullCalendarView({
   // Convert sessions to FullCalendar events (filter out cancelled sessions)
   const sessionEvents = useMemo(() => {
     if (!sessions || !Array.isArray(sessions)) return [];
+
     return sessions
       .filter(session => session.status !== SessionStatus.CANCELLED)
       .map(session => {
@@ -259,10 +259,10 @@ export function FullCalendarView({
 
         const isPaid = isSessionPaid?.(session.id) ?? false;
         const className = `session-${session.status}`;
-        
+
         // Try to get patient name from session, or use fallback
-        const patientName = session.patientName 
-          || getPatientNameFallback?.(session.patient?.id) 
+        const patientName = session.patientName
+          || getPatientNameFallback?.(session.patient?.id)
           || t('agenda.details.noPatient');
 
         return {
@@ -528,6 +528,7 @@ export function FullCalendarView({
           eventClick={handleEventClick}
           select={handleDateSelect}
           eventDrop={handleEventDrop}
+          datesSet={(dateInfo) => onDatesSet?.(dateInfo.start, dateInfo.end)}
           selectable={true}
           selectMirror={true}
           dayMaxEvents={true}
@@ -541,6 +542,11 @@ export function FullCalendarView({
             week: 'Semana',
             day: 'Día',
             list: 'Lista',
+          }}
+          businessHours={{
+            daysOfWeek: workingHours.workingDays,
+            startTime: workingHours.startTime,
+            endTime: workingHours.endTime,
           }}
           slotMinTime="07:00:00"
           slotMaxTime="22:00:00"

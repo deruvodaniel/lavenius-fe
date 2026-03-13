@@ -12,8 +12,8 @@ import { usePayments } from '@/lib/hooks/usePayments';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { patientService } from '@/lib/services/patient.service';
 import { formatTurnoReminderMessage, openWhatsApp } from '@/lib/utils/whatsappTemplates';
-import { getErrorMessage } from '@/lib/utils/error';
-import type { CreateSessionDto, SessionResponse, UpdateSessionDto } from '@/lib/types/session';
+import { getErrorMessage, isConflictError } from '@/lib/utils/error';
+import type { CreateSessionDto, SessionResponse, UpdateSessionDto, SessionDeleteScope } from '@/lib/types/session';
 import type { Patient } from '@/lib/types/api.types';
 
 export type ViewMode = 'list' | 'calendar' | 'both';
@@ -50,7 +50,7 @@ const sanitizeString = (value: string | undefined): string => {
 
 export function useAgenda() {
   const { t } = useTranslation();
-  const { sessionsUI, isLoading, error, fetchUpcoming, createSession, updateSession, deleteSession, clearError } = useSessions();
+  const { sessionsUI, isLoading, error, fetchUpcoming, fetchMonthly, createSession, updateSession, deleteSession, clearError } = useSessions();
   const { patients, selectedPatient, fetchPatients, fetchPatientById, setSelectedPatient } = usePatients();
   const { isSessionPaid, fetchPayments } = usePayments();
   const { isMobile, isDesktop } = useResponsive();
@@ -297,6 +297,13 @@ export function useAgenda() {
           updateData.scheduledTo = sessionData.scheduledTo;
         }
 
+        // Include patientId + attendeeEmail when patient changed
+        const patientChanged = sessionData.patientId !== selectedSession.patient?.id;
+        if (patientChanged) {
+          updateData.patientId = sessionData.patientId;
+          updateData.attendeeEmail = sessionData.attendeeEmail;
+        }
+
         if (sessionData.status) updateData.status = sessionData.status;
         if (sessionData.sessionSummary !== undefined) updateData.sessionSummary = sessionData.sessionSummary;
         if (sessionData.cost !== undefined) updateData.cost = sessionData.cost;
@@ -307,8 +314,34 @@ export function useAgenda() {
         await Promise.all([fetchUpcoming(), fetchPayments(true)]);
       } else {
         await createSession(sessionData);
-        toast.success(t('agenda.messages.createSuccess'));
-        await Promise.all([fetchUpcoming(), fetchPayments(true)]);
+
+        // If creating recurring sessions, show specific success message
+        if (sessionData.recurrence) {
+          toast.success(t('agenda.messages.createRecurringSuccess') || 'Sesiones recurrentes creadas exitosamente');
+
+          // Fetch all months the recurrence spans so the calendar shows every occurrence
+          const startDate = new Date(sessionData.scheduledFrom);
+          const endDate = sessionData.recurrence.until
+            ? new Date(sessionData.recurrence.until)
+            : new Date(startDate.getFullYear(), startDate.getMonth() + 2, 0);
+
+          const monthFetches: Promise<void>[] = [];
+          const cursor = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+          const endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+          while (cursor <= endMonth) {
+            monthFetches.push(fetchMonthly(cursor.getFullYear(), cursor.getMonth() + 1));
+            cursor.setMonth(cursor.getMonth() + 1);
+          }
+
+          await Promise.all([
+            fetchUpcoming(),
+            ...monthFetches,
+            fetchPayments(true)
+          ]);
+        } else {
+          toast.success(t('agenda.messages.createSuccess'));
+          await Promise.all([fetchUpcoming(), fetchPayments(true)]);
+        }
       }
       setTurnoDrawerOpen(false);
       setSelectedSession(null);
@@ -316,23 +349,29 @@ export function useAgenda() {
       console.error('Error saving session:', error);
 
       let errorMessage = t('agenda.messages.saveError');
-      const errMsg = getErrorMessage(error, '');
 
-      if (errMsg.includes('already exists')) {
-        errorMessage = t('agenda.messages.conflictError');
-      } else if (errMsg) {
-        errorMessage = errMsg;
+      if (isConflictError(error)) {
+        const paciente = pacientes.find(p => p.id === sessionData.patientId);
+        const patientName = paciente?.nombre || '';
+        errorMessage = patientName
+          ? t('agenda.messages.conflictErrorWithPatient', { patientName })
+          : t('agenda.messages.conflictError');
+      } else {
+        const errMsg = getErrorMessage(error, '');
+        if (errMsg) errorMessage = errMsg;
       }
 
       toast.error(errorMessage);
     }
-  }, [selectedSession, updateSession, createSession, fetchUpcoming, fetchPayments, t]);
+  }, [selectedSession, updateSession, createSession, fetchUpcoming, fetchMonthly, fetchPayments, pacientes, t]);
 
-  const handleDeleteTurno = useCallback(async (sessionId: string) => {
+  const handleDeleteTurno = useCallback(async (sessionId: string, scope?: SessionDeleteScope) => {
     try {
-      await deleteSession(sessionId);
+      await deleteSession(sessionId, scope);
       toast.success(t('agenda.messages.deleteSuccess'));
       setTurnoDrawerOpen(false);
+      // When deleting with scope 'this_and_future', multiple sessions are deleted
+      // Refresh both upcoming and monthly views to sync state
       await Promise.all([fetchUpcoming(), fetchPayments(true)]);
     } catch (error: unknown) {
       console.error('Error deleting session:', error);
@@ -431,6 +470,23 @@ export function useAgenda() {
     }
   }, [updateSession, fetchUpcoming, t]);
 
+  /**
+   * Fetch monthly sessions for every month visible in the calendar.
+   * Called by FullCalendar's datesSet callback when the user navigates.
+   */
+  const handleDatesSet = useCallback(async (start: Date, end: Date) => {
+    const cursor = new Date(start.getFullYear(), start.getMonth(), 1);
+    const endMonth = new Date(end.getFullYear(), end.getMonth(), 1);
+
+    const fetches: Promise<void>[] = [];
+    while (cursor <= endMonth) {
+      fetches.push(fetchMonthly(cursor.getFullYear(), cursor.getMonth() + 1));
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+
+    await Promise.all(fetches);
+  }, [fetchMonthly]);
+
   return {
     // State
     isLoading,
@@ -494,5 +550,6 @@ export function useAgenda() {
     handleSelectPatient,
     handleBackFromFicha,
     handleEventDrop,
+    handleDatesSet,
   };
 }

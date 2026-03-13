@@ -21,6 +21,36 @@ export enum SessionType {
 }
 
 /**
+ * Session Recurrence Type
+ * Tipo de recurrencia para sesiones periódicas
+ */
+export enum SessionRecurrenceType {
+  WORKING_DAYS = 'working_days',
+  WEEKLY = 'weekly',
+  BIWEEKLY = 'biweekly',
+  MONTHLY = 'monthly'
+}
+
+/**
+ * Session Delete Scope
+ * Alcance de eliminación para sesiones recurrentes
+ */
+export enum SessionDeleteScope {
+  SINGLE = 'single',
+  THIS_AND_FUTURE = 'this_and_future'
+}
+
+/**
+ * Session Recurrence Configuration
+ * Configuración de recurrencia para crear sesiones periódicas
+ */
+export interface SessionRecurrence {
+  type: SessionRecurrenceType;
+  until: string; // ISO 8601 date string
+  daysOfWeek?: number[]; // Array of numbers 1-7 (1=Monday, 7=Sunday)
+}
+
+/**
  * Session Response
  * Estructura de respuesta del backend para una sesión
  */
@@ -34,7 +64,9 @@ export interface SessionResponse {
   externalEventId?: string; // Google Calendar event ID
   cost?: number;
   sessionType: SessionType;
-  meetLink?: string; // Only for remote sessions
+  recurrenceId?: string | null; // ID del grupo de recurrencia
+  recurrenceUntil?: string | null; // ISO 8601 date string - fecha hasta la cual se repite
+  recurrenceRule?: Record<string, unknown> | null; // Regla de recurrencia (JSON del backend)
   createdAt: string;
   updatedAt: string;
   therapist?: TherapistInfo;
@@ -55,6 +87,7 @@ export interface CreateSessionDto {
   sessionSummary?: string;
   type: SessionType;
   cost?: number;
+  recurrence?: SessionRecurrence; // Configuración de recurrencia opcional
 }
 
 /**
@@ -64,6 +97,8 @@ export interface CreateSessionDto {
 export interface UpdateSessionDto {
   scheduledFrom?: string;
   scheduledTo?: string;
+  patientId?: string;
+  attendeeEmail?: string;
   status?: SessionStatus;
   sessionSummary?: string;
   cost?: number;
