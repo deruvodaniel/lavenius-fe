@@ -14,6 +14,7 @@ interface ValidationErrors {
   nombre?: string;
   apellido?: string;
   telefono?: string;
+  alternativePhone?: string;
   email?: string;
   edad?: string;
   frecuenciaOtra?: string;
@@ -97,6 +98,7 @@ const getInitialFormData = () => ({
   apellido: '',
   edad: '',
   telefono: '',
+  alternativePhone: '',
   email: '',
   coberturaMedica: '',
   tipoSesion: 'presential' as PatientSessionType,
@@ -169,6 +171,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
       apellido: patient.lastName || '',
       edad: patient.age?.toString() || '',
       telefono: patient.phone || '',
+      alternativePhone: patient.alternativePhone || '',
       email: patient.email || '',
       coberturaMedica: patient.healthInsurance || '',
       tipoSesion: (patient.sessionType as PatientSessionType) || 'presential',
@@ -195,6 +198,8 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
       case 'email':
         return !validateEmail(value) ? t('patients.drawer.validation.invalidEmail') : undefined;
       case 'telefono':
+        return !validatePhone(value) ? t('patients.drawer.validation.invalidPhone') : undefined;
+      case 'alternativePhone':
         return !validatePhone(value) ? t('patients.drawer.validation.invalidPhone') : undefined;
       case 'edad':
         return !validateAge(value) ? t('patients.drawer.validation.invalidAge') : undefined;
@@ -228,6 +233,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
       apellido: validateField('apellido', formData.apellido, formData),
       email: validateField('email', formData.email, formData),
       telefono: validateField('telefono', formData.telefono, formData),
+      alternativePhone: validateField('alternativePhone', formData.alternativePhone, formData),
       edad: validateField('edad', formData.edad, formData),
       frecuenciaOtra: validateField('frecuenciaOtra', formData.frecuenciaOtra, formData),
     };
@@ -238,6 +244,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
       apellido: true,
       email: true,
       telefono: true,
+      alternativePhone: true,
       edad: true,
       frecuenciaOtra: true,
     });
@@ -256,12 +263,14 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
       ? formData.frecuenciaOtra 
       : formData.frecuencia;
     const normalizedPhone = normalizeOptionalPhone(formData.telefono);
+    const normalizedAlternativePhone = normalizeOptionalPhone(formData.alternativePhone);
 
     const patientDto: CreatePatientDto = {
       firstName: formData.nombre.trim(),
       lastName: formData.apellido.trim(),
       email: formData.email.trim() || undefined,
       phone: normalizedPhone || undefined,
+      alternativePhone: normalizedAlternativePhone || undefined,
       age: formData.edad ? Number(formData.edad) : undefined,
       healthInsurance: formData.coberturaMedica.trim() || undefined,
       sessionType: formData.tipoSesion as SessionType,
@@ -288,7 +297,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
   };
 
   const isFormValid = formData.nombre.trim() && formData.apellido.trim() && 
-    !errors.nombre && !errors.apellido && !errors.email && !errors.telefono && !errors.edad &&
+    !errors.nombre && !errors.apellido && !errors.email && !errors.telefono && !errors.alternativePhone && !errors.edad &&
     (formData.frecuencia !== 'otra' || formData.frecuenciaOtra.trim());
 
   const isSubmitting = isSaving || isLoading;
@@ -386,6 +395,21 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
                 aria-invalid={!!(errors.telefono && touched.telefono)}
               />
               <InputError error={touched.telefono ? errors.telefono : undefined} />
+            </div>
+
+            <div>
+              <label htmlFor="paciente-telefono-alternativo" className="flex items-center gap-2 text-foreground mb-2">
+                <Phone className="w-4 h-4" />
+                {t('patients.fields.alternativePhone')}
+              </label>
+              <PhoneInput
+                id="paciente-telefono-alternativo"
+                value={formData.alternativePhone}
+                onChange={(phone) => handleFieldChange('alternativePhone', phone)}
+                placeholder={t('patients.drawer.placeholders.alternativePhone')}
+                aria-invalid={!!(errors.alternativePhone && touched.alternativePhone)}
+              />
+              <InputError error={touched.alternativePhone ? errors.alternativePhone : undefined} />
             </div>
 
             <div>
