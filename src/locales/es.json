@@ -1384,7 +1384,14 @@
       "features": "Funciones",
       "pricing": "Planes",
       "faq": "Preguntas",
-      "contact": "Contacto"
+      "contact": "Contacto",
+      "privacyPolicy": "Política de Privacidad"
+    },
+    "purpose": {
+      "title": "Para qué sirve Lavenius",
+      "description": "Lavenius es una aplicación web para profesionales de la salud mental que permite gestionar pacientes, agendar sesiones, escribir notas clínicas, controlar cobros y enviar recordatorios desde una sola plataforma segura.",
+      "privacyLabel": "Consulta nuestra",
+      "privacyLink": "Política de Privacidad"
     },
     "hero": {
       "badge": "🔒 Tus datos, 100% protegidos",
