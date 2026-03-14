@@ -18,38 +18,44 @@ const HelpCenter = lazy(() => import('./components/help/HelpCenter').then(m => (
 const PublicProfile = lazy(() => import('./components/public/PublicProfile').then(m => ({ default: m.PublicProfile })));
 
 /**
- * Landing page wrapper that redirects authenticated users to dashboard
- * Only redirects ONCE after login - subsequent visits to landing are allowed
- * This improves UX by not requiring users to click "Dashboard" after login
+ * Landing page wrapper.
+ * Note: during Google OAuth verification we keep "/" always public.
  */
 function LandingRoute() {
-  const { isLoaded, isSignedIn } = useClerkAuth();
-  const { user } = useUser();
+  const { isLoaded } = useClerkAuth();
 
   // Show loading while Clerk initializes
   if (!isLoaded) {
     return <LoadingOverlay message="Cargando..." />;
   }
 
-  // If user is signed in, check if we should redirect
-  if (isSignedIn) {
-    const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
-    const redirectKey = `lavenius_redirected_${user?.id}`;
-    const hasRedirected = sessionStorage.getItem(redirectKey);
+  /*
+   * Previous redirect flow (kept here intentionally for future reference):
+   *
+   * const { isLoaded, isSignedIn } = useClerkAuth();
+   * const { user } = useUser();
+   *
+   * if (!isLoaded) {
+   *   return <LoadingOverlay message="Cargando..." />;
+   * }
+   *
+   * if (isSignedIn) {
+   *   const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
+   *   const redirectKey = `lavenius_redirected_${user?.id}`;
+   *   const hasRedirected = sessionStorage.getItem(redirectKey);
+   *
+   *   if (!hasRedirected) {
+   *     sessionStorage.setItem(redirectKey, 'true');
+   *
+   *     if (!hasCompletedOnboarding) {
+   *       return <Navigate to="/onboarding" replace />;
+   *     }
+   *     return <Navigate to="/dashboard" replace />;
+   *   }
+   * }
+   */
 
-    // Only redirect once per session (after login)
-    // If user manually navigates to landing later, they can see it
-    if (!hasRedirected) {
-      sessionStorage.setItem(redirectKey, 'true');
-      
-      if (!hasCompletedOnboarding) {
-        return <Navigate to="/onboarding" replace />;
-      }
-      return <Navigate to="/dashboard" replace />;
-    }
-  }
-
-  // Show landing page for non-authenticated users OR logged-in users who already redirected
+  // Current behavior: always show landing page (public route), even when signed in.
   return <Landing />;
 }
 
