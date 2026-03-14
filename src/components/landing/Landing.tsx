@@ -119,6 +119,14 @@ function NavBar() {
                 {t(`landing.nav.${link.key}`)}
               </Button>
             ))}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/privacy-policy')}
+              className="text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
+            >
+              {t('landing.nav.privacyPolicy')}
+            </Button>
           </div>
           
           {/* Right side: Language + Auth + Mobile Menu */}
@@ -197,6 +205,16 @@ function NavBar() {
                   {t(`landing.nav.${link.key}`)}
                 </Button>
               ))}
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  navigate('/privacy-policy');
+                  setMobileMenuOpen(false);
+                }}
+                className="justify-start px-4 py-3 h-auto text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50"
+              >
+                {t('landing.nav.privacyPolicy')}
+              </Button>
               <div className="pt-2 border-t border-border mt-2">
                 <div className="px-4 py-2">
                   <LanguageSwitcher variant="buttons" />
@@ -388,6 +406,31 @@ function HeroSection() {
               </div>
             </div>
           </AnimatedSection>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PurposeSection() {
+  const { t } = useTranslation();
+
+  return (
+    <section className="py-10 px-4 sm:px-6 lg:px-8 bg-background">
+      <div className="max-w-5xl mx-auto">
+        <div className="rounded-2xl border border-indigo-200/60 dark:border-indigo-900/60 bg-indigo-50/60 dark:bg-indigo-950/20 p-6 sm:p-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">
+            {t('landing.purpose.title')}
+          </h2>
+          <p className="text-muted-foreground leading-relaxed mb-3">
+            {t('landing.purpose.description')}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {t('landing.purpose.privacyLabel')}{' '}
+            <a href="/privacy-policy" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline underline-offset-2">
+              {t('landing.purpose.privacyLink')}
+            </a>
+          </p>
         </div>
       </div>
     </section>
@@ -1496,6 +1539,7 @@ export function Landing() {
     <div className="min-h-screen bg-background">
       <NavBar />
       <HeroSection />
+      <PurposeSection />
       <FeaturesSection />
       <AnalyticsSection />
       <RemindersSection />
