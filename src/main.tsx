@@ -64,8 +64,9 @@ if (!rootElement) {
   throw new Error('Root element not found');
 }
 
-if (seoFallbackElement) {
-  // Keep static fallback visible for non-JS crawlers, remove it once the app boots.
+if (seoFallbackElement && window.location.pathname !== '/') {
+  // Keep a visible purpose/app-name block on home for OAuth verification checks.
+  // Remove it on non-home routes so it doesn't interfere with app screens.
   seoFallbackElement.remove();
 }
 
