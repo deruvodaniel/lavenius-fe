@@ -58,16 +58,9 @@ declare global {
 }
 
 const rootElement = document.getElementById('root');
-const seoFallbackElement = document.getElementById('seo-fallback');
 
 if (!rootElement) {
   throw new Error('Root element not found');
-}
-
-if (seoFallbackElement && window.location.pathname !== '/') {
-  // Keep a visible purpose/app-name block on home for OAuth verification checks.
-  // Remove it on non-home routes so it doesn't interfere with app screens.
-  seoFallbackElement.remove();
 }
 
 const root = window.__laveniusRoot ?? createRoot(rootElement);
