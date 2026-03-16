@@ -58,9 +58,15 @@ declare global {
 }
 
 const rootElement = document.getElementById('root');
+const seoFallbackElement = document.getElementById('seo-fallback');
 
 if (!rootElement) {
   throw new Error('Root element not found');
+}
+
+if (seoFallbackElement) {
+  // Static fallback for crawlers/no-JS; remove for normal app rendering.
+  seoFallbackElement.remove();
 }
 
 const root = window.__laveniusRoot ?? createRoot(rootElement);
