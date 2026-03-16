@@ -1463,6 +1463,13 @@ function Footer() {
           >
             {t('landing.footer.privacyPolicy')}
           </a>
+          <span className="mx-2 text-gray-600">•</span>
+          <a
+            href="/terms-of-service"
+            className="text-indigo-400 hover:text-indigo-300 transition-colors"
+          >
+            {t('landing.footer.termsOfService')}
+          </a>
         </div>
       </div>
     </footer>
