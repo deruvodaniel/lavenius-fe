@@ -1,1 +1,3 @@
-export { Landing } from './Landing';
+export { PublicProfile } from './PublicProfile';
+export { PrivacyPolicy } from './PrivacyPolicy';
+export { TermsOfService } from './TermsOfService';
