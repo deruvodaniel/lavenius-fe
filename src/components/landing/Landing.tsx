@@ -412,6 +412,26 @@ function HeroSection() {
   );
 }
 
+function ComplianceBanner() {
+  const { t } = useTranslation();
+
+  return (
+    <section className="pt-16 px-4 sm:px-6 lg:px-8 bg-background border-b border-border">
+      <div className="max-w-7xl mx-auto py-3 text-sm text-muted-foreground">
+        <span className="font-semibold text-foreground">{t('landing.brand')}</span>{' '}
+        {t('landing.purpose.description')}{' '}
+        <a href="/privacy-policy" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline underline-offset-2">
+          {t('landing.footer.privacyPolicy')}
+        </a>
+        {' · '}
+        <a href="/terms-of-service" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline underline-offset-2">
+          {t('landing.footer.termsOfService')}
+        </a>
+      </div>
+    </section>
+  );
+}
+
 function PurposeSection() {
   const { t } = useTranslation();
 
@@ -1463,6 +1483,13 @@ function Footer() {
           >
             {t('landing.footer.privacyPolicy')}
           </a>
+          <span className="mx-2 text-gray-600">•</span>
+          <a
+            href="/terms-of-service"
+            className="text-indigo-400 hover:text-indigo-300 transition-colors"
+          >
+            {t('landing.footer.termsOfService')}
+          </a>
         </div>
       </div>
     </footer>
@@ -1538,6 +1565,7 @@ export function Landing() {
   return (
     <div className="min-h-screen bg-background">
       <NavBar />
+      <ComplianceBanner />
       <HeroSection />
       <PurposeSection />
       <FeaturesSection />

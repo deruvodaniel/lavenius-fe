@@ -1529,6 +1529,7 @@
       "rights": "Todos os direitos reservados.",
       "tagline": "Simplificando a gestão da sua prática terapêutica.",
       "privacyPolicy": "Política de Privacidade",
+      "termsOfService": "Termos e Condições",
       "contact": {
         "title": "Contato"
       },
@@ -1615,7 +1616,7 @@
         "controllerLabel": "Responsável pelo tratamento",
         "controllerValue": "Lavenius",
         "emailLabel": "Email de contato de privacidade",
-        "emailValue": "laveniut.net@gmail.com",
+        "emailValue": "lavenius.net@gmail.com",
         "addressLabel": "Endereço",
         "addressValue": "Atualmente não informado"
       },
@@ -1714,7 +1715,7 @@
           "Eliminação quando aplicável.",
           "Portabilidade de dados quando tecnicamente viável."
         ],
-        "contact": "Para exercer esses direitos: laveniut.net@gmail.com"
+        "contact": "Para exercer esses direitos: lavenius.net@gmail.com"
       },
       "transfers": {
         "title": "9. Transferências internacionais",
@@ -1731,9 +1732,92 @@
       "contact": {
         "title": "12. Contato",
         "emailLabel": "Email",
-        "emailValue": "laveniut.net@gmail.com",
+        "emailValue": "lavenius.net@gmail.com",
         "controllerLabel": "Responsável",
         "controllerValue": "Lavenius"
+      }
+    }
+  },
+  "termsOfService": {
+    "badge": "Legal",
+    "title": "Termos e Condições",
+    "backToHome": "Voltar ao início",
+    "lastUpdated": "Última atualização: 16 de março de 2026",
+    "intro": "Estes Termos e Condições regulam o uso do Lavenius. Ao criar uma conta ou utilizar a plataforma, você aceita estes termos.",
+    "sections": {
+      "acceptance": {
+        "title": "1. Aceitação",
+        "description": "Ao acessar ou usar o Lavenius, você concorda com estes Termos e Condições e com nossa Política de Privacidade."
+      },
+      "service": {
+        "title": "2. Serviço",
+        "description": "Lavenius é uma plataforma para profissionais de saúde mental que permite:",
+        "items": [
+          "Gerenciar pacientes e prontuários clínicos.",
+          "Agendar sessões e coordenar lembretes.",
+          "Controlar cobranças e pagamentos.",
+          "Integrar o Google Calendar quando habilitado pelo usuário."
+        ]
+      },
+      "eligibility": {
+        "title": "3. Elegibilidade e uso profissional",
+        "description": "A plataforma é destinada ao uso profissional. O usuário é responsável por cumprir as leis e normas aplicáveis em sua jurisdição."
+      },
+      "account": {
+        "title": "4. Conta e segurança",
+        "items": [
+          "Você deve fornecer informações corretas e mantê-las atualizadas.",
+          "Você é responsável pela confidencialidade das suas credenciais.",
+          "Você deve nos informar imediatamente sobre qualquer acesso não autorizado."
+        ]
+      },
+      "professionalUse": {
+        "title": "5. Dados clínicos e responsabilidade profissional",
+        "description": "O terapeuta é o único responsável pelo conteúdo clínico inserido na plataforma e pelo uso adequado dessas informações junto aos seus pacientes."
+      },
+      "prohibited": {
+        "title": "6. Usos proibidos",
+        "items": [
+          "Usar a plataforma para atividades ilegais ou não autorizadas.",
+          "Tentar comprometer a segurança ou integridade do serviço.",
+          "Acessar dados de terceiros sem autorização.",
+          "Usar o Lavenius para spam, fraude ou abuso."
+        ]
+      },
+      "google": {
+        "title": "7. Integrações com terceiros (Google)",
+        "description": "Se você conectar o Google Calendar, autoriza o uso desses dados apenas para funcionalidades solicitadas por você. O uso de dados do Google segue a Google API Services User Data Policy e os requisitos de Limited Use."
+      },
+      "billing": {
+        "title": "8. Planos, cobrança e alterações",
+        "items": [
+          "Planos e preços podem ser atualizados com aviso prévio razoável.",
+          "Falta de pagamento pode gerar limitação do serviço.",
+          "Você pode cancelar conforme as condições vigentes no momento do cancelamento."
+        ]
+      },
+      "availability": {
+        "title": "9. Disponibilidade do serviço",
+        "description": "Fazemos esforços razoáveis para manter o serviço disponível, mas não garantimos disponibilidade ininterrupta. Podem ocorrer manutenções, erros ou interrupções de terceiros."
+      },
+      "liability": {
+        "title": "10. Limitação de responsabilidade",
+        "description": "Na máxima extensão permitida por lei, o Lavenius não se responsabiliza por danos indiretos, incidentais ou consequentes decorrentes do uso do serviço."
+      },
+      "termination": {
+        "title": "11. Suspensão ou encerramento",
+        "description": "Podemos suspender ou encerrar contas que violem estes termos ou representem riscos de segurança, fraude ou abuso."
+      },
+      "changes": {
+        "title": "12. Alterações",
+        "description": "Podemos atualizar estes Termos e Condições. Publicaremos a versão vigente com a respectiva data de atualização."
+      },
+      "contact": {
+        "title": "13. Contato",
+        "emailLabel": "Email",
+        "emailValue": "lavenius.net@gmail.com",
+        "ownerLabel": "Responsável",
+        "ownerValue": "Lavenius"
       }
     }
   },

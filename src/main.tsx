@@ -65,7 +65,7 @@ if (!rootElement) {
 }
 
 if (seoFallbackElement) {
-  // Keep static fallback visible for non-JS crawlers, remove it once the app boots.
+  // Static fallback for crawlers/no-JS; remove for normal app rendering.
   seoFallbackElement.remove();
 }
 
