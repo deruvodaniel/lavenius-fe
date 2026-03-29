@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/ui/password-input';
 import { useE2EKey } from '@/lib/e2e';
 import { ApiClientError } from '@/lib/api/client';
 
@@ -110,9 +111,8 @@ export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
             <form className="space-y-4" onSubmit={handleUnlockSubmit}>
               <div className="space-y-2">
                 <Label htmlFor="unlock-passphrase">{t('e2eUnlock.fields.passphrase')}</Label>
-                <Input
+                <PasswordInput
                   id="unlock-passphrase"
-                  type="password"
                   value={passphrase}
                   onChange={(event) => setPassphrase(event.target.value)}
                   autoComplete="current-password"
@@ -159,9 +159,8 @@ export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="new-passphrase">{t('e2eUnlock.fields.newPassphrase')}</Label>
-                <Input
+                <PasswordInput
                   id="new-passphrase"
-                  type="password"
                   value={newPassphrase}
                   onChange={(event) => setNewPassphrase(event.target.value)}
                   autoComplete="new-password"
@@ -171,9 +170,8 @@ export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="confirm-passphrase">{t('e2eUnlock.fields.confirmPassphrase')}</Label>
-                <Input
+                <PasswordInput
                   id="confirm-passphrase"
-                  type="password"
                   value={confirmPassphrase}
                   onChange={(event) => setConfirmPassphrase(event.target.value)}
                   autoComplete="new-password"
