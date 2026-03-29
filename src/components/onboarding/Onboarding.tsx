@@ -393,7 +393,7 @@ export function Onboarding() {
         console.warn('Could not save extra data to localStorage:', storageError);
       }
 
-      // 6. Keep E2E key in memory for current session (no local persistence).
+      // 6. Keep E2E key available for current tab session (survives refresh, cleared when tab closes).
       setKeyFromOnboarding(userKey, 1);
 
       // 7. Update Clerk user metadata with all profile data

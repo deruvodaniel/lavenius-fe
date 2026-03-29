@@ -46,7 +46,7 @@ function isMissingBundleError(error: unknown): boolean {
 }
 
 export function E2EKeyProvider({ children }: E2EKeyProviderProps) {
-  const { isSignedIn, userId } = useAuth();
+  const { isLoaded, isSignedIn, userId } = useAuth();
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(() => !!getE2EKeyState().userKey);
   const bootstrappedUserRef = useRef<string | null>(null);
@@ -63,6 +63,25 @@ export function E2EKeyProvider({ children }: E2EKeyProviderProps) {
   }, []);
 
   useEffect(() => {
+    if (!isLoaded) {
+      return;
+    }
+
+    if (!isSignedIn || !userId) {
+      return;
+    }
+
+    const currentKey = getE2EKeyState().userKey;
+    if (currentKey) {
+      apiClient.setUserKey(userKeyToBase64(currentKey));
+    }
+  }, [isLoaded, isSignedIn, userId]);
+
+  useEffect(() => {
+    if (!isLoaded) {
+      return;
+    }
+
     if (!isSignedIn || !userId) {
       clearE2EUserKey();
       apiClient.clearUserKey();
@@ -82,7 +101,7 @@ export function E2EKeyProvider({ children }: E2EKeyProviderProps) {
     }
 
     previousUserIdRef.current = userId;
-  }, [isSignedIn, userId]);
+  }, [isLoaded, isSignedIn, userId]);
 
   useEffect(() => {
     if (!isSignedIn || !userId || !isUnlocked) {
