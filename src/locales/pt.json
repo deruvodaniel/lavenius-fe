@@ -2055,7 +2055,8 @@
       "forgotPassphrase": "Esqueci minha passphrase",
       "resetAndUnlock": "Redefinir e desbloquear",
       "recovering": "Recuperando...",
-      "backToPassphrase": "Voltar para passphrase"
+      "backToPassphrase": "Voltar para passphrase",
+      "signOutAndHome": "Sair e ir para o início"
     },
     "errors": {
       "invalidCredentials": "Não foi possível desbloquear seus dados. Verifique sua passphrase ou frase de recuperação.",

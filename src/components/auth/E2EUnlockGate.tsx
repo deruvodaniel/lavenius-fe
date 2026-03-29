@@ -1,6 +1,7 @@
 import { FormEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, KeyRound, Loader2, RefreshCw } from 'lucide-react';
+import { AlertCircle, KeyRound, Loader2, LogOut, RefreshCw } from 'lucide-react';
+import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -33,6 +34,7 @@ function getUnlockErrorMessage(error: unknown, t: (key: string) => string): stri
 
 export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
   const { t } = useTranslation();
+  const { signOut } = useClerkAuth();
   const { isUnlocked, isUnlocking, unlockWithPassphrase, recoverAndResetPassphrase } = useE2EKey();
   const [passphrase, setPassphrase] = useState('');
   const [recoverySecret, setRecoverySecret] = useState('');
@@ -40,6 +42,7 @@ export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
   const [confirmPassphrase, setConfirmPassphrase] = useState('');
   const [mode, setMode] = useState<'passphrase' | 'recovery'>('passphrase');
   const [error, setError] = useState<string | null>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const isRecoveryValid = useMemo(() => {
     return (
@@ -82,6 +85,15 @@ export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
       setMode('passphrase');
     } catch (recoveryError) {
       setError(getUnlockErrorMessage(recoveryError, t));
+    }
+  };
+
+  const handleSignOutToHome = async () => {
+    setIsSigningOut(true);
+    try {
+      await signOut({ redirectUrl: '/' });
+    } finally {
+      setIsSigningOut(false);
     }
   };
 
@@ -211,6 +223,26 @@ export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
               <span>{error}</span>
             </div>
           )}
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={isUnlocking || isSigningOut}
+            onClick={handleSignOutToHome}
+          >
+            {isSigningOut ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                {t('common.processing')}
+              </>
+            ) : (
+              <>
+                <LogOut className="w-4 h-4 mr-2" />
+                {t('e2eUnlock.actions.signOutAndHome')}
+              </>
+            )}
+          </Button>
         </CardContent>
       </Card>
     </div>

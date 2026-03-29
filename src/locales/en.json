@@ -2063,7 +2063,8 @@
       "forgotPassphrase": "I forgot my passphrase",
       "resetAndUnlock": "Reset and unlock",
       "recovering": "Recovering...",
-      "backToPassphrase": "Back to passphrase"
+      "backToPassphrase": "Back to passphrase",
+      "signOutAndHome": "Log out and go home"
     },
     "errors": {
       "invalidCredentials": "Could not unlock your data. Check your passphrase or recovery phrase.",

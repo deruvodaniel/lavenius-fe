@@ -2110,7 +2110,8 @@
       "forgotPassphrase": "Olvidé mi contraseña maestra",
       "resetAndUnlock": "Restablecer y desbloquear",
       "recovering": "Recuperando...",
-      "backToPassphrase": "Volver a contraseña maestra"
+      "backToPassphrase": "Volver a contraseña maestra",
+      "signOutAndHome": "Cerrar sesión e ir al inicio"
     },
     "errors": {
       "invalidCredentials": "No pudimos desbloquear tus datos. Revisa tu contraseña maestra o frase de recuperación.",
