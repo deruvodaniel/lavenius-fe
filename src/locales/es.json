@@ -166,6 +166,16 @@
       "validationErrorHint": "Por favor revisa que todos los campos estén correctos",
       "createAccountError": "Error al crear cuenta",
       "createAccountErrorHint": "Hubo un problema. Por favor intenta nuevamente."
+    },
+    "accountTypeSelection": {
+      "title": "¿Cómo vas a usar Lavenius?",
+      "description": "Selecciona tu tipo de cuenta para configurar tu experiencia.",
+      "therapistTitle": "Soy psicólogo/a",
+      "therapistDescription": "Configurar mi perfil profesional y acceder al dashboard.",
+      "patientTitle": "Soy paciente",
+      "patientDescription": "Acceder solo a páginas públicas de reserva mediante enlace.",
+      "success": "Tipo de cuenta guardado correctamente.",
+      "error": "No pudimos guardar tu tipo de cuenta. Intenta nuevamente."
     }
   },
   "patients": {
@@ -365,6 +375,7 @@
     },
     "status": {
       "scheduled": "Agendada",
+      "pendingApproval": "Pendiente de aprobación",
       "confirmed": "Confirmada",
       "completed": "Completada",
       "cancelled": "Cancelada",
@@ -944,6 +955,9 @@
       "contactInfo": "Información de contacto",
       "copied": "¡Enlace copiado!",
       "copyLink": "Copiar enlace del perfil",
+      "copyBookingLink": "Copiar enlace de reservas",
+      "bookingLinkCopied": "¡Enlace de reservas copiado!",
+      "bookingLinkUnavailable": "No pudimos generar el enlace de reservas todavía.",
       "noBio": "Sin biografía disponible",
       "noSpecialty": "Especialidad no especificada",
       "previewDescription": "Así verán los pacientes tu perfil",
@@ -2118,6 +2132,55 @@
       "rateLimited": "Demasiados intentos. Espera un momento y vuelve a intentar.",
       "invalidRecoveryInput": "Revisa la frase de recuperación y confirma la nueva contraseña maestra.",
       "generic": "No pudimos desbloquear tu información cifrada."
+    }
+  },
+  "publicBooking": {
+    "title": "Reservar sesión",
+    "description": "Selecciona un horario disponible y envía tu solicitud. La sesión quedará pendiente de aprobación.",
+    "emptySlots": "No hay horarios disponibles en este momento.",
+    "fields": {
+      "slot": "Horario",
+      "firstName": "Nombre",
+      "email": "Correo electrónico",
+      "phone": "Teléfono",
+      "sessionType": "Tipo de sesión",
+      "message": "Mensaje para el terapeuta (opcional)"
+    },
+    "actions": {
+      "refresh": "Actualizar",
+      "submit": "Solicitar reserva",
+      "submitting": "Enviando solicitud...",
+      "bookAnother": "Reservar otro horario",
+      "goHome": "Volver al inicio"
+    },
+    "details": {
+      "sessionDuration": "Duración de la sesión: {{minutes}} minutos"
+    },
+    "validation": {
+      "slotRequired": "Selecciona un horario para continuar.",
+      "pastSlot": "No puedes reservar horarios en el pasado.",
+      "firstNameRequired": "El nombre es obligatorio.",
+      "emailRequired": "Ingresa un email válido.",
+      "phoneRequired": "Ingresa un teléfono válido (mínimo 8 dígitos).",
+      "messageTooLong": "El mensaje no puede superar {{max}} caracteres."
+    },
+    "errors": {
+      "invalidTherapist": "No encontramos el terapeuta indicado.",
+      "therapistUnavailable": "Este terapeuta no está disponible para reservas públicas.",
+      "forbidden": "No tienes permisos para realizar esta acción.",
+      "conflict": "Ese horario ya no está disponible. Actualizamos la disponibilidad para que elijas otro.",
+      "rateLimited": "Demasiados intentos. Espera un momento e intenta nuevamente.",
+      "rateLimitedWithRetry": "Demasiados intentos. Intenta nuevamente en {{seconds}} segundos.",
+      "retryAfterHint": "Tiempo de espera sugerido: {{seconds}} segundos.",
+      "generic": "No pudimos procesar tu solicitud. Intenta nuevamente."
+    },
+    "success": {
+      "title": "Solicitud enviada",
+      "description": "Tu reserva fue registrada correctamente.",
+      "statusLabel": "Estado",
+      "bookingId": "ID de reserva",
+      "pendingHelp": "El terapeuta revisará tu solicitud y te confirmará el turno.",
+      "sessionDetailsTitle": "Detalles del turno"
     }
   },
   "errors": {

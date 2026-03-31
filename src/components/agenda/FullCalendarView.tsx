@@ -258,7 +258,8 @@ export function FullCalendarView({
         };
 
         const isPaid = isSessionPaid?.(session.id) ?? false;
-        const className = `session-${session.status}`;
+        const normalizedStatusClass = session.status === SessionStatus.PENDING_APPROVAL ? 'pending' : session.status;
+        const className = `session-${normalizedStatusClass}`;
 
         // Try to get patient name from session, or use fallback
         const patientName = session.patientName

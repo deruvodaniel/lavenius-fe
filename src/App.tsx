@@ -6,7 +6,9 @@ import { Dashboard } from './components/dashboard';
 import { Onboarding } from './components/onboarding';
 import { NotFound, LoadingOverlay } from './components/shared';
 import { E2EUnlockGate } from './components/auth/E2EUnlockGate';
+import { AccountTypeSelection } from './components/auth/AccountTypeSelection';
 import { PrivacyPolicy, TermsOfService } from './components/public';
+import { AccountType, getUserAccountType } from './lib/auth/accountType';
 
 // Lazy load dashboard views
 const Agenda = lazy(() => import('./components/agenda/Agenda').then(m => ({ default: m.Agenda })));
@@ -16,6 +18,7 @@ const Analitica = lazy(() => import('./components/analitica/Analitica').then(m =
 const Configuracion = lazy(() => import('./components/config/Configuracion').then(m => ({ default: m.Configuracion })));
 const HelpCenter = lazy(() => import('./components/help/HelpCenter').then(m => ({ default: m.HelpCenter })));
 const PublicProfile = lazy(() => import('./components/public/PublicProfile').then(m => ({ default: m.PublicProfile })));
+const TherapistBooking = lazy(() => import('./components/public/TherapistBooking').then(m => ({ default: m.TherapistBooking })));
 
 /**
  * Landing page wrapper.
@@ -31,6 +34,15 @@ function LandingRoute() {
   }
 
   if (isSignedIn) {
+    const accountType = getUserAccountType(user);
+    if (!accountType) {
+      return <Navigate to="/select-account-type" replace />;
+    }
+
+    if (accountType === AccountType.Patient) {
+      return <Landing />;
+    }
+
     const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
     return <Navigate to={hasCompletedOnboarding ? '/dashboard' : '/onboarding'} replace />;
   }
@@ -51,13 +63,18 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <LoadingOverlay message="Cargando..." />;
   }
 
-  // Check onboarding status for signed-in users
+  const accountType = getUserAccountType(user);
+  // Check onboarding status for therapist users
   const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
 
   return (
     <>
       <SignedIn>
-        {hasCompletedOnboarding ? (
+        {!accountType ? (
+          <Navigate to="/select-account-type" replace />
+        ) : accountType === AccountType.Patient ? (
+          <Navigate to="/" replace />
+        ) : hasCompletedOnboarding ? (
           <E2EUnlockGate>{children}</E2EUnlockGate>
         ) : (
           <Navigate to="/onboarding" replace />
@@ -82,16 +99,80 @@ function OnboardingRoute({ children }: { children: React.ReactNode }) {
     return <LoadingOverlay message="Cargando..." />;
   }
 
+  const accountType = getUserAccountType(user);
   // If already completed onboarding, redirect to dashboard
   const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
 
   return (
     <>
       <SignedIn>
-        {hasCompletedOnboarding ? (
+        {!accountType ? (
+          <Navigate to="/select-account-type" replace />
+        ) : accountType === AccountType.Patient ? (
+          <Navigate to="/" replace />
+        ) : hasCompletedOnboarding ? (
           <Navigate to="/dashboard" replace />
         ) : (
           children
+        )}
+      </SignedIn>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+    </>
+  );
+}
+
+function AccountTypeSelectionRoute() {
+  const { isLoaded } = useClerkAuth();
+  const { user } = useUser();
+
+  if (!isLoaded) {
+    return <LoadingOverlay message="Cargando..." />;
+  }
+
+  const accountType = getUserAccountType(user);
+  if (accountType === AccountType.Patient) {
+    return <Navigate to="/" replace />;
+  }
+  if (accountType === AccountType.Therapist) {
+    const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
+    return <Navigate to={hasCompletedOnboarding ? '/dashboard' : '/onboarding'} replace />;
+  }
+
+  return (
+    <>
+      <SignedIn>
+        <AccountTypeSelection />
+      </SignedIn>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+    </>
+  );
+}
+
+function PublicBookingRoute() {
+  const { isLoaded } = useClerkAuth();
+  const { user } = useUser();
+
+  if (!isLoaded) {
+    return <LoadingOverlay message="Cargando..." />;
+  }
+
+  const accountType = getUserAccountType(user);
+
+  return (
+    <>
+      <SignedIn>
+        {!accountType ? (
+          <Navigate to="/select-account-type" replace />
+        ) : accountType !== AccountType.Patient ? (
+          <Navigate to="/dashboard" replace />
+        ) : (
+          <Suspense fallback={<LoadingOverlay message="Cargando reservas..." />}>
+            <TherapistBooking />
+          </Suspense>
         )}
       </SignedIn>
       <SignedOut>
@@ -118,6 +199,7 @@ export default function App() {
     <Routes>
       {/* Landing page - redirects to dashboard if already logged in */}
       <Route path="/" element={<LandingRoute />} />
+      <Route path="/select-account-type" element={<AccountTypeSelectionRoute />} />
       
       {/* Onboarding route - for new users to complete professional info */}
       <Route
@@ -132,6 +214,7 @@ export default function App() {
       {/* Public legal route */}
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-of-service" element={<TermsOfService />} />
+      <Route path="/book/:therapistId" element={<PublicBookingRoute />} />
       
       {/* TODO: Custom Clerk Auth routes for future implementation
        * Uncomment when switching from Clerk Account Portal to custom pages

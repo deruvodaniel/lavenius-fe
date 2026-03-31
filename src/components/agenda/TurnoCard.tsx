@@ -43,6 +43,7 @@ interface TurnoCardProps {
 
 const STATUS_KEY_MAP: Record<SessionStatus, string> = {
   pending: 'scheduled',
+  pending_approval: 'pendingApproval',
   confirmed: 'confirmed',
   completed: 'completed',
   cancelled: 'cancelled',

@@ -166,6 +166,16 @@
       "validationErrorHint": "Please check that all fields are correct",
       "createAccountError": "Error creating account",
       "createAccountErrorHint": "There was a problem. Please try again."
+    },
+    "accountTypeSelection": {
+      "title": "How will you use Lavenius?",
+      "description": "Choose your account type to set up the right experience.",
+      "therapistTitle": "I'm a therapist",
+      "therapistDescription": "Set up my professional profile and access the dashboard.",
+      "patientTitle": "I'm a patient",
+      "patientDescription": "Access public booking pages only through a direct therapist link.",
+      "success": "Account type saved successfully.",
+      "error": "Could not save your account type. Please try again."
     }
   },
   "patients": {
@@ -365,6 +375,7 @@
     },
     "status": {
       "scheduled": "Scheduled",
+      "pendingApproval": "Pending approval",
       "confirmed": "Confirmed",
       "completed": "Completed",
       "cancelled": "Cancelled",
@@ -943,6 +954,9 @@
       "contactInfo": "Contact Information",
       "copied": "Link copied!",
       "copyLink": "Copy profile link",
+      "copyBookingLink": "Copy booking link",
+      "bookingLinkCopied": "Booking link copied!",
+      "bookingLinkUnavailable": "We couldn't generate the booking link yet.",
       "noBio": "No bio available",
       "noSpecialty": "Specialty not specified",
       "previewDescription": "This is how patients will see your profile",
@@ -2071,6 +2085,55 @@
       "rateLimited": "Too many attempts. Please wait and try again.",
       "invalidRecoveryInput": "Check the recovery phrase and confirm the new passphrase.",
       "generic": "Could not unlock your encrypted information."
+    }
+  },
+  "publicBooking": {
+    "title": "Book a session",
+    "description": "Select an available slot and submit your request. The booking will remain pending approval.",
+    "emptySlots": "No available slots at the moment.",
+    "fields": {
+      "slot": "Slot",
+      "firstName": "First name",
+      "email": "Email",
+      "phone": "Phone",
+      "sessionType": "Session type",
+      "message": "Message for therapist (optional)"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "submit": "Request booking",
+      "submitting": "Submitting request...",
+      "bookAnother": "Book another slot",
+      "goHome": "Back to home"
+    },
+    "details": {
+      "sessionDuration": "Session duration: {{minutes}} minutes"
+    },
+    "validation": {
+      "slotRequired": "Select a slot to continue.",
+      "pastSlot": "You cannot book slots in the past.",
+      "firstNameRequired": "First name is required.",
+      "emailRequired": "Enter a valid email.",
+      "phoneRequired": "Enter a valid phone number (at least 8 digits).",
+      "messageTooLong": "Message cannot exceed {{max}} characters."
+    },
+    "errors": {
+      "invalidTherapist": "The requested therapist is invalid.",
+      "therapistUnavailable": "This therapist is not available for public booking.",
+      "forbidden": "You do not have permission for this action.",
+      "conflict": "That slot is no longer available. Availability has been refreshed.",
+      "rateLimited": "Too many attempts. Please wait and try again.",
+      "rateLimitedWithRetry": "Too many attempts. Try again in {{seconds}} seconds.",
+      "retryAfterHint": "Suggested wait time: {{seconds}} seconds.",
+      "generic": "We could not process your request. Please try again."
+    },
+    "success": {
+      "title": "Request sent",
+      "description": "Your booking request was created successfully.",
+      "statusLabel": "Status",
+      "bookingId": "Booking ID",
+      "pendingHelp": "The therapist will review your request and confirm your session.",
+      "sessionDetailsTitle": "Session details"
     }
   },
   "errors": {

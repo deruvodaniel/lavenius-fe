@@ -157,6 +157,16 @@
       "validationErrorHint": "Por favor verifique se todos os campos estão corretos",
       "createAccountError": "Erro ao criar conta",
       "createAccountErrorHint": "Houve um problema. Por favor tente novamente."
+    },
+    "accountTypeSelection": {
+      "title": "Como você vai usar o Lavenius?",
+      "description": "Selecione seu tipo de conta para configurar a experiência correta.",
+      "therapistTitle": "Sou terapeuta",
+      "therapistDescription": "Configurar meu perfil profissional e acessar o painel.",
+      "patientTitle": "Sou paciente",
+      "patientDescription": "Acessar páginas públicas de agendamento apenas por link direto do terapeuta.",
+      "success": "Tipo de conta salvo com sucesso.",
+      "error": "Não foi possível salvar seu tipo de conta. Tente novamente."
     }
   },
   "patients": {
@@ -356,6 +366,7 @@
     },
     "status": {
       "scheduled": "Agendada",
+      "pendingApproval": "Aguardando aprovação",
       "confirmed": "Confirmada",
       "completed": "Concluída",
       "cancelled": "Cancelada",
@@ -935,6 +946,9 @@
       "contactInfo": "Informações de contato",
       "copied": "Link copiado!",
       "copyLink": "Copiar link do perfil",
+      "copyBookingLink": "Copiar link de agendamento",
+      "bookingLinkCopied": "Link de agendamento copiado!",
+      "bookingLinkUnavailable": "Ainda não foi possível gerar o link de agendamento.",
       "noBio": "Sem biografia disponível",
       "noSpecialty": "Especialidade não especificada",
       "previewDescription": "Assim os pacientes verão seu perfil",
@@ -2063,6 +2077,55 @@
       "rateLimited": "Muitas tentativas. Aguarde um momento e tente novamente.",
       "invalidRecoveryInput": "Verifique a frase de recuperação e confirme a nova passphrase.",
       "generic": "Não foi possível desbloquear suas informações criptografadas."
+    }
+  },
+  "publicBooking": {
+    "title": "Reservar sessão",
+    "description": "Selecione um horário disponível e envie sua solicitação. A reserva ficará aguardando aprovação.",
+    "emptySlots": "Não há horários disponíveis no momento.",
+    "fields": {
+      "slot": "Horário",
+      "firstName": "Nome",
+      "email": "Email",
+      "phone": "Telefone",
+      "sessionType": "Tipo de sessão",
+      "message": "Mensagem para o terapeuta (opcional)"
+    },
+    "actions": {
+      "refresh": "Atualizar",
+      "submit": "Solicitar reserva",
+      "submitting": "Enviando solicitação...",
+      "bookAnother": "Reservar outro horário",
+      "goHome": "Voltar ao início"
+    },
+    "details": {
+      "sessionDuration": "Duração da sessão: {{minutes}} minutos"
+    },
+    "validation": {
+      "slotRequired": "Selecione um horário para continuar.",
+      "pastSlot": "Você não pode reservar horários no passado.",
+      "firstNameRequired": "O nome é obrigatório.",
+      "emailRequired": "Digite um email válido.",
+      "phoneRequired": "Digite um telefone válido (mínimo de 8 dígitos).",
+      "messageTooLong": "A mensagem não pode exceder {{max}} caracteres."
+    },
+    "errors": {
+      "invalidTherapist": "Não encontramos o terapeuta informado.",
+      "therapistUnavailable": "Este terapeuta não está disponível para reserva pública.",
+      "forbidden": "Você não tem permissão para esta ação.",
+      "conflict": "Esse horário não está mais disponível. Atualizamos a disponibilidade para você escolher outro.",
+      "rateLimited": "Muitas tentativas. Aguarde um momento e tente novamente.",
+      "rateLimitedWithRetry": "Muitas tentativas. Tente novamente em {{seconds}} segundos.",
+      "retryAfterHint": "Tempo de espera sugerido: {{seconds}} segundos.",
+      "generic": "Não foi possível processar sua solicitação. Tente novamente."
+    },
+    "success": {
+      "title": "Solicitação enviada",
+      "description": "Sua solicitação de reserva foi registrada com sucesso.",
+      "statusLabel": "Status",
+      "bookingId": "ID da reserva",
+      "pendingHelp": "O terapeuta revisará sua solicitação e confirmará sua sessão.",
+      "sessionDetailsTitle": "Detalhes da sessão"
     }
   },
   "errors": {

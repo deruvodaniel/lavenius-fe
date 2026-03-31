@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
+import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/clerk-react';
 import type { LucideIcon } from 'lucide-react';
 import { 
   Calendar, 
@@ -43,6 +43,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { AnimatedSection, LanguageSwitcher, BetaBadge } from '@/components/shared';
+import { AccountType, getUserAccountType } from '@/lib/auth/accountType';
 
 // ============================================================================
 // MOCK DATA FOR DASHBOARD PREVIEW
@@ -71,6 +72,8 @@ const mockStats = {
 function NavBar() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user } = useUser();
+  const accountType = getUserAccountType(user);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const scrollToSection = (sectionId: string) => {
@@ -160,13 +163,15 @@ function NavBar() {
             
             {/* Signed In: Show Dashboard link + User avatar */}
             <SignedIn>
-              <Button
-                size="sm"
-                onClick={() => navigate('/dashboard')}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md transition-all"
-              >
-                {t('landing.nav.dashboard', 'Dashboard')}
-              </Button>
+              {accountType !== AccountType.Patient && (
+                <Button
+                  size="sm"
+                  onClick={() => navigate('/dashboard')}
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md transition-all"
+                >
+                  {t('landing.nav.dashboard', 'Dashboard')}
+                </Button>
+              )}
               <UserButton 
                 afterSignOutUrl="/"
                 appearance={{

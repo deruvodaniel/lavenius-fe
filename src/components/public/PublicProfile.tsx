@@ -44,6 +44,7 @@ export function PublicProfile() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const profile = loadProfile();
+  const therapistId = user?.therapistId;
 
   const fullName = user ? `${user.firstName} ${user.lastName || ''}`.trim() : '';
   const initials = user
@@ -222,7 +223,11 @@ export function PublicProfile() {
               <h3 className="font-semibold text-foreground">{t('profile.share.bookSession')}</h3>
               <p className="text-sm text-muted-foreground mt-0.5">{t('profile.share.bookSessionDescription')}</p>
             </div>
-            <Button disabled className="w-full sm:w-auto">
+            <Button
+              className="w-full sm:w-auto"
+              disabled={!therapistId}
+              onClick={() => therapistId && navigate(`/book/${therapistId}`)}
+            >
               {t('profile.share.bookSession')}
             </Button>
           </div>

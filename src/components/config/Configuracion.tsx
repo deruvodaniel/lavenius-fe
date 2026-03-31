@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Perfil, type PerfilHandle } from '@/components/perfil/Perfil';
 import { User } from 'lucide-react';
 import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
-import { type DayOffConfig, type DayOffSetting } from '@/lib/types/setting.types';
+import { type BookingPreferencesConfig, type DayOffConfig, type DayOffSetting } from '@/lib/types/setting.types';
 import { cn } from '@/components/ui/utils';
 import { useE2EKey } from '@/lib/e2e';
 
@@ -99,6 +99,26 @@ const defaultLocalSettings: LocalSettings = {
   defaultSessionCost: null,
 };
 
+const DAY_ID_TO_KEY: Record<number, keyof BookingPreferencesConfig['bookingWorkingDays']> = {
+  1: 'monday',
+  2: 'tuesday',
+  3: 'wednesday',
+  4: 'thursday',
+  5: 'friday',
+  6: 'saturday',
+  0: 'sunday',
+};
+
+const DAY_KEY_TO_ID: Record<keyof BookingPreferencesConfig['bookingWorkingDays'], number> = {
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+  sunday: 0,
+};
+
 const loadLocalSettings = (): LocalSettings => {
   try {
     const stored = localStorage.getItem(SETTINGS_KEY);
@@ -119,6 +139,49 @@ const saveLocalSettings = (settings: LocalSettings): void => {
     throw error;
   }
 };
+
+function localSettingsToBookingPreferences(settings: LocalSettings): BookingPreferencesConfig {
+  const workingDays: BookingPreferencesConfig['bookingWorkingDays'] = {
+    monday: false,
+    tuesday: false,
+    wednesday: false,
+    thursday: false,
+    friday: false,
+    saturday: false,
+    sunday: false,
+  };
+
+  settings.workingHours.workingDays.forEach((dayId) => {
+    const dayKey = DAY_ID_TO_KEY[dayId];
+    if (dayKey) {
+      workingDays[dayKey] = true;
+    }
+  });
+
+  return {
+    bookingWorkingDays: workingDays,
+    bookingWorkingHoursFrom: settings.workingHours.startTime,
+    bookingWorkingHoursTo: settings.workingHours.endTime,
+    defaultSessionDurationMinutes: settings.defaultSessionDuration,
+    defaultSessionAmount: settings.defaultSessionCost,
+  };
+}
+
+function bookingPreferencesToLocalSettings(config: BookingPreferencesConfig): LocalSettings {
+  const workingDays = Object.entries(config.bookingWorkingDays)
+    .filter(([, isEnabled]) => isEnabled)
+    .map(([dayKey]) => DAY_KEY_TO_ID[dayKey as keyof BookingPreferencesConfig['bookingWorkingDays']]);
+
+  return {
+    workingHours: {
+      startTime: config.bookingWorkingHoursFrom,
+      endTime: config.bookingWorkingHoursTo,
+      workingDays: workingDays.sort((a, b) => a - b),
+    },
+    defaultSessionDuration: config.defaultSessionDurationMinutes,
+    defaultSessionCost: config.defaultSessionAmount ?? null,
+  };
+}
 
 // ============================================================================
 // MAPPING FUNCTIONS: UI <-> API
@@ -236,11 +299,15 @@ function parseDescriptionForType(description?: string): { tipo: DiaOffTipo; moti
  */
 function apiToUiDayOff(setting: DayOffSetting): { id: string; fechaInicio: string; fechaFin: string; motivo: string; tipo: DiaOffTipo; startTime?: string; endTime?: string } {
   const { tipo, motivo, startTime, endTime } = parseDescriptionForType(setting.description);
-  
+
+  // BE can return full ISO datetime (e.g. 2026-04-01T16:00:00.000Z).
+  // UI date inputs and formatters in this screen expect YYYY-MM-DD.
+  const normalizeToYmd = (value: string): string => value.split('T')[0] ?? value;
+
   return {
     id: setting.id,
-    fechaInicio: setting.config.fromDate,
-    fechaFin: setting.config.toDate,
+    fechaInicio: normalizeToYmd(setting.config.fromDate),
+    fechaFin: normalizeToYmd(setting.config.toDate),
     motivo,
     tipo,
     startTime,
@@ -376,12 +443,14 @@ export function Configuracion() {
     deleteSetting,
     upsertNextSessionReminder,
     upsertDuePaymentReminder,
+    upsertBookingPreferences,
   } = useSettingStore();
   
   // Get settings from the store using selectors
   const dayOffSettings = settingSelectors.getDayOffSettings({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
   const paymentReminderSetting = settingSelectors.getDuePaymentReminderSetting({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
   const sessionReminderSetting = settingSelectors.getNextSessionReminderSetting({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
+  const bookingPreferencesSetting = settingSelectors.getBookingPreferencesSetting({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
   const isLoadingSettings = fetchStatus === 'loading';
   
   // Reminder state from backend settings (with local UI state for editing)
@@ -442,6 +511,21 @@ export function Configuracion() {
     }
   }, [sessionReminderSetting]);
 
+  useEffect(() => {
+    if (!bookingPreferencesSetting?.config) {
+      return;
+    }
+
+    const nextLocalSettings = bookingPreferencesToLocalSettings(bookingPreferencesSetting.config);
+    setLocalSettings(nextLocalSettings);
+    try {
+      saveLocalSettings(nextLocalSettings);
+    } catch {
+      // ignore localStorage write failures here
+    }
+    setHasChanges(false);
+  }, [bookingPreferencesSetting]);
+
   // Update a local setting and mark as changed
   const updateLocalSetting = useCallback(<K extends keyof LocalSettings>(key: K, value: LocalSettings[K]) => {
     setLocalSettings(prev => ({ ...prev, [key]: value }));
@@ -461,6 +545,21 @@ export function Configuracion() {
   }, [hasChanges, hasReminderChanges]);
 
   const handleSave = async () => {
+    const hasWorkingDay = localSettings.workingHours.workingDays.length > 0;
+    const hasValidHourRange = localSettings.workingHours.startTime < localSettings.workingHours.endTime;
+    const hasValidDuration =
+      Number.isInteger(localSettings.defaultSessionDuration) &&
+      localSettings.defaultSessionDuration >= 15 &&
+      localSettings.defaultSessionDuration <= 180;
+    const hasValidAmount =
+      localSettings.defaultSessionCost === null ||
+      (typeof localSettings.defaultSessionCost === 'number' && localSettings.defaultSessionCost >= 0);
+
+    if (!hasWorkingDay || !hasValidHourRange || !hasValidDuration || !hasValidAmount) {
+      toast.error(t('settings.messages.saveError'));
+      return;
+    }
+
     // When on profile tab, delegate save to Perfil component
     if (activeSection === 'profile' && perfilRef.current) {
       await perfilRef.current.save();
@@ -472,6 +571,11 @@ export function Configuracion() {
       try {
         // Save local settings (language, session duration)
         if (hasChanges) {
+          await upsertBookingPreferences(
+            localSettingsToBookingPreferences(localSettings),
+            true,
+            'Preferencias de turnos'
+          );
           saveLocalSettings(localSettings);
           setHasChanges(false);
         }
@@ -490,6 +594,13 @@ export function Configuracion() {
     // Calendar tab — save local settings (working hours, days)
     setIsSaving(true);
     try {
+      if (hasChanges) {
+        await upsertBookingPreferences(
+          localSettingsToBookingPreferences(localSettings),
+          true,
+          'Preferencias de turnos'
+        );
+      }
       saveLocalSettings(localSettings);
       setHasChanges(false);
       toast.success(t('settings.messages.saved'));
