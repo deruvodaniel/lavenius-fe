@@ -1448,6 +1448,25 @@
         "description": "Conecta tu Google Calendar y olvídate de turnos superpuestos o anotaciones duplicadas."
       }
     },
+    "patientBooking": {
+      "badge": "Reserva Online de Pacientes",
+      "title": "Tus pacientes pueden reservar por sí mismos",
+      "description": "Comparte tu enlace público de reservas para que tus pacientes reserven sin idas y vueltas por WhatsApp. Tú revisas cada solicitud desde tu agenda antes de confirmarla.",
+      "steps": {
+        "patient": "El paciente selecciona fecha y horario disponible desde tu página pública.",
+        "therapist": "La sesión queda pendiente de aprobación y tú decides confirmarla o revisarla desde tu agenda."
+      },
+      "mock": {
+        "publicBookingTitle": "Reserva pública del paciente",
+        "publicBookingSubtitle": "Selección de horarios disponibles",
+        "availableSlots": "Horarios disponibles",
+        "pendingRequest": "Solicitud enviada",
+        "pendingDescription": "La reserva queda pendiente de aprobación del terapeuta.",
+        "agendaReview": "Revisión en agenda",
+        "agendaDescription": "El terapeuta gestiona la solicitud dentro de su agenda.",
+        "approveAction": "Aprobar"
+      }
+    },
     "analytics": {
       "badge": "Panel de Analíticas",
       "title": "Conoce el estado real de tu práctica",

@@ -1393,6 +1393,25 @@
         "description": "Sincronização total com seu calendário para evitar sobreposições e esquecimentos."
       }
     },
+    "patientBooking": {
+      "badge": "Reserva Online de Pacientes",
+      "title": "Seus pacientes podem reservar sozinhos",
+      "description": "Compartilhe seu link público para que seus pacientes reservem sem troca de mensagens. Você revisa cada solicitação na agenda antes de confirmar.",
+      "steps": {
+        "patient": "O paciente escolhe data e horário diretamente na sua página pública de reservas.",
+        "therapist": "A sessão fica pendente de aprovação, e você decide confirmar ou revisar pela agenda."
+      },
+      "mock": {
+        "publicBookingTitle": "Reserva pública do paciente",
+        "publicBookingSubtitle": "Seleção de horários disponíveis",
+        "availableSlots": "Horários disponíveis",
+        "pendingRequest": "Solicitação enviada",
+        "pendingDescription": "A reserva fica pendente de aprovação do terapeuta.",
+        "agendaReview": "Revisão na agenda",
+        "agendaDescription": "O terapeuta gerencia a solicitação dentro da agenda.",
+        "approveAction": "Aprovar"
+      }
+    },
     "analytics": {
       "badge": "Painel de Análises",
       "title": "Visibilidade total da sua prática profissional",

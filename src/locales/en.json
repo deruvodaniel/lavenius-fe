@@ -1401,6 +1401,25 @@
         "description": "Full synchronization with your calendar to avoid overlaps and missed appointments."
       }
     },
+    "patientBooking": {
+      "badge": "Patient Online Booking",
+      "title": "Let patients book sessions themselves",
+      "description": "Share your public booking link so patients can self-book available slots without back-and-forth messages. You review each request in your agenda before confirming.",
+      "steps": {
+        "patient": "The patient selects date and time directly from your public booking page.",
+        "therapist": "Each booking appears as pending approval, and you can approve or review it in your agenda."
+      },
+      "mock": {
+        "publicBookingTitle": "Public patient booking",
+        "publicBookingSubtitle": "Available slots selection",
+        "availableSlots": "Available slots",
+        "pendingRequest": "Request submitted",
+        "pendingDescription": "The booking remains pending therapist approval.",
+        "agendaReview": "Agenda review",
+        "agendaDescription": "The therapist manages the request in the agenda.",
+        "approveAction": "Approve"
+      }
+    },
     "analytics": {
       "badge": "Analytics Dashboard",
       "title": "Full visibility of your professional practice",
