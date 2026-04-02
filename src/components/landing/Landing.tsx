@@ -83,7 +83,7 @@ function NavBar() {
   
   const navLinks = [
     { key: 'features', sectionId: 'features' },
-    { key: 'pricing', sectionId: 'pricing' },
+    // { key: 'pricing', sectionId: 'pricing' },
     { key: 'faq', sectionId: 'faq' },
     { key: 'contact', sectionId: 'contact' },
   ];
@@ -1551,10 +1551,10 @@ export function Landing() {
       <AnalyticsSection />
       <RemindersSection />
       <SecuritySection />
-      <SocialProofSection />
+      {/* <SocialProofSection /> */}
       <WhyTerappIASection />
       <FAQSection />
-      <PricingSection />
+      {/* <PricingSection /> */}
       <CTASection />
       <Footer />
       <StickyMobileCTA />
