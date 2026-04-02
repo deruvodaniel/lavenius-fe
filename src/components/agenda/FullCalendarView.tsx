@@ -42,7 +42,7 @@ interface CalendarSettings {
   workingHours: WorkingHours;
 }
 
-const SETTINGS_KEY = 'lavenius_settings';
+const SETTINGS_KEY = 'terappIA_settings';
 
 // Default calendar display hours (8am to 8pm, all days visible)
 // Note: Working hours configuration is kept for public profile sharing only

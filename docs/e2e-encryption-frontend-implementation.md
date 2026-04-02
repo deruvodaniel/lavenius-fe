@@ -56,7 +56,7 @@ Final onboarding step now includes:
 1. Passphrase + confirm passphrase.
 2. Explicit "Generate recovery phrase" action (not pre-displayed).
 3. Recovery acknowledgment checkbox required before submit.
-4. Copy/download recovery phrase (`lavenius-recovery-phrase.txt`).
+4. Copy/download recovery phrase (`terappIA-recovery-phrase.txt`).
 
 Submit behavior:
 1. Generate `userKey`.

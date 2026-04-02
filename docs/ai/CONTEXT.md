@@ -17,7 +17,7 @@
 - Production API URL (configured via VITE_API_URL)
 
 ## Deployment
-- Frontend: Vercel (lavenius-fe.vercel.app)
+- Frontend: Vercel (terapp-ia.vercel.app)
 - Backend: Production infrastructure (no longer using ngrok)
 - Git repos:
   - github.com/deruvodaniel/lavenius-fe (Vercel deploy)

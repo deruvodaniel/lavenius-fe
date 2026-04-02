@@ -35,7 +35,7 @@ vi.mock('react-i18next', () => ({
         'settings.calendarSync.syncTimeChanges': 'Cambios de horario',
         'settings.calendarSync.syncCancellations': 'Cancelaciones',
         'settings.calendarSync.oneWaySync': 'Sincronización unidireccional',
-        'settings.calendarSync.oneWaySyncWarning': 'Los cambios en Google Calendar <strong>no</strong> se reflejarán en Lavenius',
+        'settings.calendarSync.oneWaySyncWarning': 'Los cambios en Google Calendar <strong>no</strong> se reflejarán en TerappIA',
       };
       return translations[key] || key;
     },

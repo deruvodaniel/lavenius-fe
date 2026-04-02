@@ -7,7 +7,7 @@ import {
 } from '../../lib/utils/whatsappTemplates';
 
 // Constants matching the source file
-const SETTINGS_KEY = 'lavenius_settings';
+const SETTINGS_KEY = 'terappIA_settings';
 const DEFAULT_TURNO_TEMPLATE = 'Hola {nombre}! Te recuerdo que tenes un turno agendado para el *{fecha}* a las *{hora}*. Podes confirmar tu asistencia? Responde *Si* para confirmar o *No* si necesitas cancelar. Gracias!';
 const DEFAULT_PAYMENT_TEMPLATE = 'Hola {nombre}! Te escribo para recordarte que tenes un pago pendiente del *{fecha}* por *{monto}*. Podes abonar por transferencia o en efectivo en tu proxima sesion. Gracias!';
 

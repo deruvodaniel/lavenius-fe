@@ -334,7 +334,7 @@ function HeroSection() {
                   </div>
                   <div className="flex-1 flex justify-center">
                     <div className="bg-white rounded-md px-4 py-1 text-xs text-gray-500 border border-gray-200">
-                      app.lavenius.com
+                      app.terapp-ia.com
                     </div>
                   </div>
                 </div>
@@ -957,7 +957,7 @@ function SocialProofSection() {
   );
 }
 
-function WhyLaveniusSection() {
+function WhyTerappIASection() {
   const { t } = useTranslation();
   
   const features = [
@@ -1013,13 +1013,13 @@ function WhyLaveniusSection() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/15 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium mb-6">
               <Sparkles className="w-4 h-4" />
-              {t('landing.whyLavenius.badge')}
+              {t('landing.whyTerappIA.badge')}
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {t('landing.whyLavenius.title')}
+              {t('landing.whyTerappIA.title')}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t('landing.whyLavenius.subtitle')}
+              {t('landing.whyTerappIA.subtitle')}
             </p>
           </div>
         </AnimatedSection>
@@ -1035,13 +1035,13 @@ function WhyLaveniusSection() {
                       <feature.icon className="w-6 h-6" />
                     </div>
                     <div className={`inline-block px-2 py-1 rounded text-xs font-medium text-white ${colors.highlight} mb-3`}>
-                      {t(`landing.whyLavenius.features.${feature.key}.highlight`)}
+                      {t(`landing.whyTerappIA.features.${feature.key}.highlight`)}
                     </div>
                     <h3 className="text-lg font-semibold text-foreground mb-2">
-                      {t(`landing.whyLavenius.features.${feature.key}.title`)}
+                      {t(`landing.whyTerappIA.features.${feature.key}.title`)}
                     </h3>
                     <p className="text-muted-foreground text-sm leading-relaxed">
-                      {t(`landing.whyLavenius.features.${feature.key}.description`)}
+                      {t(`landing.whyTerappIA.features.${feature.key}.description`)}
                     </p>
                   </CardContent>
                 </Card>
@@ -1382,9 +1382,9 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   const socialLinks = [
-    { icon: Instagram, href: 'https://instagram.com/lavenius', label: t('landing.footer.social.instagram') },
-    { icon: Twitter, href: 'https://twitter.com/lavenius', label: t('landing.footer.social.twitter') },
-    { icon: Linkedin, href: 'https://linkedin.com/company/lavenius', label: t('landing.footer.social.linkedin') },
+    { icon: Instagram, href: 'https://instagram.com/terappIA', label: t('landing.footer.social.instagram') },
+    { icon: Twitter, href: 'https://twitter.com/terappIA', label: t('landing.footer.social.twitter') },
+    { icon: Linkedin, href: 'https://linkedin.com/company/terappIA', label: t('landing.footer.social.linkedin') },
   ];
   
   return (
@@ -1422,11 +1422,11 @@ function Footer() {
                 <span>+54 11 1234-5678</span>
               </a>
               <a 
-                href="mailto:contacto@lavenius.com" 
+                href="mailto:lavenius.net@gmail.com"
                 className="flex items-center gap-2 text-sm transition-colors hover:text-indigo-400"
               >
                 <Mail className="w-4 h-4" />
-                <span>contacto@lavenius.com</span>
+                <span>lavenius.net@gmail.com</span>
               </a>
             </div>
           </div>
@@ -1552,7 +1552,7 @@ export function Landing() {
       <RemindersSection />
       <SecuritySection />
       <SocialProofSection />
-      <WhyLaveniusSection />
+      <WhyTerappIASection />
       <FAQSection />
       <PricingSection />
       <CTASection />

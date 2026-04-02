@@ -159,7 +159,7 @@ export const useSetupProgressStore = create<
       },
     }),
     {
-      name: 'lavenius-setup-progress',
+      name: 'terapp-ia-setup-progress',
       version: 1,
     }
   )

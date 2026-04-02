@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Button } from '@/components/ui/button';
 import { BetaBadge } from '@/components/shared';
 
-const SIDEBAR_COLLAPSED_KEY = 'lavenius_sidebar_collapsed';
+const SIDEBAR_COLLAPSED_KEY = 'terappIA_sidebar_collapsed';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -23,7 +23,7 @@ interface AppLayoutProps {
  * Note: Both layouts are always rendered to maintain consistent React component tree
  * and avoid hooks count issues during resize. CSS controls visibility.
  */
-export function AppLayout({ children, sidebar, appName = 'Lavenius' }: AppLayoutProps) {
+export function AppLayout({ children, sidebar, appName = 'TerappIA' }: AppLayoutProps) {
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {

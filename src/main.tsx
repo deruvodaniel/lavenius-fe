@@ -11,6 +11,9 @@ import { ErrorBoundary } from './components/shared/ErrorBoundary';
 import { ClerkTokenProvider } from './lib/api/ClerkTokenProvider';
 import { E2EKeyProvider } from './lib/e2e';
 
+// Run one-time localStorage migration (lavenius → terappIA) before anything reads storage
+import './lib/utils/storageMigration';
+
 // Initialize i18n - must be imported before App to ensure translations are ready
 import i18n from './lib/i18n';
 
@@ -53,7 +56,7 @@ function RootWithClerk({ children }: { children: React.ReactNode }) {
 
 declare global {
   interface Window {
-    __laveniusRoot?: Root;
+    __terappIARoot?: Root;
   }
 }
 
@@ -69,11 +72,11 @@ if (seoFallbackElement) {
   seoFallbackElement.remove();
 }
 
-const root = window.__laveniusRoot ?? createRoot(rootElement);
-window.__laveniusRoot = root;
+const root = window.__terappIARoot ?? createRoot(rootElement);
+window.__terappIARoot = root;
 
 root.render(
-  <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="lavenius-theme">
+  <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="terapp-ia-theme">
     <ErrorBoundary>
       <RootWithClerk>
         <ClerkTokenProvider>

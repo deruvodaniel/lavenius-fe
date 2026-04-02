@@ -3,7 +3,7 @@
  * Loads WhatsApp message templates from localStorage settings
  */
 
-const SETTINGS_KEY = 'lavenius_settings';
+const SETTINGS_KEY = 'terappIA_settings';
 
 // Default templates (same as in Configuracion.tsx)
 const DEFAULT_TURNO_TEMPLATE = 'Hola {nombre}! Te recuerdo que tenes un turno agendado para el *{fecha}* a las *{hora}*. Podes confirmar tu asistencia? Responde *Si* para confirmar o *No* si necesitas cancelar. Gracias!';

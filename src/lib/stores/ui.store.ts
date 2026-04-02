@@ -342,7 +342,7 @@ export const useUIStore = create<UIStore>()(
       },
     }),
     {
-      name: 'lavenius-ui',
+      name: 'terapp-ia-ui',
       storage: createJSONStorage(() => localStorage),
       // Only persist view preferences and sidebar collapsed state
       partialize: (state) => ({

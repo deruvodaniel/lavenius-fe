@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"JSON.parse\\(require\\(''fs''\\).readFileSync\\(''src/locales/en.json'',''utf8''\\)\\); console.log\\(''en.json: valid''\\)\")",
+      "Bash(node -e \"JSON.parse\\(require\\(''fs''\\).readFileSync\\(''src/locales/es.json'',''utf8''\\)\\); console.log\\(''es.json: valid''\\)\")",
+      "Bash(node -e \"JSON.parse\\(require\\(''fs''\\).readFileSync\\(''src/locales/pt.json'',''utf8''\\)\\); console.log\\(''pt.json: valid''\\)\")",
+      "Bash(npm test:*)"
+    ]
+  }
+}

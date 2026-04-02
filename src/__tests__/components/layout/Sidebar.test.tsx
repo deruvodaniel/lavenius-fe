@@ -9,7 +9,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'landing.brand': 'Lavenius',
+        'landing.brand': 'TerappIA',
         'landing.tagline': 'Tu asistente de terapia',
         'navigation.agenda': 'Agenda',
         'navigation.patients': 'Pacientes',
@@ -131,14 +131,14 @@ describe('Sidebar', () => {
     it('renders the sidebar with brand and tagline when showHeader is true', () => {
       renderSidebar({ showHeader: true });
 
-      expect(screen.getByText('Lavenius')).toBeInTheDocument();
+      expect(screen.getByText('TerappIA')).toBeInTheDocument();
       expect(screen.getByText('Tu asistente de terapia')).toBeInTheDocument();
     });
 
     it('hides header when showHeader is false', () => {
       renderSidebar({ showHeader: false });
 
-      expect(screen.queryByText('Lavenius')).not.toBeInTheDocument();
+      expect(screen.queryByText('TerappIA')).not.toBeInTheDocument();
       expect(screen.queryByText('Tu asistente de terapia')).not.toBeInTheDocument();
     });
 
