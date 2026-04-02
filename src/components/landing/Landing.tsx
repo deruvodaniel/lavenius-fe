@@ -1513,8 +1513,8 @@ function Footer() {
             </div>
           </div>
 
-          {/* Social section */}
-          <div className="flex flex-col items-center md:items-start gap-4">
+          {/* Social section — hidden until accounts are created */}
+          {/* <div className="flex flex-col items-center md:items-start gap-4">
             <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
               {t('landing.footer.social.title')}
             </h3>
@@ -1532,7 +1532,7 @@ function Footer() {
                 </a>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Copyright */}
