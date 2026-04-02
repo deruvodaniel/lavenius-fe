@@ -9,104 +9,101 @@ html {
 
 @layer base {
   :root {
-    /* Background & Foreground */
-    --background: #ffffff;
-    --foreground: #0f172a;
-    
-    /* Card */
-    --card: #ffffff;
-    --card-foreground: #0f172a;
-    
-    /* Popover */
-    --popover: #ffffff;
-    --popover-foreground: #0f172a;
-    
-    /* Primary - Indigo 600 */
-    --primary: #4f46e5;
+    /* PRIMARIO */
+    --primary:            #2D0051;
     --primary-foreground: #ffffff;
-    
-    /* Secondary - Slate 100 */
-    --secondary: #f1f5f9;
-    --secondary-foreground: #0f172a;
-    
-    /* Muted - Slate 100/500 */
-    --muted: #f1f5f9;
-    --muted-foreground: #64748b;
-    
-    /* Accent - Slate 100 */
-    --accent: #f1f5f9;
-    --accent-foreground: #0f172a;
-    
-    /* Destructive - Red 500 */
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
-    
-    /* Border, Input, Ring */
-    --border: #e2e8f0;
-    --input: #e2e8f0;
-    --input-background: #f3f4f6;
-    --ring: #4f46e5;
-    --switch-background: #cbd5e1;
-    
-    /* Radius */
+
+    /* ACENTO / RING */
+    --ring:               #2D0051;
+
+    /* FONDO BASE */
+    --background:         #F1ECF8;
+    --foreground:         #2D0051;
+
+    /* TARJETAS Y SUPERFICIES */
+    --card:               #ffffff;
+    --card-foreground:    #2D0051;
+    --popover:            #EAE4F4;
+    --popover-foreground: #2D0051;
+
+    /* SUPERFICIES SECUNDARIAS */
+    --secondary:            #EAE4F4;
+    --secondary-foreground: #2D0051;
+
+    /* SUPERFICIES SILENCIADAS */
+    --muted:            #EAE4F4;
+    --muted-foreground: #9070AA;
+
+    /* ACENTO DE HOVER / SELECCIÓN */
+    --accent:            #18B5A3;
+    --accent-foreground: #0B3D38;
+
+    /* ERRORES / DESTRUCCIÓN */
+    --destructive:            #B94A6A;
+    --destructive-foreground: #FFF0F5;
+
+    /* BORDES E INPUTS */
+    --border:            #DDD5EE;
+    --input:             #DDD5EE;
+    --input-background:  #EAE4F4;
+    --switch-background: #C5BAFF;
+
+    /* RADIO */
     --radius: 0.5rem;
-    
-    /* Chart colors */
-    --chart-1: #4f46e5;
-    --chart-2: #06b6d4;
-    --chart-3: #10b981;
-    --chart-4: #f59e0b;
-    --chart-5: #ef4444;
+
+    /* GRÁFICOS */
+    --chart-1: #2D0051;
+    --chart-2: #18B5A3;
+    --chart-3: #C5BAFF;
+    --chart-4: #8B5CF6;
+    --chart-5: #B94A6A;
   }
 
   .dark {
-    /* Background & Foreground */
-    --background: #0f172a;        /* slate-900 — deepest layer */
-    --foreground: #f8fafc;
+    /* PRIMARIO */
+    --primary:            #C5BAFF;
+    --primary-foreground: #2D0051;
 
-    /* Card — slate-800 pushed slightly lighter for separation from background */
-    --card: #1c2d42;
-    --card-foreground: #f8fafc;
+    --ring:               #C5BAFF;
 
-    /* Popover — same level as card */
-    --popover: #1c2d42;
-    --popover-foreground: #f8fafc;
+    /* FONDO BASE */
+    --background:  #1A1228;
+    --foreground:  #F1ECF8;
 
-    /* Primary - Indigo 500 for better contrast with white text */
-    --primary: #6366f1;
-    --primary-foreground: #ffffff;
+    /* TARJETAS Y SUPERFICIES */
+    --card:               #261840;
+    --card-foreground:    #F1ECF8;
+    --popover:            #201830;
+    --popover-foreground: #F1ECF8;
 
-    /* Secondary — one step above card for subtle surface variation */
-    --secondary: #243552;
-    --secondary-foreground: #f8fafc;
+    /* SUPERFICIES SECUNDARIAS */
+    --secondary:            #201830;
+    --secondary-foreground: #F1ECF8;
 
-    /* Muted — same level as secondary, foreground kept muted */
-    --muted: #243552;
-    --muted-foreground: #94a3b8;
+    /* SUPERFICIES SILENCIADAS */
+    --muted:            #201830;
+    --muted-foreground: #7A5C96;
 
-    /* Accent — one more step up for hover/selected states */
-    --accent: #2d4060;
-    --accent-foreground: #f8fafc;
+    /* ACENTO DE HOVER / SELECCIÓN */
+    --accent:            #18B5A3;
+    --accent-foreground: #D4F2EF;
 
-    /* Destructive - Red 900/400 */
-    --destructive: #7f1d1d;
-    --destructive-foreground: #fca5a5;
+    /* ERRORES */
+    --destructive:            #E07090;
+    --destructive-foreground: #FFF0F5;
 
-    /* Border — visible but not harsh against dark backgrounds */
-    --border: #3a5068;
-    /* Input border color */
-    --input: #3a5068;
-    /* Input background — clearly above card level so inputs are visible */
-    --input-background: #2d4060;
-    --ring: #6366f1;
-    --switch-background: #64748b;
+    /* BORDES E INPUTS */
+    --border:            #3A2858;
+    --input:             #3A2858;
+    --input-background:  #2E2044;
+    --switch-background: #3A2858;
 
-    /* Chart colors - brighter for dark mode */
-    --chart-1: #6366f1;
-    --chart-2: #22d3ee;
-    --chart-3: #34d399;
-    --chart-4: #fbbf24;
-    --chart-5: #f87171;
+    /* GRÁFICOS */
+    --chart-1: #C5BAFF;
+    --chart-2: #18B5A3;
+    --chart-3: #8B5CF6;
+    --chart-4: #F1ECF8;
+    --chart-5: #E07090;
   }
 
   /* Apply theme colors globally */
