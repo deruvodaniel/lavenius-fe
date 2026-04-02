@@ -88,7 +88,7 @@ function HeaderWithAuth({
 }) {
   return (
     <header data-testid="header">
-      <div className="brand">Lavenius</div>
+      <div className="brand">TerappIA</div>
       {isSignedIn && user ? (
         <div data-testid="signed-in-state">
           <span data-testid="user-name">{user.firstName} {user.lastName}</span>

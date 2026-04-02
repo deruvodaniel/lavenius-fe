@@ -22,40 +22,19 @@ const PublicProfile = lazy(() => import('./components/public/PublicProfile').the
  * Note: during Google OAuth verification we keep "/" always public.
  */
 function LandingRoute() {
-  const { isLoaded } = useClerkAuth();
+  const { isLoaded, isSignedIn } = useClerkAuth();
+  const { user } = useUser();
 
   // Show loading while Clerk initializes
   if (!isLoaded) {
     return <LoadingOverlay message="Cargando..." />;
   }
 
-  /*
-   * Previous redirect flow (kept here intentionally for future reference):
-   *
-   * const { isLoaded, isSignedIn } = useClerkAuth();
-   * const { user } = useUser();
-   *
-   * if (!isLoaded) {
-   *   return <LoadingOverlay message="Cargando..." />;
-   * }
-   *
-   * if (isSignedIn) {
-   *   const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
-   *   const redirectKey = `lavenius_redirected_${user?.id}`;
-   *   const hasRedirected = sessionStorage.getItem(redirectKey);
-   *
-   *   if (!hasRedirected) {
-   *     sessionStorage.setItem(redirectKey, 'true');
-   *
-   *     if (!hasCompletedOnboarding) {
-   *       return <Navigate to="/onboarding" replace />;
-   *     }
-   *     return <Navigate to="/dashboard" replace />;
-   *   }
-   * }
-   */
+  if (isSignedIn) {
+    const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
+    return <Navigate to={hasCompletedOnboarding ? '/dashboard' : '/onboarding'} replace />;
+  }
 
-  // Current behavior: always show landing page (public route), even when signed in.
   return <Landing />;
 }
 

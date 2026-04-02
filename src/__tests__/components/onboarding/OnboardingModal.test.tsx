@@ -12,7 +12,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'onboarding.welcome': 'Bienvenido a Lavenius',
+        'onboarding.welcome': 'Bienvenido a TerappIA',
         'onboarding.welcomeDescription': 'Tu asistente de gestión de consultorio psicológico',
         'onboarding.calendar.title': 'Conecta tu calendario',
         'onboarding.calendar.description': 'Sincroniza tu Google Calendar para gestionar tus citas',
@@ -23,7 +23,7 @@ vi.mock('react-i18next', () => ({
         'onboarding.patient.create': 'Crear paciente',
         'onboarding.patient.later': 'Más tarde',
         'onboarding.complete.title': 'Todo listo',
-        'onboarding.complete.description': 'Ya puedes comenzar a usar Lavenius',
+        'onboarding.complete.description': 'Ya puedes comenzar a usar TerappIA',
         'onboarding.complete.tip': 'Tip:',
         'onboarding.complete.tipText': 'Puedes acceder a la',
         'onboarding.complete.helpSection': 'sección de ayuda',
@@ -103,7 +103,7 @@ describe('OnboardingModal', () => {
     it('renders first step (welcome) by default', () => {
       render(<OnboardingModal {...defaultProps} />);
       
-      expect(screen.getByRole('heading', { name: 'Bienvenido a Lavenius' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Bienvenido a TerappIA' })).toBeInTheDocument();
       expect(screen.getByText('Tu asistente de gestión de consultorio psicológico')).toBeInTheDocument();
     });
 
@@ -151,7 +151,7 @@ describe('OnboardingModal', () => {
       await user.click(screen.getByText('Siguiente'));
       
       expect(screen.getByRole('heading', { name: 'Todo listo' })).toBeInTheDocument();
-      expect(screen.getByText('Ya puedes comenzar a usar Lavenius')).toBeInTheDocument();
+      expect(screen.getByText('Ya puedes comenzar a usar TerappIA')).toBeInTheDocument();
     });
 
     it('shows back button after step 1', async () => {
@@ -177,7 +177,7 @@ describe('OnboardingModal', () => {
       
       // Go back to step 1
       await user.click(screen.getByText('Atrás'));
-      expect(screen.getByRole('heading', { name: 'Bienvenido a Lavenius' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Bienvenido a TerappIA' })).toBeInTheDocument();
     });
 
     it('shows "Comenzar" button on last step instead of "Siguiente"', async () => {
@@ -512,7 +512,7 @@ describe('OnboardingModal', () => {
       render(<OnboardingModal {...defaultProps} />);
       
       // Step 1: Welcome - click next
-      expect(screen.getByRole('heading', { name: 'Bienvenido a Lavenius' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Bienvenido a TerappIA' })).toBeInTheDocument();
       await user.click(screen.getByText('Siguiente'));
       
       // Step 2: Calendar - connect
@@ -572,7 +572,7 @@ describe('OnboardingModal', () => {
       
       // Go back to step 1
       await user.click(screen.getByText('Atrás'));
-      expect(screen.getByRole('heading', { name: 'Bienvenido a Lavenius' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Bienvenido a TerappIA' })).toBeInTheDocument();
       
       // Go forward again
       await user.click(screen.getByText('Siguiente'));
@@ -617,7 +617,7 @@ describe('OnboardingModal', () => {
     it('step headings are proper h2 elements', () => {
       render(<OnboardingModal {...defaultProps} />);
       
-      const heading = screen.getByRole('heading', { name: 'Bienvenido a Lavenius' });
+      const heading = screen.getByRole('heading', { name: 'Bienvenido a TerappIA' });
       expect(heading.tagName).toBe('H2');
     });
 
@@ -645,7 +645,7 @@ describe('OnboardingModal', () => {
       expect(screen.queryByText('Atrás')).not.toBeInTheDocument();
       
       // Should still be on first step
-      expect(screen.getByRole('heading', { name: 'Bienvenido a Lavenius' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Bienvenido a TerappIA' })).toBeInTheDocument();
     });
 
     it('cannot navigate past last step with next button', async () => {

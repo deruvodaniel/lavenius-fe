@@ -708,7 +708,7 @@
   },
   "settings": {
     "title": "Configurações",
-    "subtitle": "Personalize sua experiência no Lavenius",
+    "subtitle": "Personalize sua experiência no TerappIA",
     "language": "Idioma",
     "selectLanguage": "Selecionar idioma",
     "languageChanged": "Idioma alterado com sucesso",
@@ -750,7 +750,7 @@
       "syncTimeChanges": "Alterações nos horários das sessões",
       "syncCancellations": "Cancelamento de sessões",
       "oneWaySync": "Sincronização unidirecional",
-      "oneWaySyncWarning": "A sincronização funciona apenas do Lavenius para o Google Calendar. As alterações feitas diretamente no Google Calendar <strong>não serão refletidas</strong> no aplicativo."
+      "oneWaySyncWarning": "A sincronização funciona apenas do TerappIA para o Google Calendar. As alterações feitas diretamente no Google Calendar <strong>não serão refletidas</strong> no aplicativo."
     },
     "daysOff": {
       "title": "Dias de Folga",
@@ -854,7 +854,7 @@
     },
     "theme": {
       "title": "Aparência",
-      "description": "Escolha como o Lavenius aparece no seu dispositivo.",
+      "description": "Escolha como o TerappIA aparece no seu dispositivo.",
       "light": "Claro",
       "system": "Sistema",
       "dark": "Escuro"
@@ -917,7 +917,7 @@
       "title": "Zona de perigo",
       "description": "Essas ações são permanentes e irreversíveis. Proceda com extrema cautela.",
       "deleteAccount": "Excluir conta",
-      "deleteAccountDescription": "Exclui permanentemente sua conta e todos os seus dados do Lavenius, incluindo pacientes, agendamentos, cobranças e notas clínicas.",
+      "deleteAccountDescription": "Exclui permanentemente sua conta e todos os seus dados do TerappIA, incluindo pacientes, agendamentos, cobranças e notas clínicas.",
       "confirmTitle": "Excluir sua conta?",
       "confirmDescription": "Esta ação é permanente e irreversível. Todos os seus dados, pacientes, agendamentos, cobranças e notas clínicas serão excluídos para sempre. Você não poderá recuperar essas informações.",
       "typeToConfirm": "Digite EXCLUIR para confirmar",
@@ -1103,10 +1103,10 @@
     },
     "setupProgress": {
       "title": "Configure sua conta",
-      "subtitle": "Complete estes passos para aproveitar ao máximo o Lavenius",
+      "subtitle": "Complete estes passos para aproveitar ao máximo o TerappIA",
       "progress": "{{completed}} de {{total}} completados",
       "completeTitle": "Configuração concluída!",
-      "completeSubtitle": "Tudo pronto. Aproveite o Lavenius!",
+      "completeSubtitle": "Tudo pronto. Aproveite o TerappIA!",
       "dismissHint": "Você pode mostrar este cartão novamente no menu de configurações do dashboard",
       "steps": {
         "configureProfile": "Configurar seu perfil profissional",
@@ -1119,7 +1119,7 @@
   },
   "help": {
     "title": "Central de Ajuda",
-    "subtitle": "Encontre respostas para suas perguntas sobre o Lavenius",
+    "subtitle": "Encontre respostas para suas perguntas sobre o TerappIA",
     "searchPlaceholder": "Pesquisar na ajuda...",
     "faq": "Perguntas Frequentes",
     "contact": "Contato",
@@ -1138,11 +1138,11 @@
     "categories": {
       "gettingStarted": {
         "title": "Começar",
-        "description": "Primeiros passos no Lavenius",
+        "description": "Primeiros passos no TerappIA",
         "articles": {
           "welcome": {
-            "title": "Bem-vindo ao Lavenius",
-            "content": "**Bem-vindo ao Lavenius!**\n\nO Lavenius é sua plataforma completa para gerenciar sua prática terapêutica de forma simples e organizada.\n\n**O que você pode fazer com o Lavenius?**\n\n- **Gerenciar pacientes:** Registre informações de contato, histórico clínico e anotações de sessão\n- **Agendar consultas:** Organize seu calendário com sessões presenciais ou remotas\n- **Controlar cobranças:** Mantenha um registro de pagamentos pendentes e realizados\n- **Sincronizar calendário:** Conecte com o Google Calendar para receber lembretes\n- **Analisar métricas:** Visualize estatísticas do seu consultório\n\n**Dica:** Use o menu lateral para navegar entre as diferentes seções do aplicativo.",
+            "title": "Bem-vindo ao TerappIA",
+            "content": "**Bem-vindo ao TerappIA!**\n\nO TerappIA é sua plataforma completa para gerenciar sua prática terapêutica de forma simples e organizada.\n\n**O que você pode fazer com o TerappIA?**\n\n- **Gerenciar pacientes:** Registre informações de contato, histórico clínico e anotações de sessão\n- **Agendar consultas:** Organize seu calendário com sessões presenciais ou remotas\n- **Controlar cobranças:** Mantenha um registro de pagamentos pendentes e realizados\n- **Sincronizar calendário:** Conecte com o Google Calendar para receber lembretes\n- **Analisar métricas:** Visualize estatísticas do seu consultório\n\n**Dica:** Use o menu lateral para navegar entre as diferentes seções do aplicativo.",
             "tags": [
               "bem-vindo",
               "início",
@@ -1152,7 +1152,7 @@
           },
           "createAccount": {
             "title": "Criar sua conta",
-            "content": "**Registro no Lavenius**\n\nCriar sua conta é rápido e fácil:\n\n1. Clique em **\"Começar grátis\"** na página inicial\n2. Digite seu endereço de email\n3. Crie uma senha segura\n4. Verifique seu email (se necessário)\n5. Pronto! Você já pode fazer login\n\n**Dados da conta:**\n\nSua conta inclui:\n- Nome e sobrenome\n- Endereço de email (para login)\n- Foto de perfil (opcional)\n\n**Nota:** O Lavenius usa autenticação segura para proteger sua conta.",
+            "content": "**Registro no TerappIA**\n\nCriar sua conta é rápido e fácil:\n\n1. Clique em **\"Começar grátis\"** na página inicial\n2. Digite seu endereço de email\n3. Crie uma senha segura\n4. Verifique seu email (se necessário)\n5. Pronto! Você já pode fazer login\n\n**Dados da conta:**\n\nSua conta inclui:\n- Nome e sobrenome\n- Endereço de email (para login)\n- Foto de perfil (opcional)\n\n**Nota:** O TerappIA usa autenticação segura para proteger sua conta.",
             "tags": [
               "conta",
               "registro",
@@ -1173,7 +1173,7 @@
           },
           "firstSteps": {
             "title": "Primeiros passos recomendados",
-            "content": "**Por onde começar?**\n\nRecomendamos seguir estes passos para aproveitar ao máximo o Lavenius:\n\n**1. Registre seu primeiro paciente**\n- Vá para **Pacientes** no menu lateral\n- Clique em **\"Novo Paciente\"**\n- Preencha os dados básicos (nome, telefone, email)\n\n**2. Agende sua primeira sessão**\n- Vá para **Agenda** no menu lateral\n- Clique em **\"Nova Consulta\"**\n- Selecione o paciente e escolha data/hora\n\n**3. Conecte o Google Calendar (opcional)**\n- Vá para **Configurações**\n- Na seção \"Calendário\", conecte sua conta Google\n- Suas consultas serão sincronizadas automaticamente\n\n**4. Configure seu horário de trabalho**\n- Em **Configurações**, defina seus dias e horários de trabalho\n- Isso ajudará a organizar melhor sua agenda\n\n**Precisa de ajuda?**\n\nExplore as outras seções da Central de Ajuda para aprender sobre cada funcionalidade em detalhes.",
+            "content": "**Por onde começar?**\n\nRecomendamos seguir estes passos para aproveitar ao máximo o TerappIA:\n\n**1. Registre seu primeiro paciente**\n- Vá para **Pacientes** no menu lateral\n- Clique em **\"Novo Paciente\"**\n- Preencha os dados básicos (nome, telefone, email)\n\n**2. Agende sua primeira sessão**\n- Vá para **Agenda** no menu lateral\n- Clique em **\"Nova Consulta\"**\n- Selecione o paciente e escolha data/hora\n\n**3. Conecte o Google Calendar (opcional)**\n- Vá para **Configurações**\n- Na seção \"Calendário\", conecte sua conta Google\n- Suas consultas serão sincronizadas automaticamente\n\n**4. Configure seu horário de trabalho**\n- Em **Configurações**, defina seus dias e horários de trabalho\n- Isso ajudará a organizar melhor sua agenda\n\n**Precisa de ajuda?**\n\nExplore as outras seções da Central de Ajuda para aprender sobre cada funcionalidade em detalhes.",
             "tags": [
               "primeiros passos",
               "começar",
@@ -1309,7 +1309,7 @@
           },
           "calendarConfig": {
             "title": "Configurar calendário",
-            "content": "Na seção de Configurações você pode:\n\n- Conectar ou desconectar o Google Calendar\n- Ver o status da sincronização\n- Forçar uma sincronização manual\n\nA sincronização é bidirecional: as alterações no Lavenius aparecem no seu Google Calendar e vice-versa.",
+            "content": "Na seção de Configurações você pode:\n\n- Conectar ou desconectar o Google Calendar\n- Ver o status da sincronização\n- Forçar uma sincronização manual\n\nA sincronização é bidirecional: as alterações no TerappIA aparecem no seu Google Calendar e vice-versa.",
             "tags": [
               "calendário",
               "configurar",
@@ -1322,7 +1322,7 @@
     }
   },
   "landing": {
-    "brand": "Lavenius",
+    "brand": "TerappIA",
     "tagline": "Gestão de Pacientes",
     "nav": {
       "dashboard": "Painel",
@@ -1333,8 +1333,8 @@
       "privacyPolicy": "Política de Privacidade"
     },
     "purpose": {
-      "title": "Para que serve o Lavenius",
-      "description": "Lavenius é uma aplicação web para profissionais de saúde mental que permite gerenciar pacientes, agendar sessões, escrever notas clínicas, acompanhar cobranças e enviar lembretes em uma única plataforma segura.",
+      "title": "Para que serve o TerappIA",
+      "description": "TerappIA é uma aplicação web para profissionais de saúde mental que permite gerenciar pacientes, agendar sessões, escrever notas clínicas, acompanhar cobranças e enviar lembretes em uma única plataforma segura.",
       "privacyLabel": "Leia nossa",
       "privacyLink": "Política de Privacidade"
     },
@@ -1461,8 +1461,8 @@
         }
       }
     },
-    "whyLavenius": {
-      "badge": "Por que Lavenius?",
+    "whyTerappIA": {
+      "badge": "Por que TerappIA?",
       "title": "O que outros apps não te dão",
       "subtitle": "Veja como nos comparamos com o mercado",
       "features": {
@@ -1608,13 +1608,13 @@
     "title": "Política de Privacidade",
     "backToHome": "Voltar ao início",
     "lastUpdated": "Última atualização: 13 de março de 2026",
-    "intro": "Na Lavenius, estamos comprometidos em proteger a privacidade e a segurança das informações de terapeutas e pacientes.",
+    "intro": "Na TerappIA, estamos comprometidos em proteger a privacidade e a segurança das informações de terapeutas e pacientes.",
     "sections": {
       "whoWeAre": {
         "title": "1. Quem somos",
-        "description": "Lavenius é uma plataforma de gestão para profissionais de saúde mental (consultas, sessões, notas, pagamentos e lembretes).",
+        "description": "TerappIA é uma plataforma de gestão para profissionais de saúde mental (consultas, sessões, notas, pagamentos e lembretes).",
         "controllerLabel": "Responsável pelo tratamento",
-        "controllerValue": "Lavenius",
+        "controllerValue": "TerappIA",
         "emailLabel": "Email de contato de privacidade",
         "emailValue": "lavenius.net@gmail.com",
         "addressLabel": "Endereço",
@@ -1734,7 +1734,7 @@
         "emailLabel": "Email",
         "emailValue": "lavenius.net@gmail.com",
         "controllerLabel": "Responsável",
-        "controllerValue": "Lavenius"
+        "controllerValue": "TerappIA"
       }
     }
   },
@@ -1743,15 +1743,15 @@
     "title": "Termos e Condições",
     "backToHome": "Voltar ao início",
     "lastUpdated": "Última atualização: 16 de março de 2026",
-    "intro": "Estes Termos e Condições regulam o uso do Lavenius. Ao criar uma conta ou utilizar a plataforma, você aceita estes termos.",
+    "intro": "Estes Termos e Condições regulam o uso do TerappIA. Ao criar uma conta ou utilizar a plataforma, você aceita estes termos.",
     "sections": {
       "acceptance": {
         "title": "1. Aceitação",
-        "description": "Ao acessar ou usar o Lavenius, você concorda com estes Termos e Condições e com nossa Política de Privacidade."
+        "description": "Ao acessar ou usar o TerappIA, você concorda com estes Termos e Condições e com nossa Política de Privacidade."
       },
       "service": {
         "title": "2. Serviço",
-        "description": "Lavenius é uma plataforma para profissionais de saúde mental que permite:",
+        "description": "TerappIA é uma plataforma para profissionais de saúde mental que permite:",
         "items": [
           "Gerenciar pacientes e prontuários clínicos.",
           "Agendar sessões e coordenar lembretes.",
@@ -1781,7 +1781,7 @@
           "Usar a plataforma para atividades ilegais ou não autorizadas.",
           "Tentar comprometer a segurança ou integridade do serviço.",
           "Acessar dados de terceiros sem autorização.",
-          "Usar o Lavenius para spam, fraude ou abuso."
+          "Usar o TerappIA para spam, fraude ou abuso."
         ]
       },
       "google": {
@@ -1802,7 +1802,7 @@
       },
       "liability": {
         "title": "10. Limitação de responsabilidade",
-        "description": "Na máxima extensão permitida por lei, o Lavenius não se responsabiliza por danos indiretos, incidentais ou consequentes decorrentes do uso do serviço."
+        "description": "Na máxima extensão permitida por lei, o TerappIA não se responsabiliza por danos indiretos, incidentais ou consequentes decorrentes do uso do serviço."
       },
       "termination": {
         "title": "11. Suspensão ou encerramento",
@@ -1817,7 +1817,7 @@
         "emailLabel": "Email",
         "emailValue": "lavenius.net@gmail.com",
         "ownerLabel": "Responsável",
-        "ownerValue": "Lavenius"
+        "ownerValue": "TerappIA"
       }
     }
   },
@@ -1863,7 +1863,7 @@
     }
   },
   "onboarding": {
-    "welcome": "Bem-vindo ao Lavenius!",
+    "welcome": "Bem-vindo ao TerappIA!",
     "welcomeDescription": "Sua nova ferramenta para gerenciar pacientes, agendar sessões e acompanhar sua prática terapêutica de forma simples e organizada.",
     "welcomeSubtitle": "Vamos guiá-lo pelos primeiros passos",
     "steps": {
@@ -1928,7 +1928,7 @@
     },
     "complete": {
       "title": "Tudo pronto!",
-      "description": "Agora você pode começar a usar o Lavenius. Lembre-se de que sempre pode acessar a ajuda no menu lateral se tiver dúvidas.",
+      "description": "Agora você pode começar a usar o TerappIA. Lembre-se de que sempre pode acessar a ajuda no menu lateral se tiver dúvidas.",
       "tip": "Dica:",
       "tipText": "Use a seção",
       "helpSection": "Ajuda",
@@ -2024,12 +2024,12 @@
         "download": "Baixar .txt",
         "acknowledgement": "Entendo que apenas minha passphrase ou esta frase de recuperação podem descriptografar minhas informações.",
         "copyError": "Não foi possível copiar a frase de recuperação.",
-        "fileTitle": "Frase de Recuperação Lavenius",
+        "fileTitle": "Frase de Recuperação TerappIA",
         "fileWarning": "Importante: sem esta frase (ou sua passphrase) você não poderá recuperar seus dados E2E."
       },
       "consent": {
         "title": "Proteção de Dados com Criptografia de Ponta a Ponta",
-        "description": "O Lavenius utiliza criptografia de ponta a ponta para proteger os dados sensíveis dos seus pacientes. Isso significa que somente você pode acessar as informações clínicas — nem mesmo nós podemos lê-las.",
+        "description": "O TerappIA utiliza criptografia de ponta a ponta para proteger os dados sensíveis dos seus pacientes. Isso significa que somente você pode acessar as informações clínicas — nem mesmo nós podemos lê-las.",
         "label": "Aceito que meus dados clínicos serão protegidos com criptografia de ponta a ponta e entendo que sou o único responsável pela minha chave de acesso."
       }
     }
@@ -2055,7 +2055,8 @@
       "forgotPassphrase": "Esqueci minha passphrase",
       "resetAndUnlock": "Redefinir e desbloquear",
       "recovering": "Recuperando...",
-      "backToPassphrase": "Voltar para passphrase"
+      "backToPassphrase": "Voltar para passphrase",
+      "signOutAndHome": "Sair e ir para o início"
     },
     "errors": {
       "invalidCredentials": "Não foi possível desbloquear seus dados. Verifique sua passphrase ou frase de recuperação.",

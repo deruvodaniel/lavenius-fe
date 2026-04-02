@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useCalendarStore } from '@/lib/stores/calendarStore';
 import { Button } from '../ui/button';
 import { Calendar as CalendarIcon, RefreshCw, Link2Off, CheckCircle2, Circle, ExternalLink, AlertTriangle, Loader2 } from 'lucide-react';
@@ -201,10 +201,12 @@ export default function CalendarSync() {
             <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-medium text-foreground">{t('settings.calendarSync.oneWaySync')}</p>
-              <p
-                className="text-sm text-muted-foreground mt-1"
-                dangerouslySetInnerHTML={{ __html: t('settings.calendarSync.oneWaySyncWarning') }}
-              />
+              <p className="text-sm text-muted-foreground mt-1">
+                <Trans
+                  i18nKey="settings.calendarSync.oneWaySyncWarning"
+                  components={{ strong: <strong /> }}
+                />
+              </p>
             </div>
           </div>
         </div>

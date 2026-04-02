@@ -411,7 +411,7 @@ a[class*="bg-indigo-600"]:disabled {
    ========================================================================== */
 
 /* 
- * Clerk modal backdrop - match Lavenius overlay style 
+ * Clerk modal backdrop - match TerappIA overlay style 
  * Uses !important to override Clerk's inline styles
  */
 .cl-modalBackdrop {
@@ -426,7 +426,7 @@ a[class*="bg-indigo-600"]:disabled {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
 }
 
-/* Clerk primary buttons - match Lavenius primary button style */
+/* Clerk primary buttons - match TerappIA primary button style */
 .cl-formButtonPrimary {
   background: linear-gradient(to right, #4f46e5, #7c3aed) !important;
   border: none !important;
@@ -458,7 +458,7 @@ a[class*="bg-indigo-600"]:disabled {
   background-color: var(--accent) !important;
 }
 
-/* Clerk input fields - match Lavenius input style */
+/* Clerk input fields - match TerappIA input style */
 .cl-formFieldInput {
   border-radius: calc(var(--radius) - 2px) !important;
   border-color: var(--border) !important;

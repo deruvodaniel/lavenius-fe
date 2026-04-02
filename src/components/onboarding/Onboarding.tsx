@@ -393,7 +393,7 @@ export function Onboarding() {
         console.warn('Could not save extra data to localStorage:', storageError);
       }
 
-      // 6. Keep E2E key in memory for current session (no local persistence).
+      // 6. Keep E2E key available for current tab session (survives refresh, cleared when tab closes).
       setKeyFromOnboarding(userKey, 1);
 
       // 7. Update Clerk user metadata with all profile data
@@ -511,7 +511,7 @@ export function Onboarding() {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = 'lavenius-recovery-phrase.txt';
+    anchor.download = 'terappIA-recovery-phrase.txt';
     anchor.click();
     URL.revokeObjectURL(url);
   };
@@ -1168,7 +1168,7 @@ export function Onboarding() {
 
         {/* Brand footer */}
         <p className="text-center text-sm text-muted-foreground mt-6">
-          Lavenius © {new Date().getFullYear()}
+          TerappIA © {new Date().getFullYear()}
         </p>
       </div>
     </div>

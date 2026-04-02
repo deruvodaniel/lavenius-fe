@@ -717,7 +717,7 @@
   },
   "settings": {
     "title": "Configuración",
-    "subtitle": "Personaliza tu experiencia en Lavenius",
+    "subtitle": "Personaliza tu experiencia en TerappIA",
     "language": "Idioma",
     "selectLanguage": "Seleccionar idioma",
     "languageChanged": "Idioma cambiado correctamente",
@@ -759,7 +759,7 @@
       "syncTimeChanges": "Cambios en horarios de sesiones",
       "syncCancellations": "Cancelación de sesiones",
       "oneWaySync": "Sincronización unidireccional",
-      "oneWaySyncWarning": "La sincronización funciona solo desde Lavenius hacia Google Calendar. Los cambios que realices directamente en Google Calendar <strong>no se reflejarán</strong> en la aplicación."
+      "oneWaySyncWarning": "La sincronización funciona solo desde TerappIA hacia Google Calendar. Los cambios que realices directamente en Google Calendar <strong>no se reflejarán</strong> en la aplicación."
     },
     "daysOff": {
       "title": "Días Off",
@@ -863,7 +863,7 @@
     },
     "theme": {
       "title": "Apariencia",
-      "description": "Elige cómo se ve Lavenius en tu dispositivo.",
+      "description": "Elige cómo se ve TerappIA en tu dispositivo.",
       "light": "Claro",
       "system": "Sistema",
       "dark": "Oscuro"
@@ -926,7 +926,7 @@
       "title": "Zona de peligro",
       "description": "Estas acciones son permanentes e irreversibles. Procede con extrema cautela.",
       "deleteAccount": "Eliminar cuenta",
-      "deleteAccountDescription": "Elimina permanentemente tu cuenta y todos tus datos de Lavenius, incluyendo pacientes, turnos, cobros y notas clínicas.",
+      "deleteAccountDescription": "Elimina permanentemente tu cuenta y todos tus datos de TerappIA, incluyendo pacientes, turnos, cobros y notas clínicas.",
       "confirmTitle": "¿Eliminar tu cuenta?",
       "confirmDescription": "Esta acción es permanente e irreversible. Todos tus datos, pacientes, turnos, cobros y notas clínicas serán eliminados para siempre. No podrás recuperar esta información.",
       "typeToConfirm": "Escribe ELIMINAR para confirmar",
@@ -1112,10 +1112,10 @@
     },
     "setupProgress": {
       "title": "Configura tu cuenta",
-      "subtitle": "Completa estos pasos para aprovechar al máximo Lavenius",
+      "subtitle": "Completa estos pasos para aprovechar al máximo TerappIA",
       "progress": "{{completed}} de {{total}} completados",
       "completeTitle": "¡Configuración completa!",
-      "completeSubtitle": "Todo listo. ¡Disfruta usando Lavenius!",
+      "completeSubtitle": "Todo listo. ¡Disfruta usando TerappIA!",
       "dismissHint": "Puedes volver a ver esta tarjeta desde el menú de configuración del dashboard",
       "steps": {
         "configureProfile": "Configurar tu perfil profesional",
@@ -1128,7 +1128,7 @@
   },
   "help": {
     "title": "Centro de Ayuda",
-    "subtitle": "Encuentra respuestas a tus preguntas sobre Lavenius",
+    "subtitle": "Encuentra respuestas a tus preguntas sobre TerappIA",
     "searchPlaceholder": "Buscar en la ayuda...",
     "faq": "Preguntas Frecuentes",
     "contact": "Contacto",
@@ -1147,11 +1147,11 @@
     "categories": {
       "gettingStarted": {
         "title": "Comenzar",
-        "description": "Primeros pasos en Lavenius",
+        "description": "Primeros pasos en TerappIA",
         "articles": {
           "welcome": {
-            "title": "Bienvenido a Lavenius",
-            "content": "**¡Bienvenido a Lavenius!**\n\nLavenius es tu plataforma integral para gestionar tu práctica terapéutica de manera simple y organizada.\n\n**¿Qué puedes hacer con Lavenius?**\n\n- **Gestionar pacientes:** Registra información de contacto, historial clínico y notas de sesión\n- **Agendar turnos:** Organiza tu calendario con sesiones presenciales o remotas\n- **Controlar cobros:** Lleva un registro de pagos pendientes y realizados\n- **Sincronizar calendario:** Conecta con Google Calendar para recibir recordatorios\n- **Analizar métricas:** Visualiza estadísticas de tu consultorio\n\n**Tip:** Usa el menú lateral para navegar entre las diferentes secciones de la aplicación.",
+            "title": "Bienvenido a TerappIA",
+            "content": "**¡Bienvenido a TerappIA!**\n\nTerappIA es tu plataforma integral para gestionar tu práctica terapéutica de manera simple y organizada.\n\n**¿Qué puedes hacer con TerappIA?**\n\n- **Gestionar pacientes:** Registra información de contacto, historial clínico y notas de sesión\n- **Agendar turnos:** Organiza tu calendario con sesiones presenciales o remotas\n- **Controlar cobros:** Lleva un registro de pagos pendientes y realizados\n- **Sincronizar calendario:** Conecta con Google Calendar para recibir recordatorios\n- **Analizar métricas:** Visualiza estadísticas de tu consultorio\n\n**Tip:** Usa el menú lateral para navegar entre las diferentes secciones de la aplicación.",
             "tags": [
               "bienvenido",
               "inicio",
@@ -1161,7 +1161,7 @@
           },
           "createAccount": {
             "title": "Crear tu cuenta",
-            "content": "**Registro en Lavenius**\n\nCrear tu cuenta es rápido y sencillo:\n\n1. Haz clic en **\"Comenzar gratis\"** en la página de inicio\n2. Ingresa tu correo electrónico\n3. Crea una contraseña segura\n4. Verifica tu correo (si es necesario)\n5. ¡Listo! Ya puedes iniciar sesión\n\n**Datos de la cuenta:**\n\nTu cuenta incluye:\n- Nombre y apellido\n- Correo electrónico (para iniciar sesión)\n- Foto de perfil (opcional)\n\n**Nota:** Lavenius utiliza autenticación segura para proteger tu cuenta.",
+            "content": "**Registro en TerappIA**\n\nCrear tu cuenta es rápido y sencillo:\n\n1. Haz clic en **\"Comenzar gratis\"** en la página de inicio\n2. Ingresa tu correo electrónico\n3. Crea una contraseña segura\n4. Verifica tu correo (si es necesario)\n5. ¡Listo! Ya puedes iniciar sesión\n\n**Datos de la cuenta:**\n\nTu cuenta incluye:\n- Nombre y apellido\n- Correo electrónico (para iniciar sesión)\n- Foto de perfil (opcional)\n\n**Nota:** TerappIA utiliza autenticación segura para proteger tu cuenta.",
             "tags": [
               "cuenta",
               "registro",
@@ -1182,7 +1182,7 @@
           },
           "firstSteps": {
             "title": "Primeros pasos recomendados",
-            "content": "**¿Por dónde empezar?**\n\nTe recomendamos seguir estos pasos para aprovechar al máximo Lavenius:\n\n**1. Registra tu primer paciente**\n- Ve a **Pacientes** en el menú lateral\n- Haz clic en **\"Nuevo Paciente\"**\n- Completa los datos básicos (nombre, teléfono, email)\n\n**2. Agenda tu primera sesión**\n- Ve a **Agenda** en el menú lateral\n- Haz clic en **\"Nuevo Turno\"**\n- Selecciona el paciente y elige fecha/hora\n\n**3. Conecta Google Calendar (opcional)**\n- Ve a **Configuración**\n- En la sección \"Calendario\", conecta tu cuenta de Google\n- Tus turnos se sincronizarán automáticamente\n\n**4. Configura tu horario laboral**\n- En **Configuración**, define tus días y horarios de trabajo\n- Esto ayudará a organizar mejor tu agenda\n\n**¿Necesitas ayuda?**\n\nExplora las otras secciones del Centro de Ayuda para aprender sobre cada funcionalidad en detalle.",
+            "content": "**¿Por dónde empezar?**\n\nTe recomendamos seguir estos pasos para aprovechar al máximo TerappIA:\n\n**1. Registra tu primer paciente**\n- Ve a **Pacientes** en el menú lateral\n- Haz clic en **\"Nuevo Paciente\"**\n- Completa los datos básicos (nombre, teléfono, email)\n\n**2. Agenda tu primera sesión**\n- Ve a **Agenda** en el menú lateral\n- Haz clic en **\"Nuevo Turno\"**\n- Selecciona el paciente y elige fecha/hora\n\n**3. Conecta Google Calendar (opcional)**\n- Ve a **Configuración**\n- En la sección \"Calendario\", conecta tu cuenta de Google\n- Tus turnos se sincronizarán automáticamente\n\n**4. Configura tu horario laboral**\n- En **Configuración**, define tus días y horarios de trabajo\n- Esto ayudará a organizar mejor tu agenda\n\n**¿Necesitas ayuda?**\n\nExplora las otras secciones del Centro de Ayuda para aprender sobre cada funcionalidad en detalle.",
             "tags": [
               "primeros pasos",
               "empezar",
@@ -1364,7 +1364,7 @@
           },
           "calendarConfig": {
             "title": "Configurar calendario",
-            "content": "En la sección de Configuración puedes:\n\n- Conectar o desconectar Google Calendar\n- Ver el estado de la sincronización\n- Forzar una sincronización manual\n\nLa sincronización es bidireccional: los cambios en Lavenius aparecen en tu Google Calendar y viceversa.",
+            "content": "En la sección de Configuración puedes:\n\n- Conectar o desconectar Google Calendar\n- Ver el estado de la sincronización\n- Forzar una sincronización manual\n\nLa sincronización es bidireccional: los cambios en TerappIA aparecen en tu Google Calendar y viceversa.",
             "tags": [
               "calendario",
               "configurar",
@@ -1377,7 +1377,7 @@
     }
   },
   "landing": {
-    "brand": "Lavenius",
+    "brand": "TerappIA",
     "tagline": "Gestión de Pacientes",
     "nav": {
       "dashboard": "Dashboard",
@@ -1388,8 +1388,8 @@
       "privacyPolicy": "Política de Privacidad"
     },
     "purpose": {
-      "title": "Para qué sirve Lavenius",
-      "description": "Lavenius es una aplicación web para profesionales de la salud mental que permite gestionar pacientes, agendar sesiones, escribir notas clínicas, controlar cobros y enviar recordatorios desde una sola plataforma segura.",
+      "title": "Para qué sirve TerappIA",
+      "description": "TerappIA es una aplicación web para profesionales de la salud mental que permite gestionar pacientes, agendar sesiones, escribir notas clínicas, controlar cobros y enviar recordatorios desde una sola plataforma segura.",
       "privacyLabel": "Consulta nuestra",
       "privacyLink": "Política de Privacidad"
     },
@@ -1516,8 +1516,8 @@
         }
       }
     },
-    "whyLavenius": {
-      "badge": "¿Por qué Lavenius?",
+    "whyTerappIA": {
+      "badge": "¿Por qué TerappIA?",
       "title": "Lo que nos diferencia",
       "subtitle": "Diseñado pensando en lo que realmente necesitas",
       "features": {
@@ -1663,13 +1663,13 @@
     "title": "Política de Privacidad",
     "backToHome": "Volver al inicio",
     "lastUpdated": "Última actualización: 13 de marzo de 2026",
-    "intro": "En Lavenius nos comprometemos a proteger la privacidad y seguridad de la información de terapeutas y pacientes.",
+    "intro": "En TerappIA nos comprometemos a proteger la privacidad y seguridad de la información de terapeutas y pacientes.",
     "sections": {
       "whoWeAre": {
         "title": "1. Quiénes somos",
-        "description": "Lavenius es una plataforma de gestión para profesionales de la salud mental (turnos, sesiones, notas, pagos y recordatorios).",
+        "description": "TerappIA es una plataforma de gestión para profesionales de la salud mental (turnos, sesiones, notas, pagos y recordatorios).",
         "controllerLabel": "Responsable del tratamiento",
-        "controllerValue": "Lavenius",
+        "controllerValue": "TerappIA",
         "emailLabel": "Email de contacto de privacidad",
         "emailValue": "lavenius.net@gmail.com",
         "addressLabel": "Domicilio",
@@ -1789,7 +1789,7 @@
         "emailLabel": "Email",
         "emailValue": "lavenius.net@gmail.com",
         "controllerLabel": "Responsable",
-        "controllerValue": "Lavenius"
+        "controllerValue": "TerappIA"
       }
     }
   },
@@ -1798,15 +1798,15 @@
     "title": "Términos y Condiciones",
     "backToHome": "Volver al inicio",
     "lastUpdated": "Última actualización: 16 de marzo de 2026",
-    "intro": "Estos Términos y Condiciones regulan el uso de Lavenius. Al crear una cuenta o utilizar la plataforma, aceptas estos términos.",
+    "intro": "Estos Términos y Condiciones regulan el uso de TerappIA. Al crear una cuenta o utilizar la plataforma, aceptas estos términos.",
     "sections": {
       "acceptance": {
         "title": "1. Aceptación",
-        "description": "Al acceder o usar Lavenius aceptas estos Términos y Condiciones y nuestra Política de Privacidad."
+        "description": "Al acceder o usar TerappIA aceptas estos Términos y Condiciones y nuestra Política de Privacidad."
       },
       "service": {
         "title": "2. Servicio",
-        "description": "Lavenius es una plataforma para profesionales de la salud mental que permite:",
+        "description": "TerappIA es una plataforma para profesionales de la salud mental que permite:",
         "items": [
           "Gestionar pacientes y fichas clínicas.",
           "Agendar sesiones y coordinar recordatorios.",
@@ -1836,7 +1836,7 @@
           "Usar la plataforma para actividades ilegales o no autorizadas.",
           "Intentar vulnerar la seguridad o integridad del servicio.",
           "Acceder a datos de terceros sin autorización.",
-          "Utilizar Lavenius para spam, fraude o abuso."
+          "Utilizar TerappIA para spam, fraude o abuso."
         ]
       },
       "google": {
@@ -1857,7 +1857,7 @@
       },
       "liability": {
         "title": "10. Limitación de responsabilidad",
-        "description": "En la máxima medida permitida por la ley, Lavenius no será responsable por daños indirectos, incidentales o consecuentes derivados del uso del servicio."
+        "description": "En la máxima medida permitida por la ley, TerappIA no será responsable por daños indirectos, incidentales o consecuentes derivados del uso del servicio."
       },
       "termination": {
         "title": "11. Suspensión o terminación",
@@ -1872,7 +1872,7 @@
         "emailLabel": "Email",
         "emailValue": "lavenius.net@gmail.com",
         "ownerLabel": "Responsable",
-        "ownerValue": "Lavenius"
+        "ownerValue": "TerappIA"
       }
     }
   },
@@ -1918,7 +1918,7 @@
     }
   },
   "onboarding": {
-    "welcome": "¡Bienvenido a Lavenius!",
+    "welcome": "¡Bienvenido a TerappIA!",
     "welcomeDescription": "Tu nueva herramienta para gestionar pacientes, agendar sesiones y llevar el control de tu práctica terapéutica de forma simple y organizada.",
     "welcomeSubtitle": "Te guiaremos por los primeros pasos",
     "steps": {
@@ -1983,7 +1983,7 @@
     },
     "complete": {
       "title": "¡Todo listo!",
-      "description": "Ya puedes comenzar a usar Lavenius. Recuerda que siempre puedes acceder a la ayuda desde el menú lateral si tienes dudas.",
+      "description": "Ya puedes comenzar a usar TerappIA. Recuerda que siempre puedes acceder a la ayuda desde el menú lateral si tienes dudas.",
       "tip": "Tip:",
       "tipText": "Usa la sección",
       "helpSection": "Ayuda",
@@ -2079,12 +2079,12 @@
         "download": "Descargar .txt",
         "acknowledgement": "Entiendo que solo mi contraseña maestra o esta frase de recuperación pueden descifrar mi información.",
         "copyError": "No pudimos copiar la frase de recuperación.",
-        "fileTitle": "Frase de Recuperación Lavenius",
+        "fileTitle": "Frase de Recuperación TerappIA",
         "fileWarning": "Importante: sin esta frase (o tu contraseña maestra) no podrás recuperar tus datos E2E."
       },
       "consent": {
         "title": "Protección de Datos con Cifrado de Extremo a Extremo",
-        "description": "Lavenius utiliza cifrado de extremo a extremo para proteger los datos sensibles de tus pacientes. Esto significa que solo tú puedes acceder a la información clínica: ni siquiera nosotros podemos leerla.",
+        "description": "TerappIA utiliza cifrado de extremo a extremo para proteger los datos sensibles de tus pacientes. Esto significa que solo tú puedes acceder a la información clínica: ni siquiera nosotros podemos leerla.",
         "label": "Acepto que mis datos clínicos serán protegidos con cifrado de extremo a extremo y entiendo que soy el único responsable de mi clave de acceso."
       }
     }
@@ -2110,7 +2110,8 @@
       "forgotPassphrase": "Olvidé mi contraseña maestra",
       "resetAndUnlock": "Restablecer y desbloquear",
       "recovering": "Recuperando...",
-      "backToPassphrase": "Volver a contraseña maestra"
+      "backToPassphrase": "Volver a contraseña maestra",
+      "signOutAndHome": "Cerrar sesión e ir al inicio"
     },
     "errors": {
       "invalidCredentials": "No pudimos desbloquear tus datos. Revisa tu contraseña maestra o frase de recuperación.",

@@ -1,4 +1,4 @@
-# Guía de Integración API - Frontend Lavenius
+# Guía de Integración API - Frontend TerappIA
 
 ## 🎯 Objetivo
 
@@ -457,7 +457,7 @@ sessionStorage.removeItem('userKey');
 ```typescript
 // En producción, asegurar HTTPS
 const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://api.lavenius.com'
+  ? 'https://api.terapp-ia.com'
   : 'http://localhost:3001';
 ```
 

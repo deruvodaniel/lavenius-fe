@@ -41,18 +41,23 @@ interface E2EKeyProviderProps {
   children: React.ReactNode;
 }
 
+const E2E_IDLE_LOCK_TIMEOUT_MS = 10 * 60 * 1000;
+const E2E_BACKGROUND_LOCK_TIMEOUT_MS = 2 * 60 * 1000;
+
 function isMissingBundleError(error: unknown): boolean {
   return error instanceof ApiClientError && error.statusCode === 401;
 }
 
 export function E2EKeyProvider({ children }: E2EKeyProviderProps) {
-  const { isSignedIn, userId } = useAuth();
+  const { isLoaded, isSignedIn, userId } = useAuth();
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(() => !!getE2EKeyState().userKey);
   const bootstrappedUserRef = useRef<string | null>(null);
   const previousUserIdRef = useRef<string | null>(null);
   const keyBundleCacheRef = useRef<{ userId: string; bundle: KeyBundleResponse } | null>(null);
   const recoveryBundleCacheRef = useRef<{ userId: string; bundle: RecoveryBundleResponse } | null>(null);
+  const idleTimerRef = useRef<number | null>(null);
+  const hiddenAtRef = useRef<number | null>(null);
 
   useEffect(() => {
     const unsubscribe = subscribeToE2EKeyState((nextState) => {
@@ -63,6 +68,25 @@ export function E2EKeyProvider({ children }: E2EKeyProviderProps) {
   }, []);
 
   useEffect(() => {
+    if (!isLoaded) {
+      return;
+    }
+
+    if (!isSignedIn || !userId) {
+      return;
+    }
+
+    const currentKey = getE2EKeyState().userKey;
+    if (currentKey) {
+      apiClient.setUserKey(userKeyToBase64(currentKey));
+    }
+  }, [isLoaded, isSignedIn, userId]);
+
+  useEffect(() => {
+    if (!isLoaded) {
+      return;
+    }
+
     if (!isSignedIn || !userId) {
       clearE2EUserKey();
       apiClient.clearUserKey();
@@ -82,7 +106,7 @@ export function E2EKeyProvider({ children }: E2EKeyProviderProps) {
     }
 
     previousUserIdRef.current = userId;
-  }, [isSignedIn, userId]);
+  }, [isLoaded, isSignedIn, userId]);
 
   useEffect(() => {
     if (!isSignedIn || !userId || !isUnlocked) {
@@ -197,6 +221,77 @@ export function E2EKeyProvider({ children }: E2EKeyProviderProps) {
     clearE2EUserKey();
     apiClient.clearUserKey();
   }, []);
+
+  useEffect(() => {
+    if (idleTimerRef.current !== null) {
+      window.clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
+    }
+    hiddenAtRef.current = null;
+
+    if (!isLoaded || !isSignedIn || !userId || !isUnlocked) {
+      return;
+    }
+
+    const startIdleTimer = () => {
+      if (idleTimerRef.current !== null) {
+        window.clearTimeout(idleTimerRef.current);
+      }
+
+      idleTimerRef.current = window.setTimeout(() => {
+        lock();
+      }, E2E_IDLE_LOCK_TIMEOUT_MS);
+    };
+
+    const handleActivity = () => {
+      startIdleTimer();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        hiddenAtRef.current = Date.now();
+        return;
+      }
+
+      const hiddenAt = hiddenAtRef.current;
+      hiddenAtRef.current = null;
+
+      if (hiddenAt && Date.now() - hiddenAt >= E2E_BACKGROUND_LOCK_TIMEOUT_MS) {
+        lock();
+        return;
+      }
+
+      startIdleTimer();
+    };
+
+    startIdleTimer();
+
+    const activityEvents: Array<keyof WindowEventMap> = [
+      'pointerdown',
+      'keydown',
+      'mousemove',
+      'scroll',
+      'touchstart',
+    ];
+
+    activityEvents.forEach((eventName) => {
+      window.addEventListener(eventName, handleActivity, { passive: true });
+    });
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      activityEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, handleActivity);
+      });
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+
+      if (idleTimerRef.current !== null) {
+        window.clearTimeout(idleTimerRef.current);
+        idleTimerRef.current = null;
+      }
+      hiddenAtRef.current = null;
+    };
+  }, [isLoaded, isSignedIn, userId, isUnlocked, lock]);
 
   const setKeyFromOnboarding = useCallback((userKey: Uint8Array, bundleVersion: number) => {
     setActiveKey(userKey, bundleVersion);

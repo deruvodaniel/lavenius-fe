@@ -1,6 +1,6 @@
 # E2E Frontend Integration Spec (React)
 
-Audience: React frontend team integrating with the current Lavenius backend E2E + at-rest hybrid model.
+Audience: React frontend team integrating with the current TerappIA backend E2E + at-rest hybrid model.
 
 Related docs:
 - `docs/e2e-encryption-plan.md`

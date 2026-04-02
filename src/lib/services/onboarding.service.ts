@@ -10,7 +10,7 @@ import type { ClerkUserSyncDto, OnboardingExtraData } from '../types/api.types';
  * LocalStorage key prefix for storing onboarding data not accepted by the backend
  * User ID is appended to make it user-scoped
  */
-const ONBOARDING_EXTRA_DATA_KEY_PREFIX = 'lavenius_onboarding_extra';
+const ONBOARDING_EXTRA_DATA_KEY_PREFIX = 'terappIA_onboarding_extra';
 
 /**
  * Result of a backend sync attempt
