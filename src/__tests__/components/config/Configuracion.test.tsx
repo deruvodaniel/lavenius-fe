@@ -578,7 +578,7 @@ describe('Configuracion', () => {
       await user.click(saveButton);
 
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        'lavenius_settings',
+        'terappIA_settings',
         expect.any(String)
       );
       expect(mockedToast.success).toHaveBeenCalledWith('Configuración guardada');

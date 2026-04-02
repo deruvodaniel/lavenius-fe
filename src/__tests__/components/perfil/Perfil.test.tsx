@@ -418,7 +418,7 @@ describe('Perfil', () => {
 
       await waitFor(() => {
         expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-          'lavenius_profile',
+          'terappIA_profile',
           expect.stringContaining('Psicología Clínica')
         );
       });

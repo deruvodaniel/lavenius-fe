@@ -261,8 +261,8 @@ curl http://localhost:3001/health
    - Duración correcta
    - Descripción (si aplica)
 4. Editar un evento en Google Calendar
-5. **Nota**: Por ahora la sincronización es unidireccional (de Lavenius a Google)
-   - Los cambios en Google Calendar NO se reflejan en Lavenius
+5. **Nota**: Por ahora la sincronización es unidireccional (de TerappIA a Google)
+   - Los cambios en Google Calendar NO se reflejan en TerappIA
 
 ## Próximos Pasos (Opcional)
 

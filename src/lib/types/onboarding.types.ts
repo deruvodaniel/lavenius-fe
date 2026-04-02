@@ -98,5 +98,5 @@ export interface HelpItem {
 /**
  * Constantes para localStorage keys
  */
-export const ONBOARDING_STORAGE_KEY = 'lavenius_onboarding';
+export const ONBOARDING_STORAGE_KEY = 'terappIA_onboarding';
 export const ONBOARDING_VERSION = '1.0.0';

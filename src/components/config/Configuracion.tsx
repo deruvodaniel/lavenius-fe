@@ -41,7 +41,7 @@ const NAVIGATION_SECTIONS: NavigationSection[] = [
 // SETTINGS STORAGE (localStorage for non-API settings)
 // ============================================================================
 
-const SETTINGS_KEY = 'lavenius_settings';
+const SETTINGS_KEY = 'terappIA_settings';
 
 // Days of the week (0 = Sunday, 1 = Monday, etc.)
 // Translations are handled via t() function

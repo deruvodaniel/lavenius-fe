@@ -79,7 +79,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
 
   const [selectedDuration, setSelectedDuration] = useState(() => {
     try {
-      const stored = localStorage.getItem('lavenius_settings');
+      const stored = localStorage.getItem('terappIA_settings');
       if (stored) {
         const settings = JSON.parse(stored);
         if (settings.defaultSessionDuration) return settings.defaultSessionDuration as number;
@@ -89,7 +89,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
   });
   const defaultSessionCost = useMemo(() => {
     try {
-      const stored = localStorage.getItem('lavenius_settings');
+      const stored = localStorage.getItem('terappIA_settings');
       if (stored) {
         const settings = JSON.parse(stored);
         if (settings.defaultSessionCost != null) return settings.defaultSessionCost as number;
@@ -99,7 +99,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
   }, []);
   const workingHours = useMemo(() => {
     try {
-      const stored = localStorage.getItem('lavenius_settings');
+      const stored = localStorage.getItem('terappIA_settings');
       if (stored) {
         const settings = JSON.parse(stored);
         if (settings.workingHours) return settings.workingHours as { startTime: string; endTime: string; workingDays: number[] };

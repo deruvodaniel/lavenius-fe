@@ -59,7 +59,7 @@ export function Dashboard() {
   return (
     <>
       <AppLayout
-        appName="Lavenius"
+        appName="TerappIA"
         sidebar={(onNavigate?: () => void, collapsed?: boolean, showHeader?: boolean) => (
           <Sidebar
             currentPath={location.pathname}

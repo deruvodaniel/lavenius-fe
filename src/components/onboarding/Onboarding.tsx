@@ -511,7 +511,7 @@ export function Onboarding() {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = 'lavenius-recovery-phrase.txt';
+    anchor.download = 'terappIA-recovery-phrase.txt';
     anchor.click();
     URL.revokeObjectURL(url);
   };
@@ -1168,7 +1168,7 @@ export function Onboarding() {
 
         {/* Brand footer */}
         <p className="text-center text-sm text-muted-foreground mt-6">
-          Lavenius © {new Date().getFullYear()}
+          TerappIA © {new Date().getFullYear()}
         </p>
       </div>
     </div>

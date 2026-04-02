@@ -37,7 +37,7 @@ interface RenderAppLayoutOptions {
 }
 
 const renderAppLayout = ({
-  appName = 'Lavenius',
+  appName = 'TerappIA',
   initialWidth = 1200,
 }: RenderAppLayoutOptions = {}) => {
   // Set initial width before render
@@ -112,7 +112,7 @@ describe('AppLayout', () => {
     it('displays app name in mobile header', () => {
       renderAppLayout({ initialWidth: 600 });
 
-      expect(screen.getByRole('heading', { level: 1, name: 'Lavenius' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1, name: 'TerappIA' })).toBeInTheDocument();
     });
 
     it('displays custom app name', () => {
@@ -442,7 +442,7 @@ describe('AppLayout', () => {
     it('app name is a heading', () => {
       renderAppLayout({ initialWidth: 600 });
 
-      expect(screen.getByRole('heading', { level: 1, name: 'Lavenius' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1, name: 'TerappIA' })).toBeInTheDocument();
     });
   });
 

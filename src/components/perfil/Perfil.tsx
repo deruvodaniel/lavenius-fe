@@ -33,7 +33,7 @@ interface PerfilProps {
 // PROFILE STORAGE
 // ============================================================================
 
-const PROFILE_KEY = 'lavenius_profile';
+const PROFILE_KEY = 'terappIA_profile';
 
 interface ProfileData {
   avatarUrl?: string;

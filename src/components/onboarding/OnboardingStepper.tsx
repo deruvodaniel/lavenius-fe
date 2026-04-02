@@ -596,7 +596,7 @@ export function OnboardingStepper() {
 
         {/* Brand footer */}
         <p className="text-center text-sm text-muted-foreground mt-6">
-          Lavenius © {new Date().getFullYear()}
+          TerappIA © {new Date().getFullYear()}
         </p>
       </div>
     </div>

@@ -1,6 +1,6 @@
 /**
  * @file useLanguage hook
- * @description Custom hook for language management in Lavenius
+ * @description Custom hook for language management in TerappIA
  * 
  * Usage:
  * ```tsx

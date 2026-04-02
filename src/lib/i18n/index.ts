@@ -1,5 +1,5 @@
 /**
- * @file i18n configuration for Lavenius
+ * @file i18n configuration for TerappIA
  * @description Internationalization setup using i18next with react-i18next
  * 
  * Supported Languages:
@@ -79,7 +79,7 @@ export const LANGUAGE_CODES: SupportedLanguage[] = SUPPORTED_LANGUAGES.map(
 /**
  * Local storage key for language persistence
  */
-export const LANGUAGE_STORAGE_KEY = 'lavenius_language';
+export const LANGUAGE_STORAGE_KEY = 'terappIA_language';
 
 // ============================================================================
 // RESOURCES

@@ -1,4 +1,4 @@
-# TODO - Frontend Lavenius
+# TODO - Frontend TerappIA
 
 > **Última actualización**: Marzo 11, 2026
 > Plan de mejoras y tareas pendientes.

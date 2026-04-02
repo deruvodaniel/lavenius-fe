@@ -115,7 +115,7 @@ export const useDashboardSettingsStore = create<
       },
     }),
     {
-      name: 'lavenius-dashboard-settings',
+      name: 'terapp-ia-dashboard-settings',
       version: 1,
       // Only persist sections, not UI state
       partialize: (state) => ({ sections: state.sections }),

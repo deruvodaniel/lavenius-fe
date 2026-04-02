@@ -181,7 +181,7 @@ describe('OnboardingService', () => {
 
       onboardingService.saveExtraData(userId, extraData);
 
-      const savedData = localStorage.getItem(`lavenius_onboarding_extra_${userId}`);
+      const savedData = localStorage.getItem(`terappIA_onboarding_extra_${userId}`);
       expect(savedData).toBeTruthy();
       expect(JSON.parse(savedData!)).toEqual(extraData);
     });
@@ -196,7 +196,7 @@ describe('OnboardingService', () => {
 
       onboardingService.saveExtraData(userId, extraData);
 
-      const savedData = localStorage.getItem(`lavenius_onboarding_extra_${userId}`);
+      const savedData = localStorage.getItem(`terappIA_onboarding_extra_${userId}`);
       expect(JSON.parse(savedData!)).toEqual({ specialty: 'CBT' });
     });
 
@@ -210,7 +210,7 @@ describe('OnboardingService', () => {
 
       onboardingService.saveExtraData(userId, extraData);
 
-      const savedData = localStorage.getItem(`lavenius_onboarding_extra_${userId}`);
+      const savedData = localStorage.getItem(`terappIA_onboarding_extra_${userId}`);
       expect(JSON.parse(savedData!)).toEqual({
         socialMedia: { instagram: '@therapist' },
       });
@@ -225,7 +225,7 @@ describe('OnboardingService', () => {
 
       onboardingService.saveExtraData(userId, extraData);
 
-      const savedData = localStorage.getItem(`lavenius_onboarding_extra_${userId}`);
+      const savedData = localStorage.getItem(`terappIA_onboarding_extra_${userId}`);
       expect(savedData).toBeNull();
     });
 
@@ -244,7 +244,7 @@ describe('OnboardingService', () => {
 
       onboardingService.saveExtraData(userId, extraData);
 
-      const savedData = localStorage.getItem(`lavenius_onboarding_extra_${userId}`);
+      const savedData = localStorage.getItem(`terappIA_onboarding_extra_${userId}`);
       expect(JSON.parse(savedData!)).toEqual(extraData);
     });
   });
@@ -258,7 +258,7 @@ describe('OnboardingService', () => {
         website: 'https://art-therapy.com',
       };
       localStorage.setItem(
-        `lavenius_onboarding_extra_${userId}`,
+        `terappIA_onboarding_extra_${userId}`,
         JSON.stringify(extraData)
       );
 
@@ -274,7 +274,7 @@ describe('OnboardingService', () => {
     });
 
     it('should return null for invalid JSON', () => {
-      localStorage.setItem(`lavenius_onboarding_extra_${userId}`, 'invalid-json{');
+      localStorage.setItem(`terappIA_onboarding_extra_${userId}`, 'invalid-json{');
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
       const result = onboardingService.getExtraData(userId);
@@ -289,13 +289,13 @@ describe('OnboardingService', () => {
 
     it('should remove extra data from localStorage', () => {
       localStorage.setItem(
-        `lavenius_onboarding_extra_${userId}`,
+        `terappIA_onboarding_extra_${userId}`,
         JSON.stringify({ specialty: 'Test' })
       );
 
       onboardingService.clearExtraData(userId);
 
-      expect(localStorage.getItem(`lavenius_onboarding_extra_${userId}`)).toBeNull();
+      expect(localStorage.getItem(`terappIA_onboarding_extra_${userId}`)).toBeNull();
     });
 
     it('should not throw when clearing non-existent data', () => {
