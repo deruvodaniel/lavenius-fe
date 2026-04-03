@@ -10,7 +10,7 @@ import { AccountTypeSelection } from './components/auth/AccountTypeSelection';
 import { PrivacyPolicy, TermsOfService } from './components/public';
 import { AccountType, getUserAccountType } from './lib/auth/accountType';
 
-// Lazy load dashboard views
+// Lazy load dashboard views.
 const Agenda = lazy(() => import('./components/agenda/Agenda').then(m => ({ default: m.Agenda })));
 const Pacientes = lazy(() => import('./components/pacientes/Pacientes').then(m => ({ default: m.Pacientes })));
 const Cobros = lazy(() => import('./components/cobros/Cobros').then(m => ({ default: m.Cobros })));
