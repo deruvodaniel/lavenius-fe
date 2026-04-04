@@ -10,16 +10,29 @@
     />
     <meta name="application-name" content="TerappIA" />
     <title>TerappIA | Plataforma de gestión para profesionales de la salud mental</title>
-    <style>
-      html[data-hide-oauth-fallback="true"] #oauth-verification-fallback {
-        display: none !important;
-      }
-    </style>
     <script>
       (function () {
-        if (window.location.pathname !== "/") {
-          document.documentElement.setAttribute("data-hide-oauth-fallback", "true");
+        function syncOauthFallbackVisibility() {
+          var fallback = document.getElementById("oauth-verification-fallback");
+          if (!fallback) return;
+          fallback.style.display = window.location.pathname === "/" ? "" : "none";
         }
+
+        var originalPushState = history.pushState;
+        history.pushState = function () {
+          originalPushState.apply(this, arguments);
+          syncOauthFallbackVisibility();
+        };
+
+        var originalReplaceState = history.replaceState;
+        history.replaceState = function () {
+          originalReplaceState.apply(this, arguments);
+          syncOauthFallbackVisibility();
+        };
+
+        window.addEventListener("popstate", syncOauthFallbackVisibility);
+        window.addEventListener("DOMContentLoaded", syncOauthFallbackVisibility);
+        syncOauthFallbackVisibility();
       })();
     </script>
   </head>
