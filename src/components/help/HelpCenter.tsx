@@ -11,7 +11,8 @@ import {
   HelpCircle,
   ArrowLeft,
   Rocket,
-  LayoutDashboard
+  LayoutDashboard,
+  Shield
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -200,6 +201,38 @@ const HELP_CATEGORIES: HelpCategory[] = [
         titleKey: 'help.categories.configuracion.articles.calendarConfig.title',
         contentKey: 'help.categories.configuracion.articles.calendarConfig.content',
         tagsKey: 'help.categories.configuracion.articles.calendarConfig.tags',
+      },
+      {
+        id: 'patient-booking',
+        titleKey: 'help.categories.configuracion.articles.patientBooking.title',
+        contentKey: 'help.categories.configuracion.articles.patientBooking.content',
+        tagsKey: 'help.categories.configuracion.articles.patientBooking.tags',
+      },
+      {
+        id: 'google-oauth',
+        titleKey: 'help.categories.configuracion.articles.googleOauth.title',
+        contentKey: 'help.categories.configuracion.articles.googleOauth.content',
+        tagsKey: 'help.categories.configuracion.articles.googleOauth.tags',
+      },
+    ],
+  },
+  {
+    id: 'seguridad',
+    titleKey: 'help.categories.seguridad.title',
+    descriptionKey: 'help.categories.seguridad.description',
+    icon: Shield,
+    articles: [
+      {
+        id: 'e2e-passphrase',
+        titleKey: 'help.categories.seguridad.articles.e2ePassphrase.title',
+        contentKey: 'help.categories.seguridad.articles.e2ePassphrase.content',
+        tagsKey: 'help.categories.seguridad.articles.e2ePassphrase.tags',
+      },
+      {
+        id: 'app-security',
+        titleKey: 'help.categories.seguridad.articles.appSecurity.title',
+        contentKey: 'help.categories.seguridad.articles.appSecurity.content',
+        tagsKey: 'help.categories.seguridad.articles.appSecurity.tags',
       },
     ],
   },

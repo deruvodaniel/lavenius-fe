@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Award, Mail, Phone, Globe, MapPin, Instagram, Linkedin, Calendar, Clock } from 'lucide-react';
+import { ArrowLeft, Award, Mail, Phone, Globe, MapPin, Instagram, Linkedin, Calendar, Clock, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { getNameInitials } from '@/lib/utils/nameInitials';
+import { toast } from 'sonner';
 
 // ============================================================================
 // PROFILE DATA (reuses same localStorage key as Perfil)
@@ -45,6 +46,7 @@ export function PublicProfile() {
   const { user } = useAuth();
   const profile = loadProfile();
   const therapistId = user?.therapistId;
+  const bookingUrl = therapistId ? `${window.location.origin}/book/${therapistId}` : '';
 
   const fullName = user ? `${user.firstName} ${user.lastName || ''}`.trim() : '';
   const initials = user
@@ -214,21 +216,29 @@ export function PublicProfile() {
         )}
 
         {/* Book Session CTA */}
-        <Card className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
+        <Card className="p-6 bg-gradient-to-r from-indigo-900/40 via-indigo-900/30 to-purple-900/40 border-indigo-700/50">
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <Calendar className="w-6 h-6 text-indigo-600" />
+            <div className="w-12 h-12 bg-indigo-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <Calendar className="w-6 h-6 text-indigo-300" />
             </div>
             <div className="flex-1 text-center sm:text-left">
               <h3 className="font-semibold text-foreground">{t('profile.share.bookSession')}</h3>
-              <p className="text-sm text-muted-foreground mt-0.5">{t('profile.share.bookSessionDescription')}</p>
+              <p className="text-sm text-indigo-200/90 mt-0.5">{t('profile.share.bookSessionDescription')}</p>
             </div>
             <Button
               className="w-full sm:w-auto"
-              disabled={!therapistId}
-              onClick={() => therapistId && navigate(`/book/${therapistId}`)}
+              disabled={!bookingUrl}
+              onClick={() => {
+                if (!bookingUrl) {
+                  toast.error(t('profile.share.bookingLinkUnavailable'));
+                  return;
+                }
+                navigator.clipboard.writeText(bookingUrl);
+                toast.success(t('profile.share.bookingLinkCopied'));
+              }}
             >
-              {t('profile.share.bookSession')}
+              <Copy className="w-4 h-4 mr-2" />
+              {t('profile.share.copyBookingLink')}
             </Button>
           </div>
         </Card>

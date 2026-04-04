@@ -950,7 +950,7 @@
     "share": {
       "backToSettings": "Volver a Configuración",
       "bookSession": "Agendar una sesión",
-      "bookSessionDescription": "Reserva online próximamente",
+      "bookSessionDescription": "Comparte este enlace para que tus pacientes puedan reservar online.",
       "comingSoon": "Perfil público completo próximamente",
       "contactInfo": "Información de contacto",
       "copied": "¡Enlace copiado!",
@@ -1384,6 +1384,66 @@
               "configurar",
               "google",
               "sincronizar"
+            ]
+          },
+          "patientBooking": {
+            "title": "Reservas online de pacientes",
+            "content": "Con TerappIA ya puedes compartir un enlace público para que tus pacientes reserven turnos por su cuenta.\n\n**Cómo funciona**\n\n1. Ve a **Configuración > Mi Perfil Público**\n2. Usa el botón **\"Copiar enlace de reservas\"**\n3. Comparte ese enlace con tus pacientes\n\n**Qué ve el paciente**\n\n- Horarios disponibles\n- Duración de la sesión\n- Formulario con datos de contacto\n\nCuando el paciente envía la solicitud, la sesión queda en estado **pendiente de aprobación**.\n\n**Dónde la revisas**\n\nDesde tu **Agenda**, donde puedes revisar y aprobar la solicitud.",
+            "tags": [
+              "reservas",
+              "paciente",
+              "enlace público",
+              "agenda",
+              "aprobación"
+            ]
+          },
+          "googleOauth": {
+            "title": "Google OAuth y sincronización de calendario",
+            "content": "Si conectas Google Calendar, TerappIA usa permisos para leer y actualizar eventos de agenda necesarios para sincronizar tus turnos.\n\n**Para qué se usa**\n\n- Evitar superposiciones de horarios\n- Crear/actualizar/cancelar eventos cuando cambias turnos\n- Mantener agenda de TerappIA y Google Calendar alineadas\n\n**Si no sincroniza**\n\n1. Ve a **Configuración > Calendario**\n2. Desconecta y vuelve a conectar Google Calendar\n3. Fuerza una sincronización manual\n\nSi el problema continúa, revisa que la cuenta Google conectada sea la correcta.",
+            "tags": [
+              "google oauth",
+              "calendar",
+              "sincronización",
+              "permisos",
+              "integración"
+            ]
+          },
+          "e2ePassphrase": {
+            "title": "Contraseña maestra y frase de recuperación (E2E)",
+            "content": "TerappIA protege datos sensibles con cifrado de extremo a extremo (E2E).\n\n**Contraseña maestra**\n\nSe usa para desbloquear tus datos cifrados en el navegador.\n\n**Frase de recuperación**\n\nEs tu respaldo si olvidas la contraseña maestra. Guárdala en un lugar seguro.\n\n**Cuándo se puede bloquear la sesión**\n\n- Por inactividad\n- Al volver desde segundo plano según configuración de seguridad\n- Al cerrar sesión\n\nSi pierdes la contraseña maestra y la frase de recuperación, no podrás recuperar los datos E2E.",
+            "tags": [
+              "e2e",
+              "contraseña maestra",
+              "frase de recuperación",
+              "seguridad",
+              "bloqueo"
+            ]
+          }
+        }
+      },
+      "seguridad": {
+        "title": "Seguridad",
+        "description": "Protección de datos explicada de forma simple",
+        "articles": {
+          "e2ePassphrase": {
+            "title": "Contraseña maestra y frase de recuperación",
+            "content": "TerappIA protege información sensible con cifrado de extremo a extremo (E2E).\n\n**Qué significa en la práctica**\n\nSolo tú, desde tu sesión desbloqueada, puedes leer esos datos sensibles.\n\n**Contraseña maestra**\n\nSe usa para desbloquear la información E2E en tu navegador.\n\n**Frase de recuperación**\n\nEs tu respaldo si olvidas la contraseña maestra. Guárdala fuera de la app (por ejemplo, en un lugar físico seguro).\n\n**Importante**\n\nSi pierdes la contraseña maestra y también la frase de recuperación, no podrás recuperar los datos E2E.",
+            "tags": [
+              "seguridad",
+              "e2e",
+              "contraseña maestra",
+              "frase de recuperación"
+            ]
+          },
+          "appSecurity": {
+            "title": "¿Qué seguridad usa TerappIA?",
+            "content": "En TerappIA aplicamos varias capas de seguridad pensadas para el trabajo clínico:\n\n- Cifrado en tránsito (HTTPS/TLS)\n- Cifrado en base de datos para datos operativos\n- Cifrado E2E para datos sensibles definidos\n- Controles de acceso y registros de auditoría\n- Límites de uso para prevenir abuso\n\n**En palabras simples**\n\nEsto ayuda a proteger la información de tus pacientes tanto cuando viaja por internet como cuando se guarda.\n\nSi no tienes experiencia técnica, la recomendación principal es: usar una contraseña maestra fuerte y guardar bien tu frase de recuperación.",
+            "tags": [
+              "seguridad",
+              "cifrado",
+              "datos",
+              "pacientes",
+              "privacidad"
             ]
           }
         }

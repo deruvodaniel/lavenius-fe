@@ -949,7 +949,7 @@
     },
     "share": {
       "bookSession": "Book a Session",
-      "bookSessionDescription": "Online booking coming soon",
+      "bookSessionDescription": "Share this link so patients can book online.",
       "backToSettings": "Back to Settings",
       "contactInfo": "Contact Information",
       "copied": "Link copied!",
@@ -1337,6 +1337,66 @@
               "configure",
               "google",
               "sync"
+            ]
+          },
+          "patientBooking": {
+            "title": "Online patient booking",
+            "content": "TerappIA now lets you share a public booking link so patients can book sessions themselves.\n\n**How it works**\n\n1. Go to **Settings > Public Profile**\n2. Use **\"Copy booking link\"**\n3. Share that link with patients\n\n**What the patient sees**\n\n- Available time slots\n- Session duration\n- Contact details form\n\nWhen the patient submits a request, the session stays in **pending approval** status.\n\n**Where you review it**\n\nIn your **Agenda**, where you can review and approve the request.",
+            "tags": [
+              "booking",
+              "patient",
+              "public link",
+              "agenda",
+              "approval"
+            ]
+          },
+          "googleOauth": {
+            "title": "Google OAuth and calendar sync",
+            "content": "If you connect Google Calendar, TerappIA uses permissions to read and update calendar events required to sync your sessions.\n\n**What it is used for**\n\n- Prevent scheduling conflicts\n- Create/update/cancel events when session data changes\n- Keep TerappIA agenda and Google Calendar aligned\n\n**If sync is not working**\n\n1. Go to **Settings > Calendar**\n2. Disconnect and reconnect Google Calendar\n3. Trigger a manual sync\n\nIf the issue persists, verify that the connected Google account is the correct one.",
+            "tags": [
+              "google oauth",
+              "calendar",
+              "sync",
+              "permissions",
+              "integration"
+            ]
+          },
+          "e2ePassphrase": {
+            "title": "Master passphrase and recovery phrase (E2E)",
+            "content": "TerappIA protects sensitive data with end-to-end encryption (E2E).\n\n**Master passphrase**\n\nUsed to unlock encrypted data in your browser.\n\n**Recovery phrase**\n\nYour backup if you forget the master passphrase. Store it in a safe place.\n\n**When session lock can happen**\n\n- Due to inactivity\n- When returning from background depending on security settings\n- After sign-out\n\nIf you lose both your master passphrase and recovery phrase, E2E data cannot be recovered.",
+            "tags": [
+              "e2e",
+              "master passphrase",
+              "recovery phrase",
+              "security",
+              "lock"
+            ]
+          }
+        }
+      },
+      "seguridad": {
+        "title": "Security",
+        "description": "Data protection explained in simple terms",
+        "articles": {
+          "e2ePassphrase": {
+            "title": "Master passphrase and recovery phrase",
+            "content": "TerappIA protects sensitive information with end-to-end encryption (E2E).\n\n**What this means in practice**\n\nOnly you, from an unlocked session, can read that sensitive data.\n\n**Master passphrase**\n\nUsed to unlock E2E information in your browser.\n\n**Recovery phrase**\n\nYour backup if you forget the master passphrase. Store it outside the app (for example, in a safe physical place).\n\n**Important**\n\nIf you lose both your master passphrase and recovery phrase, E2E data cannot be recovered.",
+            "tags": [
+              "security",
+              "e2e",
+              "master passphrase",
+              "recovery phrase"
+            ]
+          },
+          "appSecurity": {
+            "title": "What security does TerappIA use?",
+            "content": "TerappIA applies multiple security layers designed for clinical workflows:\n\n- Encryption in transit (HTTPS/TLS)\n- Database encryption for operational data\n- E2E encryption for defined sensitive fields\n- Access controls and audit logs\n- Rate limiting to prevent abuse\n\n**In simple words**\n\nThis helps protect patient information both while it travels over the internet and while it is stored.\n\nIf you are not technical, the most important recommendation is: use a strong master passphrase and keep your recovery phrase safe.",
+            "tags": [
+              "security",
+              "encryption",
+              "data",
+              "patients",
+              "privacy"
             ]
           }
         }
