@@ -10,6 +10,18 @@
     />
     <meta name="application-name" content="TerappIA" />
     <title>TerappIA | Plataforma de gestión para profesionales de la salud mental</title>
+    <style>
+      html[data-hide-oauth-fallback="true"] #oauth-verification-fallback {
+        display: none !important;
+      }
+    </style>
+    <script>
+      (function () {
+        if (window.location.pathname !== "/") {
+          document.documentElement.setAttribute("data-hide-oauth-fallback", "true");
+        }
+      })();
+    </script>
   </head>
 
   <body>
