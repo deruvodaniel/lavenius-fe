@@ -2071,6 +2071,11 @@
       "rateLimited": "Too many attempts. Please wait and try again.",
       "invalidRecoveryInput": "Check the recovery phrase and confirm the new passphrase.",
       "generic": "Could not unlock your encrypted information."
+    },
+    "security": {
+      "attemptsRemaining": "Attempts remaining: {{count}}",
+      "retryIn": "Wait {{seconds}}s before trying again.",
+      "maxAttemptsSignOut": "Too many failed attempts. Signing out for security."
     }
   },
   "errors": {

@@ -2063,6 +2063,11 @@
       "rateLimited": "Muitas tentativas. Aguarde um momento e tente novamente.",
       "invalidRecoveryInput": "Verifique a frase de recuperação e confirme a nova passphrase.",
       "generic": "Não foi possível desbloquear suas informações criptografadas."
+    },
+    "security": {
+      "attemptsRemaining": "Tentativas restantes: {{count}}",
+      "retryIn": "Aguarde {{seconds}}s para tentar novamente.",
+      "maxAttemptsSignOut": "Muitas tentativas falhas. Encerrando sessão por segurança."
     }
   },
   "errors": {

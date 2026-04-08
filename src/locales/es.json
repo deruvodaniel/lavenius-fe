@@ -2118,6 +2118,11 @@
       "rateLimited": "Demasiados intentos. Espera un momento y vuelve a intentar.",
       "invalidRecoveryInput": "Revisa la frase de recuperación y confirma la nueva contraseña maestra.",
       "generic": "No pudimos desbloquear tu información cifrada."
+    },
+    "security": {
+      "attemptsRemaining": "Intentos restantes: {{count}}",
+      "retryIn": "Espera {{seconds}}s para reintentar.",
+      "maxAttemptsSignOut": "Demasiados intentos fallidos. Cerrando sesión por seguridad."
     }
   },
   "errors": {
