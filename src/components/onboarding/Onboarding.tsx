@@ -132,7 +132,7 @@ const STEPS: StepConfig[] = [
 
 const TOTAL_STEPS = STEPS.length;
 const ONBOARDING_PASSPHRASE_MIN_LENGTH = 10;
-const ONBOARDING_PASSPHRASE_MIN_SCORE = 2;
+const ONBOARDING_PASSPHRASE_MIN_SCORE = 3;
 const ONBOARDING_PASSPHRASE_RECOMMENDED_SCORE = 3;
 
 type PassphraseStrength = 'weak' | 'medium' | 'strong';
