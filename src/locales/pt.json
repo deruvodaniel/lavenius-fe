@@ -1978,6 +1978,13 @@
         "tipText": "Você pode editar essas informações a qualquer momento no seu perfil."
       },
       "passphraseInfo": "Defina uma senha mestra forte (recomendado 12+ caracteres, com letras, números e símbolos). Ela protege seus dados E2E; sem ela, você só poderá recuperar o acesso com sua frase de recuperação.",
+      "security": {
+        "strength": "Força da passphrase mestra",
+        "weak": "Fraca",
+        "medium": "Média",
+        "strong": "Forte",
+        "recommended": "Aceitável por enquanto, mas recomendamos uma passphrase mestra mais robusta (nível forte)."
+      },
       "fields": {
         "licenseNumber": "Registro Profissional",
         "specialty": "Especialidade",
@@ -2009,6 +2016,8 @@
         "websiteInvalid": "Digite uma URL válida (ex: https://exemplo.com)",
         "bioTooLong": "A bio não pode exceder 500 caracteres",
         "passphraseMinLength": "A passphrase deve ter pelo menos {{count}} caracteres",
+        "passphraseOnlyNumbers": "A passphrase não pode conter apenas números.",
+        "passphraseTooWeak": "A passphrase está muito fraca. Tente uma combinação menos previsível.",
         "passphraseMismatch": "As passphrases não coincidem",
         "recoveryAcknowledged": "Você deve confirmar que salvou sua frase de recuperação.",
         "consentRequired": "Você deve aceitar os termos de privacidade e criptografia para continuar"

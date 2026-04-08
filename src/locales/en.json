@@ -1986,6 +1986,13 @@
         "tipText": "You can edit this information at any time from your profile."
       },
       "passphraseInfo": "Set a strong master password (12+ characters recommended, with letters, numbers and symbols). It protects your E2E data; without it, you can only recover access with your recovery phrase.",
+      "security": {
+        "strength": "Master passphrase strength",
+        "weak": "Weak",
+        "medium": "Medium",
+        "strong": "Strong",
+        "recommended": "Acceptable for now, but we recommend a stronger master passphrase (strong level)."
+      },
       "fields": {
         "licenseNumber": "Professional License",
         "specialty": "Specialty",
@@ -2017,6 +2024,8 @@
         "websiteInvalid": "Enter a valid URL (e.g.: https://example.com)",
         "bioTooLong": "Bio cannot exceed 500 characters",
         "passphraseMinLength": "Passphrase must be at least {{count}} characters",
+        "passphraseOnlyNumbers": "Passphrase cannot contain only numbers.",
+        "passphraseTooWeak": "Passphrase is too weak. Try a less predictable combination.",
         "passphraseMismatch": "Passphrases do not match",
         "recoveryAcknowledged": "You must confirm you saved your recovery phrase.",
         "consentRequired": "You must accept the privacy and encryption terms to continue"

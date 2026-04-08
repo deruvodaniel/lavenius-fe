@@ -41,7 +41,7 @@ import {
   ShieldCheck,
   Stethoscope
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -131,6 +131,29 @@ const STEPS: StepConfig[] = [
 ];
 
 const TOTAL_STEPS = STEPS.length;
+const ONBOARDING_PASSPHRASE_MIN_LENGTH = 10;
+const ONBOARDING_PASSPHRASE_MIN_SCORE = 2;
+const ONBOARDING_PASSPHRASE_RECOMMENDED_SCORE = 3;
+
+type PassphraseStrength = 'weak' | 'medium' | 'strong';
+type ZxcvbnResult = {
+  score: number;
+  feedback?: {
+    warning?: string;
+    suggestions?: string[];
+  };
+};
+type ZxcvbnFn = (password: string, userInputs?: string[]) => ZxcvbnResult;
+
+function isNumericOnlyPassphrase(passphrase: string): boolean {
+  return /^\d+$/.test(passphrase);
+}
+
+function getPassphraseStrengthFromScore(score: number): PassphraseStrength {
+  if (score >= 3) return 'strong';
+  if (score >= 2) return 'medium';
+  return 'weak';
+}
 
 /**
  * Multi-step onboarding page component for new Clerk users
@@ -166,6 +189,27 @@ export function Onboarding() {
   const [confirmPassphraseTouched, setConfirmPassphraseTouched] = useState(false);
   const [isPassphraseFocused, setIsPassphraseFocused] = useState(false);
   const [isConfirmPassphraseFocused, setIsConfirmPassphraseFocused] = useState(false);
+  const [zxcvbn, setZxcvbn] = useState<ZxcvbnFn | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    void import('zxcvbn')
+      .then((module) => {
+        const loaded = module as unknown as { default?: ZxcvbnFn };
+        const zxcvbnFn = loaded.default ?? (module as unknown as ZxcvbnFn);
+        if (isMounted) {
+          setZxcvbn(() => zxcvbnFn);
+        }
+      })
+      .catch(() => {
+        // Keep onboarding usable even if strength module fails to load.
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Progress percentage
   const progressPercentage = useMemo(() => {
@@ -178,12 +222,42 @@ export function Onboarding() {
   const isFirstStep = currentStep === 0;
   const hasPassphraseInput = formData.passphrase.length > 0;
   const hasConfirmPassphraseInput = formData.confirmPassphrase.length > 0;
-  const isPassphraseTooShort = hasPassphraseInput && formData.passphrase.length < 8;
+  const isPassphraseTooShort =
+    hasPassphraseInput && formData.passphrase.length < ONBOARDING_PASSPHRASE_MIN_LENGTH;
+  const isPassphraseNumericOnly =
+    hasPassphraseInput && isNumericOnlyPassphrase(formData.passphrase);
+  const passphraseEvaluation = useMemo<ZxcvbnResult | null>(() => {
+    if (!hasPassphraseInput || !zxcvbn) {
+      return null;
+    }
+    const userInputs = [
+      user?.firstName ?? '',
+      user?.lastName ?? '',
+      user?.primaryEmailAddress?.emailAddress ?? '',
+    ].filter(Boolean);
+    return zxcvbn(formData.passphrase, userInputs);
+  }, [
+    formData.passphrase,
+    hasPassphraseInput,
+    user?.firstName,
+    user?.lastName,
+    user?.primaryEmailAddress?.emailAddress,
+    zxcvbn,
+  ]);
+  const passphraseScore = passphraseEvaluation?.score ?? null;
   const isPassphraseMismatch =
     hasConfirmPassphraseInput && formData.confirmPassphrase !== formData.passphrase;
+  const passphraseStrength =
+    passphraseScore === null ? null : getPassphraseStrengthFromScore(passphraseScore);
+  const isPassphraseScoreValid =
+    passphraseScore === null || passphraseScore >= ONBOARDING_PASSPHRASE_MIN_SCORE;
+  const showPassphraseScoreRecommendation =
+    passphraseScore !== null && passphraseScore < ONBOARDING_PASSPHRASE_RECOMMENDED_SCORE;
   const isPassphraseReady =
-    formData.passphrase.length >= 8 &&
-    formData.confirmPassphrase === formData.passphrase;
+    formData.passphrase.length >= ONBOARDING_PASSPHRASE_MIN_LENGTH &&
+    formData.confirmPassphrase === formData.passphrase &&
+    !isPassphraseNumericOnly &&
+    isPassphraseScoreValid;
   const canCompleteSetup =
     isPassphraseReady &&
     Boolean(recoverySecret) &&
@@ -274,8 +348,14 @@ export function Onboarding() {
     }
 
     if (currentStep === 3) {
-      if (formData.passphrase.length < 8) {
-        newErrors.passphrase = t('onboarding.stepper.validation.passphraseMinLength', { count: 8 });
+      if (formData.passphrase.length < ONBOARDING_PASSPHRASE_MIN_LENGTH) {
+        newErrors.passphrase = t('onboarding.stepper.validation.passphraseMinLength', {
+          count: ONBOARDING_PASSPHRASE_MIN_LENGTH,
+        });
+      } else if (isNumericOnlyPassphrase(formData.passphrase)) {
+        newErrors.passphrase = t('onboarding.stepper.validation.passphraseOnlyNumbers');
+      } else if (passphraseScore !== null && passphraseScore < ONBOARDING_PASSPHRASE_MIN_SCORE) {
+        newErrors.passphrase = t('onboarding.stepper.validation.passphraseTooWeak');
       }
 
       if (formData.confirmPassphrase !== formData.passphrase) {
@@ -898,7 +978,46 @@ export function Onboarding() {
           )}
           {!errors.passphrase && passphraseTouched && !isPassphraseFocused && isPassphraseTooShort && (
             <p className="text-sm text-red-600 animate-stepper-error">
-              {t('onboarding.stepper.validation.passphraseMinLength', { count: 8 })}
+              {t('onboarding.stepper.validation.passphraseMinLength', {
+                count: ONBOARDING_PASSPHRASE_MIN_LENGTH,
+              })}
+            </p>
+          )}
+          {!errors.passphrase && passphraseTouched && !isPassphraseFocused && isPassphraseNumericOnly && (
+            <p className="text-sm text-red-600 animate-stepper-error">
+              {t('onboarding.stepper.validation.passphraseOnlyNumbers')}
+            </p>
+          )}
+          {passphraseStrength && (
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">{t('onboarding.stepper.security.strength')}</span>
+                <span
+                  className={cn(
+                    'font-medium',
+                    passphraseStrength === 'weak' && 'text-red-600',
+                    passphraseStrength === 'medium' && 'text-amber-600',
+                    passphraseStrength === 'strong' && 'text-emerald-600',
+                  )}
+                >
+                  {t(`onboarding.stepper.security.${passphraseStrength}`)}
+                </span>
+              </div>
+              <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                <div
+                  className={cn(
+                    'h-full transition-all duration-300',
+                    passphraseStrength === 'weak' && 'w-1/2 bg-red-500',
+                    passphraseStrength === 'medium' && 'w-3/4 bg-amber-500',
+                    passphraseStrength === 'strong' && 'w-full bg-emerald-500',
+                  )}
+                />
+              </div>
+            </div>
+          )}
+          {!errors.passphrase && showPassphraseScoreRecommendation && (
+            <p className="text-xs text-amber-600 dark:text-amber-300">
+              {t('onboarding.stepper.security.recommended')}
             </p>
           )}
           <p className="text-xs text-muted-foreground">
