@@ -40,7 +40,7 @@ const STEP_CONFIG: Record<
 > = {
   configureProfile: {
     icon: User,
-    route: '/dashboard/perfil',
+    route: '/dashboard/configuracion?tab=profile',
     colorClass: 'text-indigo-600 dark:text-indigo-400',
     bgClass: 'bg-indigo-100 dark:bg-indigo-900/30',
   },

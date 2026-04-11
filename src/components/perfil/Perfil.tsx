@@ -22,7 +22,7 @@ import { useUser } from '@clerk/clerk-react';
 import { toast } from 'sonner';
 
 export interface PerfilHandle {
-  save: () => Promise<void>;
+  save: () => Promise<boolean>;
 }
 
 interface PerfilProps {
@@ -203,15 +203,17 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasChanges]);
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<boolean> => {
     setIsSaving(true);
     try {
       saveProfile(profile);
 
       setHasChanges(false);
       toast.success(t('profile.messages.saveSuccess'));
+      return true;
     } catch {
       toast.error(t('profile.messages.saveError'));
+      return false;
     } finally {
       setIsSaving(false);
     }
