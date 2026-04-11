@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, Globe, Loader2, Sun } from 'lucide-react';
+import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, Globe, Loader2, Sun, HelpCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -9,8 +9,8 @@ import { TimePicker } from '@/components/ui/time-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
-import { useSearchParams } from 'react-router-dom';
-import { LanguageSwitcher, ThemeToggle } from '@/components/shared';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { ConfirmDialog, LanguageSwitcher, ThemeToggle } from '@/components/shared';
 import { Input } from '@/components/ui/input';
 import { Perfil, type PerfilHandle } from '@/components/perfil/Perfil';
 import { User } from 'lucide-react';
@@ -414,6 +414,7 @@ export function Configuracion() {
   
   // Navigation state - read initial tab from URL query params
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<SectionId>(() => {
     const tab = searchParams.get('tab') as SectionId | null;
     if (tab && NAVIGATION_SECTIONS.some(s => s.id === tab)) return tab;
@@ -465,6 +466,9 @@ export function Configuracion() {
   // Track saving state for reminders
   const [isSavingReminders, setIsSavingReminders] = useState(false);
   const [hasReminderChanges, setHasReminderChanges] = useState(false);
+  const hasUnsavedChanges = profileHasChanges || hasChanges || hasReminderChanges;
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [pendingNavigationTo, setPendingNavigationTo] = useState<string | null>(null);
   
   // Convert API day off settings to UI format
   const diasOffFromApi = dayOffSettings.map(apiToUiDayOff);
@@ -535,14 +539,49 @@ export function Configuracion() {
   // Warn user about unsaved changes
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasChanges || hasReminderChanges) {
+      if (hasUnsavedChanges) {
         e.preventDefault();
         e.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasChanges, hasReminderChanges]);
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    const normalizePath = (pathname: string) =>
+      pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+
+    const isSettingsPath = (pathname: string) =>
+      normalizePath(pathname) === '/dashboard/configuracion';
+
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (!hasUnsavedChanges) return;
+      if (event.defaultPrevented) return;
+      if (event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+
+      const target = event.target as HTMLElement | null;
+      const anchor = target?.closest('a[href]') as HTMLAnchorElement | null;
+      if (!anchor) return;
+      if (anchor.target && anchor.target !== '_self') return;
+      if (anchor.hasAttribute('download')) return;
+
+      const nextUrl = new URL(anchor.href, window.location.origin);
+      if (nextUrl.origin !== window.location.origin) return;
+      if (isSettingsPath(nextUrl.pathname)) return;
+      if (!isSettingsPath(window.location.pathname)) return;
+
+      event.preventDefault();
+      setPendingNavigationTo(`${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+      setShowLeaveDialog(true);
+    };
+
+    document.addEventListener('click', handleDocumentClick, true);
+    return () => {
+      document.removeEventListener('click', handleDocumentClick, true);
+    };
+  }, [hasUnsavedChanges]);
 
   const handleSave = async () => {
     const hasWorkingDay = localSettings.workingHours.workingDays.length > 0;
@@ -562,7 +601,10 @@ export function Configuracion() {
 
     // When on profile tab, delegate save to Perfil component
     if (activeSection === 'profile' && perfilRef.current) {
-      await perfilRef.current.save();
+      const profileSaved = await perfilRef.current.save();
+      if (profileSaved) {
+        setProfileHasChanges(false);
+      }
       return;
     }
     // When on preferences tab, save local settings + reminders
@@ -797,6 +839,20 @@ export function Configuracion() {
             })}
           </div>
 
+          <div className="md:hidden mt-3">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="w-full justify-center border-indigo-500/40 text-foreground hover:bg-indigo-500/10"
+            >
+              <Link to="/dashboard/ayuda" className="inline-flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-indigo-500" />
+                {t('navigation.help')}
+              </Link>
+            </Button>
+          </div>
+
           {/* Desktop: Vertical sidebar navigation */}
           <div className="hidden md:flex md:flex-col">
             {NAVIGATION_SECTIONS.map((section) => {
@@ -824,6 +880,20 @@ export function Configuracion() {
                 </Button>
               );
             })}
+          </div>
+
+          <div className="hidden md:block mt-4">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="w-full justify-start border-indigo-500/40 text-foreground hover:bg-indigo-500/10"
+            >
+              <Link to="/dashboard/ayuda" className="inline-flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-indigo-500" />
+                {t('navigation.help')}
+              </Link>
+            </Button>
           </div>
         </nav>
 
@@ -1415,6 +1485,32 @@ export function Configuracion() {
           </div>
         ) : null;
       })()}
+
+      <ConfirmDialog
+        open={showLeaveDialog}
+        onOpenChange={(open) => {
+          setShowLeaveDialog(open);
+          if (!open) {
+            setPendingNavigationTo(null);
+          }
+        }}
+        title={t('settings.messages.leaveWithUnsavedTitle')}
+        description={t('settings.messages.leaveWithUnsavedDescription')}
+        confirmLabel={t('settings.messages.leaveWithoutSaving')}
+        cancelLabel={t('common.cancel')}
+        variant="warning"
+        onConfirm={() => {
+          if (pendingNavigationTo) {
+            navigate(pendingNavigationTo);
+          }
+          setPendingNavigationTo(null);
+          setShowLeaveDialog(false);
+        }}
+        onCancel={() => {
+          setPendingNavigationTo(null);
+          setShowLeaveDialog(false);
+        }}
+      />
     </div>
   );
 }
