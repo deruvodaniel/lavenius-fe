@@ -1624,7 +1624,7 @@
         "controllerLabel": "Data controller",
         "controllerValue": "TerappIA",
         "emailLabel": "Privacy contact email",
-        "emailValue": "lavenius.net@gmail.com",
+        "emailValue": "support@terapp-ia.com",
         "addressLabel": "Address",
         "addressValue": "Currently not provided"
       },
@@ -1723,7 +1723,7 @@
           "Deletion where applicable.",
           "Data portability when technically feasible."
         ],
-        "contact": "To exercise these rights: lavenius.net@gmail.com"
+        "contact": "To exercise these rights: support@terapp-ia.com"
       },
       "transfers": {
         "title": "9. International transfers",
@@ -1740,7 +1740,7 @@
       "contact": {
         "title": "12. Contact",
         "emailLabel": "Email",
-        "emailValue": "lavenius.net@gmail.com",
+        "emailValue": "support@terapp-ia.com",
         "controllerLabel": "Controller",
         "controllerValue": "TerappIA"
       }
@@ -1823,7 +1823,7 @@
       "contact": {
         "title": "13. Contact",
         "emailLabel": "Email",
-        "emailValue": "lavenius.net@gmail.com",
+        "emailValue": "support@terapp-ia.com",
         "ownerLabel": "Owner",
         "ownerValue": "TerappIA"
       }

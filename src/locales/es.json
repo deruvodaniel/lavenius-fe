@@ -1671,7 +1671,7 @@
         "controllerLabel": "Responsable del tratamiento",
         "controllerValue": "TerappIA",
         "emailLabel": "Email de contacto de privacidad",
-        "emailValue": "lavenius.net@gmail.com",
+        "emailValue": "support@terapp-ia.com",
         "addressLabel": "Domicilio",
         "addressValue": "No informado actualmente"
       },
@@ -1770,7 +1770,7 @@
           "Eliminación cuando corresponda.",
           "Portabilidad de datos cuando sea técnicamente viable."
         ],
-        "contact": "Para ejercer estos derechos: lavenius.net@gmail.com"
+        "contact": "Para ejercer estos derechos: support@terapp-ia.com"
       },
       "transfers": {
         "title": "9. Transferencias internacionales",
@@ -1787,7 +1787,7 @@
       "contact": {
         "title": "12. Contacto",
         "emailLabel": "Email",
-        "emailValue": "lavenius.net@gmail.com",
+        "emailValue": "support@terapp-ia.com",
         "controllerLabel": "Responsable",
         "controllerValue": "TerappIA"
       }
@@ -1870,7 +1870,7 @@
       "contact": {
         "title": "13. Contacto",
         "emailLabel": "Email",
-        "emailValue": "lavenius.net@gmail.com",
+        "emailValue": "support@terapp-ia.com",
         "ownerLabel": "Responsable",
         "ownerValue": "TerappIA"
       }

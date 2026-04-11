@@ -68,9 +68,9 @@ describe('NotFound', () => {
     it('renders support email link', () => {
       renderNotFound();
 
-      const emailLink = screen.getByRole('link', { name: /lavenius.net@gmail.com/i });
+      const emailLink = screen.getByRole('link', { name: /support@terapp-ia.com/i });
       expect(emailLink).toBeInTheDocument();
-      expect(emailLink).toHaveAttribute('href', 'mailto:lavenius.net@gmail.com');
+      expect(emailLink).toHaveAttribute('href', 'mailto:support@terapp-ia.com');
     });
 
     it('renders footer with brand name', () => {
@@ -157,7 +157,7 @@ describe('NotFound', () => {
     it('renders mail icon in support section', () => {
       renderNotFound();
 
-      const emailLink = screen.getByRole('link', { name: /lavenius.net@gmail.com/i });
+      const emailLink = screen.getByRole('link', { name: /support@terapp-ia.com/i });
       expect(emailLink.querySelector('svg')).toBeInTheDocument();
     });
   });
@@ -187,7 +187,7 @@ describe('NotFound', () => {
     it('email link is focusable', () => {
       renderNotFound();
 
-      const emailLink = screen.getByRole('link', { name: /lavenius.net@gmail.com/i });
+      const emailLink = screen.getByRole('link', { name: /support@terapp-ia.com/i });
       emailLink.focus();
       expect(emailLink).toHaveFocus();
     });
@@ -262,7 +262,7 @@ describe('NotFound', () => {
     it('email link has hover styling classes', () => {
       renderNotFound();
 
-      const emailLink = screen.getByRole('link', { name: /lavenius.net@gmail.com/i });
+      const emailLink = screen.getByRole('link', { name: /support@terapp-ia.com/i });
       expect(emailLink).toHaveClass('text-indigo-600');
       expect(emailLink).toHaveClass('hover:text-indigo-700');
       expect(emailLink).toHaveClass('transition-colors');
