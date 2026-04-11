@@ -455,6 +455,7 @@
     },
     "card": {
       "paid": "Pago",
+      "pendingApprovalChip": "Requer aprovação",
       "viewFile": "Ver ficha",
       "editAppointment": "Editar consulta",
       "sendWhatsApp": "Enviar WhatsApp",
@@ -832,7 +833,10 @@
       "selectDate": "Selecione uma data",
       "selectTimeRange": "Selecione o intervalo de horário",
       "startBeforeEnd": "O horário de início deve ser anterior ao horário de término",
-      "endDateBeforeStart": "A data de fim não pode ser anterior à data de início"
+      "endDateBeforeStart": "A data de fim não pode ser anterior à data de início",
+      "leaveWithUnsavedTitle": "Você tem alterações não salvas",
+      "leaveWithUnsavedDescription": "Se você sair agora, perderá as alterações feitas em Configurações.",
+      "leaveWithoutSaving": "Sair sem salvar"
     },
     "weekdays": {
       "monday": "Segunda-feira",
@@ -1176,7 +1180,7 @@
           },
           "completeProfile": {
             "title": "Completar seu perfil profissional",
-            "content": "**Configuração do Perfil**\n\nApós criar sua conta, vamos guiá-lo para completar seu perfil profissional:\n\n**Passo 1: Informações Profissionais**\n- Número de registro profissional (obrigatório)\n- Especialidade\n\n**Passo 2: Informações de Contato**\n- Telefone principal\n- Telefone alternativo\n- Endereço do consultório\n\n**Passo 3: Presença Online**\n- Site\n- Instagram\n- LinkedIn\n- Bio profissional\n\n**Dica:** Você pode editar essas informações a qualquer momento na seção **Perfil** no menu lateral.\n\n**Por que isso é importante?**\n\nSeu registro profissional nos ajuda a verificar sua prática e personalizar sua experiência na plataforma.",
+            "content": "**Configuração do Perfil**\n\nApós criar sua conta, vamos guiá-lo para completar seu perfil profissional:\n\n**Passo 1: Informações Profissionais**\n- Número de registro profissional (obrigatório)\n- Especialidade\n\n**Passo 2: Informações de Contato**\n- Telefone principal\n- Telefone alternativo\n- Endereço do consultório\n\n**Passo 3: Presença Online**\n- Site\n- Instagram\n- LinkedIn\n- Bio profissional\n\n**Dica:** Você pode editar essas informações a qualquer momento em **Configurações > Perfil** no menu lateral.\n\n**Por que isso é importante?**\n\nSeu registro profissional nos ajuda a verificar sua prática e personalizar sua experiência na plataforma.",
             "tags": [
               "perfil",
               "registro",
@@ -1312,7 +1316,7 @@
         "articles": {
           "profile": {
             "title": "Editar seu perfil",
-            "content": "Seu perfil tem duas partes:\n\n**Dados da conta (gerenciados pelo Clerk)**\n- Nome e sobrenome\n- Foto de perfil\n- Email e senha\n\nPara editar esses dados, clique no seu avatar e selecione **\"Gerenciar conta\"**.\n\n**Dados profissionais**\n\nPara editar suas informações profissionais:\n\n1. Vá para a seção **Perfil** no menu lateral\n2. Modifique seus dados (registro, especialidade, telefones, etc.)\n3. Clique em **\"Salvar Alterações\"**\n\nOs dados profissionais incluem: número de registro, especialidade, telefones de contato, endereço do consultório, redes sociais e bio.",
+            "content": "Seu perfil tem duas partes:\n\n**Dados da conta (gerenciados pelo Clerk)**\n- Nome e sobrenome\n- Foto de perfil\n- Email e senha\n\nPara editar esses dados, clique no seu avatar e selecione **\"Gerenciar conta\"**.\n\n**Dados profissionais**\n\nPara editar suas informações profissionais:\n\n1. Vá para **Configurações > Perfil** no menu lateral\n2. Modifique seus dados (registro, especialidade, telefones, etc.)\n3. Clique em **\"Salvar Alterações\"**\n\nOs dados profissionais incluem: número de registro, especialidade, telefones de contato, endereço do consultório, redes sociais e bio.",
             "tags": [
               "perfil",
               "editar",
@@ -1408,9 +1412,14 @@
     },
     "purpose": {
       "title": "Para que serve o TerappIA",
-      "description": "TerappIA é uma aplicação web para profissionais de saúde mental que permite gerenciar pacientes, agendar sessões, escrever notas clínicas, acompanhar cobranças e enviar lembretes em uma única plataforma segura.",
-      "privacyLabel": "Leia nossa",
-      "privacyLink": "Política de Privacidade"
+      "badge": "Fluxos clínicos e administrativos em um só lugar",
+      "description": "O TerappIA ajuda profissionais de saúde mental a organizar a rotina: pacientes, agenda, notas clínicas, cobranças e lembretes em uma plataforma segura e fácil de usar.",
+      "points": {
+        "patients": "Comece rápido: configure sua conta e inicie os atendimentos sem fricção.",
+        "agenda": "Trabalhe com clareza: todo o consultório em um único fluxo, sem ferramentas soltas.",
+        "billing": "Privacidade em primeiro lugar: dados clínicos protegidos e política de uso transparente."
+      },
+      "privacyCta": "Ver Política de Privacidade"
     },
     "hero": {
       "badge": "Gestão inteligente para profissionais de saúde mental",
@@ -1592,7 +1601,7 @@
         },
         "cancel": {
           "question": "Posso cancelar quando quiser?",
-          "answer": "Sim, sem complicação. Não há permanência mínima nem contratos. Cancele do seu perfil em 2 cliques e pronto."
+          "answer": "Sim, sem complicação. Não há permanência mínima nem contratos. Cancele em Configurações em 2 cliques e pronto."
         },
         "modality": {
           "question": "Funciona para terapia presencial e online?",
@@ -2010,6 +2019,9 @@
       "title": "Conecte seu calendário",
       "description": "Sincronize com o Google Calendar para agendar consultas automaticamente e receber lembretes. Seus pacientes também receberão convites.",
       "workWeekTip": "Lembre-se de configurar seus dias e horários de atendimento em Configurações > Horário de trabalho.",
+      "workWeekTipPrefix": "Lembre-se de configurar seus dias e horários de atendimento em",
+      "settingsLink": "Configurações",
+      "workWeekTipSuffix": "para definir seu horário de trabalho.",
       "connect": "Conectar Google Calendar",
       "later": "Farei isso depois"
     },
@@ -2018,6 +2030,15 @@
       "description": "Comece adicionando seus pacientes para poder agendar sessões, fazer anotações clínicas e gerenciar seus pagamentos.",
       "create": "Criar paciente",
       "later": "Farei isso depois"
+    },
+    "settings": {
+      "title": "Revise suas Configurações",
+      "description": "Ajuste lembretes, calendário e preferências da conta.",
+      "remindersTip": "Em Configurações você pode definir lembretes automáticos, horários de trabalho e outras opções importantes da sua prática.",
+      "bookingLinkTipPrefix": "Em",
+      "profileLinkLabel": "Perfil",
+      "bookingLinkTipSuffix": "você também poderá copiar e compartilhar seu link de reservas para que seus pacientes agendem sessões.",
+      "openSettings": "Ir para Configurações"
     },
     "complete": {
       "title": "Tudo pronto!",
@@ -2068,7 +2089,7 @@
         "description": "Seu perfil está pronto para uso",
         "ready": "Excelente! Você completou a configuração do seu perfil profissional.",
         "summary": "Resumo do seu perfil:",
-        "tipText": "Você pode editar essas informações a qualquer momento no seu perfil."
+        "tipText": "Você pode editar essas informações a qualquer momento em Configurações > Perfil."
       },
       "passphraseInfo": "Defina uma senha mestra forte (recomendado 12+ caracteres, com letras, números e símbolos). Ela protege seus dados E2E; sem ela, você só poderá recuperar o acesso com sua frase de recuperação.",
       "security": {

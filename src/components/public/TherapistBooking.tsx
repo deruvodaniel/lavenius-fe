@@ -23,6 +23,18 @@ interface BookingFormState {
 
 const BOOKING_MESSAGE_MAX_LENGTH = 500;
 const DISPLAY_TIMEZONE = 'America/Argentina/Buenos_Aires';
+const AVAILABILITY_WINDOW_DAYS = 7;
+
+function getAvailabilityWindow(): { from: string; to: string } {
+  const fromDate = new Date();
+  const toDate = new Date(fromDate);
+  toDate.setDate(toDate.getDate() + AVAILABILITY_WINDOW_DAYS);
+
+  return {
+    from: fromDate.toISOString(),
+    to: toDate.toISOString(),
+  };
+}
 
 function formatSlotDateLabel(slot: AvailabilitySlot): string {
   return new Date(slot.from).toLocaleDateString('es-AR', {
@@ -124,7 +136,8 @@ export function TherapistBooking() {
     setFormError(null);
 
     try {
-      const response = await publicBookingService.getAvailability(therapistId);
+      const availabilityWindow = getAvailabilityWindow();
+      const response = await publicBookingService.getAvailability(therapistId, availabilityWindow);
       const nextSlots = response.slots ?? [];
       setSlots(nextSlots);
       setSelectedSlotId(nextSlots[0]?.from ?? null);

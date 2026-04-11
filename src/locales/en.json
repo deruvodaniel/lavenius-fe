@@ -464,6 +464,7 @@
     },
     "card": {
       "paid": "Paid",
+      "pendingApprovalChip": "Needs approval",
       "viewFile": "View file",
       "editAppointment": "Edit appointment",
       "sendWhatsApp": "Send WhatsApp",
@@ -841,7 +842,10 @@
       "selectDate": "Select a date",
       "selectTimeRange": "Select time range",
       "startBeforeEnd": "Start time must be before end time",
-      "endDateBeforeStart": "End date cannot be before start date"
+      "endDateBeforeStart": "End date cannot be before start date",
+      "leaveWithUnsavedTitle": "You have unsaved changes",
+      "leaveWithUnsavedDescription": "If you leave now, your changes in Settings will be lost.",
+      "leaveWithoutSaving": "Leave without saving"
     },
     "weekdays": {
       "monday": "Monday",
@@ -1185,7 +1189,7 @@
           },
           "completeProfile": {
             "title": "Complete your professional profile",
-            "content": "**Profile Setup**\n\nAfter creating your account, we'll guide you to complete your professional profile:\n\n**Step 1: Professional Information**\n- Professional license number (required)\n- Specialty\n\n**Step 2: Contact Information**\n- Primary phone\n- Alternative phone\n- Office address\n\n**Step 3: Online Presence**\n- Website\n- Instagram\n- LinkedIn\n- Professional bio\n\n**Tip:** You can edit this information at any time from the **Profile** section in the sidebar.\n\n**Why is this important?**\n\nYour professional license helps us verify your practice and personalize your experience on the platform.",
+            "content": "**Profile Setup**\n\nAfter creating your account, we'll guide you to complete your professional profile:\n\n**Step 1: Professional Information**\n- Professional license number (required)\n- Specialty\n\n**Step 2: Contact Information**\n- Primary phone\n- Alternative phone\n- Office address\n\n**Step 3: Online Presence**\n- Website\n- Instagram\n- LinkedIn\n- Professional bio\n\n**Tip:** You can edit this information at any time from **Settings > Profile** in the sidebar.\n\n**Why is this important?**\n\nYour professional license helps us verify your practice and personalize your experience on the platform.",
             "tags": [
               "profile",
               "license",
@@ -1320,7 +1324,7 @@
         "articles": {
           "profile": {
             "title": "Edit your profile",
-            "content": "Your profile has two parts:\n\n**Account data (managed by Clerk)**\n- First and last name\n- Profile picture\n- Email and password\n\nTo edit this data, click your avatar and select **\"Manage account\"**.\n\n**Professional data**\n\nTo edit your professional information:\n\n1. Go to the **Profile** section from the sidebar\n2. Modify your data (license, specialty, phones, etc.)\n3. Click **\"Save Changes\"**\n\nProfessional data includes: license number, specialty, contact phones, office address, social media, and bio.",
+            "content": "Your profile has two parts:\n\n**Account data (managed by Clerk)**\n- First and last name\n- Profile picture\n- Email and password\n\nTo edit this data, click your avatar and select **\"Manage account\"**.\n\n**Professional data**\n\nTo edit your professional information:\n\n1. Go to **Settings > Profile** from the sidebar\n2. Modify your data (license, specialty, phones, etc.)\n3. Click **\"Save Changes\"**\n\nProfessional data includes: license number, specialty, contact phones, office address, social media, and bio.",
             "tags": [
               "profile",
               "edit",
@@ -1416,9 +1420,14 @@
     },
     "purpose": {
       "title": "What TerappIA is for",
-      "description": "TerappIA is a web application for mental health professionals to manage patients, schedule sessions, write clinical notes, track payments, and send reminders from one secure platform.",
-      "privacyLabel": "Read our",
-      "privacyLink": "Privacy Policy"
+      "badge": "Clinical and admin workflows in one place",
+      "description": "TerappIA helps mental health professionals run their daily practice: patients, schedule, clinical notes, payments, and reminders from one secure, easy-to-use platform.",
+      "points": {
+        "patients": "Get started fast: set up your account and begin seeing patients without friction.",
+        "agenda": "Work with clarity: your entire practice in one workflow, not scattered tools.",
+        "billing": "Privacy first: protected clinical data and a transparent usage policy."
+      },
+      "privacyCta": "View Privacy Policy"
     },
     "hero": {
       "badge": "Smart management for mental health professionals",
@@ -1600,7 +1609,7 @@
         },
         "cancel": {
           "question": "Can I cancel anytime?",
-          "answer": "Yes, no hassle. No minimum commitment, no contracts. Cancel from your profile in 2 clicks and you're done."
+          "answer": "Yes, no hassle. No minimum commitment, no contracts. Cancel from Settings in 2 clicks and you're done."
         },
         "modality": {
           "question": "Does it work for in-person and online therapy?",
@@ -2018,6 +2027,9 @@
       "title": "Connect your calendar",
       "description": "Sync with Google Calendar to automatically schedule appointments and receive reminders. Your patients will also receive invitations.",
       "workWeekTip": "Remember to configure your working days and hours in Settings > Work Schedule.",
+      "workWeekTipPrefix": "Remember to configure your working days and hours in",
+      "settingsLink": "Settings",
+      "workWeekTipSuffix": "to define your work schedule.",
       "connect": "Connect Google Calendar",
       "later": "I'll do it later"
     },
@@ -2026,6 +2038,15 @@
       "description": "Start by adding your patients so you can schedule sessions, keep clinical notes, and manage their payments.",
       "create": "Create patient",
       "later": "I'll do it later"
+    },
+    "settings": {
+      "title": "Review your Settings",
+      "description": "Adjust reminders, calendar, and account preferences.",
+      "remindersTip": "In Settings you can define automatic reminders, working hours, and other key options for your practice.",
+      "bookingLinkTipPrefix": "From",
+      "profileLinkLabel": "Profile",
+      "bookingLinkTipSuffix": "you can also copy and share your booking link so patients can book sessions.",
+      "openSettings": "Go to Settings"
     },
     "complete": {
       "title": "All set!",
@@ -2076,7 +2097,7 @@
         "description": "Your profile is ready to use",
         "ready": "Excellent! You've completed your professional profile setup.",
         "summary": "Your profile summary:",
-        "tipText": "You can edit this information at any time from your profile."
+        "tipText": "You can edit this information at any time from Settings > Profile."
       },
       "passphraseInfo": "Set a strong master password (12+ characters recommended, with letters, numbers and symbols). It protects your E2E data; without it, you can only recover access with your recovery phrase.",
       "security": {
