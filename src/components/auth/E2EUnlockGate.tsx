@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertCircle, KeyRound, Loader2, LogOut, RefreshCw } from 'lucide-react';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
@@ -12,6 +12,65 @@ import { ApiClientError } from '@/lib/api/client';
 
 interface E2EUnlockGateProps {
   children: React.ReactNode;
+}
+
+const MAX_UNLOCK_ATTEMPTS = 5;
+const BASE_UNLOCK_BACKOFF_MS = 1000;
+const MAX_UNLOCK_BACKOFF_MS = 30_000;
+const UNLOCK_ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
+const E2E_UNLOCK_STATE_STORAGE_KEY = 'terappia_e2e_unlock_state';
+
+interface PersistedUnlockState {
+  userId: string | null;
+  failedUnlockAttempts: number;
+  lastFailedAt: number | null;
+  lockUntilTs: number | null;
+}
+
+function loadPersistedUnlockState(userId: string | null): PersistedUnlockState {
+  try {
+    const raw = window.sessionStorage.getItem(E2E_UNLOCK_STATE_STORAGE_KEY);
+    if (!raw) {
+      return {
+        userId,
+        failedUnlockAttempts: 0,
+        lastFailedAt: null,
+        lockUntilTs: null,
+      };
+    }
+
+    const parsed = JSON.parse(raw) as PersistedUnlockState;
+    if (parsed.userId !== userId) {
+      return {
+        userId,
+        failedUnlockAttempts: 0,
+        lastFailedAt: null,
+        lockUntilTs: null,
+      };
+    }
+
+    return {
+      userId,
+      failedUnlockAttempts: typeof parsed.failedUnlockAttempts === 'number' ? parsed.failedUnlockAttempts : 0,
+      lastFailedAt: typeof parsed.lastFailedAt === 'number' ? parsed.lastFailedAt : null,
+      lockUntilTs: typeof parsed.lockUntilTs === 'number' ? parsed.lockUntilTs : null,
+    };
+  } catch {
+    return {
+      userId,
+      failedUnlockAttempts: 0,
+      lastFailedAt: null,
+      lockUntilTs: null,
+    };
+  }
+}
+
+function savePersistedUnlockState(state: PersistedUnlockState): void {
+  try {
+    window.sessionStorage.setItem(E2E_UNLOCK_STATE_STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // Non-blocking: if storage fails, keep runtime state only.
+  }
 }
 
 function getUnlockErrorMessage(error: unknown, t: (key: string) => string): string {
@@ -34,7 +93,7 @@ function getUnlockErrorMessage(error: unknown, t: (key: string) => string): stri
 
 export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
   const { t } = useTranslation();
-  const { signOut } = useClerkAuth();
+  const { signOut, userId } = useClerkAuth();
   const { isUnlocked, isUnlocking, unlockWithPassphrase, recoverAndResetPassphrase } = useE2EKey();
   const [passphrase, setPassphrase] = useState('');
   const [recoverySecret, setRecoverySecret] = useState('');
@@ -43,6 +102,16 @@ export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
   const [mode, setMode] = useState<'passphrase' | 'recovery'>('passphrase');
   const [error, setError] = useState<string | null>(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [failedUnlockAttempts, setFailedUnlockAttempts] = useState(() =>
+    loadPersistedUnlockState(userId ?? null).failedUnlockAttempts,
+  );
+  const [lastFailedAt, setLastFailedAt] = useState<number | null>(() =>
+    loadPersistedUnlockState(userId ?? null).lastFailedAt,
+  );
+  const [lockUntilTs, setLockUntilTs] = useState<number | null>(() =>
+    loadPersistedUnlockState(userId ?? null).lockUntilTs,
+  );
+  const [nowTs, setNowTs] = useState(() => Date.now());
 
   const isRecoveryValid = useMemo(() => {
     return (
@@ -51,19 +120,98 @@ export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
       newPassphrase === confirmPassphrase
     );
   }, [confirmPassphrase, newPassphrase, recoverySecret]);
+  const lockRemainingMs = lockUntilTs ? Math.max(lockUntilTs - nowTs, 0) : 0;
+  const lockRemainingSeconds = Math.ceil(lockRemainingMs / 1000);
+  const isBackoffActive = lockRemainingMs > 0;
+
+  useEffect(() => {
+    const persistedState = loadPersistedUnlockState(userId ?? null);
+    setFailedUnlockAttempts(persistedState.failedUnlockAttempts);
+    setLastFailedAt(persistedState.lastFailedAt);
+    setLockUntilTs(persistedState.lockUntilTs);
+  }, [userId]);
+
+  useEffect(() => {
+    savePersistedUnlockState({
+      userId: userId ?? null,
+      failedUnlockAttempts,
+      lastFailedAt,
+      lockUntilTs,
+    });
+  }, [failedUnlockAttempts, lastFailedAt, lockUntilTs, userId]);
+
+  useEffect(() => {
+    if (!lockUntilTs) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setNowTs(Date.now());
+    }, 250);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [lockUntilTs]);
+
+  useEffect(() => {
+    if (!lockUntilTs || lockRemainingMs > 0) {
+      return;
+    }
+    setLockUntilTs(null);
+  }, [lockRemainingMs, lockUntilTs]);
 
   if (isUnlocked) {
     return <>{children}</>;
   }
 
+  const handleSecuritySignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await signOut({ redirectUrl: '/' });
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
+
   const handleUnlockSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
 
+    if (isBackoffActive) {
+      setError(t('e2eUnlock.security.retryIn', { seconds: lockRemainingSeconds }));
+      return;
+    }
+
     try {
       await unlockWithPassphrase(passphrase);
       setPassphrase('');
+      setFailedUnlockAttempts(0);
+      setLastFailedAt(null);
+      setLockUntilTs(null);
     } catch (unlockError) {
+      const now = Date.now();
+      const previousFailedAt = lastFailedAt;
+      const withinWindow =
+        previousFailedAt !== null && now - previousFailedAt <= UNLOCK_ATTEMPT_WINDOW_MS;
+      const nextFailedAttempts = withinWindow ? failedUnlockAttempts + 1 : 1;
+      setFailedUnlockAttempts(nextFailedAttempts);
+      setLastFailedAt(now);
+
+      if (nextFailedAttempts >= MAX_UNLOCK_ATTEMPTS) {
+        setError(t('e2eUnlock.security.maxAttemptsSignOut'));
+        await handleSecuritySignOut();
+        return;
+      }
+
+      const backoffMs = Math.min(
+        BASE_UNLOCK_BACKOFF_MS * (2 ** (nextFailedAttempts - 1)),
+        MAX_UNLOCK_BACKOFF_MS,
+      );
+      const nextLockUntilTs = now + backoffMs;
+      setLockUntilTs(nextLockUntilTs);
+      setNowTs(now);
+
       setError(getUnlockErrorMessage(unlockError, t));
     }
   };
@@ -89,12 +237,7 @@ export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
   };
 
   const handleSignOutToHome = async () => {
-    setIsSigningOut(true);
-    try {
-      await signOut({ redirectUrl: '/' });
-    } finally {
-      setIsSigningOut(false);
-    }
+    await handleSecuritySignOut();
   };
 
   return (
@@ -128,11 +271,25 @@ export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
                   value={passphrase}
                   onChange={(event) => setPassphrase(event.target.value)}
                   autoComplete="current-password"
-                  disabled={isUnlocking}
+                  disabled={isUnlocking || isBackoffActive}
                 />
+                {isBackoffActive && (
+                  <p className="text-xs text-amber-600 dark:text-amber-300">
+                    {t('e2eUnlock.security.retryIn', { seconds: lockRemainingSeconds })}
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {t('e2eUnlock.security.attemptsRemaining', {
+                    count: Math.max(0, MAX_UNLOCK_ATTEMPTS - failedUnlockAttempts),
+                  })}
+                </p>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isUnlocking || passphrase.length < 8}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isUnlocking || isBackoffActive || passphrase.length < 8}
+              >
                 {isUnlocking ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />

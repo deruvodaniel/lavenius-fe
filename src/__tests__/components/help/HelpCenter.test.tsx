@@ -139,9 +139,9 @@ describe('HelpCenter', () => {
 
     it('renders support email link', () => {
       renderHelpCenter();
-      const emailLink = screen.getByRole('link', { name: 'lavenius.net@gmail.com' });
+      const emailLink = screen.getByRole('link', { name: 'support@terapp-ia.com' });
       expect(emailLink).toBeInTheDocument();
-      expect(emailLink).toHaveAttribute('href', 'mailto:lavenius.net@gmail.com');
+      expect(emailLink).toHaveAttribute('href', 'mailto:support@terapp-ia.com');
     });
   });
 
@@ -510,7 +510,7 @@ describe('HelpCenter', () => {
     it('email link is focusable', () => {
       renderHelpCenter();
       
-      const emailLink = screen.getByRole('link', { name: 'lavenius.net@gmail.com' });
+      const emailLink = screen.getByRole('link', { name: 'support@terapp-ia.com' });
       emailLink.focus();
       expect(emailLink).toHaveFocus();
     });

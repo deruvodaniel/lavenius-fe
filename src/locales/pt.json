@@ -1709,7 +1709,7 @@
         "controllerLabel": "Responsável pelo tratamento",
         "controllerValue": "TerappIA",
         "emailLabel": "Email de contato de privacidade",
-        "emailValue": "lavenius.net@gmail.com",
+        "emailValue": "support@terapp-ia.com",
         "addressLabel": "Endereço",
         "addressValue": "Atualmente não informado"
       },
@@ -1808,7 +1808,7 @@
           "Eliminação quando aplicável.",
           "Portabilidade de dados quando tecnicamente viável."
         ],
-        "contact": "Para exercer esses direitos: lavenius.net@gmail.com"
+        "contact": "Para exercer esses direitos: support@terapp-ia.com"
       },
       "transfers": {
         "title": "9. Transferências internacionais",
@@ -1825,7 +1825,7 @@
       "contact": {
         "title": "12. Contato",
         "emailLabel": "Email",
-        "emailValue": "lavenius.net@gmail.com",
+        "emailValue": "support@terapp-ia.com",
         "controllerLabel": "Responsável",
         "controllerValue": "TerappIA"
       }
@@ -1908,7 +1908,7 @@
       "contact": {
         "title": "13. Contato",
         "emailLabel": "Email",
-        "emailValue": "lavenius.net@gmail.com",
+        "emailValue": "support@terapp-ia.com",
         "ownerLabel": "Responsável",
         "ownerValue": "TerappIA"
       }
@@ -2071,6 +2071,13 @@
         "tipText": "Você pode editar essas informações a qualquer momento no seu perfil."
       },
       "passphraseInfo": "Defina uma senha mestra forte (recomendado 12+ caracteres, com letras, números e símbolos). Ela protege seus dados E2E; sem ela, você só poderá recuperar o acesso com sua frase de recuperação.",
+      "security": {
+        "strength": "Força da passphrase mestra",
+        "weak": "Fraca",
+        "medium": "Média",
+        "strong": "Forte",
+        "recommended": "Aceitável por enquanto, mas recomendamos uma passphrase mestra mais robusta (nível forte)."
+      },
       "fields": {
         "licenseNumber": "Registro Profissional",
         "specialty": "Especialidade",
@@ -2102,6 +2109,8 @@
         "websiteInvalid": "Digite uma URL válida (ex: https://exemplo.com)",
         "bioTooLong": "A bio não pode exceder 500 caracteres",
         "passphraseMinLength": "A passphrase deve ter pelo menos {{count}} caracteres",
+        "passphraseOnlyNumbers": "A passphrase não pode conter apenas números.",
+        "passphraseTooWeak": "A passphrase está muito fraca. Tente uma combinação menos previsível.",
         "passphraseMismatch": "As passphrases não coincidem",
         "recoveryAcknowledged": "Você deve confirmar que salvou sua frase de recuperação.",
         "consentRequired": "Você deve aceitar os termos de privacidade e criptografia para continuar"
@@ -2156,6 +2165,11 @@
       "rateLimited": "Muitas tentativas. Aguarde um momento e tente novamente.",
       "invalidRecoveryInput": "Verifique a frase de recuperação e confirme a nova passphrase.",
       "generic": "Não foi possível desbloquear suas informações criptografadas."
+    },
+    "security": {
+      "attemptsRemaining": "Tentativas restantes: {{count}}",
+      "retryIn": "Aguarde {{seconds}}s para tentar novamente.",
+      "maxAttemptsSignOut": "Muitas tentativas falhas. Encerrando sessão por segurança."
     }
   },
   "publicBooking": {

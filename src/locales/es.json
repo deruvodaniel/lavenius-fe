@@ -1764,7 +1764,7 @@
         "controllerLabel": "Responsable del tratamiento",
         "controllerValue": "TerappIA",
         "emailLabel": "Email de contacto de privacidad",
-        "emailValue": "lavenius.net@gmail.com",
+        "emailValue": "support@terapp-ia.com",
         "addressLabel": "Domicilio",
         "addressValue": "No informado actualmente"
       },
@@ -1863,7 +1863,7 @@
           "Eliminación cuando corresponda.",
           "Portabilidad de datos cuando sea técnicamente viable."
         ],
-        "contact": "Para ejercer estos derechos: lavenius.net@gmail.com"
+        "contact": "Para ejercer estos derechos: support@terapp-ia.com"
       },
       "transfers": {
         "title": "9. Transferencias internacionales",
@@ -1880,7 +1880,7 @@
       "contact": {
         "title": "12. Contacto",
         "emailLabel": "Email",
-        "emailValue": "lavenius.net@gmail.com",
+        "emailValue": "support@terapp-ia.com",
         "controllerLabel": "Responsable",
         "controllerValue": "TerappIA"
       }
@@ -1963,7 +1963,7 @@
       "contact": {
         "title": "13. Contacto",
         "emailLabel": "Email",
-        "emailValue": "lavenius.net@gmail.com",
+        "emailValue": "support@terapp-ia.com",
         "ownerLabel": "Responsable",
         "ownerValue": "TerappIA"
       }
@@ -2126,6 +2126,13 @@
         "tipText": "Puedes editar esta información en cualquier momento desde tu perfil."
       },
       "passphraseInfo": "Define una contraseña maestra segura (recomendado 12+ caracteres, con letras, números y símbolos). Protege tus datos E2E; sin ella, solo podrás recuperar acceso con tu frase de recuperación.",
+      "security": {
+        "strength": "Seguridad de la contraseña maestra",
+        "weak": "Débil",
+        "medium": "Media",
+        "strong": "Fuerte",
+        "recommended": "Aceptable por ahora, pero te recomendamos una contraseña maestra más robusta (nivel fuerte)."
+      },
       "fields": {
         "licenseNumber": "Matrícula Profesional",
         "specialty": "Especialidad",
@@ -2157,6 +2164,8 @@
         "websiteInvalid": "Ingresa una URL válida (ej: https://ejemplo.com)",
         "bioTooLong": "La biografía no puede superar los 500 caracteres",
         "passphraseMinLength": "La contraseña maestra debe tener al menos {{count}} caracteres",
+        "passphraseOnlyNumbers": "La contraseña maestra no puede contener solo números.",
+        "passphraseTooWeak": "La contraseña maestra es demasiado débil. Intenta una combinación menos predecible.",
         "passphraseMismatch": "Las contraseñas maestras no coinciden",
         "recoveryAcknowledged": "Debes confirmar que guardaste tu frase de recuperación.",
         "consentRequired": "Debes aceptar los términos de privacidad y cifrado para continuar"
@@ -2211,6 +2220,11 @@
       "rateLimited": "Demasiados intentos. Espera un momento y vuelve a intentar.",
       "invalidRecoveryInput": "Revisa la frase de recuperación y confirma la nueva contraseña maestra.",
       "generic": "No pudimos desbloquear tu información cifrada."
+    },
+    "security": {
+      "attemptsRemaining": "Intentos restantes: {{count}}",
+      "retryIn": "Espera {{seconds}}s para reintentar.",
+      "maxAttemptsSignOut": "Demasiados intentos fallidos. Cerrando sesión por seguridad."
     }
   },
   "publicBooking": {
