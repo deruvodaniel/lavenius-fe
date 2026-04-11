@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/clerk-react';
 import type { LucideIcon } from 'lucide-react';
@@ -421,21 +421,47 @@ function PurposeSection() {
   const { t } = useTranslation();
 
   return (
-    <section className="py-10 px-4 sm:px-6 lg:px-8 bg-background">
-      <div className="max-w-5xl mx-auto">
-        <div className="rounded-2xl border border-indigo-200/60 dark:border-indigo-900/60 bg-indigo-50/60 dark:bg-indigo-950/20 p-6 sm:p-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">
-            {t('landing.purpose.title')}
-          </h2>
-          <p className="text-muted-foreground leading-relaxed mb-3">
-            {t('landing.purpose.description')}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {t('landing.purpose.privacyLabel')}{' '}
-            <a href="/privacy-policy" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline underline-offset-2">
-              {t('landing.purpose.privacyLink')}
-            </a>
-          </p>
+    <section className="py-12 px-4 sm:px-6 lg:px-8 bg-background">
+      <div className="max-w-6xl mx-auto">
+        <div className="rounded-2xl border border-indigo-200/60 dark:border-indigo-900/60 bg-gradient-to-br from-indigo-50/70 via-background to-purple-50/60 dark:from-indigo-950/30 dark:via-background dark:to-purple-950/20 p-6 sm:p-8 lg:p-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 items-start">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950/40 border border-indigo-200/70 dark:border-indigo-800/60 mb-4">
+                <Shield className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">
+                  {t('landing.purpose.badge')}
+                </span>
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
+                {t('landing.purpose.title')}
+              </h2>
+              <p className="text-muted-foreground leading-relaxed">
+                {t('landing.purpose.description')}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-border bg-card/70 p-5 sm:p-6">
+              <ul className="space-y-3 mb-5">
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-foreground">{t('landing.purpose.points.patients')}</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-foreground">{t('landing.purpose.points.agenda')}</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-foreground">{t('landing.purpose.points.billing')}</span>
+                </li>
+              </ul>
+
+              <Button asChild variant="outline" className="w-full sm:w-auto">
+                <Link to="/privacy-policy">{t('landing.purpose.privacyCta')}</Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
