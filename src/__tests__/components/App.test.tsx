@@ -62,7 +62,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'landing.brand': 'TerappIA',
+        'landing.brand': 'Tilia',
         'landing.tagline': 'Tu asistente de terapia',
         'loading.agenda': 'Cargando agenda...',
         'loading.patients': 'Cargando pacientes...',

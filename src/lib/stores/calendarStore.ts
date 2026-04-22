@@ -38,7 +38,7 @@ interface CalendarState {
   setShowCalendarModal: (show: boolean) => void;
 }
 
-const STORAGE_KEY = 'terapp-ia-calendar';
+const STORAGE_KEY = 'tilia-calendar';
 
 export const useCalendarStore = create<CalendarState>()(
   persist(
@@ -74,7 +74,7 @@ export const useCalendarStore = create<CalendarState>()(
       const calendars = await calendarService.getCalendars();
       const hasCalendars = Array.isArray(calendars) && calendars.length > 0;
       
-      // Find the "Sesiones" calendar (created by TerappIA)
+      // Find the "Sesiones" calendar (created by Tilia)
       const sessionsCalendar = calendars?.find(
         (cal) => cal.summary === 'Sesiones' || cal.description?.includes('sesiones de terapia')
       );

@@ -64,17 +64,17 @@ export function NotFound() {
             Si el problema persiste, contacta a soporte tecnico:
           </p>
           <a 
-            href="mailto:support@terapp-ia.com"
+            href="mailto:support@tilia.com"
             className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
           >
             <Mail className="w-4 h-4" />
-            support@terapp-ia.com
+            support@tilia.com
           </a>
         </div>
 
         {/* Footer */}
         <p className="mt-8 text-xs text-muted-foreground">
-          TerappIA - Gestion de Pacientes
+          Tilia - Gestion de Pacientes
         </p>
       </div>
     </div>

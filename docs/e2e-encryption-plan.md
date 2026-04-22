@@ -1,13 +1,13 @@
-# Hybrid E2E Encryption + Recovery Plan (TerappIA Backend)
+# Hybrid E2E Encryption + Recovery Plan (Tilia Backend)
 
-This document updates the original strict E2E proposal to match current TerappIA product requirements and runtime needs.
+This document updates the original strict E2E proposal to match current Tilia product requirements and runtime needs.
 
 Frontend implementation companion:
 - `docs/e2e-frontend-react-spec.md`
 
 ## Why Hybrid (not full strict for all fields)
 
-TerappIA currently needs backend runtime access to a subset of patient fields for operational workflows (reminders/WhatsApp):
+Tilia currently needs backend runtime access to a subset of patient fields for operational workflows (reminders/WhatsApp):
 
 - `firstName`
 - `phone`

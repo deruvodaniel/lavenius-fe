@@ -10,7 +10,7 @@ import { getNameInitials } from '@/lib/utils/nameInitials';
 // PROFILE DATA (reuses same localStorage key as Perfil)
 // ============================================================================
 
-const PROFILE_KEY = 'terappIA_profile';
+const PROFILE_KEY = 'tilia_profile';
 
 interface ProfileData {
   avatarUrl?: string;

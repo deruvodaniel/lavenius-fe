@@ -489,8 +489,8 @@ export function HelpCenter() {
         </p>
         <p className="text-sm text-muted-foreground mt-1">
           {t('help.contactUs')}{' '}
-          <a href="mailto:support@terapp-ia.com" className="text-indigo-600 hover:underline">
-            support@terapp-ia.com
+          <a href="mailto:support@tilia.com" className="text-indigo-600 hover:underline">
+            support@tilia.com
           </a>
         </p>
       </div>

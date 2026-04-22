@@ -1,4 +1,4 @@
-# TerappIA Frontend Guidelines
+# Tilia Frontend Guidelines
 
 > Última actualización: Febrero 19, 2026
 

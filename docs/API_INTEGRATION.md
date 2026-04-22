@@ -1,4 +1,4 @@
-# Guía de Integración API - Frontend TerappIA
+# Guía de Integración API - Frontend Tilia
 
 ## 🎯 Objetivo
 
@@ -457,7 +457,7 @@ sessionStorage.removeItem('userKey');
 ```typescript
 // En producción, asegurar HTTPS
 const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://api.terapp-ia.com'
+  ? 'https://api.tilia.com'
   : 'http://localhost:3001';
 ```
 

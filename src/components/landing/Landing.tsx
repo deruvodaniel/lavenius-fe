@@ -334,7 +334,7 @@ function HeroSection() {
                   </div>
                   <div className="flex-1 flex justify-center">
                     <div className="bg-white rounded-md px-4 py-1 text-xs text-gray-500 border border-gray-200">
-                      app.terapp-ia.com
+                      app.tilia.com
                     </div>
                   </div>
                 </div>
@@ -957,7 +957,7 @@ function SocialProofSection() {
   );
 }
 
-function WhyTerappIASection() {
+function WhyTiliaSection() {
   const { t } = useTranslation();
   
   const features = [
@@ -1013,13 +1013,13 @@ function WhyTerappIASection() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/15 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium mb-6">
               <Sparkles className="w-4 h-4" />
-              {t('landing.whyTerappIA.badge')}
+              {t('landing.whyTilia.badge')}
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {t('landing.whyTerappIA.title')}
+              {t('landing.whyTilia.title')}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t('landing.whyTerappIA.subtitle')}
+              {t('landing.whyTilia.subtitle')}
             </p>
           </div>
         </AnimatedSection>
@@ -1035,13 +1035,13 @@ function WhyTerappIASection() {
                       <feature.icon className="w-6 h-6" />
                     </div>
                     <div className={`inline-block px-2 py-1 rounded text-xs font-medium text-white ${colors.highlight} mb-3`}>
-                      {t(`landing.whyTerappIA.features.${feature.key}.highlight`)}
+                      {t(`landing.whyTilia.features.${feature.key}.highlight`)}
                     </div>
                     <h3 className="text-lg font-semibold text-foreground mb-2">
-                      {t(`landing.whyTerappIA.features.${feature.key}.title`)}
+                      {t(`landing.whyTilia.features.${feature.key}.title`)}
                     </h3>
                     <p className="text-muted-foreground text-sm leading-relaxed">
-                      {t(`landing.whyTerappIA.features.${feature.key}.description`)}
+                      {t(`landing.whyTilia.features.${feature.key}.description`)}
                     </p>
                   </CardContent>
                 </Card>
@@ -1382,9 +1382,9 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   const socialLinks = [
-    { icon: Instagram, href: 'https://instagram.com/terappIA', label: t('landing.footer.social.instagram') },
-    { icon: Twitter, href: 'https://twitter.com/terappIA', label: t('landing.footer.social.twitter') },
-    { icon: Linkedin, href: 'https://linkedin.com/company/terappIA', label: t('landing.footer.social.linkedin') },
+    { icon: Instagram, href: 'https://instagram.com/tilia', label: t('landing.footer.social.instagram') },
+    { icon: Twitter, href: 'https://twitter.com/tilia', label: t('landing.footer.social.twitter') },
+    { icon: Linkedin, href: 'https://linkedin.com/company/tilia', label: t('landing.footer.social.linkedin') },
   ];
   
   return (
@@ -1422,11 +1422,11 @@ function Footer() {
                 <span>+54 11 1234-5678</span>
               </a>
               <a 
-                href="mailto:support@terapp-ia.com"
+                href="mailto:support@tilia.com"
                 className="flex items-center gap-2 text-sm transition-colors hover:text-indigo-400"
               >
                 <Mail className="w-4 h-4" />
-                <span>support@terapp-ia.com</span>
+                <span>support@tilia.com</span>
               </a>
             </div>
           </div>
@@ -1552,7 +1552,7 @@ export function Landing() {
       <RemindersSection />
       <SecuritySection />
       {/* <SocialProofSection /> */}
-      <WhyTerappIASection />
+      <WhyTiliaSection />
       <FAQSection />
       {/* <PricingSection /> */}
       <CTASection />

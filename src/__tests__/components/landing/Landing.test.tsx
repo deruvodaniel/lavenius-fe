@@ -72,7 +72,7 @@ vi.mock('react-i18next', () => ({
     t: (key: string, fallback?: string) => {
       const translations: Record<string, string> = {
         // Brand
-        'landing.brand': 'TerappIA',
+        'landing.brand': 'Tilia',
         
         // Nav
         'landing.nav.features': 'Funcionalidades',
@@ -158,7 +158,7 @@ vi.mock('react-i18next', () => ({
         'landing.socialProof.stats.professionalsLabel': 'Profesionales',
         'landing.socialProof.stats.sessionsLabel': 'Sesiones gestionadas',
         'landing.socialProof.stats.collectedLabel': 'Cobrado',
-        'landing.socialProof.testimonials.1.quote': 'TerappIA me ahorra horas de trabajo administrativo.',
+        'landing.socialProof.testimonials.1.quote': 'Tilia me ahorra horas de trabajo administrativo.',
         'landing.socialProof.testimonials.1.name': 'Dra. Maria Garcia',
         'landing.socialProof.testimonials.1.role': 'Psicologa Clinica',
         'landing.socialProof.testimonials.2.quote': 'La gestion de cobros es excelente.',
@@ -168,22 +168,22 @@ vi.mock('react-i18next', () => ({
         'landing.socialProof.testimonials.3.name': 'Lic. Ana Martinez',
         'landing.socialProof.testimonials.3.role': 'Psicoanalista',
         
-        // Why TerappIA section
-        'landing.whyTerappIA.badge': 'Por que elegirnos',
-        'landing.whyTerappIA.title': 'Por que TerappIA',
-        'landing.whyTerappIA.subtitle': 'Disenado por y para profesionales de la salud mental',
-        'landing.whyTerappIA.features.unlimited.title': 'Pacientes ilimitados',
-        'landing.whyTerappIA.features.unlimited.description': 'Sin limites en la cantidad de pacientes.',
-        'landing.whyTerappIA.features.unlimited.highlight': 'Sin limites',
-        'landing.whyTerappIA.features.encryption.title': 'Encriptacion total',
-        'landing.whyTerappIA.features.encryption.description': 'Datos protegidos con encriptacion de grado clinico.',
-        'landing.whyTerappIA.features.encryption.highlight': '256-bit',
-        'landing.whyTerappIA.features.localPricing.title': 'Precios locales',
-        'landing.whyTerappIA.features.localPricing.description': 'Paga en tu moneda local.',
-        'landing.whyTerappIA.features.localPricing.highlight': 'ARS/USD',
-        'landing.whyTerappIA.features.noContracts.title': 'Sin contratos',
-        'landing.whyTerappIA.features.noContracts.description': 'Cancela cuando quieras.',
-        'landing.whyTerappIA.features.noContracts.highlight': 'Flexible',
+        // Why Tilia section
+        'landing.whyTilia.badge': 'Por que elegirnos',
+        'landing.whyTilia.title': 'Por que Tilia',
+        'landing.whyTilia.subtitle': 'Disenado por y para profesionales de la salud mental',
+        'landing.whyTilia.features.unlimited.title': 'Pacientes ilimitados',
+        'landing.whyTilia.features.unlimited.description': 'Sin limites en la cantidad de pacientes.',
+        'landing.whyTilia.features.unlimited.highlight': 'Sin limites',
+        'landing.whyTilia.features.encryption.title': 'Encriptacion total',
+        'landing.whyTilia.features.encryption.description': 'Datos protegidos con encriptacion de grado clinico.',
+        'landing.whyTilia.features.encryption.highlight': '256-bit',
+        'landing.whyTilia.features.localPricing.title': 'Precios locales',
+        'landing.whyTilia.features.localPricing.description': 'Paga en tu moneda local.',
+        'landing.whyTilia.features.localPricing.highlight': 'ARS/USD',
+        'landing.whyTilia.features.noContracts.title': 'Sin contratos',
+        'landing.whyTilia.features.noContracts.description': 'Cancela cuando quieras.',
+        'landing.whyTilia.features.noContracts.highlight': 'Flexible',
         
         // FAQ section
         'landing.faq.badge': 'Preguntas frecuentes',
@@ -194,7 +194,7 @@ vi.mock('react-i18next', () => ({
         'landing.faq.questions.cancel.question': 'Puedo cancelar en cualquier momento?',
         'landing.faq.questions.cancel.answer': 'Si, puedes cancelar tu suscripcion cuando quieras sin penalidades.',
         'landing.faq.questions.modality.question': 'Sirve para sesiones online?',
-        'landing.faq.questions.modality.answer': 'Si, TerappIA soporta tanto sesiones presenciales como online.',
+        'landing.faq.questions.modality.answer': 'Si, Tilia soporta tanto sesiones presenciales como online.',
         'landing.faq.questions.patientLimit.question': 'Hay limite de pacientes?',
         'landing.faq.questions.patientLimit.answer': 'No, todos los planes incluyen pacientes ilimitados.',
         'landing.faq.questions.trial.question': 'Hay periodo de prueba?',
@@ -345,7 +345,7 @@ describe('Landing', () => {
       renderLanding();
       
       // NavBar - brand name
-      expect(screen.getAllByText('TerappIA').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Tilia').length).toBeGreaterThan(0);
       
       // Hero section
       expect(screen.getByText('Control total de tu consultorio')).toBeInTheDocument();
@@ -365,8 +365,8 @@ describe('Landing', () => {
       // Social Proof section
       expect(screen.getByText('Profesionales que confian en nosotros')).toBeInTheDocument();
       
-      // Why TerappIA section
-      expect(screen.getByText('Por que TerappIA')).toBeInTheDocument();
+      // Why Tilia section
+      expect(screen.getByText('Por que Tilia')).toBeInTheDocument();
       
       // FAQ section
       expect(screen.getByText('Preguntas Frecuentes')).toBeInTheDocument();
@@ -390,7 +390,7 @@ describe('Landing', () => {
     it('renders the brand logo and name', () => {
       renderLanding();
       
-      const brandTexts = screen.getAllByText('TerappIA');
+      const brandTexts = screen.getAllByText('Tilia');
       expect(brandTexts.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -560,7 +560,7 @@ describe('Landing', () => {
       renderLanding();
       
       // Browser chrome elements
-      expect(screen.getByText('app.terapp-ia.com')).toBeInTheDocument();
+      expect(screen.getByText('app.tilia.com')).toBeInTheDocument();
       
       // Stats preview - values appear in both Hero and Analytics sections
       const incomeElements = screen.getAllByText('$485.000');
@@ -784,7 +784,7 @@ describe('Landing', () => {
     it('renders encryption badge', () => {
       renderLanding();
       
-      // "256-bit" appears in both Security and WhyTerappIA sections
+      // "256-bit" appears in both Security and WhyTilia sections
       const encryptionBits = screen.getAllByText('256-bit');
       expect(encryptionBits.length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('Encriptacion')).toBeInTheDocument();
@@ -827,7 +827,7 @@ describe('Landing', () => {
       renderLanding();
       
       // Testimonial quotes - use regex for partial match as text may be split by elements
-      expect(screen.getByText(/TerappIA me ahorra horas/)).toBeInTheDocument();
+      expect(screen.getByText(/Tilia me ahorra horas/)).toBeInTheDocument();
       expect(screen.getByText(/gestion de cobros es excelente/i)).toBeInTheDocument();
       expect(screen.getByText(/puedo enfocarme en mis pacientes/i)).toBeInTheDocument();
     });
@@ -856,7 +856,7 @@ describe('Landing', () => {
   // WHY LAVENIUS SECTION TESTS
   // ==========================================================================
 
-  describe('Why TerappIA Section', () => {
+  describe('Why Tilia Section', () => {
     it('renders section badge', () => {
       renderLanding();
       
@@ -866,7 +866,7 @@ describe('Landing', () => {
     it('renders section title', () => {
       renderLanding();
       
-      expect(screen.getByText('Por que TerappIA')).toBeInTheDocument();
+      expect(screen.getByText('Por que Tilia')).toBeInTheDocument();
     });
 
     it('renders section subtitle', () => {
@@ -878,7 +878,7 @@ describe('Landing', () => {
     it('renders all feature cards', () => {
       renderLanding();
       
-      // "Pacientes ilimitados" appears in both WhyTerappIA and Pricing sections
+      // "Pacientes ilimitados" appears in both WhyTilia and Pricing sections
       const pacientesElements = screen.getAllByText('Pacientes ilimitados');
       expect(pacientesElements.length).toBeGreaterThanOrEqual(1);
       
@@ -1079,7 +1079,7 @@ describe('Landing', () => {
     it('renders plan features with checkmarks', () => {
       renderLanding();
       
-      // "Pacientes ilimitados" appears in both WhyTerappIA and Pricing - use getAllBy
+      // "Pacientes ilimitados" appears in both WhyTilia and Pricing - use getAllBy
       const pacientesElements = screen.getAllByText('Pacientes ilimitados');
       expect(pacientesElements.length).toBeGreaterThanOrEqual(1);
       
@@ -1210,7 +1210,7 @@ describe('Landing', () => {
     it('renders footer brand', () => {
       renderLanding();
       
-      const brandTexts = screen.getAllByText('TerappIA');
+      const brandTexts = screen.getAllByText('Tilia');
       expect(brandTexts.length).toBeGreaterThanOrEqual(2); // navbar + footer
     });
 
@@ -1353,7 +1353,7 @@ describe('Landing', () => {
       renderLanding();
       
       const sections = document.querySelectorAll('section');
-      // Hero, Features, Analytics, Reminders, Security, SocialProof, WhyTerappIA, FAQ, Pricing, CTA
+      // Hero, Features, Analytics, Reminders, Security, SocialProof, WhyTilia, FAQ, Pricing, CTA
       expect(sections.length).toBeGreaterThanOrEqual(10);
     });
 

@@ -342,7 +342,7 @@ export const useUIStore = create<UIStore>()(
       },
     }),
     {
-      name: 'terapp-ia-ui',
+      name: 'tilia-ui',
       storage: createJSONStorage(() => localStorage),
       // Only persist view preferences and sidebar collapsed state
       partialize: (state) => ({

@@ -591,7 +591,7 @@ export function Onboarding() {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = 'terappIA-recovery-phrase.txt';
+    anchor.download = 'tilia-recovery-phrase.txt';
     anchor.click();
     URL.revokeObjectURL(url);
   };
@@ -1287,7 +1287,7 @@ export function Onboarding() {
 
         {/* Brand footer */}
         <p className="text-center text-sm text-muted-foreground mt-6">
-          TerappIA © {new Date().getFullYear()}
+          Tilia © {new Date().getFullYear()}
         </p>
       </div>
     </div>

@@ -159,7 +159,7 @@ export const useSetupProgressStore = create<
       },
     }),
     {
-      name: 'terapp-ia-setup-progress',
+      name: 'tilia-setup-progress',
       version: 1,
     }
   )

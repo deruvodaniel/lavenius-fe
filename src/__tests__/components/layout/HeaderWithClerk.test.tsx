@@ -125,7 +125,7 @@ function HeaderWithClerk() {
       <nav className="nav">
         {/* Brand */}
         <div className="brand" data-testid="brand">
-          <a href="/">TerappIA</a>
+          <a href="/">Tilia</a>
         </div>
 
         {/* Auth state */}
@@ -190,7 +190,7 @@ function HeaderWithUseAuth() {
   return (
     <header data-testid="header-loaded">
       <nav>
-        <div className="brand">TerappIA</div>
+        <div className="brand">Tilia</div>
         
         {isSignedIn && user ? (
           <div data-testid="user-section">
@@ -352,7 +352,7 @@ describe('Header with Clerk Auth', () => {
         renderHeader(HeaderWithClerk);
 
         expect(screen.getByTestId('brand')).toBeInTheDocument();
-        expect(screen.getByText('TerappIA')).toBeInTheDocument();
+        expect(screen.getByText('Tilia')).toBeInTheDocument();
       });
     });
   });

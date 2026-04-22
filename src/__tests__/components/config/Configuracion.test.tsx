@@ -578,7 +578,7 @@ describe('Configuracion', () => {
       await user.click(saveButton);
 
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        'terappIA_settings',
+        'tilia_settings',
         expect.any(String)
       );
       expect(mockedToast.success).toHaveBeenCalledWith('Configuración guardada');

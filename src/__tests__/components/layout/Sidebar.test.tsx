@@ -9,7 +9,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'landing.brand': 'TerappIA',
+        'landing.brand': 'Tilia',
         'landing.tagline': 'Tu asistente de terapia',
         'navigation.agenda': 'Agenda',
         'navigation.patients': 'Pacientes',
@@ -131,14 +131,14 @@ describe('Sidebar', () => {
     it('renders the sidebar with brand and tagline when showHeader is true', () => {
       renderSidebar({ showHeader: true });
 
-      expect(screen.getByText('TerappIA')).toBeInTheDocument();
+      expect(screen.getByText('Tilia')).toBeInTheDocument();
       expect(screen.getByText('Tu asistente de terapia')).toBeInTheDocument();
     });
 
     it('hides header when showHeader is false', () => {
       renderSidebar({ showHeader: false });
 
-      expect(screen.queryByText('TerappIA')).not.toBeInTheDocument();
+      expect(screen.queryByText('Tilia')).not.toBeInTheDocument();
       expect(screen.queryByText('Tu asistente de terapia')).not.toBeInTheDocument();
     });
 

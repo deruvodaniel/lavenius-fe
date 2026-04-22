@@ -35,7 +35,7 @@ vi.mock('react-i18next', () => ({
         'settings.calendarSync.syncTimeChanges': 'Cambios de horario',
         'settings.calendarSync.syncCancellations': 'Cancelaciones',
         'settings.calendarSync.oneWaySync': 'Sincronización unidireccional',
-        'settings.calendarSync.oneWaySyncWarning': 'Los cambios en Google Calendar <strong>no</strong> se reflejarán en TerappIA',
+        'settings.calendarSync.oneWaySyncWarning': 'Los cambios en Google Calendar <strong>no</strong> se reflejarán en Tilia',
       };
       return translations[key] || key;
     },

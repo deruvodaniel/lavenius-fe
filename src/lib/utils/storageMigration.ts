@@ -1,22 +1,22 @@
 /**
- * One-time localStorage migration from "lavenius" to "terappIA" brand keys.
+ * One-time localStorage migration from "lavenius" to "tilia" brand keys.
  * Runs before React renders. Safe to remove ~3 months after deploy.
  */
 
-const SENTINEL = 'terappIA_migrated';
+const SENTINEL = 'tilia_migrated';
 
 if (!localStorage.getItem(SENTINEL)) {
   const exactKeyMap: Record<string, string> = {
-    'lavenius-theme': 'terapp-ia-theme',
-    'lavenius_language': 'terappIA_language',
-    'lavenius_onboarding': 'terappIA_onboarding',
-    'lavenius_settings': 'terappIA_settings',
-    'lavenius_sidebar_collapsed': 'terappIA_sidebar_collapsed',
-    'lavenius_profile': 'terappIA_profile',
-    'lavenius-ui': 'terapp-ia-ui',
-    'lavenius-setup-progress': 'terapp-ia-setup-progress',
-    'lavenius-dashboard-settings': 'terapp-ia-dashboard-settings',
-    'lavenius-calendar': 'terapp-ia-calendar',
+    'lavenius-theme': 'tilia-theme',
+    'lavenius_language': 'tilia_language',
+    'lavenius_onboarding': 'tilia_onboarding',
+    'lavenius_settings': 'tilia_settings',
+    'lavenius_sidebar_collapsed': 'tilia_sidebar_collapsed',
+    'lavenius_profile': 'tilia_profile',
+    'lavenius-ui': 'tilia-ui',
+    'lavenius-setup-progress': 'tilia-setup-progress',
+    'lavenius-dashboard-settings': 'tilia-dashboard-settings',
+    'lavenius-calendar': 'tilia-calendar',
   };
 
   // Migrate exact keys
@@ -29,8 +29,8 @@ if (!localStorage.getItem(SENTINEL)) {
 
   // Migrate prefix-based keys (onboarding extra data, redirect flags)
   const prefixMap: Record<string, string> = {
-    'lavenius_onboarding_extra_': 'terappIA_onboarding_extra_',
-    'lavenius_redirected_': 'terappIA_redirected_',
+    'lavenius_onboarding_extra_': 'tilia_onboarding_extra_',
+    'lavenius_redirected_': 'tilia_redirected_',
   };
 
   for (let i = 0; i < localStorage.length; i++) {
@@ -52,7 +52,7 @@ if (!localStorage.getItem(SENTINEL)) {
     const key = sessionStorage.key(i);
     if (!key) continue;
     if (key.startsWith('lavenius_redirected_')) {
-      const newKey = 'terappIA_redirected_' + key.slice('lavenius_redirected_'.length);
+      const newKey = 'tilia_redirected_' + key.slice('lavenius_redirected_'.length);
       const value = sessionStorage.getItem(key);
       if (value != null && sessionStorage.getItem(newKey) == null) {
         sessionStorage.setItem(newKey, value);

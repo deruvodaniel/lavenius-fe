@@ -1,6 +1,6 @@
 # AI Documentation
 
-> LLM-optimized guidelines for TerappIA frontend development.  
+> LLM-optimized guidelines for Tilia frontend development.  
 > **Actualizado**: Enero 14, 2026
 
 ## 📍 Ubicación

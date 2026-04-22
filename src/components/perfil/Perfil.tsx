@@ -33,7 +33,7 @@ interface PerfilProps {
 // PROFILE STORAGE
 // ============================================================================
 
-const PROFILE_KEY = 'terappIA_profile';
+const PROFILE_KEY = 'tilia_profile';
 
 interface ProfileData {
   avatarUrl?: string;
@@ -337,7 +337,7 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
                   variant="secondary"
                   size="sm"
                   onClick={() => {
-                    const url = `https://terapp-ia.com/p/${user?.firstName?.toLowerCase() || 'tu-nombre'}`;
+                    const url = `https://tilia.com/p/${user?.firstName?.toLowerCase() || 'tu-nombre'}`;
                     navigator.clipboard.writeText(url);
                     toast.success(t('profile.share.copied'));
                   }}

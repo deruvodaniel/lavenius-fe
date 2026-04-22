@@ -39,7 +39,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'landing.brand': 'TerappIA',
+        'landing.brand': 'Tilia',
         'landing.tagline': 'Gestión de consultorio',
         'navigation.agenda': 'Agenda',
         'navigation.patients': 'Pacientes',
@@ -49,7 +49,7 @@ vi.mock('react-i18next', () => ({
         'navigation.help': 'Ayuda',
         'navigation.logout': 'Cerrar sesión',
         'common.toggleMenu': 'Abrir menú',
-        'onboarding.welcome': '¡Bienvenido a TerappIA!',
+        'onboarding.welcome': '¡Bienvenido a Tilia!',
         'onboarding.welcomeDescription': 'Tu asistente de gestión de consultorio',
         'onboarding.calendar.title': 'Conecta tu calendario',
         'onboarding.calendar.description': 'Sincroniza con Google Calendar',
@@ -60,7 +60,7 @@ vi.mock('react-i18next', () => ({
         'onboarding.patient.create': 'Crear paciente',
         'onboarding.patient.later': 'Más tarde',
         'onboarding.complete.title': '¡Todo listo!',
-        'onboarding.complete.description': 'Ya puedes comenzar a usar TerappIA',
+        'onboarding.complete.description': 'Ya puedes comenzar a usar Tilia',
         'onboarding.complete.tip': 'Tip:',
         'onboarding.complete.tipText': 'Puedes acceder a la',
         'onboarding.complete.helpSection': 'sección de ayuda',
@@ -120,7 +120,7 @@ vi.mock('../../../components/layout', () => ({
   }) => (
     <div data-testid="app-layout">
       <header data-testid="app-header">
-        <h1>{appName || 'TerappIA'}</h1>
+        <h1>{appName || 'Tilia'}</h1>
         <button data-testid="mobile-menu-toggle" aria-label="Abrir menú">
           Menu
         </button>
@@ -163,7 +163,7 @@ vi.mock('../../../components/onboarding', () => ({
     onCreatePatient?: () => void;
   }) => isOpen ? (
     <div data-testid="onboarding-modal" role="dialog" aria-modal="true">
-      <h2>¡Bienvenido a TerappIA!</h2>
+      <h2>¡Bienvenido a Tilia!</h2>
       <p>Tu asistente de gestión de consultorio</p>
       <button data-testid="connect-calendar-btn" onClick={onConnectCalendar}>
         Conectar calendario
@@ -232,9 +232,9 @@ describe('Dashboard', () => {
       expect(screen.getByTestId('app-layout')).toBeInTheDocument();
     });
 
-    it('renders with app name "TerappIA"', () => {
+    it('renders with app name "Tilia"', () => {
       renderDashboardSimple();
-      expect(screen.getByRole('heading', { name: 'TerappIA' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Tilia' })).toBeInTheDocument();
     });
 
     it('renders the sidebar navigation', () => {
@@ -344,7 +344,7 @@ describe('Dashboard', () => {
         vi.advanceTimersByTime(500);
       });
       
-      expect(screen.getByText('¡Bienvenido a TerappIA!')).toBeInTheDocument();
+      expect(screen.getByText('¡Bienvenido a Tilia!')).toBeInTheDocument();
     });
 
     it('closes onboarding modal when close button is clicked', async () => {
@@ -453,7 +453,7 @@ describe('Dashboard', () => {
     it('has accessible heading structure', () => {
       renderDashboardSimple();
       
-      expect(screen.getByRole('heading', { name: 'TerappIA' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Tilia' })).toBeInTheDocument();
     });
 
     it('sidebar navigation is accessible', () => {

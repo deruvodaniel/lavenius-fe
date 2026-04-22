@@ -18,7 +18,7 @@ const MAX_UNLOCK_ATTEMPTS = 5;
 const BASE_UNLOCK_BACKOFF_MS = 1000;
 const MAX_UNLOCK_BACKOFF_MS = 30_000;
 const UNLOCK_ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
-const E2E_UNLOCK_STATE_STORAGE_KEY = 'terappia_e2e_unlock_state';
+const E2E_UNLOCK_STATE_STORAGE_KEY = 'tilia_e2e_unlock_state';
 
 interface PersistedUnlockState {
   userId: string | null;
