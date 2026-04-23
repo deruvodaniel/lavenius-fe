@@ -139,9 +139,9 @@ describe('HelpCenter', () => {
 
     it('renders support email link', () => {
       renderHelpCenter();
-      const emailLink = screen.getByRole('link', { name: 'support@tilia.com' });
+      const emailLink = screen.getByRole('link', { name: 'support@somostilia.com' });
       expect(emailLink).toBeInTheDocument();
-      expect(emailLink).toHaveAttribute('href', 'mailto:support@tilia.com');
+      expect(emailLink).toHaveAttribute('href', 'mailto:support@somostilia.com');
     });
   });
 
@@ -510,7 +510,7 @@ describe('HelpCenter', () => {
     it('email link is focusable', () => {
       renderHelpCenter();
       
-      const emailLink = screen.getByRole('link', { name: 'support@tilia.com' });
+      const emailLink = screen.getByRole('link', { name: 'support@somostilia.com' });
       emailLink.focus();
       expect(emailLink).toHaveFocus();
     });

@@ -64,11 +64,11 @@ export function NotFound() {
             Si el problema persiste, contacta a soporte tecnico:
           </p>
           <a 
-            href="mailto:support@tilia.com"
+            href="mailto:support@somostilia.com"
             className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
           >
             <Mail className="w-4 h-4" />
-            support@tilia.com
+            support@somostilia.com
           </a>
         </div>
 

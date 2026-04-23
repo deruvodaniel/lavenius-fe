@@ -1422,11 +1422,11 @@ function Footer() {
                 <span>+54 11 1234-5678</span>
               </a>
               <a 
-                href="mailto:support@tilia.com"
+                href="mailto:support@somostilia.com"
                 className="flex items-center gap-2 text-sm transition-colors hover:text-indigo-400"
               >
                 <Mail className="w-4 h-4" />
-                <span>support@tilia.com</span>
+                <span>support@somostilia.com</span>
               </a>
             </div>
           </div>

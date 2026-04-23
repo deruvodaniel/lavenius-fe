@@ -1624,7 +1624,7 @@
         "controllerLabel": "Data controller",
         "controllerValue": "Tilia",
         "emailLabel": "Privacy contact email",
-        "emailValue": "support@tilia.com",
+        "emailValue": "support@somostilia.com",
         "addressLabel": "Address",
         "addressValue": "Currently not provided"
       },
@@ -1723,7 +1723,7 @@
           "Deletion where applicable.",
           "Data portability when technically feasible."
         ],
-        "contact": "To exercise these rights: support@tilia.com"
+        "contact": "To exercise these rights: support@somostilia.com"
       },
       "transfers": {
         "title": "9. International transfers",
@@ -1740,7 +1740,7 @@
       "contact": {
         "title": "12. Contact",
         "emailLabel": "Email",
-        "emailValue": "support@tilia.com",
+        "emailValue": "support@somostilia.com",
         "controllerLabel": "Controller",
         "controllerValue": "Tilia"
       }
@@ -1823,7 +1823,7 @@
       "contact": {
         "title": "13. Contact",
         "emailLabel": "Email",
-        "emailValue": "support@tilia.com",
+        "emailValue": "support@somostilia.com",
         "ownerLabel": "Owner",
         "ownerValue": "Tilia"
       }

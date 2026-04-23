@@ -1671,7 +1671,7 @@
         "controllerLabel": "Responsable del tratamiento",
         "controllerValue": "Tilia",
         "emailLabel": "Email de contacto de privacidad",
-        "emailValue": "support@tilia.com",
+        "emailValue": "support@somostilia.com",
         "addressLabel": "Domicilio",
         "addressValue": "No informado actualmente"
       },
@@ -1770,7 +1770,7 @@
           "Eliminación cuando corresponda.",
           "Portabilidad de datos cuando sea técnicamente viable."
         ],
-        "contact": "Para ejercer estos derechos: support@tilia.com"
+        "contact": "Para ejercer estos derechos: support@somostilia.com"
       },
       "transfers": {
         "title": "9. Transferencias internacionales",
@@ -1787,7 +1787,7 @@
       "contact": {
         "title": "12. Contacto",
         "emailLabel": "Email",
-        "emailValue": "support@tilia.com",
+        "emailValue": "support@somostilia.com",
         "controllerLabel": "Responsable",
         "controllerValue": "Tilia"
       }
@@ -1870,7 +1870,7 @@
       "contact": {
         "title": "13. Contacto",
         "emailLabel": "Email",
-        "emailValue": "support@tilia.com",
+        "emailValue": "support@somostilia.com",
         "ownerLabel": "Responsable",
         "ownerValue": "Tilia"
       }

@@ -124,7 +124,7 @@ export function DevTools() {
           <AlertDescription>
             <strong>Test User:</strong>
             <div className="mt-2 space-y-1 text-sm">
-              <div>Email: support@tilia.com</div>
+              <div>Email: support@somostilia.com</div>
               <div>Password: Test1234!</div>
               <div>Passphrase: MySecretKey123</div>
             </div>
