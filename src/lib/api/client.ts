@@ -119,19 +119,21 @@ export class ApiClientError extends Error {
     public statusCode: number,
     public error: string,
     message: string | string[],
-    public path?: string
+    public path?: string,
+    public retryAfterSeconds?: number
   ) {
     super(Array.isArray(message) ? message.join(', ') : message);
     this.name = 'ApiClientError';
   }
 
-  static fromApiError(error: ApiError): ApiClientError {
+  static fromApiError(error: ApiError, retryAfterSeconds?: number): ApiClientError {
     const translatedMessage = translateErrorMessage(error.message);
     return new ApiClientError(
       error.statusCode,
       error.error,
       translatedMessage,
-      error.path
+      error.path,
+      retryAfterSeconds
     );
   }
 }
@@ -314,8 +316,12 @@ export class ApiClient {
       }
 
       // Create custom error with API error details
+      const retryAfterHeader = error.response?.headers?.['retry-after'];
+      const parsedRetryAfter = Number.parseInt(String(retryAfterHeader ?? ''), 10);
+      const retryAfterSeconds = Number.isFinite(parsedRetryAfter) ? parsedRetryAfter : undefined;
+
       if (apiError) {
-        return Promise.reject(ApiClientError.fromApiError(apiError));
+        return Promise.reject(ApiClientError.fromApiError(apiError, retryAfterSeconds));
       }
 
       // Network or timeout error

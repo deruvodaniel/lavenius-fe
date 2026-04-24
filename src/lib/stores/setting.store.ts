@@ -7,12 +7,15 @@ import type {
   DayOffSetting,
   DuePaymentReminderSetting,
   NextSessionReminderSetting,
+  BookingPreferencesConfig,
+  BookingPreferencesSetting,
   UpdateSettingDto,
 } from '../types/setting.types';
 import {
   SettingType,
   PaymentReminderFrequency,
   isDayOffSetting,
+  isBookingPreferencesSetting,
   isDuePaymentReminderSetting,
   isNextSessionReminderSetting,
 } from '../types/setting.types';
@@ -51,6 +54,7 @@ interface SettingActions {
   // Reminder-specific actions (message templates managed by backend)
   upsertNextSessionReminder: (config: { hoursBeforeSession: number; message?: string }, active: boolean) => Promise<Setting>;
   upsertDuePaymentReminder: (config: { frequency: 'daily' | 'weekly' | 'biweekly'; remindDuePaymentLimit: number; message?: string }, active: boolean) => Promise<Setting>;
+  upsertBookingPreferences: (config: BookingPreferencesConfig, active?: boolean, description?: string) => Promise<Setting>;
   reset: () => void;
 }
 
@@ -230,6 +234,26 @@ export const useSettingStore = create<SettingState & SettingActions>((set, get) 
     }
   },
 
+  upsertBookingPreferences: async (config, active = true, description = 'Preferencias de turnos') => {
+    const { settings } = get();
+    const existing = settings.find(isBookingPreferencesSetting);
+
+    if (existing) {
+      return get().updateSetting(existing.id, {
+        active,
+        config,
+        description,
+      });
+    }
+
+    return get().createSetting({
+      type: SettingType.BOOKING_PREFERENCES,
+      active,
+      config,
+      description,
+    });
+  },
+
   reset: () => set(initialState),
 }));
 
@@ -257,6 +281,13 @@ export const settingSelectors = {
    */
   getNextSessionReminderSetting: (state: SettingState): NextSessionReminderSetting | undefined => {
     return state.settings.find(isNextSessionReminderSetting);
+  },
+
+  /**
+   * Get booking preferences setting (there should be only one)
+   */
+  getBookingPreferencesSetting: (state: SettingState): BookingPreferencesSetting | undefined => {
+    return state.settings.find(isBookingPreferencesSetting);
   },
 
   /**

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, Globe, Loader2, Sun } from 'lucide-react';
+import { Bell, DollarSign, Calendar, X, Plus, Save, Clock, Globe, Loader2, Sun, HelpCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -9,13 +9,13 @@ import { TimePicker } from '@/components/ui/time-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import CalendarSync from './CalendarSync';
-import { useSearchParams } from 'react-router-dom';
-import { LanguageSwitcher, ThemeToggle } from '@/components/shared';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { ConfirmDialog, LanguageSwitcher, ThemeToggle } from '@/components/shared';
 import { Input } from '@/components/ui/input';
 import { Perfil, type PerfilHandle } from '@/components/perfil/Perfil';
 import { User } from 'lucide-react';
 import { useSettingStore, settingSelectors } from '@/lib/stores/setting.store';
-import { type DayOffConfig, type DayOffSetting } from '@/lib/types/setting.types';
+import { type BookingPreferencesConfig, type DayOffConfig, type DayOffSetting } from '@/lib/types/setting.types';
 import { cn } from '@/components/ui/utils';
 import { useE2EKey } from '@/lib/e2e';
 
@@ -99,6 +99,26 @@ const defaultLocalSettings: LocalSettings = {
   defaultSessionCost: null,
 };
 
+const DAY_ID_TO_KEY: Record<number, keyof BookingPreferencesConfig['bookingWorkingDays']> = {
+  1: 'monday',
+  2: 'tuesday',
+  3: 'wednesday',
+  4: 'thursday',
+  5: 'friday',
+  6: 'saturday',
+  0: 'sunday',
+};
+
+const DAY_KEY_TO_ID: Record<keyof BookingPreferencesConfig['bookingWorkingDays'], number> = {
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+  sunday: 0,
+};
+
 const loadLocalSettings = (): LocalSettings => {
   try {
     const stored = localStorage.getItem(SETTINGS_KEY);
@@ -119,6 +139,49 @@ const saveLocalSettings = (settings: LocalSettings): void => {
     throw error;
   }
 };
+
+function localSettingsToBookingPreferences(settings: LocalSettings): BookingPreferencesConfig {
+  const workingDays: BookingPreferencesConfig['bookingWorkingDays'] = {
+    monday: false,
+    tuesday: false,
+    wednesday: false,
+    thursday: false,
+    friday: false,
+    saturday: false,
+    sunday: false,
+  };
+
+  settings.workingHours.workingDays.forEach((dayId) => {
+    const dayKey = DAY_ID_TO_KEY[dayId];
+    if (dayKey) {
+      workingDays[dayKey] = true;
+    }
+  });
+
+  return {
+    bookingWorkingDays: workingDays,
+    bookingWorkingHoursFrom: settings.workingHours.startTime,
+    bookingWorkingHoursTo: settings.workingHours.endTime,
+    defaultSessionDurationMinutes: settings.defaultSessionDuration,
+    defaultSessionAmount: settings.defaultSessionCost,
+  };
+}
+
+function bookingPreferencesToLocalSettings(config: BookingPreferencesConfig): LocalSettings {
+  const workingDays = Object.entries(config.bookingWorkingDays)
+    .filter(([, isEnabled]) => isEnabled)
+    .map(([dayKey]) => DAY_KEY_TO_ID[dayKey as keyof BookingPreferencesConfig['bookingWorkingDays']]);
+
+  return {
+    workingHours: {
+      startTime: config.bookingWorkingHoursFrom,
+      endTime: config.bookingWorkingHoursTo,
+      workingDays: workingDays.sort((a, b) => a - b),
+    },
+    defaultSessionDuration: config.defaultSessionDurationMinutes,
+    defaultSessionCost: config.defaultSessionAmount ?? null,
+  };
+}
 
 // ============================================================================
 // MAPPING FUNCTIONS: UI <-> API
@@ -236,11 +299,15 @@ function parseDescriptionForType(description?: string): { tipo: DiaOffTipo; moti
  */
 function apiToUiDayOff(setting: DayOffSetting): { id: string; fechaInicio: string; fechaFin: string; motivo: string; tipo: DiaOffTipo; startTime?: string; endTime?: string } {
   const { tipo, motivo, startTime, endTime } = parseDescriptionForType(setting.description);
-  
+
+  // BE can return full ISO datetime (e.g. 2026-04-01T16:00:00.000Z).
+  // UI date inputs and formatters in this screen expect YYYY-MM-DD.
+  const normalizeToYmd = (value: string): string => value.split('T')[0] ?? value;
+
   return {
     id: setting.id,
-    fechaInicio: setting.config.fromDate,
-    fechaFin: setting.config.toDate,
+    fechaInicio: normalizeToYmd(setting.config.fromDate),
+    fechaFin: normalizeToYmd(setting.config.toDate),
     motivo,
     tipo,
     startTime,
@@ -347,6 +414,7 @@ export function Configuracion() {
   
   // Navigation state - read initial tab from URL query params
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<SectionId>(() => {
     const tab = searchParams.get('tab') as SectionId | null;
     if (tab && NAVIGATION_SECTIONS.some(s => s.id === tab)) return tab;
@@ -376,12 +444,14 @@ export function Configuracion() {
     deleteSetting,
     upsertNextSessionReminder,
     upsertDuePaymentReminder,
+    upsertBookingPreferences,
   } = useSettingStore();
   
   // Get settings from the store using selectors
   const dayOffSettings = settingSelectors.getDayOffSettings({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
   const paymentReminderSetting = settingSelectors.getDuePaymentReminderSetting({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
   const sessionReminderSetting = settingSelectors.getNextSessionReminderSetting({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
+  const bookingPreferencesSetting = settingSelectors.getBookingPreferencesSetting({ settings: allSettings, fetchStatus, error: null, lastFetchTime: null });
   const isLoadingSettings = fetchStatus === 'loading';
   
   // Reminder state from backend settings (with local UI state for editing)
@@ -396,6 +466,9 @@ export function Configuracion() {
   // Track saving state for reminders
   const [isSavingReminders, setIsSavingReminders] = useState(false);
   const [hasReminderChanges, setHasReminderChanges] = useState(false);
+  const hasUnsavedChanges = profileHasChanges || hasChanges || hasReminderChanges;
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [pendingNavigationTo, setPendingNavigationTo] = useState<string | null>(null);
   
   // Convert API day off settings to UI format
   const diasOffFromApi = dayOffSettings.map(apiToUiDayOff);
@@ -442,6 +515,21 @@ export function Configuracion() {
     }
   }, [sessionReminderSetting]);
 
+  useEffect(() => {
+    if (!bookingPreferencesSetting?.config) {
+      return;
+    }
+
+    const nextLocalSettings = bookingPreferencesToLocalSettings(bookingPreferencesSetting.config);
+    setLocalSettings(nextLocalSettings);
+    try {
+      saveLocalSettings(nextLocalSettings);
+    } catch {
+      // ignore localStorage write failures here
+    }
+    setHasChanges(false);
+  }, [bookingPreferencesSetting]);
+
   // Update a local setting and mark as changed
   const updateLocalSetting = useCallback(<K extends keyof LocalSettings>(key: K, value: LocalSettings[K]) => {
     setLocalSettings(prev => ({ ...prev, [key]: value }));
@@ -451,19 +539,72 @@ export function Configuracion() {
   // Warn user about unsaved changes
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasChanges || hasReminderChanges) {
+      if (hasUnsavedChanges) {
         e.preventDefault();
         e.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasChanges, hasReminderChanges]);
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    const normalizePath = (pathname: string) =>
+      pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+
+    const isSettingsPath = (pathname: string) =>
+      normalizePath(pathname) === '/dashboard/configuracion';
+
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (!hasUnsavedChanges) return;
+      if (event.defaultPrevented) return;
+      if (event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+
+      const target = event.target as HTMLElement | null;
+      const anchor = target?.closest('a[href]') as HTMLAnchorElement | null;
+      if (!anchor) return;
+      if (anchor.target && anchor.target !== '_self') return;
+      if (anchor.hasAttribute('download')) return;
+
+      const nextUrl = new URL(anchor.href, window.location.origin);
+      if (nextUrl.origin !== window.location.origin) return;
+      if (isSettingsPath(nextUrl.pathname)) return;
+      if (!isSettingsPath(window.location.pathname)) return;
+
+      event.preventDefault();
+      setPendingNavigationTo(`${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+      setShowLeaveDialog(true);
+    };
+
+    document.addEventListener('click', handleDocumentClick, true);
+    return () => {
+      document.removeEventListener('click', handleDocumentClick, true);
+    };
+  }, [hasUnsavedChanges]);
 
   const handleSave = async () => {
+    const hasWorkingDay = localSettings.workingHours.workingDays.length > 0;
+    const hasValidHourRange = localSettings.workingHours.startTime < localSettings.workingHours.endTime;
+    const hasValidDuration =
+      Number.isInteger(localSettings.defaultSessionDuration) &&
+      localSettings.defaultSessionDuration >= 15 &&
+      localSettings.defaultSessionDuration <= 180;
+    const hasValidAmount =
+      localSettings.defaultSessionCost === null ||
+      (typeof localSettings.defaultSessionCost === 'number' && localSettings.defaultSessionCost >= 0);
+
+    if (!hasWorkingDay || !hasValidHourRange || !hasValidDuration || !hasValidAmount) {
+      toast.error(t('settings.messages.saveError'));
+      return;
+    }
+
     // When on profile tab, delegate save to Perfil component
     if (activeSection === 'profile' && perfilRef.current) {
-      await perfilRef.current.save();
+      const profileSaved = await perfilRef.current.save();
+      if (profileSaved) {
+        setProfileHasChanges(false);
+      }
       return;
     }
     // When on preferences tab, save local settings + reminders
@@ -472,6 +613,11 @@ export function Configuracion() {
       try {
         // Save local settings (language, session duration)
         if (hasChanges) {
+          await upsertBookingPreferences(
+            localSettingsToBookingPreferences(localSettings),
+            true,
+            'Preferencias de turnos'
+          );
           saveLocalSettings(localSettings);
           setHasChanges(false);
         }
@@ -490,6 +636,13 @@ export function Configuracion() {
     // Calendar tab — save local settings (working hours, days)
     setIsSaving(true);
     try {
+      if (hasChanges) {
+        await upsertBookingPreferences(
+          localSettingsToBookingPreferences(localSettings),
+          true,
+          'Preferencias de turnos'
+        );
+      }
       saveLocalSettings(localSettings);
       setHasChanges(false);
       toast.success(t('settings.messages.saved'));
@@ -686,6 +839,20 @@ export function Configuracion() {
             })}
           </div>
 
+          <div className="md:hidden mt-3">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="w-full justify-center border-indigo-500/40 text-foreground hover:bg-indigo-500/10"
+            >
+              <Link to="/dashboard/ayuda" className="inline-flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-indigo-500" />
+                {t('navigation.help')}
+              </Link>
+            </Button>
+          </div>
+
           {/* Desktop: Vertical sidebar navigation */}
           <div className="hidden md:flex md:flex-col">
             {NAVIGATION_SECTIONS.map((section) => {
@@ -713,6 +880,20 @@ export function Configuracion() {
                 </Button>
               );
             })}
+          </div>
+
+          <div className="hidden md:block mt-4">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="w-full justify-start border-indigo-500/40 text-foreground hover:bg-indigo-500/10"
+            >
+              <Link to="/dashboard/ayuda" className="inline-flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-indigo-500" />
+                {t('navigation.help')}
+              </Link>
+            </Button>
           </div>
         </nav>
 
@@ -1304,6 +1485,32 @@ export function Configuracion() {
           </div>
         ) : null;
       })()}
+
+      <ConfirmDialog
+        open={showLeaveDialog}
+        onOpenChange={(open) => {
+          setShowLeaveDialog(open);
+          if (!open) {
+            setPendingNavigationTo(null);
+          }
+        }}
+        title={t('settings.messages.leaveWithUnsavedTitle')}
+        description={t('settings.messages.leaveWithUnsavedDescription')}
+        confirmLabel={t('settings.messages.leaveWithoutSaving')}
+        cancelLabel={t('common.cancel')}
+        variant="warning"
+        onConfirm={() => {
+          if (pendingNavigationTo) {
+            navigate(pendingNavigationTo);
+          }
+          setPendingNavigationTo(null);
+          setShowLeaveDialog(false);
+        }}
+        onCancel={() => {
+          setPendingNavigationTo(null);
+          setShowLeaveDialog(false);
+        }}
+      />
     </div>
   );
 }

@@ -37,6 +37,7 @@ export enum PatientStatus {
 export enum AppointmentStatus {
   CONFIRMED = 'confirmed',
   PENDING = 'pending',
+  PENDING_APPROVAL = 'pending_approval',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
 }

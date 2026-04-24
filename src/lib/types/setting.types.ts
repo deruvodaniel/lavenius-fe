@@ -9,6 +9,7 @@ export enum SettingType {
   DUE_PAYMENT_REMINDER = 'due_payment_reminder',
   NEXT_SESSION_REMINDER = 'next_session_reminder',
   DAY_OFF = 'day_off',
+  BOOKING_PREFERENCES = 'booking_preferences',
 }
 
 export enum PaymentReminderFrequency {
@@ -33,6 +34,24 @@ export interface DuePaymentReminderConfig {
 export interface NextSessionReminderConfig {
   hoursBeforeSession: number; // Hours before the session
   message?: string; // Optional - message templates are managed by backend (Meta API approved)
+}
+
+export interface BookingWorkingDays {
+  monday: boolean;
+  tuesday: boolean;
+  wednesday: boolean;
+  thursday: boolean;
+  friday: boolean;
+  saturday: boolean;
+  sunday: boolean;
+}
+
+export interface BookingPreferencesConfig {
+  bookingWorkingDays: BookingWorkingDays;
+  bookingWorkingHoursFrom: string; // HH:mm
+  bookingWorkingHoursTo: string;   // HH:mm
+  defaultSessionDurationMinutes: number;
+  defaultSessionAmount?: number | null;
 }
 
 // ==================== Therapist Info ====================
@@ -68,7 +87,16 @@ export type NextSessionReminderSetting = BaseSettingResponse & {
   config: NextSessionReminderConfig;
 };
 
-export type Setting = DayOffSetting | DuePaymentReminderSetting | NextSessionReminderSetting;
+export type BookingPreferencesSetting = BaseSettingResponse & {
+  type: SettingType.BOOKING_PREFERENCES;
+  config: BookingPreferencesConfig;
+};
+
+export type Setting =
+  | DayOffSetting
+  | DuePaymentReminderSetting
+  | NextSessionReminderSetting
+  | BookingPreferencesSetting;
 
 // ==================== Create/Update DTOs ====================
 
@@ -97,10 +125,16 @@ export type CreateNextSessionReminderSettingDto = BaseCreateSettingDto & {
   config: NextSessionReminderConfig;
 };
 
+export type CreateBookingPreferencesSettingDto = BaseCreateSettingDto & {
+  type: SettingType.BOOKING_PREFERENCES;
+  config: BookingPreferencesConfig;
+};
+
 export type CreateSettingDto = 
   | CreateDayOffSettingDto 
   | CreateDuePaymentReminderSettingDto 
-  | CreateNextSessionReminderSettingDto;
+  | CreateNextSessionReminderSettingDto
+  | CreateBookingPreferencesSettingDto;
 
 interface BaseUpdateSettingDto {
   active?: boolean;
@@ -126,10 +160,16 @@ export type UpdateNextSessionReminderSettingDto = BaseUpdateSettingDto & {
   config?: NextSessionReminderConfig;
 };
 
+export type UpdateBookingPreferencesSettingDto = BaseUpdateSettingDto & {
+  type?: SettingType.BOOKING_PREFERENCES;
+  config?: BookingPreferencesConfig;
+};
+
 export type UpdateSettingDto = 
   | UpdateDayOffSettingDto 
   | UpdateDuePaymentReminderSettingDto 
-  | UpdateNextSessionReminderSettingDto;
+  | UpdateNextSessionReminderSettingDto
+  | UpdateBookingPreferencesSettingDto;
 
 // Batch update request
 export interface BatchUpdateSettingDto {
@@ -160,6 +200,13 @@ export function isNextSessionReminderSetting(setting: Setting): setting is NextS
   return setting.type === SettingType.NEXT_SESSION_REMINDER;
 }
 
+/**
+ * Type guard to check if a setting is a Booking Preferences setting
+ */
+export function isBookingPreferencesSetting(setting: Setting): setting is BookingPreferencesSetting {
+  return setting.type === SettingType.BOOKING_PREFERENCES;
+}
+
 // ==================== Filter Helpers ====================
 
 export function getDayOffSettings(settings: Setting[]): DayOffSetting[] {
@@ -172,4 +219,8 @@ export function getDuePaymentReminderSetting(settings: Setting[]): DuePaymentRem
 
 export function getNextSessionReminderSetting(settings: Setting[]): NextSessionReminderSetting | undefined {
   return settings.find(isNextSessionReminderSetting);
+}
+
+export function getBookingPreferencesSetting(settings: Setting[]): BookingPreferencesSetting | undefined {
+  return settings.find(isBookingPreferencesSetting);
 }

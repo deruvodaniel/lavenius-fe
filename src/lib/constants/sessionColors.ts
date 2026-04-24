@@ -11,6 +11,7 @@ import { SessionStatus } from '../types/session';
  */
 export const SESSION_STATUS_COLORS: Record<SessionStatus, string> = {
   [SessionStatus.PENDING]: '#f59e0b',      // Orange/Amber 500
+  [SessionStatus.PENDING_APPROVAL]: '#f59e0b', // Orange/Amber 500
   [SessionStatus.CONFIRMED]: '#3b82f6',    // Blue 500
   [SessionStatus.COMPLETED]: '#10b981',    // Green 500
   [SessionStatus.CANCELLED]: '#ef4444',    // Red 500
@@ -22,6 +23,7 @@ export const SESSION_STATUS_COLORS: Record<SessionStatus, string> = {
  */
 export const SESSION_STATUS_BADGE_CLASSES: Record<SessionStatus, string> = {
   [SessionStatus.PENDING]: 'bg-orange-100 text-orange-700',
+  [SessionStatus.PENDING_APPROVAL]: 'bg-orange-100 text-orange-700',
   [SessionStatus.CONFIRMED]: 'bg-blue-100 text-blue-700',
   [SessionStatus.COMPLETED]: 'bg-green-100 text-green-700',
   [SessionStatus.CANCELLED]: 'bg-red-100 text-red-700',
@@ -33,6 +35,7 @@ export const SESSION_STATUS_BADGE_CLASSES: Record<SessionStatus, string> = {
  */
 export const SESSION_STATUS_BORDER_CLASSES: Record<SessionStatus, string> = {
   [SessionStatus.PENDING]: 'border-l-orange-500',
+  [SessionStatus.PENDING_APPROVAL]: 'border-l-orange-500',
   [SessionStatus.CONFIRMED]: 'border-l-blue-500',
   [SessionStatus.COMPLETED]: 'border-l-green-500',
   [SessionStatus.CANCELLED]: 'border-l-red-500',
@@ -43,6 +46,7 @@ export const SESSION_STATUS_BORDER_CLASSES: Record<SessionStatus, string> = {
  */
 export const SESSION_STATUS_LABELS: Record<SessionStatus, string> = {
   [SessionStatus.PENDING]: 'Agendada',
+  [SessionStatus.PENDING_APPROVAL]: 'Pendiente de aprobación',
   [SessionStatus.CONFIRMED]: 'Confirmada',
   [SessionStatus.COMPLETED]: 'Completada',
   [SessionStatus.CANCELLED]: 'Cancelada',

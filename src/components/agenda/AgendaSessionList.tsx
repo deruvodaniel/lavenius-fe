@@ -14,6 +14,7 @@ import type { Patient } from '@/lib/types/api.types';
 
 interface AgendaSessionListProps {
   isLoading: boolean;
+  isCalendarConnected: boolean;
   visibleTurnosPorDia: [string, TurnoUI[]][];
   hasMore: boolean;
   isLoadingMore: boolean;
@@ -37,6 +38,7 @@ interface AgendaSessionListProps {
 
 export function AgendaSessionList({
   isLoading,
+  isCalendarConnected,
   visibleTurnosPorDia,
   hasMore,
   isLoadingMore,
@@ -79,11 +81,12 @@ export function AgendaSessionList({
                 onClick: onClearSearch
               } : {
                 label: t('agenda.addFirstSession'),
-                onClick: onNewTurno
+                onClick: onNewTurno,
+                disabled: !isCalendarConnected
               }}
               variant="subtle"
             />
-            {!searchTerm && (
+            {!searchTerm && !isCalendarConnected && (
               <div className="flex justify-center pt-4">
                 <CalendarSyncButton variant="outline" />
               </div>

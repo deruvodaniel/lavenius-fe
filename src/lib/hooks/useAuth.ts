@@ -36,6 +36,7 @@ export interface User {
  * Onboarding metadata stored in Clerk's unsafeMetadata
  */
 export interface OnboardingMetadata {
+  accountType?: 'therapist' | 'patient';
   specialty?: string;
   phone?: string;
   alternativePhone?: string;

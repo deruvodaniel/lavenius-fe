@@ -52,7 +52,11 @@ export function AgendaHeader({
             {t('agenda.subtitle')}
           </p>
         </div>
-        <Button onClick={onNewTurno} className="w-full sm:w-auto">
+        <Button
+          onClick={onNewTurno}
+          className="w-full sm:w-auto"
+          disabled={!isCalendarConnected}
+        >
           <Plus className="w-4 h-4" />
           {t('agenda.newSession')}
         </Button>

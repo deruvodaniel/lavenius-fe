@@ -579,6 +579,7 @@ export function TurnoDrawer({ isOpen, onClose, session, patients, pacienteId, in
               className="w-full"
             >
               <option value="pending">{t('agenda.status.scheduled')}</option>
+              <option value="pending_approval">{t('agenda.status.pendingApproval')}</option>
               <option value="confirmed">{t('agenda.status.confirmed')}</option>
               <option value="completed">{t('agenda.status.completed')}</option>
               <option value="cancelled">{t('agenda.status.cancelled')}</option>
