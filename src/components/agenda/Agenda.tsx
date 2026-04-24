@@ -135,6 +135,7 @@ export function Agenda() {
         {(viewMode === 'list' || viewMode === 'both') && (
           <AgendaSessionList
             isLoading={isLoading}
+            isCalendarConnected={isCalendarConnected}
             visibleTurnosPorDia={visibleTurnosPorDia}
             hasMore={hasMore}
             isLoadingMore={isLoadingMore}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
+import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/clerk-react';
 import type { LucideIcon } from 'lucide-react';
 import { 
   Calendar, 
@@ -42,6 +42,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { AnimatedSection, LanguageSwitcher, BetaBadge } from '@/components/shared';
+import { AccountType, getUserAccountType } from '@/lib/auth/accountType';
 
 // ============================================================================
 // MOCK DATA FOR DASHBOARD PREVIEW
@@ -70,6 +71,8 @@ const mockStats = {
 function NavBar() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user } = useUser();
+  const accountType = getUserAccountType(user);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const scrollToSection = (sectionId: string) => {
@@ -159,13 +162,15 @@ function NavBar() {
             
             {/* Signed In: Show Dashboard link + User avatar */}
             <SignedIn>
-              <Button
-                size="sm"
-                onClick={() => navigate('/dashboard')}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md transition-all"
-              >
-                {t('landing.nav.dashboard', 'Dashboard')}
-              </Button>
+              {accountType !== AccountType.Patient && (
+                <Button
+                  size="sm"
+                  onClick={() => navigate('/dashboard')}
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md transition-all"
+                >
+                  {t('landing.nav.dashboard', 'Dashboard')}
+                </Button>
+              )}
               <UserButton 
                 afterSignOutUrl="/"
                 appearance={{
@@ -415,21 +420,47 @@ function PurposeSection() {
   const { t } = useTranslation();
 
   return (
-    <section className="py-10 px-4 sm:px-6 lg:px-8 bg-background">
-      <div className="max-w-5xl mx-auto">
-        <div className="rounded-2xl border border-indigo-200/60 dark:border-indigo-900/60 bg-indigo-50/60 dark:bg-indigo-950/20 p-6 sm:p-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">
-            {t('landing.purpose.title')}
-          </h2>
-          <p className="text-muted-foreground leading-relaxed mb-3">
-            {t('landing.purpose.description')}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {t('landing.purpose.privacyLabel')}{' '}
-            <a href="/privacy-policy" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline underline-offset-2">
-              {t('landing.purpose.privacyLink')}
-            </a>
-          </p>
+    <section className="py-12 px-4 sm:px-6 lg:px-8 bg-background">
+      <div className="max-w-6xl mx-auto">
+        <div className="rounded-2xl border border-indigo-200/60 dark:border-indigo-900/60 bg-gradient-to-br from-indigo-50/70 via-background to-purple-50/60 dark:from-indigo-950/30 dark:via-background dark:to-purple-950/20 p-6 sm:p-8 lg:p-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 items-start">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950/40 border border-indigo-200/70 dark:border-indigo-800/60 mb-4">
+                <Shield className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">
+                  {t('landing.purpose.badge')}
+                </span>
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
+                {t('landing.purpose.title')}
+              </h2>
+              <p className="text-muted-foreground leading-relaxed">
+                {t('landing.purpose.description')}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-border bg-card/70 p-5 sm:p-6">
+              <ul className="space-y-3 mb-5">
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-foreground">{t('landing.purpose.points.patients')}</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-foreground">{t('landing.purpose.points.agenda')}</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-foreground">{t('landing.purpose.points.billing')}</span>
+                </li>
+              </ul>
+
+              <Button asChild variant="outline" className="w-full sm:w-auto">
+                <Link to="/privacy-policy">{t('landing.purpose.privacyCta')}</Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -506,6 +537,83 @@ function FeaturesSection() {
               </Card>
             </AnimatedSection>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PatientBookingSection() {
+  const { t } = useTranslation();
+
+  return (
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-background via-indigo-950/10 to-purple-950/10">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <AnimatedSection animation="slide-up" duration={500}>
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/15 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium mb-6">
+                <Users className="w-4 h-4" />
+                {t('landing.patientBooking.badge')}
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
+                {t('landing.patientBooking.title')}
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                {t('landing.patientBooking.description')}
+              </p>
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center mt-0.5">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <p className="text-foreground">{t('landing.patientBooking.steps.patient')}</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center mt-0.5">
+                    <CheckCircle2 className="w-4 h-4" />
+                  </div>
+                  <p className="text-foreground">{t('landing.patientBooking.steps.therapist')}</p>
+                </div>
+              </div>
+            </div>
+          </AnimatedSection>
+
+          <AnimatedSection animation="scale" delay={150} duration={600}>
+            <div className="bg-card/90 rounded-2xl border border-border shadow-2xl overflow-hidden">
+              <div className="p-4 border-b border-border bg-muted/40">
+                <p className="text-sm font-semibold text-foreground">{t('landing.patientBooking.mock.publicBookingTitle')}</p>
+                <p className="text-xs text-muted-foreground">{t('landing.patientBooking.mock.publicBookingSubtitle')}</p>
+              </div>
+
+              <div className="p-4 space-y-4">
+                <div className="rounded-xl border border-border bg-muted/30 p-3">
+                  <p className="text-xs text-muted-foreground mb-2">{t('landing.patientBooking.mock.availableSlots')}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-2.5 py-1 rounded-md text-xs bg-indigo-600 text-white">10:30 - 11:15</span>
+                    <span className="px-2.5 py-1 rounded-md text-xs bg-background border border-border text-foreground">11:15 - 12:00</span>
+                    <span className="px-2.5 py-1 rounded-md text-xs bg-background border border-border text-foreground">12:00 - 12:45</span>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
+                  <p className="text-xs text-amber-300 mb-1">{t('landing.patientBooking.mock.pendingRequest')}</p>
+                  <p className="text-sm text-foreground">{t('landing.patientBooking.mock.pendingDescription')}</p>
+                </div>
+
+                <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
+                  <p className="text-xs text-emerald-300 mb-1">{t('landing.patientBooking.mock.agendaReview')}</p>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm text-foreground">{t('landing.patientBooking.mock.agendaDescription')}</p>
+                    <span className="px-2 py-1 rounded-md text-xs bg-emerald-600 text-white whitespace-nowrap">
+                      {t('landing.patientBooking.mock.approveAction')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </AnimatedSection>
         </div>
       </div>
     </section>
@@ -1547,6 +1655,7 @@ export function Landing() {
       <HeroSection />
       <PurposeSection />
       <FeaturesSection />
+      <PatientBookingSection />
       <AnalyticsSection />
       <RemindersSection />
       <SecuritySection />

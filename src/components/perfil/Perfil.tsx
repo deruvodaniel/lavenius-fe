@@ -22,7 +22,7 @@ import { useUser } from '@clerk/clerk-react';
 import { toast } from 'sonner';
 
 export interface PerfilHandle {
-  save: () => Promise<void>;
+  save: () => Promise<boolean>;
 }
 
 interface PerfilProps {
@@ -203,15 +203,17 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasChanges]);
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<boolean> => {
     setIsSaving(true);
     try {
       saveProfile(profile);
 
       setHasChanges(false);
       toast.success(t('profile.messages.saveSuccess'));
+      return true;
     } catch {
       toast.error(t('profile.messages.saveError'));
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -252,6 +254,8 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
   const initials = user
     ? getNameInitials(`${user.firstName} ${user.lastName || ''}`, 'U')
     : 'U';
+  const therapistId = user?.therapistId;
+  const bookingUrl = therapistId ? `${window.location.origin}/book/${therapistId}` : '';
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -337,14 +341,17 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
                   variant="secondary"
                   size="sm"
                   onClick={() => {
-                    const url = `https://tilia.com/p/${user?.firstName?.toLowerCase() || 'tu-nombre'}`;
-                    navigator.clipboard.writeText(url);
-                    toast.success(t('profile.share.copied'));
+                    if (!bookingUrl) {
+                      toast.error(t('profile.share.bookingLinkUnavailable'));
+                      return;
+                    }
+                    navigator.clipboard.writeText(bookingUrl);
+                    toast.success(t('profile.share.bookingLinkCopied'));
                   }}
                   className="bg-white/10 hover:bg-white/20 text-indigo-200 border-0"
                 >
                   <Copy className="w-4 h-4 mr-1.5" />
-                  {t('profile.share.copyLink')}
+                  {t('profile.share.copyBookingLink')}
                 </Button>
               </div>
             </div>

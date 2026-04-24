@@ -43,6 +43,7 @@ interface TurnoCardProps {
 
 const STATUS_KEY_MAP: Record<SessionStatus, string> = {
   pending: 'scheduled',
+  pending_approval: 'pendingApproval',
   confirmed: 'confirmed',
   completed: 'completed',
   cancelled: 'cancelled',
@@ -101,6 +102,7 @@ export function TurnoCard({
   const statusKey = STATUS_KEY_MAP[status] || 'unknown';
   const statusLabel = t(`agenda.status.${statusKey}`);
   const isRemote = session.sessionType === 'remote';
+  const needsApproval = status === 'pending_approval';
   
   const initials = patient ? getNameInitials(patient.nombre) : '?';
   const patientName = patient?.nombre || t('agenda.details.noPatient');
@@ -144,6 +146,15 @@ export function TurnoCard({
 
         {/* Indicators */}
         <div className="flex items-center gap-1.5">
+          {needsApproval && (
+            <span
+              className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-800"
+              title={t('agenda.card.pendingApprovalChip')}
+            >
+              {t('agenda.card.pendingApprovalChip')}
+            </span>
+          )}
+
           {/* Risk indicator */}
           {patient?.riskLevel && patient.riskLevel !== 'low' && (
             <RiskIndicator level={patient.riskLevel} t={t} />

@@ -9,6 +9,7 @@ interface EmptyStateProps {
   action?: {
     label: string;
     onClick: () => void;
+    disabled?: boolean;
   };
   variant?: 'default' | 'subtle';
 }
@@ -41,7 +42,7 @@ export function EmptyState({
       </p>
       
       {action && (
-        <Button onClick={action.onClick}>
+        <Button onClick={action.onClick} disabled={action.disabled}>
           {action.label}
         </Button>
       )}

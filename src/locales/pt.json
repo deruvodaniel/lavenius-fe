@@ -157,6 +157,16 @@
       "validationErrorHint": "Por favor verifique se todos os campos estão corretos",
       "createAccountError": "Erro ao criar conta",
       "createAccountErrorHint": "Houve um problema. Por favor tente novamente."
+    },
+    "accountTypeSelection": {
+      "title": "Como você vai usar o Lavenius?",
+      "description": "Selecione seu tipo de conta para configurar a experiência correta.",
+      "therapistTitle": "Sou terapeuta",
+      "therapistDescription": "Configurar meu perfil profissional e acessar o painel.",
+      "patientTitle": "Sou paciente",
+      "patientDescription": "Acessar páginas públicas de agendamento apenas por link direto do terapeuta.",
+      "success": "Tipo de conta salvo com sucesso.",
+      "error": "Não foi possível salvar seu tipo de conta. Tente novamente."
     }
   },
   "patients": {
@@ -356,6 +366,7 @@
     },
     "status": {
       "scheduled": "Agendada",
+      "pendingApproval": "Aguardando aprovação",
       "confirmed": "Confirmada",
       "completed": "Concluída",
       "cancelled": "Cancelada",
@@ -444,6 +455,7 @@
     },
     "card": {
       "paid": "Pago",
+      "pendingApprovalChip": "Requer aprovação",
       "viewFile": "Ver ficha",
       "editAppointment": "Editar consulta",
       "sendWhatsApp": "Enviar WhatsApp",
@@ -821,7 +833,10 @@
       "selectDate": "Selecione uma data",
       "selectTimeRange": "Selecione o intervalo de horário",
       "startBeforeEnd": "O horário de início deve ser anterior ao horário de término",
-      "endDateBeforeStart": "A data de fim não pode ser anterior à data de início"
+      "endDateBeforeStart": "A data de fim não pode ser anterior à data de início",
+      "leaveWithUnsavedTitle": "Você tem alterações não salvas",
+      "leaveWithUnsavedDescription": "Se você sair agora, perderá as alterações feitas em Configurações.",
+      "leaveWithoutSaving": "Sair sem salvar"
     },
     "weekdays": {
       "monday": "Segunda-feira",
@@ -930,11 +945,14 @@
     "share": {
       "backToSettings": "Voltar para Configurações",
       "bookSession": "Agendar uma sessão",
-      "bookSessionDescription": "Reserva online em breve",
+      "bookSessionDescription": "Compartilhe este link para que seus pacientes possam reservar online.",
       "comingSoon": "Perfil público completo em breve",
       "contactInfo": "Informações de contato",
       "copied": "Link copiado!",
       "copyLink": "Copiar link do perfil",
+      "copyBookingLink": "Copiar link de agendamento",
+      "bookingLinkCopied": "Link de agendamento copiado!",
+      "bookingLinkUnavailable": "Ainda não foi possível gerar o link de agendamento.",
       "noBio": "Sem biografia disponível",
       "noSpecialty": "Especialidade não especificada",
       "previewDescription": "Assim os pacientes verão seu perfil",
@@ -1162,7 +1180,7 @@
           },
           "completeProfile": {
             "title": "Completar seu perfil profissional",
-            "content": "**Configuração do Perfil**\n\nApós criar sua conta, vamos guiá-lo para completar seu perfil profissional:\n\n**Passo 1: Informações Profissionais**\n- Número de registro profissional (obrigatório)\n- Especialidade\n\n**Passo 2: Informações de Contato**\n- Telefone principal\n- Telefone alternativo\n- Endereço do consultório\n\n**Passo 3: Presença Online**\n- Site\n- Instagram\n- LinkedIn\n- Bio profissional\n\n**Dica:** Você pode editar essas informações a qualquer momento na seção **Perfil** no menu lateral.\n\n**Por que isso é importante?**\n\nSeu registro profissional nos ajuda a verificar sua prática e personalizar sua experiência na plataforma.",
+            "content": "**Configuração do Perfil**\n\nApós criar sua conta, vamos guiá-lo para completar seu perfil profissional:\n\n**Passo 1: Informações Profissionais**\n- Número de registro profissional (obrigatório)\n- Especialidade\n\n**Passo 2: Informações de Contato**\n- Telefone principal\n- Telefone alternativo\n- Endereço do consultório\n\n**Passo 3: Presença Online**\n- Site\n- Instagram\n- LinkedIn\n- Bio profissional\n\n**Dica:** Você pode editar essas informações a qualquer momento em **Configurações > Perfil** no menu lateral.\n\n**Por que isso é importante?**\n\nSeu registro profissional nos ajuda a verificar sua prática e personalizar sua experiência na plataforma.",
             "tags": [
               "perfil",
               "registro",
@@ -1298,7 +1316,7 @@
         "articles": {
           "profile": {
             "title": "Editar seu perfil",
-            "content": "Seu perfil tem duas partes:\n\n**Dados da conta (gerenciados pelo Clerk)**\n- Nome e sobrenome\n- Foto de perfil\n- Email e senha\n\nPara editar esses dados, clique no seu avatar e selecione **\"Gerenciar conta\"**.\n\n**Dados profissionais**\n\nPara editar suas informações profissionais:\n\n1. Vá para a seção **Perfil** no menu lateral\n2. Modifique seus dados (registro, especialidade, telefones, etc.)\n3. Clique em **\"Salvar Alterações\"**\n\nOs dados profissionais incluem: número de registro, especialidade, telefones de contato, endereço do consultório, redes sociais e bio.",
+            "content": "Seu perfil tem duas partes:\n\n**Dados da conta (gerenciados pelo Clerk)**\n- Nome e sobrenome\n- Foto de perfil\n- Email e senha\n\nPara editar esses dados, clique no seu avatar e selecione **\"Gerenciar conta\"**.\n\n**Dados profissionais**\n\nPara editar suas informações profissionais:\n\n1. Vá para **Configurações > Perfil** no menu lateral\n2. Modifique seus dados (registro, especialidade, telefones, etc.)\n3. Clique em **\"Salvar Alterações\"**\n\nOs dados profissionais incluem: número de registro, especialidade, telefones de contato, endereço do consultório, redes sociais e bio.",
             "tags": [
               "perfil",
               "editar",
@@ -1315,6 +1333,66 @@
               "configurar",
               "google",
               "sincronizar"
+            ]
+          },
+          "patientBooking": {
+            "title": "Reserva online de pacientes",
+            "content": "O Tilia agora permite compartilhar um link público para que os pacientes reservem sessões por conta própria.\n\n**Como funciona**\n\n1. Vá em **Configurações > Perfil Público**\n2. Use **\"Copiar link de agendamento\"**\n3. Compartilhe o link com seus pacientes\n\n**O que o paciente vê**\n\n- Horários disponíveis\n- Duração da sessão\n- Formulário de contato\n\nQuando o paciente envia a solicitação, a sessão fica em **pendente de aprovação**.\n\n**Onde revisar**\n\nNa sua **Agenda**, onde você pode revisar e aprovar a solicitação.",
+            "tags": [
+              "agendamento",
+              "paciente",
+              "link público",
+              "agenda",
+              "aprovação"
+            ]
+          },
+          "googleOauth": {
+            "title": "Google OAuth e sincronização de calendário",
+            "content": "Se você conectar o Google Calendar, o Tilia usa permissões para ler e atualizar eventos necessários para sincronizar suas sessões.\n\n**Para que é usado**\n\n- Evitar conflitos de horário\n- Criar/atualizar/cancelar eventos quando as sessões mudam\n- Manter agenda do Tilia e Google Calendar alinhadas\n\n**Se não sincronizar**\n\n1. Vá em **Configurações > Calendário**\n2. Desconecte e conecte novamente o Google Calendar\n3. Execute uma sincronização manual\n\nSe o problema continuar, confirme que a conta Google conectada é a correta.",
+            "tags": [
+              "google oauth",
+              "calendar",
+              "sincronização",
+              "permissões",
+              "integração"
+            ]
+          },
+          "e2ePassphrase": {
+            "title": "Senha mestra e frase de recuperação (E2E)",
+            "content": "O Tilia protege dados sensíveis com criptografia ponta a ponta (E2E).\n\n**Senha mestra**\n\nÉ usada para desbloquear os dados criptografados no navegador.\n\n**Frase de recuperação**\n\nÉ seu backup caso esqueça a senha mestra. Guarde em local seguro.\n\n**Quando o bloqueio pode acontecer**\n\n- Por inatividade\n- Ao voltar do segundo plano, conforme configuração de segurança\n- Após sair da conta\n\nSe você perder a senha mestra e a frase de recuperação, os dados E2E não poderão ser recuperados.",
+            "tags": [
+              "e2e",
+              "senha mestra",
+              "frase de recuperação",
+              "segurança",
+              "bloqueio"
+            ]
+          }
+        }
+      },
+      "seguridad": {
+        "title": "Segurança",
+        "description": "Proteção de dados explicada de forma simples",
+        "articles": {
+          "e2ePassphrase": {
+            "title": "Senha mestra e frase de recuperação",
+            "content": "O Tilia protege informações sensíveis com criptografia de ponta a ponta (E2E).\n\n**O que isso significa na prática**\n\nSomente você, com a sessão desbloqueada, consegue ler esses dados sensíveis.\n\n**Senha mestra**\n\nÉ usada para desbloquear os dados E2E no navegador.\n\n**Frase de recuperação**\n\nÉ seu backup caso esqueça a senha mestra. Guarde fora do app (por exemplo, em local físico seguro).\n\n**Importante**\n\nSe você perder a senha mestra e também a frase de recuperação, os dados E2E não poderão ser recuperados.",
+            "tags": [
+              "segurança",
+              "e2e",
+              "senha mestra",
+              "frase de recuperação"
+            ]
+          },
+          "appSecurity": {
+            "title": "Que segurança o Tilia utiliza?",
+            "content": "O Tilia aplica várias camadas de segurança pensadas para fluxos clínicos:\n\n- Criptografia em trânsito (HTTPS/TLS)\n- Criptografia em banco para dados operacionais\n- Criptografia E2E para campos sensíveis definidos\n- Controle de acesso e trilhas de auditoria\n- Limite de requisições para prevenir abuso\n\n**Em palavras simples**\n\nIsso ajuda a proteger os dados dos pacientes tanto durante a transmissão quanto no armazenamento.\n\nSe você não é técnico, a recomendação principal é: usar uma senha mestra forte e guardar bem a frase de recuperação.",
+            "tags": [
+              "segurança",
+              "criptografia",
+              "dados",
+              "pacientes",
+              "privacidade"
             ]
           }
         }
@@ -1334,9 +1412,14 @@
     },
     "purpose": {
       "title": "Para que serve o Tilia",
-      "description": "Tilia é uma aplicação web para profissionais de saúde mental que permite gerenciar pacientes, agendar sessões, escrever notas clínicas, acompanhar cobranças e enviar lembretes em uma única plataforma segura.",
-      "privacyLabel": "Leia nossa",
-      "privacyLink": "Política de Privacidade"
+      "badge": "Fluxos clínicos e administrativos em um só lugar",
+      "description": "O Tilia ajuda profissionais de saúde mental a organizar a rotina: pacientes, agenda, notas clínicas, cobranças e lembretes em uma plataforma segura e fácil de usar.",
+      "points": {
+        "patients": "Comece rápido: configure sua conta e inicie os atendimentos sem fricção.",
+        "agenda": "Trabalhe com clareza: todo o consultório em um único fluxo, sem ferramentas soltas.",
+        "billing": "Privacidade em primeiro lugar: dados clínicos protegidos e política de uso transparente."
+      },
+      "privacyCta": "Ver Política de Privacidade"
     },
     "hero": {
       "badge": "Gestão inteligente para profissionais de saúde mental",
@@ -1377,6 +1460,25 @@
       "calendar": {
         "title": "Sincronização de Calendário",
         "description": "Sincronização total com seu calendário para evitar sobreposições e esquecimentos."
+      }
+    },
+    "patientBooking": {
+      "badge": "Reserva Online de Pacientes",
+      "title": "Seus pacientes podem reservar sozinhos",
+      "description": "Compartilhe seu link público para que seus pacientes reservem sem troca de mensagens. Você revisa cada solicitação na agenda antes de confirmar.",
+      "steps": {
+        "patient": "O paciente escolhe data e horário diretamente na sua página pública de reservas.",
+        "therapist": "A sessão fica pendente de aprovação, e você decide confirmar ou revisar pela agenda."
+      },
+      "mock": {
+        "publicBookingTitle": "Reserva pública do paciente",
+        "publicBookingSubtitle": "Seleção de horários disponíveis",
+        "availableSlots": "Horários disponíveis",
+        "pendingRequest": "Solicitação enviada",
+        "pendingDescription": "A reserva fica pendente de aprovação do terapeuta.",
+        "agendaReview": "Revisão na agenda",
+        "agendaDescription": "O terapeuta gerencia a solicitação dentro da agenda.",
+        "approveAction": "Aprovar"
       }
     },
     "analytics": {
@@ -1499,7 +1601,7 @@
         },
         "cancel": {
           "question": "Posso cancelar quando quiser?",
-          "answer": "Sim, sem complicação. Não há permanência mínima nem contratos. Cancele do seu perfil em 2 cliques e pronto."
+          "answer": "Sim, sem complicação. Não há permanência mínima nem contratos. Cancele em Configurações em 2 cliques e pronto."
         },
         "modality": {
           "question": "Funciona para terapia presencial e online?",
@@ -1917,6 +2019,9 @@
       "title": "Conecte seu calendário",
       "description": "Sincronize com o Google Calendar para agendar consultas automaticamente e receber lembretes. Seus pacientes também receberão convites.",
       "workWeekTip": "Lembre-se de configurar seus dias e horários de atendimento em Configurações > Horário de trabalho.",
+      "workWeekTipPrefix": "Lembre-se de configurar seus dias e horários de atendimento em",
+      "settingsLink": "Configurações",
+      "workWeekTipSuffix": "para definir seu horário de trabalho.",
       "connect": "Conectar Google Calendar",
       "later": "Farei isso depois"
     },
@@ -1925,6 +2030,15 @@
       "description": "Comece adicionando seus pacientes para poder agendar sessões, fazer anotações clínicas e gerenciar seus pagamentos.",
       "create": "Criar paciente",
       "later": "Farei isso depois"
+    },
+    "settings": {
+      "title": "Revise suas Configurações",
+      "description": "Ajuste lembretes, calendário e preferências da conta.",
+      "remindersTip": "Em Configurações você pode definir lembretes automáticos, horários de trabalho e outras opções importantes da sua prática.",
+      "bookingLinkTipPrefix": "Em",
+      "profileLinkLabel": "Perfil",
+      "bookingLinkTipSuffix": "você também poderá copiar e compartilhar seu link de reservas para que seus pacientes agendem sessões.",
+      "openSettings": "Ir para Configurações"
     },
     "complete": {
       "title": "Tudo pronto!",
@@ -1975,7 +2089,7 @@
         "description": "Seu perfil está pronto para uso",
         "ready": "Excelente! Você completou a configuração do seu perfil profissional.",
         "summary": "Resumo do seu perfil:",
-        "tipText": "Você pode editar essas informações a qualquer momento no seu perfil."
+        "tipText": "Você pode editar essas informações a qualquer momento em Configurações > Perfil."
       },
       "passphraseInfo": "Defina uma senha mestra forte (recomendado 12+ caracteres, com letras, números e símbolos). Ela protege seus dados E2E; sem ela, você só poderá recuperar o acesso com sua frase de recuperação.",
       "security": {
@@ -2077,6 +2191,55 @@
       "attemptsRemaining": "Tentativas restantes: {{count}}",
       "retryIn": "Aguarde {{seconds}}s para tentar novamente.",
       "maxAttemptsSignOut": "Muitas tentativas falhas. Encerrando sessão por segurança."
+    }
+  },
+  "publicBooking": {
+    "title": "Reservar sessão",
+    "description": "Selecione um horário disponível e envie sua solicitação. A reserva ficará aguardando aprovação.",
+    "emptySlots": "Não há horários disponíveis no momento.",
+    "fields": {
+      "slot": "Horário",
+      "firstName": "Nome",
+      "email": "Email",
+      "phone": "Telefone",
+      "sessionType": "Tipo de sessão",
+      "message": "Mensagem para o terapeuta (opcional)"
+    },
+    "actions": {
+      "refresh": "Atualizar",
+      "submit": "Solicitar reserva",
+      "submitting": "Enviando solicitação...",
+      "bookAnother": "Reservar outro horário",
+      "goHome": "Voltar ao início"
+    },
+    "details": {
+      "sessionDuration": "Duração da sessão: {{minutes}} minutos"
+    },
+    "validation": {
+      "slotRequired": "Selecione um horário para continuar.",
+      "pastSlot": "Você não pode reservar horários no passado.",
+      "firstNameRequired": "O nome é obrigatório.",
+      "emailRequired": "Digite um email válido.",
+      "phoneRequired": "Digite um telefone válido (mínimo de 8 dígitos).",
+      "messageTooLong": "A mensagem não pode exceder {{max}} caracteres."
+    },
+    "errors": {
+      "invalidTherapist": "Não encontramos o terapeuta informado.",
+      "therapistUnavailable": "Este terapeuta não está disponível para reserva pública.",
+      "forbidden": "Você não tem permissão para esta ação.",
+      "conflict": "Esse horário não está mais disponível. Atualizamos a disponibilidade para você escolher outro.",
+      "rateLimited": "Muitas tentativas. Aguarde um momento e tente novamente.",
+      "rateLimitedWithRetry": "Muitas tentativas. Tente novamente em {{seconds}} segundos.",
+      "retryAfterHint": "Tempo de espera sugerido: {{seconds}} segundos.",
+      "generic": "Não foi possível processar sua solicitação. Tente novamente."
+    },
+    "success": {
+      "title": "Solicitação enviada",
+      "description": "Sua solicitação de reserva foi registrada com sucesso.",
+      "statusLabel": "Status",
+      "bookingId": "ID da reserva",
+      "pendingHelp": "O terapeuta revisará sua solicitação e confirmará sua sessão.",
+      "sessionDetailsTitle": "Detalhes da sessão"
     }
   },
   "errors": {

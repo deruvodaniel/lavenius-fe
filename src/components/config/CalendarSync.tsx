@@ -196,9 +196,9 @@ export default function CalendarSync() {
         </div>
 
         {/* Disclaimer - One-way sync warning */}
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
           <div className="flex gap-3">
-            <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-medium text-foreground">{t('settings.calendarSync.oneWaySync')}</p>
               <p className="text-sm text-muted-foreground mt-1">

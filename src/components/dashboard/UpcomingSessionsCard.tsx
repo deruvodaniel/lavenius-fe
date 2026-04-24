@@ -39,7 +39,7 @@ export function UpcomingSessionsCard({
         <div className="space-y-3">
           {sessions.map((turno) => {
             const dateTime = new Date(turno.scheduledFrom);
-            const fecha = dateTime.toISOString().split('T')[0];
+            const fecha = dateTime.toISOString();
             const hora = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
             
             return (

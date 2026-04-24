@@ -40,6 +40,7 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
     { path: '/dashboard/agenda', labelKey: 'navigation.agenda', icon: Calendar },
     { path: '/dashboard/pacientes', labelKey: 'navigation.patients', icon: Users },
     { path: '/dashboard/cobros', labelKey: 'navigation.payments', icon: DollarSign },
+    { path: '/dashboard/configuracion', labelKey: 'navigation.settings', icon: Settings },
   ];
 
   const getLinkClassName = ({ isActive }: { isActive: boolean }) => 
@@ -199,15 +200,6 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
                 <p className="text-sm font-semibold text-foreground truncate">{user.firstName} {user.lastName}</p>
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
               </div>
-
-              <NavLink
-                to="/dashboard/configuracion"
-                onClick={handleNavClick}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-muted transition-colors"
-              >
-                <Settings className="w-4 h-4" />
-                {t('navigation.settings')}
-              </NavLink>
 
               <NavLink
                 to="/dashboard/ayuda"

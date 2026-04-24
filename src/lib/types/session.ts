@@ -6,6 +6,7 @@ import type { PatientInfo, TherapistInfo, PaymentInfo } from './common';
  */
 export enum SessionStatus {
   PENDING = 'pending',
+  PENDING_APPROVAL = 'pending_approval',
   CONFIRMED = 'confirmed',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled'
