@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { 
-  Sparkles, 
+  Shield, 
   Calendar, 
   UserPlus, 
   PartyPopper,
@@ -75,7 +75,7 @@ export function OnboardingModal({
       case 0:
         return (
           <OnboardingStep
-            icon={Sparkles}
+            icon={Shield}
             title={t('onboarding.welcome')}
             description={t('onboarding.welcomeDescription')}
           />

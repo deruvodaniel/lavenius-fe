@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DollarSign, Calendar, FileText, Sparkles, CalendarRange, Pencil, CheckCircle2, Clock, AlertCircle, Loader2 } from 'lucide-react';
+import { DollarSign, Calendar, FileText, CalendarRange, Pencil, CheckCircle2, Clock, AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { BaseDrawer, DrawerBody, DrawerFooter, NativeSelect } from '@/components/shared';
 import { Button } from '@/components/ui/button';
@@ -133,7 +133,7 @@ const ComingSoonOverlay = () => {
   return (
     <div className="absolute inset-0 bg-white/90 backdrop-blur-[1px] rounded-lg flex flex-col items-center justify-center z-10">
       <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
-        <Sparkles className="w-8 h-8 text-indigo-600" />
+        <CalendarRange className="w-8 h-8 text-indigo-600" />
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-2">{t('payments.comingSoon.title')}</h3>
       <p className="text-sm text-muted-foreground text-center max-w-xs px-4">

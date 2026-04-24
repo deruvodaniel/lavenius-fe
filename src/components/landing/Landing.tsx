@@ -17,7 +17,6 @@ import {
   BarChart3,
   CheckCircle2,
   ArrowRight,
-  Sparkles,
   Check,
   X,
   Zap,
@@ -97,8 +96,8 @@ function NavBar() {
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+              <img src="/favicon.ico" alt="Tilia logo" className="w-8 h-8 object-cover" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               {t('landing.brand')}
@@ -1012,7 +1011,7 @@ function WhyTiliaSection() {
         <AnimatedSection animation="slide-up" duration={500}>
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/15 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium mb-6">
-              <Sparkles className="w-4 h-4" />
+              <Shield className="w-4 h-4" />
               {t('landing.whyTilia.badge')}
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
@@ -1398,8 +1397,8 @@ function Footer() {
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+                <img src="/favicon.ico" alt="Tilia logo" className="w-8 h-8 object-cover" />
               </div>
               <span className="text-lg font-bold text-white">{t('landing.brand')}</span>
             </button>

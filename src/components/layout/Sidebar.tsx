@@ -112,8 +112,8 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
             onClick={handleNavClick}
           >
             {collapsed ? (
-              <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white text-lg font-bold">L</span>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
+                <img src="/favicon.ico" alt="Tilia logo" className="w-10 h-10 object-cover" />
               </div>
             ) : (
               <div>

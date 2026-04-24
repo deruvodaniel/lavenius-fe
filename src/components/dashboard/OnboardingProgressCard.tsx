@@ -14,7 +14,7 @@ import {
   Check,
   X,
   ChevronRight,
-  Sparkles,
+  Shield,
   PartyPopper,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -226,7 +226,7 @@ export function OnboardingProgressCard({ className = '' }: OnboardingProgressCar
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
-            <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <Shield className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
           </div>
           <div>
             <h3 className="font-semibold text-foreground">
