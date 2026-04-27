@@ -1770,6 +1770,18 @@
         ],
         "policyLink": "Google API Services User Data Policy"
       },
+      "googleDataSharing": {
+        "title": "4.1 Compartilhamento, transferência ou divulgação de dados do Google",
+        "description": "Quando você conecta o Google Calendar, a Tilia acessa dados do Google apenas para funcionalidades de agenda visíveis ao usuário (criar, atualizar, cancelar e sincronizar consultas).",
+        "items": [
+          "Com provedores de infraestrutura e segurança que processam dados em nome da Tilia sob contrato e salvaguardas adequadas.",
+          "Quando o usuário solicita ou autoriza explicitamente para uma funcionalidade do aplicativo.",
+          "Quando necessário para cumprir obrigações legais/regulatórias ou investigar abuso/fraude.",
+          "Como parte de fusão, aquisição ou venda de ativos, com salvaguardas razoáveis e, quando aplicável, notificação e/ou consentimento."
+        ],
+        "noTransfer": "Fora desses cenários, não transferimos nem divulgamos dados do Google a terceiros.",
+        "limitedUse": "Não vendemos dados do Google nem os usamos para publicidade. O uso de dados do Google segue a Google API Services User Data Policy, incluindo os requisitos de Limited Use."
+      },
       "processors": {
         "title": "5. Terceiros e operadores",
         "description": "Podemos usar provedores para operar o serviço, por exemplo:",

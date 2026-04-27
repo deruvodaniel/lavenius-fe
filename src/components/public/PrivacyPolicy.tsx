@@ -103,6 +103,19 @@ export function PrivacyPolicy() {
             </section>
 
             <section>
+              <h2 className="text-xl font-semibold text-foreground mb-3">{t('privacyPolicy.sections.googleDataSharing.title')}</h2>
+              <p className="text-muted-foreground mb-3 leading-relaxed">{t('privacyPolicy.sections.googleDataSharing.description')}</p>
+              <ul className="list-disc pl-6 space-y-1 text-muted-foreground mb-3">
+                <li>{t('privacyPolicy.sections.googleDataSharing.items.0')}</li>
+                <li>{t('privacyPolicy.sections.googleDataSharing.items.1')}</li>
+                <li>{t('privacyPolicy.sections.googleDataSharing.items.2')}</li>
+                <li>{t('privacyPolicy.sections.googleDataSharing.items.3')}</li>
+              </ul>
+              <p className="text-muted-foreground mb-2 leading-relaxed">{t('privacyPolicy.sections.googleDataSharing.noTransfer')}</p>
+              <p className="font-medium text-foreground">{t('privacyPolicy.sections.googleDataSharing.limitedUse')}</p>
+            </section>
+
+            <section>
               <h2 className="text-xl font-semibold text-foreground mb-3">{t('privacyPolicy.sections.processors.title')}</h2>
               <p className="text-muted-foreground mb-3 leading-relaxed">{t('privacyPolicy.sections.processors.description')}</p>
               <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
