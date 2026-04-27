@@ -1782,6 +1782,49 @@
         "noTransfer": "Fora desses cenários, não transferimos nem divulgamos dados do Google a terceiros.",
         "limitedUse": "Não vendemos dados do Google nem os usamos para publicidade. O uso de dados do Google segue a Google API Services User Data Policy, incluindo os requisitos de Limited Use."
       },
+      "googleDataAccess": {
+        "title": "4.2 Acesso a dados (quais dados do Google acessamos)",
+        "description": "Para integração com Google Calendar, a Tilia solicita apenas os escopos necessários para funcionalidades de agenda.",
+        "items": [
+          "Metadados da lista de calendários (para selecionar e identificar calendários).",
+          "Dados de eventos necessários para fluxo de agenda (resumo/título, data-hora de início/fim, IDs de evento, metadados de link de reunião e campos de participantes quando aplicável).",
+          "Credenciais/tokens OAuth necessários para manter o acesso autorizado.",
+          "Não solicitamos acesso mais amplo à conta Google do que o necessário para esses fins."
+        ]
+      },
+      "googleDataRetention": {
+        "title": "4.3 Retenção e exclusão de dados do Google",
+        "description": "A Tilia retém dados conectados ao Google apenas pelo tempo necessário para prestar serviços e cumprir obrigações legais.",
+        "items": [
+          "Tokens OAuth e identificadores de calendário relacionados são mantidos enquanto a integração estiver ativa.",
+          "Se o usuário desconectar o Google Calendar, a Tilia interrompe a sincronização e exclui/invalida credenciais OAuth armazenadas em prazo razoável.",
+          "Dados do Google não são usados para publicidade.",
+          "A Tilia aplica salvaguardas técnicas e organizacionais para proteger dados conectados ao Google."
+        ]
+      },
+      "googleRevoke": {
+        "title": "4.4 Como revogar o acesso do Google",
+        "description": "Os usuários podem revogar o acesso ao Google a qualquer momento por meio de:",
+        "items": [
+          "Desconectar o Google Calendar na Tilia (se a opção estiver disponível no app).",
+          "Revogar o acesso nas configurações da Conta Google."
+        ],
+        "after": [
+          "Novas operações do Google Calendar pela Tilia serão interrompidas.",
+          "Dados previamente armazenados permanecem sujeitos à política de retenção/exclusão da Tilia."
+        ],
+        "contact": "Para suporte ou solicitações de exclusão, contate-nos em: support@somostilia.com"
+      },
+      "googleLimitedUse": {
+        "title": "4.5 Google API Services User Data Policy / Limited Use",
+        "description": "O uso de informações recebidas das APIs do Google pela Tilia está em conformidade com a Google API Services User Data Policy, incluindo os requisitos de Limited Use.",
+        "items": [
+          "Usamos dados de usuários do Google apenas para fornecer e melhorar funcionalidades visíveis ao usuário.",
+          "Não vendemos dados de usuários do Google.",
+          "Não usamos dados de usuários do Google para publicidade, incluindo publicidade personalizada.",
+          "Restringimos o acesso humano a casos limitados, como suporte solicitado pelo usuário, operações de segurança e conformidade legal."
+        ]
+      },
       "processors": {
         "title": "5. Terceiros e operadores",
         "description": "Podemos usar provedores para operar o serviço, por exemplo:",

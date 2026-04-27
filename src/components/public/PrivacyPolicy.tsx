@@ -116,6 +116,62 @@ export function PrivacyPolicy() {
             </section>
 
             <section>
+              <h2 className="text-xl font-semibold text-foreground mb-3">{t('privacyPolicy.sections.googleDataAccess.title')}</h2>
+              <p className="text-muted-foreground mb-3 leading-relaxed">{t('privacyPolicy.sections.googleDataAccess.description')}</p>
+              <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
+                <li>{t('privacyPolicy.sections.googleDataAccess.items.0')}</li>
+                <li>{t('privacyPolicy.sections.googleDataAccess.items.1')}</li>
+                <li>{t('privacyPolicy.sections.googleDataAccess.items.2')}</li>
+                <li>{t('privacyPolicy.sections.googleDataAccess.items.3')}</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-foreground mb-3">{t('privacyPolicy.sections.googleDataRetention.title')}</h2>
+              <p className="text-muted-foreground mb-3 leading-relaxed">{t('privacyPolicy.sections.googleDataRetention.description')}</p>
+              <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
+                <li>{t('privacyPolicy.sections.googleDataRetention.items.0')}</li>
+                <li>{t('privacyPolicy.sections.googleDataRetention.items.1')}</li>
+                <li>{t('privacyPolicy.sections.googleDataRetention.items.2')}</li>
+                <li>{t('privacyPolicy.sections.googleDataRetention.items.3')}</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-foreground mb-3">{t('privacyPolicy.sections.googleRevoke.title')}</h2>
+              <p className="text-muted-foreground mb-3 leading-relaxed">{t('privacyPolicy.sections.googleRevoke.description')}</p>
+              <ul className="list-disc pl-6 space-y-1 text-muted-foreground mb-3">
+                <li>{t('privacyPolicy.sections.googleRevoke.items.0')}</li>
+                <li>{t('privacyPolicy.sections.googleRevoke.items.1')}</li>
+              </ul>
+              <a
+                href="https://myaccount.google.com/permissions"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 mb-3"
+              >
+                https://myaccount.google.com/permissions
+                <ExternalLink className="w-4 h-4" />
+              </a>
+              <ul className="list-disc pl-6 space-y-1 text-muted-foreground mb-2">
+                <li>{t('privacyPolicy.sections.googleRevoke.after.0')}</li>
+                <li>{t('privacyPolicy.sections.googleRevoke.after.1')}</li>
+              </ul>
+              <p className="text-muted-foreground">{t('privacyPolicy.sections.googleRevoke.contact')}</p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-foreground mb-3">{t('privacyPolicy.sections.googleLimitedUse.title')}</h2>
+              <p className="font-medium text-foreground mb-3">{t('privacyPolicy.sections.googleLimitedUse.description')}</p>
+              <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
+                <li>{t('privacyPolicy.sections.googleLimitedUse.items.0')}</li>
+                <li>{t('privacyPolicy.sections.googleLimitedUse.items.1')}</li>
+                <li>{t('privacyPolicy.sections.googleLimitedUse.items.2')}</li>
+                <li>{t('privacyPolicy.sections.googleLimitedUse.items.3')}</li>
+              </ul>
+            </section>
+
+            <section>
               <h2 className="text-xl font-semibold text-foreground mb-3">{t('privacyPolicy.sections.processors.title')}</h2>
               <p className="text-muted-foreground mb-3 leading-relaxed">{t('privacyPolicy.sections.processors.description')}</p>
               <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
