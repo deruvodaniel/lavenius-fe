@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -9,54 +8,37 @@
       content="TerappIA es una aplicación web para profesionales de la salud mental para gestionar pacientes, sesiones, notas clínicas, cobros y recordatorios."
     />
     <meta name="application-name" content="TerappIA" />
-    <title>TerappIA | Plataforma de gestión para profesionales de la salud mental</title>
-    <script>
-      (function () {
-        function syncOauthFallbackVisibility() {
-          var fallback = document.getElementById("oauth-verification-fallback");
-          if (!fallback) return;
-          fallback.style.display = window.location.pathname === "/" ? "" : "none";
-        }
-
-        var originalPushState = history.pushState;
-        history.pushState = function () {
-          originalPushState.apply(this, arguments);
-          syncOauthFallbackVisibility();
-        };
-
-        var originalReplaceState = history.replaceState;
-        history.replaceState = function () {
-          originalReplaceState.apply(this, arguments);
-          syncOauthFallbackVisibility();
-        };
-
-        window.addEventListener("popstate", syncOauthFallbackVisibility);
-        window.addEventListener("DOMContentLoaded", syncOauthFallbackVisibility);
-        syncOauthFallbackVisibility();
-      })();
+    <meta name="apple-mobile-web-app-title" content="TerappIA" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>TerappIA | Gestión para profesionales de salud mental</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "name": "TerappIA",
+            "alternateName": ["terappia", "Terappia"],
+            "url": "https://terapp-ia.com"
+          },
+          {
+            "@type": "WebSite",
+            "name": "TerappIA",
+            "alternateName": ["terappia", "Terappia"],
+            "url": "https://terapp-ia.com"
+          }
+        ]
+      }
     </script>
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
   </head>
 
   <body>
-    <div
-      id="oauth-verification-fallback"
-      style="background: #f8fafc; color: #334155; border-bottom: 1px solid #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;"
-    >
-      <div style="max-width: 1200px; margin: 0 auto; padding: 6px 12px; font-size: 12px; line-height: 1.4;">
-        <strong style="font-weight: 700; color: #0f172a;">TerappIA</strong> is a web application for mental health professionals to manage patients, sessions, clinical notes, payments and reminders.
-        <a href="https://terapp-ia.com/privacy-policy" style="margin-left: 8px; color: #4f46e5; text-decoration: underline;">Privacy Policy</a>
-        <a href="https://terapp-ia.com/terms-of-service" style="margin-left: 8px; color: #4f46e5; text-decoration: underline;">Terms of Service</a>
-      </div>
-    </div>
-
-    <noscript>
-      <div style="max-width: 860px; margin: 8px auto 24px; padding: 0 16px; font-family: Arial, sans-serif;">
-        <p>
-          JavaScript está deshabilitado. Puedes consultar la
-          <a href="https://terapp-ia.com/privacy-policy"> Política de Privacidad</a>.
-        </p>
-      </div>
-    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
