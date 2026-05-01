@@ -69,7 +69,7 @@ function DrawerHeader({
   titleId,
 }: DrawerHeaderProps) {
   return (
-    <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 md:p-6">
+    <div className="bg-gradient-to-r from-primary-deep to-primary-hover text-white p-4 md:p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {Icon && (
@@ -82,7 +82,7 @@ function DrawerHeader({
               {title}
             </h2>
             {subtitle && (
-              <p className="text-indigo-200 text-sm mt-0.5">{subtitle}</p>
+              <p className="text-primary-foreground/80 text-sm mt-0.5">{subtitle}</p>
             )}
           </div>
         </div>
@@ -93,8 +93,8 @@ function DrawerHeader({
             onClick={onClose}
             disabled={disableClose}
             className={cn(
-              'text-indigo-200 hover:text-white hover:bg-white/10 transition-colors',
-              'focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-700',
+              'text-primary-foreground/80 hover:text-white hover:bg-white/10 transition-colors',
+              'focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-hover',
               disableClose && 'opacity-50 cursor-not-allowed'
             )}
             aria-label={closeLabel}

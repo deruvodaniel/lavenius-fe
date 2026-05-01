@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/clerk-react';
+import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 import type { LucideIcon } from 'lucide-react';
 import { 
   Calendar, 
@@ -43,7 +43,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { AnimatedSection, LanguageSwitcher, BetaBadge } from '@/components/shared';
-import { AccountType, getUserAccountType } from '@/lib/auth/accountType';
 
 // ============================================================================
 // MOCK DATA FOR DASHBOARD PREVIEW
@@ -72,8 +71,6 @@ const mockStats = {
 function NavBar() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { user } = useUser();
-  const accountType = getUserAccountType(user);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const scrollToSection = (sectionId: string) => {
@@ -92,7 +89,7 @@ function NavBar() {
   ];
   
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-card/90 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -100,10 +97,10 @@ function NavBar() {
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#2D0051] to-[#3D1A6E] rounded-lg flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
               {t('landing.brand')}
             </span>
             <span className="max-[400px]:hidden"><BetaBadge /></span>
@@ -117,7 +114,7 @@ function NavBar() {
                 variant="ghost"
                 size="sm"
                 onClick={() => scrollToSection(link.sectionId)}
-                className="text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
+                className="text-muted-foreground hover:text-primary hover:bg-primary-light dark:hover:bg-primary-deep/40"
               >
                 {t(`landing.nav.${link.key}`)}
               </Button>
@@ -126,7 +123,7 @@ function NavBar() {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/privacy-policy')}
-              className="text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
+              className="text-muted-foreground hover:text-primary hover:bg-primary-light dark:hover:bg-primary-deep/40"
             >
               {t('landing.nav.privacyPolicy')}
             </Button>
@@ -153,7 +150,7 @@ function NavBar() {
                 <SignUpButton mode="modal">
                   <Button
                     size="sm"
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md transition-all"
+                    className="bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-deep text-white shadow-sm hover:shadow-md transition-all"
                   >
                     {t('landing.hero.cta')}
                   </Button>
@@ -163,21 +160,19 @@ function NavBar() {
             
             {/* Signed In: Show Dashboard link + User avatar */}
             <SignedIn>
-              {accountType !== AccountType.Patient && (
-                <Button
-                  size="sm"
-                  onClick={() => navigate('/dashboard')}
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md transition-all"
-                >
-                  {t('landing.nav.dashboard', 'Dashboard')}
-                </Button>
-              )}
+              <Button
+                size="sm"
+                onClick={() => navigate('/dashboard')}
+                className="bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-deep text-white shadow-sm hover:shadow-md transition-all"
+              >
+                {t('landing.nav.dashboard', 'Dashboard')}
+              </Button>
               <UserButton 
                 afterSignOutUrl="/"
                 appearance={{
                   elements: {
-                    avatarBox: 'w-9 h-9 ring-2 ring-transparent hover:ring-indigo-500/50 transition-all',
-                    userButtonTrigger: 'focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none rounded-full',
+                    avatarBox: 'w-9 h-9 ring-2 ring-transparent hover:ring-primary/50 transition-all',
+                    userButtonTrigger: 'focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none rounded-full',
                   }
                 }}
               />
@@ -188,7 +183,7 @@ function NavBar() {
               variant="ghost"
               size="icon"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50"
+              className="md:hidden text-muted-foreground hover:text-primary hover:bg-primary-light"
               aria-label="Toggle menu"
             >
               <Menu className="w-5 h-5" />
@@ -205,7 +200,7 @@ function NavBar() {
                   key={link.key}
                   variant="ghost"
                   onClick={() => scrollToSection(link.sectionId)}
-                  className="justify-start px-4 py-3 h-auto text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50"
+                  className="justify-start px-4 py-3 h-auto text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary-light"
                 >
                   {t(`landing.nav.${link.key}`)}
                 </Button>
@@ -216,7 +211,7 @@ function NavBar() {
                   navigate('/privacy-policy');
                   setMobileMenuOpen(false);
                 }}
-                className="justify-start px-4 py-3 h-auto text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50"
+                className="justify-start px-4 py-3 h-auto text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary-light"
               >
                 {t('landing.nav.privacyPolicy')}
               </Button>
@@ -228,7 +223,7 @@ function NavBar() {
                   <SignInButton mode="modal">
                     <Button
                       variant="ghost"
-                      className="w-full justify-start px-4 py-3 h-auto text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50"
+                      className="w-full justify-start px-4 py-3 h-auto text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary-light"
                     >
                       {t('landing.cta.login')}
                     </Button>
@@ -247,11 +242,11 @@ function HeroSection() {
   const { t } = useTranslation();
   
   return (
-    <section className="pt-28 pb-16 lg:pt-32 lg:pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30 dark:from-background dark:via-indigo-950/20 dark:to-purple-950/20 relative overflow-hidden">
+    <section className="pt-28 pb-16 lg:pt-32 lg:pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-background via-primary-light/30 to-accent-light/30 dark:from-background dark:via-primary-deep/20 dark:to-primary-deep/20 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-200/30 dark:bg-purple-900/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-200/30 dark:bg-indigo-900/20 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-muted/30 dark:bg-primary-deep/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary-muted/30 dark:bg-primary-deep/20 rounded-full blur-3xl" />
       </div>
       
       <div className="max-w-7xl mx-auto relative">
@@ -259,7 +254,7 @@ function HeroSection() {
           {/* Left: Text Content */}
           <div className="text-center lg:text-left">
             <AnimatedSection animation="fade" duration={400}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium mb-6 shadow-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/15 text-primary-hover dark:text-primary-foreground/60 rounded-full text-sm font-medium mb-6 shadow-sm">
                 <Shield className="w-4 h-4" />
                 {t('landing.hero.badge')}
               </div>
@@ -269,7 +264,7 @@ function HeroSection() {
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-foreground leading-[1.1] mb-6 tracking-tight">
                 {t('landing.hero.title')}
                 <br />
-                <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+                <span className="bg-gradient-to-r from-primary via-primary-hover to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
                   {t('landing.hero.titleHighlight')}
                 </span>
               </h1>
@@ -286,7 +281,7 @@ function HeroSection() {
                 <SignUpButton mode="modal">
                   <Button
                     size="lg"
-                    className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
+                    className="w-full sm:w-auto !bg-gradient-to-r !from-[#2D0051] !to-[#3D1A6E] hover:!from-[#3D1A6E] hover:!to-[#1A0A33] text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
                   >
                     {t('landing.hero.cta')}
                     <ArrowRight className="w-5 h-5 ml-2" />
@@ -326,7 +321,7 @@ function HeroSection() {
           <AnimatedSection animation="scale" delay={200} duration={700}>
             <div className="relative">
               {/* Glow effect behind */}
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-2xl blur-2xl opacity-20 scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-hover rounded-2xl blur-2xl opacity-20 scale-105" />
               
               {/* Dashboard mockup */}
               <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
@@ -381,7 +376,7 @@ function HeroSection() {
                   <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-100 mb-3">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-medium text-gray-700">{t('landing.hero.preview.todayAgenda', 'Agenda de hoy')}</span>
-                      <span className="text-xs text-indigo-600 font-medium">5 {t('landing.hero.preview.appointments', 'turnos')}</span>
+                      <span className="text-xs text-primary font-medium">5 {t('landing.hero.preview.appointments', 'turnos')}</span>
                     </div>
                     <div className="space-y-2">
                       {[
@@ -421,47 +416,21 @@ function PurposeSection() {
   const { t } = useTranslation();
 
   return (
-    <section className="py-12 px-4 sm:px-6 lg:px-8 bg-background">
-      <div className="max-w-6xl mx-auto">
-        <div className="rounded-2xl border border-indigo-200/60 dark:border-indigo-900/60 bg-gradient-to-br from-indigo-50/70 via-background to-purple-50/60 dark:from-indigo-950/30 dark:via-background dark:to-purple-950/20 p-6 sm:p-8 lg:p-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 items-start">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950/40 border border-indigo-200/70 dark:border-indigo-800/60 mb-4">
-                <Shield className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">
-                  {t('landing.purpose.badge')}
-                </span>
-              </div>
-
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
-                {t('landing.purpose.title')}
-              </h2>
-              <p className="text-muted-foreground leading-relaxed">
-                {t('landing.purpose.description')}
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card/70 p-5 sm:p-6">
-              <ul className="space-y-3 mb-5">
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-foreground">{t('landing.purpose.points.patients')}</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-foreground">{t('landing.purpose.points.agenda')}</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-foreground">{t('landing.purpose.points.billing')}</span>
-                </li>
-              </ul>
-
-              <Button asChild variant="outline" className="w-full sm:w-auto">
-                <Link to="/privacy-policy">{t('landing.purpose.privacyCta')}</Link>
-              </Button>
-            </div>
-          </div>
+    <section className="py-10 px-4 sm:px-6 lg:px-8 bg-background">
+      <div className="max-w-5xl mx-auto">
+        <div className="rounded-2xl border border-primary-muted/60 dark:border-primary-deep/60 bg-primary-light/60 dark:bg-primary-deep/20 p-6 sm:p-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">
+            {t('landing.purpose.title')}
+          </h2>
+          <p className="text-muted-foreground leading-relaxed mb-3">
+            {t('landing.purpose.description')}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {t('landing.purpose.privacyLabel')}{' '}
+            <a href="/privacy-policy" className="text-primary hover:text-primary-hover dark:text-primary dark:hover:text-primary-foreground/60 underline underline-offset-2">
+              {t('landing.purpose.privacyLink')}
+            </a>
+          </p>
         </div>
       </div>
     </section>
@@ -499,9 +468,9 @@ function FeaturesSection() {
   ];
   
   const colorClasses = {
-    indigo: 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
+    indigo: 'bg-primary/15 text-primary dark:text-primary',
     emerald: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
-    purple: 'bg-purple-500/15 text-purple-600 dark:text-purple-400',
+    purple: 'bg-primary-light/15 text-primary dark:text-primary',
     blue: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
   };
   
@@ -544,83 +513,6 @@ function FeaturesSection() {
   );
 }
 
-function PatientBookingSection() {
-  const { t } = useTranslation();
-
-  return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-background via-indigo-950/10 to-purple-950/10">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <AnimatedSection animation="slide-up" duration={500}>
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/15 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium mb-6">
-                <Users className="w-4 h-4" />
-                {t('landing.patientBooking.badge')}
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
-                {t('landing.patientBooking.title')}
-              </h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                {t('landing.patientBooking.description')}
-              </p>
-
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center mt-0.5">
-                    <Calendar className="w-4 h-4" />
-                  </div>
-                  <p className="text-foreground">{t('landing.patientBooking.steps.patient')}</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center mt-0.5">
-                    <CheckCircle2 className="w-4 h-4" />
-                  </div>
-                  <p className="text-foreground">{t('landing.patientBooking.steps.therapist')}</p>
-                </div>
-              </div>
-            </div>
-          </AnimatedSection>
-
-          <AnimatedSection animation="scale" delay={150} duration={600}>
-            <div className="bg-card/90 rounded-2xl border border-border shadow-2xl overflow-hidden">
-              <div className="p-4 border-b border-border bg-muted/40">
-                <p className="text-sm font-semibold text-foreground">{t('landing.patientBooking.mock.publicBookingTitle')}</p>
-                <p className="text-xs text-muted-foreground">{t('landing.patientBooking.mock.publicBookingSubtitle')}</p>
-              </div>
-
-              <div className="p-4 space-y-4">
-                <div className="rounded-xl border border-border bg-muted/30 p-3">
-                  <p className="text-xs text-muted-foreground mb-2">{t('landing.patientBooking.mock.availableSlots')}</p>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-2.5 py-1 rounded-md text-xs bg-indigo-600 text-white">10:30 - 11:15</span>
-                    <span className="px-2.5 py-1 rounded-md text-xs bg-background border border-border text-foreground">11:15 - 12:00</span>
-                    <span className="px-2.5 py-1 rounded-md text-xs bg-background border border-border text-foreground">12:00 - 12:45</span>
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
-                  <p className="text-xs text-amber-300 mb-1">{t('landing.patientBooking.mock.pendingRequest')}</p>
-                  <p className="text-sm text-foreground">{t('landing.patientBooking.mock.pendingDescription')}</p>
-                </div>
-
-                <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
-                  <p className="text-xs text-emerald-300 mb-1">{t('landing.patientBooking.mock.agendaReview')}</p>
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm text-foreground">{t('landing.patientBooking.mock.agendaDescription')}</p>
-                    <span className="px-2 py-1 rounded-md text-xs bg-emerald-600 text-white whitespace-nowrap">
-                      {t('landing.patientBooking.mock.approveAction')}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </AnimatedSection>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function AnalyticsSection() {
   const { t } = useTranslation();
   
@@ -632,20 +524,20 @@ function AnalyticsSection() {
   ];
   
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 to-indigo-900 text-white">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[#1A0A33] to-[#2D0051] text-white">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Text Content */}
           <AnimatedSection animation="slide-up" duration={500}>
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/20 text-primary-foreground/60 rounded-full text-sm font-medium mb-6">
                 <BarChart3 className="w-4 h-4" />
                 {t('landing.analytics.badge')}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold mb-6">
                 {t('landing.analytics.title')}
               </h2>
-              <p className="text-lg text-indigo-200 mb-8">
+              <p className="text-lg text-primary-foreground/80 mb-8">
                 {t('landing.analytics.description')}
               </p>
               
@@ -653,10 +545,10 @@ function AnalyticsSection() {
                 {analyticsFeatures.map((item, index) => (
                   <AnimatedSection key={item} animation="slide-left" delay={200 + index * 100} duration={400}>
                     <div className="flex items-center gap-3">
-                      <div className="w-6 h-6 bg-indigo-500/30 rounded-full flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-indigo-300" />
+                      <div className="w-6 h-6 bg-primary/30 rounded-full flex items-center justify-center">
+                        <CheckCircle2 className="w-4 h-4 text-primary-foreground/60" />
                       </div>
-                      <span className="text-indigo-100">{item}</span>
+                      <span className="text-primary-foreground">{item}</span>
                     </div>
                   </AnimatedSection>
                 ))}
@@ -670,7 +562,7 @@ function AnalyticsSection() {
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="bg-white/10 rounded-xl p-4">
-                  <div className="flex items-center gap-2 text-indigo-300 text-sm mb-1">
+                  <div className="flex items-center gap-2 text-primary-foreground/60 text-sm mb-1">
                     <DollarSign className="w-4 h-4" />
                     {t('landing.analytics.stats.monthlyIncome')}
                   </div>
@@ -681,22 +573,22 @@ function AnalyticsSection() {
                   </div>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4">
-                  <div className="flex items-center gap-2 text-indigo-300 text-sm mb-1">
+                  <div className="flex items-center gap-2 text-primary-foreground/60 text-sm mb-1">
                     <Clock className="w-4 h-4" />
                     {t('landing.analytics.stats.sessions')}
                   </div>
                   <div className="text-2xl font-bold text-white">{mockStats.sesionesRealizadas}</div>
-                  <div className="text-xs text-indigo-300 mt-1">{t('landing.analytics.stats.thisMonth')}</div>
+                  <div className="text-xs text-primary-foreground/60 mt-1">{t('landing.analytics.stats.thisMonth')}</div>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4">
-                  <div className="flex items-center gap-2 text-indigo-300 text-sm mb-1">
+                  <div className="flex items-center gap-2 text-primary-foreground/60 text-sm mb-1">
                     <Users className="w-4 h-4" />
                     {t('landing.analytics.stats.activePatients')}
                   </div>
                   <div className="text-2xl font-bold text-white">{mockStats.pacientesActivos}</div>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4">
-                  <div className="flex items-center gap-2 text-indigo-300 text-sm mb-1">
+                  <div className="flex items-center gap-2 text-primary-foreground/60 text-sm mb-1">
                     <CheckCircle2 className="w-4 h-4" />
                     {t('landing.analytics.stats.collectionRate')}
                   </div>
@@ -706,15 +598,15 @@ function AnalyticsSection() {
               
               {/* Mini Chart */}
               <div className="bg-white/10 rounded-xl p-4">
-                <div className="text-sm text-indigo-300 mb-3">{t('landing.analytics.stats.lastSixMonths')}</div>
+                <div className="text-sm text-primary-foreground/60 mb-3">{t('landing.analytics.stats.lastSixMonths')}</div>
                 <div className="flex items-end gap-2 h-24">
                   {mockChartData.map((data) => (
                     <div key={data.month} className="flex-1 flex flex-col items-center gap-1">
                       <div 
-                        className="w-full bg-gradient-to-t from-indigo-500 to-purple-500 rounded-t"
+                        className="w-full bg-gradient-to-t from-primary-light to-accent-light rounded-t"
                         style={{ height: `${data.value}%` }}
                       />
-                      <span className="text-xs text-indigo-300">{data.month}</span>
+                      <span className="text-xs text-primary-foreground/60">{data.month}</span>
                     </div>
                   ))}
                 </div>
@@ -775,7 +667,7 @@ function RemindersSection() {
           <AnimatedSection animation="scale" delay={100} duration={600} className="order-2 lg:order-1">
             <div className="bg-card rounded-2xl shadow-xl p-6 border border-border">
               <div className="flex items-center gap-2 mb-6">
-                <Bell className="w-5 h-5 text-indigo-600" />
+                <Bell className="w-5 h-5 text-primary" />
                 <span className="font-semibold text-foreground">{t('landing.reminders.notifications')}</span>
               </div>
               
@@ -818,8 +710,8 @@ function RemindersSection() {
                 {reminderFeatures.map((item, index) => (
                   <AnimatedSection key={index} animation="slide-left" delay={100 + index * 100} duration={400}>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                        <item.icon className="w-5 h-5 text-indigo-600" />
+                      <div className="w-10 h-10 bg-primary-muted rounded-lg flex items-center justify-center">
+                        <item.icon className="w-5 h-5 text-primary" />
                       </div>
                       <span className="text-foreground">{item.text}</span>
                     </div>
@@ -841,9 +733,9 @@ function SecuritySection() {
     <section className="py-16 px-4 sm:px-6 lg:px-8 bg-background">
       <div className="max-w-7xl mx-auto">
         <AnimatedSection animation="scale" duration={600}>
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 rounded-3xl p-8 sm:p-12">
+          <div className="bg-gradient-to-br from-primary-light to-accent-light dark:from-primary-deep/50 dark:to-primary-deep/50 rounded-3xl p-8 sm:p-12">
             <div className="flex flex-col lg:flex-row items-center gap-8">
-              <div className="w-20 h-20 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+              <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-hover rounded-2xl flex items-center justify-center flex-shrink-0">
                 <Shield className="w-10 h-10 text-white" />
               </div>
               <div className="flex-1 text-center lg:text-left">
@@ -856,11 +748,11 @@ function SecuritySection() {
               </div>
               <div className="flex items-center gap-6 text-sm">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">256-bit</div>
+                  <div className="text-2xl font-bold text-primary dark:text-primary">256-bit</div>
                   <div className="text-muted-foreground">{t('landing.security.encryption')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">E2E</div>
+                  <div className="text-2xl font-bold text-primary dark:text-primary">E2E</div>
                   <div className="text-muted-foreground">{t('landing.security.e2e')}</div>
                 </div>
               </div>
@@ -945,10 +837,10 @@ function AnimatedStatCard({
   return (
     <AnimatedSection animation="scale" delay={delay} duration={500}>
       <div ref={ref} className="bg-card rounded-2xl p-8 shadow-lg text-center border border-border">
-        <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+        <div className="w-14 h-14 bg-gradient-to-br from-primary-light to-accent-light rounded-xl flex items-center justify-center mx-auto mb-4">
           <Icon className="w-7 h-7 text-white" />
         </div>
-        <div className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+        <div className="text-4xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent mb-2">
           {prefix}{count.toLocaleString()}{suffix}
         </div>
         <div className="text-muted-foreground font-medium">{label}</div>
@@ -1003,11 +895,11 @@ function SocialProofSection() {
   ];
   
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-background dark:via-background dark:to-background">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-light via-card to-accent-light dark:from-background dark:via-card/20 dark:to-background">
       <div className="max-w-7xl mx-auto">
         <AnimatedSection animation="slide-up" duration={500}>
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/15 text-primary-hover dark:text-primary-foreground/60 rounded-full text-sm font-medium mb-6">
               <Users className="w-4 h-4" />
               {t('landing.socialProof.badge')}
             </div>
@@ -1047,7 +939,7 @@ function SocialProofSection() {
                     "{testimonial.quote}"
                   </blockquote>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                    <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-hover rounded-full flex items-center justify-center text-white font-semibold text-sm">
                       {testimonial.name.split(' ').slice(1, 3).map(n => n[0]).join('')}
                     </div>
                     <div>
@@ -1093,9 +985,9 @@ function WhyTerappIASection() {
   
   const colorClasses = {
     indigo: {
-      bg: 'bg-indigo-500/15',
-      text: 'text-indigo-600 dark:text-indigo-400',
-      highlight: 'bg-indigo-500',
+      bg: 'bg-primary/15',
+      text: 'text-primary dark:text-primary',
+      highlight: 'bg-primary',
     },
     emerald: {
       bg: 'bg-emerald-500/15',
@@ -1103,9 +995,9 @@ function WhyTerappIASection() {
       highlight: 'bg-emerald-500',
     },
     purple: {
-      bg: 'bg-purple-500/15',
-      text: 'text-purple-600 dark:text-purple-400',
-      highlight: 'bg-purple-500',
+      bg: 'bg-primary-light/15',
+      text: 'text-primary dark:text-primary',
+      highlight: 'bg-primary-light',
     },
     amber: {
       bg: 'bg-amber-500/15',
@@ -1119,7 +1011,7 @@ function WhyTerappIASection() {
       <div className="max-w-7xl mx-auto">
         <AnimatedSection animation="slide-up" duration={500}>
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/15 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary-light/15 text-primary-hover dark:text-primary rounded-full text-sm font-medium mb-6">
               <Sparkles className="w-4 h-4" />
               {t('landing.whyTerappIA.badge')}
             </div>
@@ -1242,14 +1134,14 @@ function PricingCard({
   return (
     <Card className={`relative border-0 shadow-lg hover:shadow-xl transition-all h-full flex flex-col ${
       plan.popular
-        ? 'ring-2 ring-purple-500 bg-card scale-[1.01]'
+        ? 'ring-2 ring-primary bg-card scale-[1.01]'
         : 'bg-card'
     } ${
       compactMobile ? 'min-h-[520px]' : ''
     }`}>
       {plan.popular && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-          <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-medium px-4 py-1 rounded-full shadow-lg">
+          <span className="bg-gradient-to-r from-primary-hover to-primary text-white text-sm font-medium px-4 py-1 rounded-full shadow-lg">
             {t('landing.pricing.popular')}
           </span>
         </div>
@@ -1257,8 +1149,8 @@ function PricingCard({
       <CardContent className={`flex flex-col h-full ${compactMobile ? 'p-5' : 'p-6'}`}>
         <div className={`text-center ${compactMobile ? 'mb-4' : 'mb-6'}`}>
           <div className={`mx-auto rounded-xl flex items-center justify-center ${compactMobile ? 'w-10 h-10 mb-3' : 'w-12 h-12 mb-4'} ${
-            plan.color === 'indigo' ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400' :
-            plan.color === 'purple' ? 'bg-purple-500/15 text-purple-600 dark:text-purple-400' :
+            plan.color === 'indigo' ? 'bg-primary/15 text-primary dark:text-primary' :
+            plan.color === 'purple' ? 'bg-primary-light/15 text-primary dark:text-primary' :
             'bg-amber-500/15 text-amber-600 dark:text-amber-400'
           }`}>
             <plan.icon className={compactMobile ? 'w-5 h-5' : 'w-6 h-6'} />
@@ -1294,7 +1186,7 @@ function PricingCard({
           <Button
             className={`w-full py-6 ${
               plan.popular
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
+                ? '!bg-gradient-to-r !from-[#2D0051] !to-[#3D1A6E] hover:!from-[#3D1A6E] hover:!to-[#1A0A33] text-white'
                 : 'bg-muted hover:bg-muted/80 text-foreground'
             }`}
           >
@@ -1377,11 +1269,11 @@ function PricingSection() {
   ];
   
   return (
-    <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30 dark:from-background dark:via-indigo-950/10 dark:to-purple-950/10">
+    <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-background via-primary-light/30 to-accent-light/30 dark:from-background dark:via-primary-deep/10 dark:to-primary-deep/10">
       <div className="max-w-7xl mx-auto">
         <AnimatedSection animation="slide-up" duration={500}>
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/15 text-primary-hover dark:text-primary-foreground/60 rounded-full text-sm font-medium mb-6">
               <DollarSign className="w-4 h-4" />
               {t('landing.pricing.badge')}
             </div>
@@ -1423,7 +1315,7 @@ function PricingSection() {
         <AnimatedSection animation="fade" delay={500} duration={600}>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-12 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-indigo-500" />
+              <Shield className="w-4 h-4 text-primary" />
               {t('landing.pricing.trustBadges.encryption')}
             </div>
             <div className="flex items-center gap-2">
@@ -1445,7 +1337,7 @@ function CTASection() {
   const { t } = useTranslation();
   
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-600 to-purple-700">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[#2D0051] to-[#1A0A33]">
       <div className="max-w-4xl mx-auto text-center">
         <AnimatedSection animation="slide-up" duration={500}>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
@@ -1453,7 +1345,7 @@ function CTASection() {
           </h2>
         </AnimatedSection>
         <AnimatedSection animation="fade" delay={200} duration={500}>
-          <p className="text-lg text-indigo-100 mb-8">
+          <p className="text-lg text-primary-foreground mb-8">
             {t('landing.cta.subtitle')}
           </p>
         </AnimatedSection>
@@ -1463,7 +1355,7 @@ function CTASection() {
               <Button
                 size="lg"
                 variant="secondary"
-                className="w-full sm:w-auto !bg-white !text-indigo-600 hover:!bg-indigo-50 px-8 py-6 text-lg shadow-lg"
+                className="w-full sm:w-auto !bg-white !text-primary hover:!bg-primary-light px-8 py-6 text-lg shadow-lg"
               >
                 {t('landing.cta.createAccount')}
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -1506,7 +1398,7 @@ function Footer() {
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-[#2D0051] to-[#3D1A6E] rounded-lg flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <span className="text-lg font-bold text-white">{t('landing.brand')}</span>
@@ -1524,17 +1416,17 @@ function Footer() {
             <div className="flex flex-col gap-3">
               <a 
                 href="tel:+5411123456789" 
-                className="flex items-center gap-2 text-sm transition-colors hover:text-indigo-400"
+                className="flex items-center gap-2 text-sm transition-colors hover:text-primary"
               >
                 <Phone className="w-4 h-4" />
                 <span>+54 11 1234-5678</span>
               </a>
               <a 
-                href="mailto:support@terapp-ia.com"
-                className="flex items-center gap-2 text-sm transition-colors hover:text-indigo-400"
+                href="mailto:lavenius.net@gmail.com"
+                className="flex items-center gap-2 text-sm transition-colors hover:text-primary"
               >
                 <Mail className="w-4 h-4" />
-                <span>support@terapp-ia.com</span>
+                <span>lavenius.net@gmail.com</span>
               </a>
             </div>
           </div>
@@ -1552,7 +1444,7 @@ function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center transition-all hover:bg-gradient-to-br hover:from-indigo-600 hover:to-purple-600 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+                  className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center transition-all hover:bg-gradient-to-br hover:from-primary hover:to-primary-hover hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
                 >
                   <social.icon className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
                 </a>
@@ -1567,14 +1459,14 @@ function Footer() {
           <span className="mx-2 text-gray-600">•</span>
           <a
             href="/privacy-policy"
-            className="text-indigo-400 hover:text-indigo-300 transition-colors"
+            className="text-primary hover:text-primary-foreground/60 transition-colors"
           >
             {t('landing.footer.privacyPolicy')}
           </a>
           <span className="mx-2 text-gray-600">•</span>
           <a
             href="/terms-of-service"
-            className="text-indigo-400 hover:text-indigo-300 transition-colors"
+            className="text-primary hover:text-primary-foreground/60 transition-colors"
           >
             {t('landing.footer.termsOfService')}
           </a>
@@ -1624,7 +1516,7 @@ function StickyMobileCTA() {
         <SignedOut>
           <SignUpButton mode="modal">
             <Button 
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-6 text-base font-semibold shadow-md"
+              className="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-deep text-white py-6 text-base font-semibold shadow-md"
             >
               {t('landing.hero.cta')}
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -1634,7 +1526,7 @@ function StickyMobileCTA() {
         <SignedIn>
           <Button 
             onClick={() => window.location.href = '/dashboard'}
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-6 text-base font-semibold shadow-md"
+            className="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-deep text-white py-6 text-base font-semibold shadow-md"
           >
             {t('landing.nav.dashboard')}
             <ArrowRight className="w-5 h-5 ml-2" />
@@ -1656,7 +1548,6 @@ export function Landing() {
       <HeroSection />
       <PurposeSection />
       <FeaturesSection />
-      <PatientBookingSection />
       <AnalyticsSection />
       <RemindersSection />
       <SecuritySection />

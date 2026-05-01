@@ -393,7 +393,7 @@ describe('SessionDetailsModal', () => {
       render(<SessionDetailsModal {...defaultProps} />);
 
       const patientLabel = screen.getByText('Paciente');
-      expect(patientLabel).toHaveClass('text-sm', 'font-semibold', 'text-gray-500');
+      expect(patientLabel).toHaveClass('text-sm', 'font-semibold', 'text-muted-foreground');
     });
   });
 
@@ -402,11 +402,11 @@ describe('SessionDetailsModal', () => {
   // ==========================================================================
 
   describe('Visual Structure', () => {
-    it('edit button has indigo styling', () => {
+    it('edit button has primary styling', () => {
       render(<SessionDetailsModal {...defaultProps} />);
 
       const editButton = screen.getByRole('button', { name: /Editar Sesión/i });
-      expect(editButton).toHaveClass('bg-indigo-600');
+      expect(editButton).toHaveClass('bg-primary');
     });
 
     it('close button has outline variant', () => {
@@ -428,8 +428,8 @@ describe('SessionDetailsModal', () => {
       render(<SessionDetailsModal {...defaultProps} />);
 
       const dialog = screen.getByRole('dialog');
-      // The !bg-white class is on the dialog element itself
-      expect(dialog).toHaveClass('!bg-white');
+      // The bg-card class is on the dialog/drawer element
+      expect(dialog).toHaveClass('bg-card');
     });
   });
 
@@ -599,7 +599,15 @@ describe('SessionDetailsModal', () => {
 
       rerender(<SessionDetailsModal {...defaultProps} isOpen={false} />);
 
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      // Drawer/Dialog may retain DOM element during close animation.
+      // Verify the dialog is either removed or in closed state.
+      const dialog = screen.queryByRole('dialog');
+      if (dialog) {
+        // Vaul Drawer sets data-state="closed" when closed
+        expect(dialog).toHaveAttribute('data-state', 'closed');
+      } else {
+        expect(dialog).not.toBeInTheDocument();
+      }
     });
   });
 });

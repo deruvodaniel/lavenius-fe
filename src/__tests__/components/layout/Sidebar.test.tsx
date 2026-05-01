@@ -79,6 +79,7 @@ vi.mock('@/components/shared', () => ({
       </div>
     );
   },
+  BetaBadge: () => <span data-testid="beta-badge">BETA</span>,
 }));
 
 interface RenderSidebarOptions {
@@ -292,21 +293,21 @@ describe('Sidebar', () => {
       renderSidebar({ initialEntries: ['/dashboard/agenda'] });
 
       const agendaLink = screen.getByRole('link', { name: /agenda/i });
-      expect(agendaLink).toHaveClass('bg-indigo-700');
+      expect(agendaLink).toHaveClass('bg-primary-hover');
     });
 
     it('highlights active navigation item when on patients route', () => {
       renderSidebar({ initialEntries: ['/dashboard/pacientes'] });
 
       const patientsLink = screen.getByRole('link', { name: /pacientes/i });
-      expect(patientsLink).toHaveClass('bg-indigo-700');
+      expect(patientsLink).toHaveClass('bg-primary-hover');
     });
 
     it('highlights active navigation item when on payments route', () => {
       renderSidebar({ initialEntries: ['/dashboard/cobros'] });
 
       const paymentsLink = screen.getByRole('link', { name: /cobros/i });
-      expect(paymentsLink).toHaveClass('bg-indigo-700');
+      expect(paymentsLink).toHaveClass('bg-primary-hover');
     });
   });
 

@@ -8,12 +8,12 @@ export function NotFound() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light via-white to-accent-light flex items-center justify-center p-4">
       <div className="max-w-lg w-full text-center">
         {/* Illustration */}
         <div className="relative mb-8">
           {/* Big 404 */}
-          <div className="text-[150px] sm:text-[180px] font-black text-indigo-100 leading-none select-none">
+          <div className="text-[150px] sm:text-[180px] font-black text-primary-foreground leading-none select-none">
             404
           </div>
           
@@ -21,8 +21,8 @@ export function NotFound() {
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="relative">
               {/* Search icon with question mark */}
-              <div className="w-24 h-24 bg-card rounded-2xl shadow-xl flex items-center justify-center transform -rotate-6 border-2 border-indigo-100">
-                <Search className="w-12 h-12 text-indigo-400" />
+              <div className="w-24 h-24 bg-card rounded-2xl shadow-xl flex items-center justify-center transform -rotate-6 border-2 border-primary-muted">
+                <Search className="w-12 h-12 text-primary" />
               </div>
               <div className="absolute -top-2 -right-2 w-8 h-8 bg-amber-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
                 ?
@@ -64,11 +64,11 @@ export function NotFound() {
             Si el problema persiste, contacta a soporte tecnico:
           </p>
           <a 
-            href="mailto:support@terapp-ia.com"
-            className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
+            href="mailto:lavenius.net@gmail.com"
+            className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-medium transition-colors"
           >
             <Mail className="w-4 h-4" />
-            support@terapp-ia.com
+            lavenius.net@gmail.com
           </a>
         </div>
 

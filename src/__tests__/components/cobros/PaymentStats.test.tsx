@@ -281,8 +281,8 @@ describe('PaymentStats', () => {
     it('each card is wrapped in a Card component', () => {
       const { container } = render(<PaymentStats totals={mockTotals} />);
 
-      // Cards have bg-white class
-      const cards = container.querySelectorAll('.bg-white');
+      // Cards have bg-card class
+      const cards = container.querySelectorAll('.bg-card');
       expect(cards.length).toBeGreaterThanOrEqual(4);
     });
 
@@ -350,7 +350,7 @@ describe('PaymentStats', () => {
       const grid = container.querySelector('.grid');
       expect(grid).toBeInTheDocument();
 
-      const skeletonCards = grid?.querySelectorAll('.bg-white');
+      const skeletonCards = grid?.querySelectorAll('.bg-card');
       expect(skeletonCards?.length).toBe(4);
     });
 

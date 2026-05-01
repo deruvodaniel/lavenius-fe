@@ -35,7 +35,7 @@ export function SessionNotesSection({
     <div className="bg-card border rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-foreground flex items-center gap-2">
-          <FileText className="w-5 h-5 text-indigo-600" />
+          <FileText className="w-5 h-5 text-primary" />
           {t('clinicalFile.sections.sessionNotes')}
         </h3>
         <Button size="sm" onClick={onCreateNote}>
@@ -57,7 +57,7 @@ export function SessionNotesSection({
           </p>
           <button
             onClick={onRetry}
-            className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+            className="text-primary hover:text-primary-hover text-sm font-medium"
           >
             {t('clinicalFile.notes.retry')}
           </button>

@@ -48,8 +48,8 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
       'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
       collapsed && 'justify-center',
       isActive
-        ? 'bg-indigo-700 text-white'
-        : 'text-indigo-200 hover:bg-indigo-800 hover:text-white'
+        ? 'bg-primary-hover text-white'
+        : 'text-primary-foreground/80 hover:bg-primary-deep hover:text-white'
     );
 
   // Wrapper component for nav items with tooltip when collapsed
@@ -104,7 +104,7 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
       {/* Header - Only show on desktop */}
       {showHeader && (
         <div className={cn(
-          'border-b border-indigo-800 transition-all duration-200 min-h-[80px] flex items-center px-4',
+          'border-b border-primary-deep transition-all duration-200 min-h-[80px] flex items-center px-4',
           collapsed && 'justify-center'
         )}>
           <Link 
@@ -113,13 +113,13 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
             onClick={handleNavClick}
           >
             {collapsed ? (
-              <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                 <span className="text-white text-lg font-bold">L</span>
               </div>
             ) : (
               <div>
                 <h1 className="text-white text-2xl font-bold flex items-center gap-2">{t('landing.brand')} <BetaBadge className="border-amber-500/60 bg-amber-500/20 text-amber-300" /></h1>
-                <p className="text-indigo-300 text-sm mt-1">{t('landing.tagline')}</p>
+                <p className="text-primary-foreground/60 text-sm mt-1">{t('landing.tagline')}</p>
               </div>
             )}
           </Link>
@@ -143,20 +143,20 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
       </TooltipProvider>
 
       {/* User Menu Popover - Outside TooltipProvider to avoid click conflicts */}
-      <div className="border-t border-indigo-800 transition-all duration-200 p-4">
+      <div className="border-t border-primary-deep transition-all duration-200 p-4">
         {user && (
           <Popover open={isUserMenuOpen} onOpenChange={setIsUserMenuOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="ghost"
                 className={cn(
-                  'w-full flex items-center gap-3 px-4 py-3 h-auto hover:bg-indigo-800 group',
+                  'w-full flex items-center gap-3 px-4 py-3 h-auto hover:bg-primary-deep group',
                   collapsed && 'justify-center'
                 )}
                 aria-label={t('navigation.userMenu')}
               >
                 <div className={cn(
-                  'bg-indigo-600 ring-2 ring-indigo-400 rounded-full flex items-center justify-center flex-shrink-0 group-hover:ring-indigo-300 transition-all duration-200 overflow-hidden',
+                  'bg-primary ring-2 ring-primary rounded-full flex items-center justify-center flex-shrink-0 group-hover:ring-primary-muted transition-all duration-200 overflow-hidden',
                   collapsed ? 'w-5 h-5 ring-1' : 'w-10 h-10'
                 )}>
                   {user.imageUrl ? (
@@ -181,10 +181,10 @@ export function Sidebar({ currentPath: _currentPath, onLogout, showHeader = true
                   <p className="text-white text-sm font-medium truncate">
                     {user.firstName} {user.lastName}
                   </p>
-                  <p className="text-indigo-300 text-xs truncate">{user.email}</p>
+                  <p className="text-primary-foreground/60 text-xs truncate">{user.email}</p>
                 </div>
                 <ChevronUp className={cn(
-                  'w-4 h-4 text-indigo-400 group-hover:text-indigo-300 transition-colors flex-shrink-0',
+                  'w-4 h-4 text-primary group-hover:text-primary-foreground/60 transition-colors flex-shrink-0',
                   collapsed && 'hidden'
                 )} />
               </Button>

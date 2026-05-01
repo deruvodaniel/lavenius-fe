@@ -128,7 +128,7 @@ describe('OnboardingStep', () => {
       const svg = container.querySelector('svg');
       expect(svg).toHaveClass('w-10');
       expect(svg).toHaveClass('h-10');
-      expect(svg).toHaveClass('text-indigo-600');
+      expect(svg).toHaveClass('text-primary');
     });
 
     it('icon container has gradient background', () => {
@@ -136,8 +136,8 @@ describe('OnboardingStep', () => {
       
       const iconContainer = container.querySelector('.w-20.h-20');
       expect(iconContainer).toHaveClass('bg-gradient-to-br');
-      expect(iconContainer).toHaveClass('from-indigo-100');
-      expect(iconContainer).toHaveClass('to-purple-100');
+      expect(iconContainer).toHaveClass('from-primary-muted');
+      expect(iconContainer).toHaveClass('to-primary-muted');
     });
 
     it('icon container has hover scale effect', () => {
@@ -167,7 +167,7 @@ describe('OnboardingStep', () => {
       const heading = screen.getByRole('heading', { name: 'Test Title' });
       expect(heading).toHaveClass('text-xl');
       expect(heading).toHaveClass('font-semibold');
-      expect(heading).toHaveClass('text-gray-900');
+      expect(heading).toHaveClass('text-foreground');
     });
 
     it('renders long title correctly', () => {
@@ -213,7 +213,7 @@ describe('OnboardingStep', () => {
       render(<OnboardingStep {...defaultProps} />);
       
       const description = screen.getByText('Test description text');
-      expect(description).toHaveClass('text-gray-600');
+      expect(description).toHaveClass('text-muted-foreground');
       expect(description).toHaveClass('max-w-sm');
       expect(description).toHaveClass('leading-relaxed');
     });
@@ -404,7 +404,7 @@ describe('OnboardingStep', () => {
         if (el.tagName === 'H2') {
           elementOrder.push('title');
         }
-        if (el.tagName === 'P' && el.classList.contains('text-gray-600')) {
+        if (el.tagName === 'P' && el.classList.contains('text-muted-foreground')) {
           elementOrder.push('description');
         }
         if (el.tagName === 'BUTTON' && el.textContent === 'Action') {
@@ -423,8 +423,8 @@ describe('OnboardingStep', () => {
       const heading = screen.getByRole('heading', { name: 'Test Title' });
       const description = screen.getByText('Test description text');
       
-      expect(heading).toHaveClass('text-gray-900');
-      expect(description).toHaveClass('text-gray-600');
+      expect(heading).toHaveClass('text-foreground');
+      expect(description).toHaveClass('text-muted-foreground');
     });
   });
 

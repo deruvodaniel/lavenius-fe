@@ -398,7 +398,7 @@ const ToggleRow = ({ checked, onChange, label, description }: ToggleRowProps) =>
       className="switch-lg mt-0.5 flex-shrink-0"
     />
     <div className="flex-1 cursor-pointer" onClick={() => onChange(!checked)}>
-      <span className="text-sm font-medium text-foreground hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">{label}</span>
+      <span className="text-sm font-medium text-foreground hover:text-primary dark:hover:text-primary transition-colors">{label}</span>
       {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
     </div>
   </div>
@@ -821,18 +821,18 @@ export function Configuracion() {
                                   className={cn(
                                     "flex flex-col items-center gap-1 px-1 py-3 h-auto text-xs font-medium transition-all relative rounded-none",
                                     isActive
-                                      ? "text-indigo-600"
+                                      ? "text-primary"
                                       : "text-muted-foreground hover:text-foreground"
                                   )}
                                   aria-current={isActive ? "page" : undefined}
                                 >
                                   <Icon className={cn(
                                     "w-5 h-5",
-                                    isActive ? "text-indigo-600" : "text-muted-foreground"
+                                    isActive ? "text-primary" : "text-muted-foreground"
                                   )} />
                                   <span className="truncate w-full text-center">{t(section.labelKey)}</span>
                                   {isActive && (
-                                    <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-indigo-600 rounded-full" />
+                                    <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-primary rounded-full" />
                                   )}
                                 </Button>
                               );
@@ -867,14 +867,14 @@ export function Configuracion() {
                   className={cn(
                     "flex items-center gap-2.5 px-3 py-2 h-auto text-sm transition-colors w-full text-left justify-start border-l-2 rounded-none",
                     isActive
-                      ? "border-indigo-600 text-indigo-700 font-medium"
+                      ? "border-primary text-primary-hover font-medium"
                       : "border-transparent text-muted-foreground font-normal hover:text-foreground hover:border-border"
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
                   <Icon className={cn(
                     "w-4 h-4 flex-shrink-0",
-                    isActive ? "text-indigo-600" : "text-muted-foreground"
+                    isActive ? "text-primary" : "text-muted-foreground"
                   )} />
                   <span>{t(section.labelKey)}</span>
                 </Button>
@@ -928,8 +928,8 @@ export function Configuracion() {
             {/* Language Section */}
             <ConfigSection
               icon={Globe}
-              iconColor="text-purple-600 dark:text-purple-400"
-              iconBg="bg-purple-100 dark:bg-purple-950/50"
+              iconColor="text-primary dark:text-primary"
+              iconBg="bg-primary-muted dark:bg-primary-deep/50"
               title={t('settings.language')}
               description={t('settings.selectLanguage')}
             >
@@ -964,7 +964,7 @@ export function Configuracion() {
                         onClick={() => updateLocalSetting('defaultSessionDuration', value)}
                         className={cn(
                           "px-4 py-2",
-                          isSelected && "bg-indigo-600 hover:bg-indigo-700"
+                          isSelected && "bg-primary hover:bg-primary-hover"
                         )}
                       >
                         {t(labelKey)}
@@ -1165,8 +1165,8 @@ export function Configuracion() {
             {/* Working Hours & Days */}
             <ConfigSection
               icon={Clock}
-              iconColor="text-indigo-600 dark:text-indigo-400"
-              iconBg="bg-indigo-100 dark:bg-indigo-950/50"
+              iconColor="text-primary dark:text-primary"
+              iconBg="bg-primary-muted dark:bg-primary-deep/50"
               title={t('settings.workingHours.title')}
               description={t('settings.workingHours.description')}
             >
@@ -1233,7 +1233,7 @@ export function Configuracion() {
                           }}
                           className={cn(
                             "w-9 h-9 rounded-full text-xs",
-                            isSelected && "bg-indigo-600 hover:bg-indigo-700"
+                            isSelected && "bg-primary hover:bg-primary-hover"
                           )}
                           title={t(day.nameKey)}
                           aria-label={t(day.nameKey)}

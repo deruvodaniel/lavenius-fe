@@ -592,12 +592,12 @@ export function FullCalendarView({
            ================================================================ */
         .fullcalendar-wrapper {
           --fc-border-color: var(--border);
-          --fc-button-bg-color: #4f46e5;
-          --fc-button-border-color: #4f46e5;
-          --fc-button-hover-bg-color: #4338ca;
-          --fc-button-hover-border-color: #4338ca;
-          --fc-button-active-bg-color: #3730a3;
-          --fc-button-active-border-color: #3730a3;
+          --fc-button-bg-color: var(--primary);
+          --fc-button-border-color: var(--primary);
+          --fc-button-hover-bg-color: var(--primary-hover);
+          --fc-button-hover-border-color: var(--primary-hover);
+          --fc-button-active-bg-color: var(--primary-deep);
+          --fc-button-active-border-color: var(--primary-deep);
           --fc-today-bg-color: color-mix(in srgb, var(--primary) 10%, transparent);
           --fc-page-bg-color: var(--background);
           --fc-neutral-bg-color: var(--muted);
@@ -715,35 +715,35 @@ export function FullCalendarView({
 
         /* Gradient on toolbar buttons — matches app primary button style */
         .fullcalendar-wrapper .fc-button-primary {
-          background: linear-gradient(to right, #312e81, #4338ca) !important;
+          background: linear-gradient(to right, var(--primary-deep), var(--primary-hover)) !important;
           border: none !important;
           box-shadow: 0 1px 3px rgba(49, 46, 129, 0.3);
         }
 
         .fullcalendar-wrapper .fc-button-primary:hover:not(:disabled) {
-          background: linear-gradient(to right, #3730a3, #4f46e5) !important;
+          background: linear-gradient(to right, var(--primary-hover), var(--primary)) !important;
           box-shadow: 0 2px 6px rgba(49, 46, 129, 0.4);
         }
 
         .fullcalendar-wrapper .fc-button-primary:not(:disabled).fc-button-active,
         .fullcalendar-wrapper .fc-button-primary:not(:disabled):active {
-          background: linear-gradient(to right, #312e81, #4338ca) !important;
+          background: linear-gradient(to right, var(--primary-deep), var(--primary-hover)) !important;
           box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
         /* Dark mode gradient */
         .dark .fullcalendar-wrapper .fc-button-primary {
-          background: linear-gradient(to right, #3730a3, #4f46e5) !important;
+          background: linear-gradient(to right, var(--primary-hover), var(--primary)) !important;
           box-shadow: 0 1px 3px rgba(55, 48, 163, 0.3);
         }
 
         .dark .fullcalendar-wrapper .fc-button-primary:hover:not(:disabled) {
-          background: linear-gradient(to right, #4338ca, #6366f1) !important;
+          background: linear-gradient(to right, var(--primary-hover), var(--primary)) !important;
         }
 
         .dark .fullcalendar-wrapper .fc-button-primary:not(:disabled).fc-button-active,
         .dark .fullcalendar-wrapper .fc-button-primary:not(:disabled):active {
-          background: linear-gradient(to right, #3730a3, #4f46e5) !important;
+          background: linear-gradient(to right, var(--primary-hover), var(--primary)) !important;
         }
 
         .fullcalendar-wrapper .fc-button:focus {

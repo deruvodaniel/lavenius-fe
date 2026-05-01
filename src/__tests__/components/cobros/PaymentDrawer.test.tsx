@@ -54,6 +54,7 @@ vi.mock('react-i18next', () => ({
       return result;
     },
   }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 // Mock sonner toast
@@ -1109,7 +1110,7 @@ describe('PaymentDrawer', () => {
       );
 
       const singlePaymentButton = screen.getByText('Pago Único').closest('button');
-      expect(singlePaymentButton).toHaveClass('border-indigo-500');
+      expect(singlePaymentButton).toHaveClass('border-primary');
     });
 
     it('shows coming soon overlay when monthly is selected', async () => {

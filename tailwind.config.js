@@ -17,6 +17,10 @@ export default {
         primary: {
           DEFAULT: "var(--primary)",
           foreground: "var(--primary-foreground)",
+          light: "var(--primary-light)",
+          muted: "var(--primary-muted)",
+          hover: "var(--primary-hover)",
+          deep: "var(--primary-deep)",
         },
         secondary: {
           DEFAULT: "var(--secondary)",
@@ -33,6 +37,7 @@ export default {
         accent: {
           DEFAULT: "var(--accent)",
           foreground: "var(--accent-foreground)",
+          light: "var(--accent-light)",
         },
         popover: {
           DEFAULT: "var(--popover)",

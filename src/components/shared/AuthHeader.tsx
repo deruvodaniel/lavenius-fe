@@ -51,10 +51,10 @@ export function AuthHeader({
             to="/" 
             className="flex items-center gap-2 hover:opacity-90 transition-opacity"
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-hover rounded-lg flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
               {t('landing.brand')}
             </span>
           </Link>
@@ -94,7 +94,7 @@ export function AuthHeader({
               
               <SignUpButton mode="modal">
                 <Button 
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-0 shadow-sm hover:shadow-md transition-all"
+                  className="bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-deep text-white border-0 shadow-sm hover:shadow-md transition-all"
                 >
                   {t('landing.hero.cta')}
                 </Button>
@@ -116,8 +116,8 @@ export function AuthHeader({
                 appearance={{
                   elements: {
                     // Use CSS classes for consistent theming
-                    avatarBox: 'w-9 h-9 ring-2 ring-transparent hover:ring-indigo-500/50 transition-all',
-                    userButtonTrigger: 'focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none rounded-full',
+                    avatarBox: 'w-9 h-9 ring-2 ring-transparent hover:ring-primary/50 transition-all',
+                    userButtonTrigger: 'focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none rounded-full',
                   }
                 }}
               />
@@ -151,7 +151,7 @@ export function AuthButtons({ className }: { className?: string }) {
         
         <SignUpButton mode="modal">
           <Button 
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+            className="bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-deep text-white"
           >
             {t('landing.hero.cta')}
           </Button>

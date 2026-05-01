@@ -860,7 +860,7 @@ describe('PacienteDrawer', () => {
 
       // Presential button should have active styles
       const presentialButton = screen.getByText('Presencial').closest('button');
-      expect(presentialButton).toHaveClass('border-purple-600');
+      expect(presentialButton).toHaveClass('border-primary');
     });
 
     it('pre-selects frequency from patient data', () => {
@@ -1091,7 +1091,7 @@ describe('PacienteDrawer', () => {
       const remoteButton = screen.getByText('Remoto').closest('button')!;
 
       // Default is presential
-      expect(presentialButton).toHaveClass('border-purple-600');
+      expect(presentialButton).toHaveClass('border-primary');
 
       // Click remote
       await user.click(remoteButton);
@@ -1099,7 +1099,7 @@ describe('PacienteDrawer', () => {
 
       // Click presential again
       await user.click(presentialButton);
-      expect(presentialButton).toHaveClass('border-purple-600');
+      expect(presentialButton).toHaveClass('border-primary');
     });
 
     it('shows custom frequency input when "Otra" is selected', async () => {

@@ -220,7 +220,7 @@ export function LoadingOverlay({ message = 'Cargando...' }: { message?: string }
   return (
     <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-primary-muted border-t-primary rounded-full animate-spin" />
         <p className="text-muted-foreground text-sm">{message}</p>
       </div>
     </div>

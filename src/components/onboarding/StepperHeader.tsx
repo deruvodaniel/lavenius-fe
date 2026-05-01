@@ -34,7 +34,7 @@ export function StepperHeader({ steps, currentStep, className = '' }: StepperHea
           
           {/* Progress bar fill - animated */}
           <div 
-            className="absolute top-5 left-0 h-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 mx-12 transition-all duration-500 ease-out"
+            className="absolute top-5 left-0 h-0.5 bg-gradient-to-r from-primary to-primary-hover mx-12 transition-all duration-500 ease-out"
             style={{ width: `calc(${progressPercent}% - 3rem)` }}
           />
 
@@ -57,9 +57,9 @@ export function StepperHeader({ steps, currentStep, className = '' }: StepperHea
                       relative z-10 flex items-center justify-center w-10 h-10 rounded-full
                       transition-all duration-300 ease-out
                       ${isCompleted 
-                        ? 'bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg shadow-indigo-200' 
+                        ? 'bg-gradient-to-br from-primary to-primary-hover shadow-lg shadow-primary-muted' 
                         : isCurrent 
-                          ? 'bg-gradient-to-br from-indigo-600 to-purple-600 ring-4 ring-indigo-100 shadow-lg shadow-indigo-200' 
+                          ? 'bg-gradient-to-br from-primary to-primary-hover ring-4 ring-primary-muted shadow-lg shadow-primary-muted' 
                           : 'bg-muted border-2 border-border'
                       }
                     `}
@@ -80,7 +80,7 @@ export function StepperHeader({ steps, currentStep, className = '' }: StepperHea
                     className={`
                       mt-2 text-xs font-medium text-center max-w-[80px] leading-tight
                       transition-colors duration-300
-                      ${isCompleted ? 'text-indigo-600' : isCurrent ? 'text-foreground' : 'text-muted-foreground'}
+                      ${isCompleted ? 'text-primary' : isCurrent ? 'text-foreground' : 'text-muted-foreground'}
                     `}
                   >
                     {step.shortTitle || step.title}
@@ -97,7 +97,7 @@ export function StepperHeader({ steps, currentStep, className = '' }: StepperHea
         <div className="flex flex-col items-center gap-3">
           {/* Step counter */}
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-indigo-600">
+            <span className="text-sm font-medium text-primary">
               Paso {currentStep + 1}
             </span>
             <span className="text-sm text-muted-foreground">de {totalSteps}</span>
@@ -106,7 +106,7 @@ export function StepperHeader({ steps, currentStep, className = '' }: StepperHea
           {/* Progress bar */}
           <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full transition-all duration-500 ease-out"
+              className="h-full bg-gradient-to-r from-primary to-primary-hover rounded-full transition-all duration-500 ease-out"
               style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
             />
           </div>

@@ -158,6 +158,7 @@ vi.mock('@/components/shared', () => ({
       </select>
     </div>
   ),
+  BetaBadge: () => <span data-testid="beta-badge">BETA</span>,
 }));
 
 // Mock setting store - must be inline because vi.mock is hoisted

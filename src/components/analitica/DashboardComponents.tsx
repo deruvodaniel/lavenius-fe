@@ -232,7 +232,7 @@ export function SwipeableCards({ children, peek = false }: SwipeableCardsProps) 
             className={cn(
               'w-2 h-2 rounded-full transition-colors',
               index === currentIndex 
-                ? 'bg-indigo-600' 
+                ? 'bg-primary' 
                 : 'bg-border hover:bg-muted-foreground'
             )}
             aria-label={`Go to card ${index + 1}`}
@@ -251,7 +251,7 @@ export function DashboardSkeleton() {
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6">
       {/* Welcome Header Skeleton */}
-      <div className="bg-gradient-to-r from-indigo-900 to-indigo-800 rounded-2xl p-6 sm:p-8">
+      <div className="bg-gradient-to-r from-primary-deep to-primary-deep rounded-2xl p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-2">
             <Skeleton className="h-4 w-32 bg-white/20" />

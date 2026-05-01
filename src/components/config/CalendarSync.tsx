@@ -147,7 +147,7 @@ export default function CalendarSync() {
           <Button
             onClick={connectCalendar}
             disabled={isCheckingConnection}
-            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
+            className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white"
           >
             <ExternalLink className="mr-2 h-4 w-4" />
             {t('settings.calendarSync.connect')}
@@ -159,7 +159,7 @@ export default function CalendarSync() {
             <Button
               onClick={syncCalendar}
               disabled={isSyncing}
-              className="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white"
+              className="flex-1 sm:flex-none bg-primary hover:bg-primary-hover text-white"
             >
               <RefreshCw className={`mr-2 h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
               {isSyncing ? t('settings.calendarSync.syncing') : t('settings.calendarSync.syncNow')}

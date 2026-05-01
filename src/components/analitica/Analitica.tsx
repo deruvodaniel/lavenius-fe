@@ -82,7 +82,7 @@ const TIME_RANGE_KEYS: { value: TimeRange; key: string }[] = [
 ];
 
 const COLORS = {
-  primary: '#4f46e5', // indigo-600
+  primary: 'var(--primary)',
   success: '#22c55e', // green-500
   warning: '#f59e0b', // amber-500
   danger: '#ef4444', // red-500
@@ -178,7 +178,7 @@ interface ChartCardProps {
 
 const ChartCard = ({ title, subtitle, children, className = '', onClick }: ChartCardProps) => (
   <Card
-    className={`p-3 sm:p-4 lg:p-6 bg-card ${className} ${onClick ? 'cursor-pointer hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 transition-all' : ''}`}
+    className={`p-3 sm:p-4 lg:p-6 bg-card ${className} ${onClick ? 'cursor-pointer hover:shadow-md hover:border-primary-muted dark:hover:border-primary-deep transition-all' : ''}`}
     onClick={onClick}
   >
     <div className="mb-3 sm:mb-4">
@@ -912,9 +912,9 @@ export function Analitica() {
       shortLabel: t('dashboard.quickActions.session'),
       icon: Plus,
       onClick: () => navigate('/dashboard/agenda?action=new'),
-      color: 'text-indigo-600',
-      hoverBg: 'hover:bg-indigo-50 dark:hover:bg-indigo-900/20',
-      hoverBorder: 'hover:border-indigo-300 dark:hover:border-indigo-700',
+      color: 'text-primary',
+      hoverBg: 'hover:bg-primary-light dark:hover:bg-primary-deep/20',
+      hoverBorder: 'hover:border-primary-muted dark:hover:border-primary-hover',
     },
     {
       id: 'new-patient',
@@ -942,9 +942,9 @@ export function Analitica() {
       shortLabel: t('dashboard.quickActions.agenda'),
       icon: Calendar,
       onClick: () => navigate('/dashboard/agenda'),
-      color: 'text-purple-600',
-      hoverBg: 'hover:bg-purple-50 dark:hover:bg-purple-900/20',
-      hoverBorder: 'hover:border-purple-300 dark:hover:border-purple-700',
+      color: 'text-primary',
+      hoverBg: 'hover:bg-primary-light dark:hover:bg-primary-deep/20',
+      hoverBorder: 'hover:border-primary-muted dark:hover:border-primary-hover',
     },
   ], [t, navigate]);
 
@@ -1038,7 +1038,7 @@ export function Analitica() {
                           }}
                           className={`w-full justify-start px-4 py-2 h-auto text-sm first:rounded-t-lg last:rounded-b-lg rounded-none ${
                             timeRange === option.value
-                              ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium'
+                              ? 'bg-primary-light dark:bg-primary-deep/30 text-primary-hover dark:text-primary-foreground/60 font-medium'
                               : 'text-foreground'
                           }`}
                         >
@@ -1059,8 +1059,8 @@ export function Analitica() {
               value={stats.totalSessions}
               subtitle={`${stats.completedSessions} ${t('analytics.stats.completed')}`}
               icon={Calendar}
-              iconBg="bg-indigo-100 dark:bg-indigo-900/30"
-              iconColor="text-indigo-600 dark:text-indigo-400"
+              iconBg="bg-primary-muted dark:bg-primary-deep/30"
+              iconColor="text-primary dark:text-primary"
               onClick={() => navigate('/dashboard/agenda')}
               compact={isMobile}
             />
@@ -1086,7 +1086,7 @@ export function Analitica() {
             />
             {/* Completion Rate with Radial Progress */}
             <Card
-              className="p-3 sm:p-4 bg-card cursor-pointer hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 transition-all"
+              className="p-3 sm:p-4 bg-card cursor-pointer hover:shadow-md hover:border-primary-muted dark:hover:border-primary-deep transition-all"
               onClick={() => navigate('/dashboard/agenda')}
             >
               <div className="flex items-center justify-between gap-2">
@@ -1272,7 +1272,7 @@ export function Analitica() {
                               e.stopPropagation();
                               navigate(`/dashboard/agenda?action=new&patientId=${patient.id}`);
                             }}
-                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+                            className="text-primary dark:text-primary hover:text-primary-hover dark:hover:text-primary-foreground/60 hover:bg-primary-light dark:hover:bg-primary-deep/30"
                           >
                             <Plus className="w-4 h-4" />
                           </Button>
@@ -1395,7 +1395,7 @@ export function Analitica() {
                           e.stopPropagation();
                           navigate(`/dashboard/agenda?action=new&patientId=${patient.id}`);
                         }}
-                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+                        className="text-primary dark:text-primary hover:text-primary-hover dark:hover:text-primary-foreground/60 hover:bg-primary-light dark:hover:bg-primary-deep/30"
                       >
                         <Plus className="w-4 h-4 mr-1" />
                         {t('dashboard.quickActions.newSession')}

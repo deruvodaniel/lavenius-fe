@@ -68,9 +68,9 @@ describe('NotFound', () => {
     it('renders support email link', () => {
       renderNotFound();
 
-      const emailLink = screen.getByRole('link', { name: /support@terapp-ia.com/i });
+      const emailLink = screen.getByRole('link', { name: /lavenius.net@gmail.com/i });
       expect(emailLink).toBeInTheDocument();
-      expect(emailLink).toHaveAttribute('href', 'mailto:support@terapp-ia.com');
+      expect(emailLink).toHaveAttribute('href', 'mailto:lavenius.net@gmail.com');
     });
 
     it('renders footer with brand name', () => {
@@ -112,8 +112,8 @@ describe('NotFound', () => {
 
       const backgroundDiv = container.firstChild;
       expect(backgroundDiv).toHaveClass('bg-gradient-to-br');
-      expect(backgroundDiv).toHaveClass('from-indigo-50');
-      expect(backgroundDiv).toHaveClass('to-purple-50');
+      expect(backgroundDiv).toHaveClass('from-primary-light');
+      expect(backgroundDiv).toHaveClass('to-accent-light');
     });
 
     it('has centered layout', () => {
@@ -130,14 +130,14 @@ describe('NotFound', () => {
 
       const errorCode = screen.getByText('404');
       expect(errorCode).toHaveClass('font-black');
-      expect(errorCode).toHaveClass('text-indigo-100');
+      expect(errorCode).toHaveClass('text-primary-foreground');
     });
 
     it('go to home button has primary styling', () => {
       renderNotFound();
 
       const homeButton = screen.getByRole('button', { name: /ir al inicio/i });
-      expect(homeButton).toHaveClass('bg-indigo-600');
+      expect(homeButton).toHaveClass('bg-primary');
       expect(homeButton).toHaveClass('text-white');
     });
   });
@@ -157,7 +157,7 @@ describe('NotFound', () => {
     it('renders mail icon in support section', () => {
       renderNotFound();
 
-      const emailLink = screen.getByRole('link', { name: /support@terapp-ia.com/i });
+      const emailLink = screen.getByRole('link', { name: /lavenius.net@gmail.com/i });
       expect(emailLink.querySelector('svg')).toBeInTheDocument();
     });
   });
@@ -187,7 +187,7 @@ describe('NotFound', () => {
     it('email link is focusable', () => {
       renderNotFound();
 
-      const emailLink = screen.getByRole('link', { name: /support@terapp-ia.com/i });
+      const emailLink = screen.getByRole('link', { name: /lavenius.net@gmail.com/i });
       emailLink.focus();
       expect(emailLink).toHaveFocus();
     });
@@ -254,7 +254,7 @@ describe('NotFound', () => {
       const supportText = screen.getByText(/si el problema persiste/i);
       const supportSection = supportText.closest('div');
 
-      expect(supportSection).toHaveClass('bg-white/60');
+      expect(supportSection).toHaveClass('bg-card/60');
       expect(supportSection).toHaveClass('backdrop-blur-sm');
       expect(supportSection).toHaveClass('rounded-xl');
     });
@@ -262,9 +262,9 @@ describe('NotFound', () => {
     it('email link has hover styling classes', () => {
       renderNotFound();
 
-      const emailLink = screen.getByRole('link', { name: /support@terapp-ia.com/i });
-      expect(emailLink).toHaveClass('text-indigo-600');
-      expect(emailLink).toHaveClass('hover:text-indigo-700');
+      const emailLink = screen.getByRole('link', { name: /lavenius.net@gmail.com/i });
+      expect(emailLink).toHaveClass('text-primary');
+      expect(emailLink).toHaveClass('hover:text-primary-hover');
       expect(emailLink).toHaveClass('transition-colors');
     });
   });

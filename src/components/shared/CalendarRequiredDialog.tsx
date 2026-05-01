@@ -52,8 +52,8 @@ export function CalendarRequiredDialog({
   };
 
   const icon = (
-    <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-      <Calendar className="w-6 h-6 text-indigo-600" />
+    <div className="w-12 h-12 bg-primary-muted rounded-full flex items-center justify-center flex-shrink-0">
+      <Calendar className="w-6 h-6 text-primary" />
     </div>
   );
 

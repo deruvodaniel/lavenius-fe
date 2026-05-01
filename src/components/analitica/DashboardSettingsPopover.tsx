@@ -122,8 +122,8 @@ export function DashboardSettingsPopover({
               onClick={toggleAll}
               className={cn(
                 'text-xs px-2 py-1 rounded',
-                'text-indigo-600 dark:text-indigo-400',
-                'hover:bg-indigo-50 dark:hover:bg-indigo-900/30',
+                'text-primary dark:text-primary',
+                'hover:bg-primary-light dark:hover:bg-primary-deep/30',
                 'transition-colors duration-150'
               )}
             >

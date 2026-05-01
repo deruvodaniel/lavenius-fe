@@ -79,8 +79,8 @@ export const PaymentCard = ({ payment, onMarkAsPaid, onDelete }: PaymentCardProp
           <div className="flex-1 space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                  <span className="text-indigo-600 text-xs font-semibold">
+                <div className="w-8 h-8 bg-primary-muted rounded-full flex items-center justify-center">
+                  <span className="text-primary text-xs font-semibold">
                     {getNameInitials(patientName)}
                   </span>
                 </div>

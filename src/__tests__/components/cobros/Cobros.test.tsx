@@ -410,6 +410,10 @@ vi.mock('../../../components/shared', () => ({
       <p>{description}</p>
     </div>
   ),
+  NativeSelect: ({ children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement> & { children?: React.ReactNode }) => (
+    <select data-testid="native-select" {...props}>{children}</select>
+  ),
+  BetaBadge: () => <span data-testid="beta-badge">Beta</span>,
 }));
 
 // Import mocked hooks for dynamic returns
@@ -664,7 +668,7 @@ describe('Cobros', () => {
       
       // Button should now be active
       const weekButton = screen.getByRole('button', { name: 'Esta semana' });
-      expect(weekButton).toHaveClass('bg-indigo-600');
+      expect(weekButton).toHaveClass('bg-primary');
     });
 
     it('applies "Este mes" quick filter when clicked', async () => {
@@ -674,7 +678,7 @@ describe('Cobros', () => {
       await user.click(screen.getByRole('button', { name: 'Este mes' }));
       
       const monthButton = screen.getByRole('button', { name: 'Este mes' });
-      expect(monthButton).toHaveClass('bg-indigo-600');
+      expect(monthButton).toHaveClass('bg-primary');
     });
 
     it('shows date range inputs when "Rango" is clicked', async () => {

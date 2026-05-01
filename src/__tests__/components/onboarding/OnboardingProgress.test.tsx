@@ -133,7 +133,7 @@ describe('OnboardingProgress', () => {
       render(<OnboardingProgress currentStep={1} totalSteps={4} />);
       
       const currentDot = screen.getByRole('button', { name: 'Paso 2 de 4' });
-      expect(currentDot).toHaveClass('bg-indigo-600');
+      expect(currentDot).toHaveClass('bg-primary');
     });
 
     it('completed steps have secondary color', () => {
@@ -142,15 +142,15 @@ describe('OnboardingProgress', () => {
       const completedDot1 = screen.getByRole('button', { name: 'Paso 1 de 4' });
       const completedDot2 = screen.getByRole('button', { name: 'Paso 2 de 4' });
       
-      expect(completedDot1).toHaveClass('bg-indigo-400');
-      expect(completedDot2).toHaveClass('bg-indigo-400');
+      expect(completedDot1).toHaveClass('bg-primary');
+      expect(completedDot2).toHaveClass('bg-primary');
     });
 
     it('future steps have neutral color', () => {
       render(<OnboardingProgress currentStep={0} totalSteps={4} />);
       
       const futureDot = screen.getByRole('button', { name: 'Paso 2 de 4' });
-      expect(futureDot).toHaveClass('bg-gray-300');
+      expect(futureDot).toHaveClass('bg-muted');
     });
 
     it('non-current dots have standard width', () => {
@@ -268,22 +268,22 @@ describe('OnboardingProgress', () => {
       
       const dot = screen.getByRole('button', { name: 'Paso 1 de 1' });
       expect(dot).toHaveAttribute('aria-current', 'step');
-      expect(dot).toHaveClass('bg-indigo-600');
+      expect(dot).toHaveClass('bg-primary');
     });
 
     it('correctly shows all steps as completed except current on last step', () => {
       render(<OnboardingProgress currentStep={3} totalSteps={4} />);
       
-      // Steps 1, 2, 3 should be completed (indigo-400)
+      // Steps 1, 2, 3 should be completed (primary)
       const step1 = screen.getByRole('button', { name: 'Paso 1 de 4' });
       const step2 = screen.getByRole('button', { name: 'Paso 2 de 4' });
       const step3 = screen.getByRole('button', { name: 'Paso 3 de 4' });
       const step4 = screen.getByRole('button', { name: 'Paso 4 de 4' });
       
-      expect(step1).toHaveClass('bg-indigo-400');
-      expect(step2).toHaveClass('bg-indigo-400');
-      expect(step3).toHaveClass('bg-indigo-400');
-      expect(step4).toHaveClass('bg-indigo-600'); // Current step
+      expect(step1).toHaveClass('bg-primary');
+      expect(step2).toHaveClass('bg-primary');
+      expect(step3).toHaveClass('bg-primary');
+      expect(step4).toHaveClass('bg-primary'); // Current step
     });
   });
 

@@ -160,11 +160,11 @@ describe('ConfirmDialog', () => {
   });
 
   describe('Variants', () => {
-    it('renders default variant with indigo styling', () => {
+    it('renders default variant with primary styling', () => {
       render(<ConfirmDialog {...defaultProps} variant="default" />);
 
       const confirmButton = screen.getByRole('button', { name: 'Confirmar' });
-      expect(confirmButton).toHaveClass('bg-indigo-600');
+      expect(confirmButton).toHaveClass('bg-primary');
     });
 
     it('renders danger variant with red styling', () => {
@@ -209,7 +209,7 @@ describe('ConfirmDialog', () => {
 
       // Default variant styling should still apply
       const confirmButton = screen.getByRole('button', { name: 'Confirmar' });
-      expect(confirmButton).toHaveClass('bg-indigo-600');
+      expect(confirmButton).toHaveClass('bg-primary');
     });
   });
 

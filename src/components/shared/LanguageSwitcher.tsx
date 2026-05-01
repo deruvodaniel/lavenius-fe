@@ -177,7 +177,7 @@ export function LanguageSwitcher({
                     className={cn(
                       'w-full justify-start gap-3 px-3 py-2.5 h-auto',
                       isActive
-                        ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-50'
+                        ? 'bg-primary-light text-primary-hover hover:bg-primary-light'
                         : 'text-foreground'
                     )}
                   >
@@ -185,7 +185,7 @@ export function LanguageSwitcher({
                     <span className="flex-1 text-left">{lang.label}</span>
                     {isActive && (
                       <Check
-                        className="h-4 w-4 text-indigo-600 shrink-0"
+                        className="h-4 w-4 text-primary shrink-0"
                         aria-hidden="true"
                       />
                     )}

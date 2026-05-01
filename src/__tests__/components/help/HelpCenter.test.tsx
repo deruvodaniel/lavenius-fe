@@ -121,7 +121,7 @@ describe('HelpCenter', () => {
     it('renders the help icon in header', () => {
       renderHelpCenter();
       // The icon is in a container div
-      const iconContainer = document.querySelector('.bg-indigo-100.rounded-full');
+      const iconContainer = document.querySelector('.bg-primary-muted.rounded-full');
       expect(iconContainer).toBeInTheDocument();
       expect(iconContainer?.querySelector('svg')).toBeInTheDocument();
     });
@@ -176,7 +176,7 @@ describe('HelpCenter', () => {
     it('renders category icons', () => {
       renderHelpCenter();
       // Each category card has an icon container
-      const iconContainers = document.querySelectorAll('.w-10.h-10.bg-indigo-100');
+      const iconContainers = document.querySelectorAll('.w-10.h-10.bg-primary-muted');
       expect(iconContainers.length).toBe(4);
     });
 
@@ -640,7 +640,7 @@ describe('HelpCenter', () => {
       await user.click(screen.getByRole('button', { name: /crear un turno/i }));
 
       // Article should be in a card with border
-      const articleCard = document.querySelector('.bg-white.rounded-lg.border');
+      const articleCard = document.querySelector('.bg-card.rounded-lg.border');
       expect(articleCard).toBeInTheDocument();
     });
 
@@ -651,7 +651,7 @@ describe('HelpCenter', () => {
       await user.click(screen.getByRole('button', { name: /cobros/i }));
       await user.click(screen.getByRole('button', { name: /enviar recordatorio/i }));
 
-      const tagBadges = document.querySelectorAll('.bg-gray-100.text-gray-600');
+      const tagBadges = document.querySelectorAll('.bg-muted.text-muted-foreground');
       expect(tagBadges.length).toBeGreaterThan(0);
     });
   });
@@ -672,7 +672,7 @@ describe('HelpCenter', () => {
       renderHelpCenter();
       
       const contactSection = screen.getByText('¿No encontraste lo que buscabas?').closest('div');
-      expect(contactSection).toHaveClass('bg-gray-50');
+      expect(contactSection).toHaveClass('bg-muted');
       expect(contactSection).toHaveClass('rounded-lg');
     });
 
@@ -689,7 +689,7 @@ describe('HelpCenter', () => {
       renderHelpCenter();
       
       const categoryCard = screen.getByRole('button', { name: /agenda/i });
-      expect(categoryCard).toHaveClass('hover:border-indigo-300');
+      expect(categoryCard).toHaveClass('hover:border-primary-muted');
       expect(categoryCard).toHaveClass('hover:shadow-md');
     });
   });

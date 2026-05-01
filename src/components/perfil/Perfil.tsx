@@ -261,7 +261,7 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
     <div className="space-y-4 sm:space-y-6">
       {/* Avatar, Basic Info & Share Actions */}
       <Card className="overflow-hidden">
-          <div className="p-4 sm:p-6 bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900">
+          <div className="p-4 sm:p-6 bg-gradient-to-r from-primary-deep via-primary-deep to-primary-deep">
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               {/* Avatar */}
               <div className="relative group flex-shrink-0">
@@ -312,7 +312,7 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
                 <h2 className="text-lg sm:text-xl font-bold text-white">
                   {user ? `${user.firstName} ${user.lastName}` : 'Usuario'}
                 </h2>
-                <p className="text-indigo-200 text-sm mt-0.5">{user?.email}</p>
+                <p className="text-primary-foreground/80 text-sm mt-0.5">{user?.email}</p>
                 {profile.specialty && (
                   <p className="text-white/80 text-sm mt-1.5 flex items-center justify-center sm:justify-start gap-1.5">
                     <Award className="w-4 h-4" />
@@ -320,7 +320,7 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
                   </p>
                 )}
                 {(profile.licenseNumber || user?.licenseNumber) && (
-                  <p className="text-indigo-200 text-xs mt-0.5">
+                  <p className="text-primary-foreground/80 text-xs mt-0.5">
                     {t('profile.professional.licenseNumber')}: {profile.licenseNumber || user?.licenseNumber}
                   </p>
                 )}
@@ -348,7 +348,7 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
                     navigator.clipboard.writeText(bookingUrl);
                     toast.success(t('profile.share.bookingLinkCopied'));
                   }}
-                  className="bg-white/10 hover:bg-white/20 text-indigo-200 border-0"
+                  className="bg-white/10 hover:bg-white/20 text-primary-foreground/80 border-0"
                 >
                   <Copy className="w-4 h-4 mr-1.5" />
                   {t('profile.share.copyBookingLink')}
@@ -361,8 +361,8 @@ export const Perfil = forwardRef<PerfilHandle, PerfilProps>(function Perfil({ on
         {/* Professional Info */}
         <ProfileSection
           icon={Award}
-          iconColor="text-indigo-600 dark:text-indigo-400"
-          iconBg="bg-indigo-100 dark:bg-indigo-950/50"
+          iconColor="text-primary dark:text-primary"
+          iconBg="bg-primary-muted dark:bg-primary-deep/50"
           title={t('profile.professional.title')}
           description={t('profile.professional.description')}
         >

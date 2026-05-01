@@ -123,11 +123,11 @@ export function TurnoCard({
           className="flex items-center gap-2 min-w-0 flex-1 text-left h-auto p-1 justify-start group"
           disabled={!patient}
         >
-          <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-200 transition-colors">
-            <span className="text-indigo-600 text-xs font-semibold">{initials}</span>
+          <div className="w-8 h-8 bg-primary-muted rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-primary-muted transition-colors">
+            <span className="text-primary text-xs font-semibold">{initials}</span>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-foreground truncate group-hover:text-indigo-600 transition-colors">
+            <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
               {patientName}
             </p>
             {/* Secondary info line - status + modality */}
@@ -173,7 +173,7 @@ export function TurnoCard({
           {/* Compact view: show modality icon */}
           {isCompactView && (
             <span 
-              className={`p-1 rounded ${isRemote ? 'text-blue-600' : 'text-purple-600'}`}
+              className={`p-1 rounded ${isRemote ? 'text-blue-600' : 'text-primary'}`}
               title={isRemote ? t('agenda.sessionTypes.remote') : t('agenda.sessionTypes.presential')}
             >
               {isRemote ? <Video className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}

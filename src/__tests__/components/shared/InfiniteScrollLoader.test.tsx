@@ -183,7 +183,7 @@ describe('InfiniteScrollLoader', () => {
       dots.forEach((dot) => {
         expect(dot).toHaveClass('w-2');
         expect(dot).toHaveClass('h-2');
-        expect(dot).toHaveClass('bg-indigo-600');
+        expect(dot).toHaveClass('bg-primary');
         expect(dot).toHaveClass('rounded-full');
       });
     });
@@ -228,7 +228,7 @@ describe('InfiniteScrollLoader', () => {
 
       const loadingText = screen.getByText('Cargando más...');
       expect(loadingText).toHaveClass('text-sm');
-      expect(loadingText).toHaveClass('text-gray-500');
+      expect(loadingText).toHaveClass('text-muted-foreground');
     });
 
     it('loading content is flexbox centered', () => {

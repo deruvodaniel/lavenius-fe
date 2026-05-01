@@ -163,22 +163,22 @@ describe('CalendarView', () => {
 
       // Find the day cell for today (15th)
       const dayCell = screen.getByText('15').closest('div');
-      expect(dayCell).toHaveClass('border-indigo-600');
-      expect(dayCell).toHaveClass('bg-indigo-50');
+      expect(dayCell).toHaveClass('border-primary');
+      expect(dayCell).toHaveClass('bg-primary-light');
     });
 
-    it('today text has indigo color', () => {
+    it('today text has primary color', () => {
       render(<CalendarView {...defaultProps} />);
 
       const todaySpan = screen.getByText('15');
-      expect(todaySpan).toHaveClass('text-indigo-600');
+      expect(todaySpan).toHaveClass('text-primary');
     });
 
     it('does not highlight other days as today', () => {
       render(<CalendarView {...defaultProps} />);
 
       const otherDay = screen.getByText('10').closest('div');
-      expect(otherDay).not.toHaveClass('border-indigo-600');
+      expect(otherDay).not.toHaveClass('border-primary');
     });
   });
 
@@ -188,15 +188,15 @@ describe('CalendarView', () => {
 
       // Day 10 is in the past (today is 15th)
       const pastDaySpan = screen.getByText('10');
-      expect(pastDaySpan).toHaveClass('text-gray-400');
+      expect(pastDaySpan).toHaveClass('text-muted-foreground');
     });
 
     it('past day cells have gray background', () => {
       render(<CalendarView {...defaultProps} />);
 
       const pastDay = screen.getByText('5').closest('div');
-      expect(pastDay).toHaveClass('bg-gray-50');
-      expect(pastDay).toHaveClass('border-gray-100');
+      expect(pastDay).toHaveClass('bg-muted');
+      expect(pastDay).toHaveClass('border-border');
     });
 
     it('future days do not have past styling', () => {
@@ -204,8 +204,8 @@ describe('CalendarView', () => {
 
       // Day 20 is in the future
       const futureDay = screen.getByText('20');
-      expect(futureDay).not.toHaveClass('text-gray-400');
-      expect(futureDay).toHaveClass('text-gray-700');
+      expect(futureDay).not.toHaveClass('text-muted-foreground');
+      expect(futureDay).toHaveClass('text-foreground');
     });
   });
 
@@ -259,7 +259,7 @@ describe('CalendarView', () => {
       );
 
       const badge = screen.getByText('45');
-      expect(badge).toHaveClass('bg-indigo-600');
+      expect(badge).toHaveClass('bg-primary');
       expect(badge).toHaveClass('text-white');
       expect(badge).toHaveClass('text-xs');
       expect(badge).toHaveClass('rounded-full');
@@ -291,7 +291,7 @@ describe('CalendarView', () => {
       );
 
       const todayCell = screen.getByText('15').closest('div');
-      expect(todayCell).toHaveClass('bg-indigo-600');
+      expect(todayCell).toHaveClass('bg-primary');
       expect(todayCell).toHaveClass('text-white');
       expect(todayCell).toHaveClass('font-bold');
     });
@@ -518,23 +518,23 @@ describe('CalendarView', () => {
       render(<CalendarView {...defaultProps} />);
 
       const prevButton = screen.getByRole('button', { name: /mes anterior/i });
-      expect(prevButton).toHaveClass('hover:bg-gray-100');
+      expect(prevButton).toHaveClass('hover:bg-muted');
     });
 
-    it('today button has indigo styling', () => {
+    it('today button has primary styling', () => {
       render(<CalendarView {...defaultProps} />);
 
       const todayButton = screen.getByRole('button', { name: 'Hoy' });
-      expect(todayButton).toHaveClass('bg-indigo-100');
-      expect(todayButton).toHaveClass('text-indigo-600');
-      expect(todayButton).toHaveClass('hover:bg-indigo-200');
+      expect(todayButton).toHaveClass('bg-primary-muted');
+      expect(todayButton).toHaveClass('text-primary');
+      expect(todayButton).toHaveClass('hover:bg-primary-muted');
     });
 
     it('future days have hover state', () => {
       render(<CalendarView {...defaultProps} />);
 
       const futureDay = screen.getByText('20').closest('div');
-      expect(futureDay).toHaveClass('hover:border-indigo-300');
+      expect(futureDay).toHaveClass('hover:border-primary-muted');
     });
   });
 

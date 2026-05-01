@@ -100,8 +100,8 @@ export function AgendaSessionList({
               return (
                 <div key={fecha} className="space-y-3">
                   {/* Date Header */}
-                  <div className={`pb-2 border-b-2 ${isToday ? 'border-indigo-600' : 'border-border'}`}>
-                    <h3 className={`capitalize ${isToday ? 'text-indigo-600' : 'text-foreground'}`}>
+                  <div className={`pb-2 border-b-2 ${isToday ? 'border-primary' : 'border-border'}`}>
+                    <h3 className={`capitalize ${isToday ? 'text-primary' : 'text-foreground'}`}>
                       {formatFecha(fecha)}
                     </h3>
                   </div>
@@ -147,9 +147,9 @@ export function AgendaSessionList({
                 {isLoadingMore ? (
                   <div className="flex flex-col items-center gap-3">
                     <div className="inline-flex items-center gap-2">
-                      <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
                     <p className="text-sm text-muted-foreground">{t('agenda.loadingMore')}</p>
                   </div>
