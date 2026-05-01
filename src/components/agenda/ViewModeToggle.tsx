@@ -40,7 +40,7 @@ export function ViewModeToggle({ value, onChange, isMobile, labels }: ViewModeTo
             className={cn(
               'gap-1.5 h-auto px-3 py-1.5',
               isActive
-                ? 'bg-background text-indigo-600 shadow-sm hover:bg-background'
+                ? 'bg-background text-primary shadow-sm hover:bg-background'
                 : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
             )}
             aria-pressed={isActive}

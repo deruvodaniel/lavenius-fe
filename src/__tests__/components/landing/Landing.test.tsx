@@ -268,6 +268,7 @@ vi.mock('@/components/shared', () => ({
     <div data-testid="animated-section" className={className}>{children}</div>
   ),
   LanguageSwitcher: () => <div data-testid="language-switcher">Language Switcher</div>,
+  BetaBadge: () => <span data-testid="beta-badge">BETA</span>,
 }));
 
 // ============================================================================

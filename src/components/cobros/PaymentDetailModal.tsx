@@ -128,7 +128,7 @@ function PaymentDetailContent({
   return (
     <>
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 sm:p-5">
+      <div className="bg-gradient-to-r from-primary-deep to-primary-hover text-white p-4 sm:p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -138,14 +138,14 @@ function PaymentDetailContent({
               <h2 className="text-lg font-semibold">
                 {t('payments.paymentDetail')}
               </h2>
-              <p className="text-indigo-200 text-sm">{formatShortDate(payment.paymentDate)}</p>
+              <p className="text-primary-foreground/80 text-sm">{formatShortDate(payment.paymentDate)}</p>
             </div>
           </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="text-indigo-200 hover:text-white"
+            className="text-primary-foreground/80 hover:text-white"
             aria-label={t('common.close')}
           >
             <X className="w-6 h-6" />

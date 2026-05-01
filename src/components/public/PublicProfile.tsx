@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Award, Mail, Phone, Globe, MapPin, Instagram, Linkedin, Calendar, Clock, Copy } from 'lucide-react';
+import { ArrowLeft, Award, Mail, Phone, Globe, MapPin, Instagram, Linkedin, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { getNameInitials } from '@/lib/utils/nameInitials';
-import { toast } from 'sonner';
 
 // ============================================================================
 // PROFILE DATA (reuses same localStorage key as Perfil)
@@ -45,8 +44,6 @@ export function PublicProfile() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const profile = loadProfile();
-  const therapistId = user?.therapistId;
-  const bookingUrl = therapistId ? `${window.location.origin}/book/${therapistId}` : '';
 
   const fullName = user ? `${user.firstName} ${user.lastName || ''}`.trim() : '';
   const initials = user
@@ -81,7 +78,7 @@ export function PublicProfile() {
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         {/* Hero Card */}
         <Card className="overflow-hidden">
-          <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 px-6 pt-8 pb-16" />
+          <div className="bg-gradient-to-r from-primary-deep via-primary-deep to-primary-deep px-6 pt-8 pb-16" />
           <div className="px-6 pb-6 -mt-12">
             <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4">
               {/* Avatar */}
@@ -93,8 +90,8 @@ export function PublicProfile() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-indigo-100 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-indigo-600">{initials}</span>
+                  <div className="w-full h-full bg-primary-muted flex items-center justify-center">
+                    <span className="text-2xl font-bold text-primary">{initials}</span>
                   </div>
                 )}
               </div>
@@ -103,7 +100,7 @@ export function PublicProfile() {
               <div className="text-center sm:text-left flex-1 min-w-0 pb-1">
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground">{fullName || 'Terapeuta'}</h1>
                 {profile.specialty ? (
-                  <p className="text-indigo-600 font-medium flex items-center justify-center sm:justify-start gap-1.5 mt-1">
+                  <p className="text-primary font-medium flex items-center justify-center sm:justify-start gap-1.5 mt-1">
                     <Award className="w-4 h-4" />
                     {profile.specialty}
                   </p>
@@ -165,14 +162,14 @@ export function PublicProfile() {
               )}
               {profile.website && (
                 <div className="flex items-center gap-3 text-foreground">
-                  <div className="w-9 h-9 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Globe className="w-4 h-4 text-indigo-600" />
+                  <div className="w-9 h-9 bg-primary-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Globe className="w-4 h-4 text-primary" />
                   </div>
                   <a
                     href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-indigo-600 hover:underline"
+                    className="text-sm text-primary hover:underline"
                   >
                     {profile.website}
                   </a>
@@ -194,7 +191,7 @@ export function PublicProfile() {
                   href={`https://instagram.com/${profile.socialMedia.instagram.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-50 to-pink-50 border border-pink-200 rounded-lg text-sm text-pink-700 hover:from-purple-100 hover:to-pink-100 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-light to-pink-50 border border-pink-200 rounded-lg text-sm text-pink-700 hover:from-primary-muted hover:to-pink-100 transition-colors"
                 >
                   <Instagram className="w-4 h-4" />
                   {profile.socialMedia.instagram}
@@ -216,29 +213,17 @@ export function PublicProfile() {
         )}
 
         {/* Book Session CTA */}
-        <Card className="p-6 bg-gradient-to-r from-indigo-900/40 via-indigo-900/30 to-purple-900/40 border-indigo-700/50">
+        <Card className="p-6 bg-gradient-to-r from-primary-light to-accent-light border-primary-muted">
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="w-12 h-12 bg-indigo-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <Calendar className="w-6 h-6 text-indigo-300" />
+            <div className="w-12 h-12 bg-primary-muted rounded-full flex items-center justify-center flex-shrink-0">
+              <Calendar className="w-6 h-6 text-primary" />
             </div>
             <div className="flex-1 text-center sm:text-left">
               <h3 className="font-semibold text-foreground">{t('profile.share.bookSession')}</h3>
-              <p className="text-sm text-indigo-200/90 mt-0.5">{t('profile.share.bookSessionDescription')}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{t('profile.share.bookSessionDescription')}</p>
             </div>
-            <Button
-              className="w-full sm:w-auto"
-              disabled={!bookingUrl}
-              onClick={() => {
-                if (!bookingUrl) {
-                  toast.error(t('profile.share.bookingLinkUnavailable'));
-                  return;
-                }
-                navigator.clipboard.writeText(bookingUrl);
-                toast.success(t('profile.share.bookingLinkCopied'));
-              }}
-            >
-              <Copy className="w-4 h-4 mr-2" />
-              {t('profile.share.copyBookingLink')}
+            <Button disabled className="w-full sm:w-auto">
+              {t('profile.share.bookSession')}
             </Button>
           </div>
         </Card>

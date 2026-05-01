@@ -60,7 +60,7 @@ export function CalendarView({
             variant="secondary"
             size="sm"
             onClick={onToday}
-            className="bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+            className="bg-primary-muted text-primary hover:bg-primary-muted"
           >
             {t('agenda.calendar.today')}
           </Button>
@@ -102,21 +102,21 @@ export function CalendarView({
               key={day}
               className={`aspect-square p-2 rounded-lg border transition-colors flex flex-col items-center justify-center ${
                 isToday
-                  ? 'border-indigo-600 bg-indigo-50'
+                  ? 'border-primary bg-primary-light'
                   : isPast
                   ? 'border-border bg-muted'
-                  : 'border-border hover:border-indigo-300'
-              } ${isMobile && isToday ? 'bg-indigo-600 text-white font-bold' : ''}`}
+                  : 'border-border hover:border-primary-muted'
+              } ${isMobile && isToday ? 'bg-primary text-white font-bold' : ''}`}
             >
               <span
                 className={`text-sm ${
-                  isToday && isMobile ? 'text-white' : isToday ? 'text-indigo-600' : isPast ? 'text-muted-foreground' : 'text-foreground'
+                  isToday && isMobile ? 'text-white' : isToday ? 'text-primary' : isPast ? 'text-muted-foreground' : 'text-foreground'
                 }`}
               >
                 {day}
               </span>
               {turnosCount > 0 && (
-                <span className={`${isToday && isMobile ? 'text-white' : 'bg-indigo-600 text-white'} text-xs px-2 py-0.5 rounded-full mt-1`}>
+                <span className={`${isToday && isMobile ? 'text-white' : 'bg-primary text-white'} text-xs px-2 py-0.5 rounded-full mt-1`}>
                   {turnosCount}
                 </span>
               )}

@@ -571,7 +571,7 @@ describe('PaymentCard', () => {
     it('avatar has correct styling', () => {
       render(<PaymentCard {...defaultProps} />);
 
-      const avatar = screen.getByText('JP').closest('.bg-indigo-100');
+      const avatar = screen.getByText('JP').closest('.bg-primary-muted');
       expect(avatar).toBeInTheDocument();
       expect(avatar).toHaveClass('rounded-full', 'w-8', 'h-8');
     });

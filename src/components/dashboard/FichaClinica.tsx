@@ -261,7 +261,7 @@ export function FichaClinica({ patient, onBack }: FichaClinicaProps) {
       <Button
         variant="ghost"
         onClick={() => onBack ? onBack() : navigate(-1)}
-        className="pl-0 gap-2 text-indigo-600 hover:text-indigo-700 mb-6"
+        className="pl-0 gap-2 text-primary hover:text-primary-hover mb-6"
       >
         <ArrowLeft className="w-5 h-5" />
         <span>{t('common.back')}</span>

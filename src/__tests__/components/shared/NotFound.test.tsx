@@ -112,8 +112,8 @@ describe('NotFound', () => {
 
       const backgroundDiv = container.firstChild;
       expect(backgroundDiv).toHaveClass('bg-gradient-to-br');
-      expect(backgroundDiv).toHaveClass('from-indigo-50');
-      expect(backgroundDiv).toHaveClass('to-purple-50');
+      expect(backgroundDiv).toHaveClass('from-primary-light');
+      expect(backgroundDiv).toHaveClass('to-accent-light');
     });
 
     it('has centered layout', () => {
@@ -130,14 +130,14 @@ describe('NotFound', () => {
 
       const errorCode = screen.getByText('404');
       expect(errorCode).toHaveClass('font-black');
-      expect(errorCode).toHaveClass('text-indigo-100');
+      expect(errorCode).toHaveClass('text-primary-foreground');
     });
 
     it('go to home button has primary styling', () => {
       renderNotFound();
 
       const homeButton = screen.getByRole('button', { name: /ir al inicio/i });
-      expect(homeButton).toHaveClass('bg-indigo-600');
+      expect(homeButton).toHaveClass('bg-primary');
       expect(homeButton).toHaveClass('text-white');
     });
   });
@@ -254,7 +254,7 @@ describe('NotFound', () => {
       const supportText = screen.getByText(/si el problema persiste/i);
       const supportSection = supportText.closest('div');
 
-      expect(supportSection).toHaveClass('bg-white/60');
+      expect(supportSection).toHaveClass('bg-card/60');
       expect(supportSection).toHaveClass('backdrop-blur-sm');
       expect(supportSection).toHaveClass('rounded-xl');
     });

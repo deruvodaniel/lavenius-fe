@@ -71,7 +71,7 @@ export function RadialProgress({
   size = 80,
   strokeWidth = 8,
   className,
-  color = '#4f46e5',
+  color = 'var(--primary)',
   trackColor = '#e5e7eb',
   showValue = true,
   label,
@@ -140,7 +140,7 @@ export function Sparkline({
   data,
   width = 80,
   height = 24,
-  color = '#4f46e5',
+  color = 'var(--primary)',
   fillColor,
   className,
 }: SparklineProps) {
@@ -213,7 +213,7 @@ export function MiniStatCard({
   iconColor,
   trend,
   sparklineData,
-  sparklineColor = '#4f46e5',
+  sparklineColor = 'var(--primary)',
   onClick,
   compact = false,
 }: MiniStatCardProps) {
@@ -222,7 +222,7 @@ export function MiniStatCard({
       className={cn(
         'bg-card transition-all duration-200',
         compact ? 'p-3' : 'p-4',
-        onClick && 'cursor-pointer hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800'
+        onClick && 'cursor-pointer hover:shadow-md hover:border-primary-muted dark:hover:border-primary-deep'
       )}
       onClick={onClick}
     >
@@ -296,7 +296,7 @@ export function AnimatedProgress({
   max = 100,
   label,
   showValue = true,
-  color = 'bg-indigo-600',
+  color = 'bg-primary',
   className,
   size = 'md',
 }: AnimatedProgressProps) {
@@ -357,7 +357,7 @@ export function CompactHeader({
   return (
     <div 
       className={cn(
-        'sticky top-0 z-50 bg-gradient-to-r from-indigo-900 to-indigo-800 text-white shadow-lg transition-all duration-300',
+        'sticky top-0 z-50 bg-gradient-to-r from-primary-deep to-primary-deep text-white shadow-lg transition-all duration-300',
         isScrolled 
           ? 'rounded-none py-3 px-4 sm:px-6 -mx-4 md:-mx-6 lg:-mx-8 w-[calc(100%+2rem)] md:w-[calc(100%+3rem)] lg:w-[calc(100%+4rem)]' 
           : 'rounded-2xl p-6 sm:p-8',
@@ -367,7 +367,7 @@ export function CompactHeader({
       <div className="flex items-start sm:items-center justify-between gap-2 sm:gap-4">
         <div className={cn('transition-all duration-300', isScrolled && 'flex items-center gap-3')}>
           {!isScrolled && (
-            <p className="text-indigo-200 text-sm font-medium mb-1">
+            <p className="text-primary-foreground/80 text-sm font-medium mb-1">
               {subtitle}
             </p>
           )}
@@ -515,7 +515,7 @@ export function TodaySummaryWidget({
             variant="link"
             size="sm"
             onClick={onViewAgenda}
-            className="text-xs text-indigo-600 dark:text-indigo-400 h-auto p-0"
+            className="text-xs text-primary dark:text-primary h-auto p-0"
           >
             {t('dashboard.quickActions.viewAgenda')}
           </Button>
@@ -529,7 +529,7 @@ export function TodaySummaryWidget({
             value={completionRate} 
             size={48}
             strokeWidth={5}
-            color={completionRate >= 75 ? '#22c55e' : completionRate >= 50 ? '#f59e0b' : '#4f46e5'}
+            color={completionRate >= 75 ? '#22c55e' : completionRate >= 50 ? '#f59e0b' : 'var(--primary)'}
           />
           <div>
             <p className="text-xs text-muted-foreground">
@@ -559,8 +559,8 @@ export function TodaySummaryWidget({
         {/* Next Session */}
         {data.nextSession ? (
           <div className="flex items-center gap-3 col-span-2 sm:col-span-2">
-            <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="w-10 h-10 rounded-lg bg-primary-muted dark:bg-primary-deep/30 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-primary dark:text-primary" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs text-muted-foreground">
@@ -570,7 +570,7 @@ export function TodaySummaryWidget({
                 {data.nextSession.time} - {data.nextSession.patientName}
               </p>
               {data.nextSession.minutesUntil > 0 && (
-                <p className="text-[10px] text-indigo-600 dark:text-indigo-400">
+                <p className="text-[10px] text-primary dark:text-primary">
                   {t('dashboard.todaySummary.inMinutes', { minutes: data.nextSession.minutesUntil })}
                 </p>
               )}

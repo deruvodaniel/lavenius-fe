@@ -10,103 +10,115 @@ html {
 @layer base {
   :root {
     /* Background & Foreground */
-    --background: #ffffff;
-    --foreground: #0f172a;
-    
+    --background: #F9F7EB;
+    --foreground: #2D0051;
+
     /* Card */
     --card: #ffffff;
-    --card-foreground: #0f172a;
-    
+    --card-foreground: #2D0051;
+
     /* Popover */
-    --popover: #ffffff;
-    --popover-foreground: #0f172a;
-    
-    /* Primary - Indigo 600 */
-    --primary: #4f46e5;
+    --popover: #EAE4F4;
+    --popover-foreground: #2D0051;
+
+    /* Primary — brand purple */
+    --primary: #2D0051;
     --primary-foreground: #ffffff;
-    
-    /* Secondary - Slate 100 */
-    --secondary: #f1f5f9;
-    --secondary-foreground: #0f172a;
-    
-    /* Muted - Slate 100/500 */
-    --muted: #f1f5f9;
-    --muted-foreground: #64748b;
-    
-    /* Accent - Slate 100 */
-    --accent: #f1f5f9;
-    --accent-foreground: #0f172a;
-    
-    /* Destructive - Red 500 */
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
-    
+
+    /* Secondary */
+    --secondary: #EAE4F4;
+    --secondary-foreground: #2D0051;
+
+    /* Muted */
+    --muted: #EAE4F4;
+    --muted-foreground: #9070AA;
+
+    /* Accent — lime */
+    --accent: #D3E141;
+    --accent-foreground: #3D4010;
+
+    /* Destructive */
+    --destructive: #B94A6A;
+    --destructive-foreground: #FFF0F5;
+
     /* Border, Input, Ring */
-    --border: #e2e8f0;
-    --input: #e2e8f0;
-    --input-background: #f3f4f6;
-    --ring: #4f46e5;
-    --switch-background: #cbd5e1;
-    
+    --border: #DDD5EE;
+    --input: #DDD5EE;
+    --input-background: #EAE4F4;
+    --ring: #2D0051;
+    --switch-background: #C5BAFF;
+
+    /* Primary variants — intermediate shades for surfaces, hover, sidebar */
+    --primary-light: #F1ECF8;
+    --primary-muted: #EAE4F4;
+    --primary-hover: #3D1A6E;
+    --primary-deep: #1A0A33;
+    --accent-light: #F4F7D6;
+
     /* Radius */
     --radius: 0.5rem;
-    
+
     /* Chart colors */
-    --chart-1: #4f46e5;
-    --chart-2: #06b6d4;
-    --chart-3: #10b981;
-    --chart-4: #f59e0b;
-    --chart-5: #ef4444;
+    --chart-1: #2D0051;
+    --chart-2: #D3E141;
+    --chart-3: #C5BAFF;
+    --chart-4: #8B5CF6;
+    --chart-5: #B94A6A;
   }
 
   .dark {
     /* Background & Foreground */
-    --background: #0f172a;        /* slate-900 — deepest layer */
-    --foreground: #f8fafc;
+    --background: #1A1228;
+    --foreground: #F1ECF8;
 
-    /* Card — slate-800 pushed slightly lighter for separation from background */
-    --card: #1c2d42;
-    --card-foreground: #f8fafc;
+    /* Card */
+    --card: #261840;
+    --card-foreground: #F1ECF8;
 
-    /* Popover — same level as card */
-    --popover: #1c2d42;
-    --popover-foreground: #f8fafc;
+    /* Popover */
+    --popover: #201830;
+    --popover-foreground: #F1ECF8;
 
-    /* Primary - Indigo 500 for better contrast with white text */
-    --primary: #6366f1;
-    --primary-foreground: #ffffff;
+    /* Primary — lavender for dark mode */
+    --primary: #C5BAFF;
+    --primary-foreground: #2D0051;
 
-    /* Secondary — one step above card for subtle surface variation */
-    --secondary: #243552;
-    --secondary-foreground: #f8fafc;
+    /* Secondary */
+    --secondary: #201830;
+    --secondary-foreground: #F1ECF8;
 
-    /* Muted — same level as secondary, foreground kept muted */
-    --muted: #243552;
-    --muted-foreground: #94a3b8;
+    /* Muted */
+    --muted: #201830;
+    --muted-foreground: #7A5C96;
 
-    /* Accent — one more step up for hover/selected states */
-    --accent: #2d4060;
-    --accent-foreground: #f8fafc;
+    /* Accent — lime */
+    --accent: #D3E141;
+    --accent-foreground: #3D4010;
 
-    /* Destructive - Red 900/400 */
-    --destructive: #7f1d1d;
-    --destructive-foreground: #fca5a5;
+    /* Destructive */
+    --destructive: #E07090;
+    --destructive-foreground: #FFF0F5;
 
-    /* Border — visible but not harsh against dark backgrounds */
-    --border: #3a5068;
-    /* Input border color */
-    --input: #3a5068;
-    /* Input background — clearly above card level so inputs are visible */
-    --input-background: #2d4060;
-    --ring: #6366f1;
-    --switch-background: #64748b;
+    /* Border, Input, Ring */
+    --border: #3A2858;
+    --input: #3A2858;
+    --input-background: #2E2044;
+    --ring: #C5BAFF;
+    --switch-background: #3A2858;
 
-    /* Chart colors - brighter for dark mode */
-    --chart-1: #6366f1;
-    --chart-2: #22d3ee;
-    --chart-3: #34d399;
-    --chart-4: #fbbf24;
-    --chart-5: #f87171;
+    /* Primary variants — dark mode */
+    --primary-light: #2E2044;
+    --primary-muted: #3A2858;
+    --primary-hover: #D4CCFF;
+    --primary-deep: #1A1228;
+    --accent-light: #2A2B0E;
+
+    /* Chart colors — brighter for dark mode */
+    --chart-1: #C5BAFF;
+    --chart-2: #D3E141;
+    --chart-3: #8B5CF6;
+    --chart-4: #F1ECF8;
+    --chart-5: #E07090;
   }
 
   /* Apply theme colors globally */
@@ -134,24 +146,24 @@ body {
 
 /* ==========================================================================
    Switch Component — track colors + size variants
-   shadcn Switch uses --primary-foreground for dark checked thumb (#0f172a)
-   which is invisible on the indigo track. Force all thumbs white in dark.
+   shadcn Switch uses --primary-foreground for dark checked thumb
+   which may be invisible on the primary track. Force all thumbs white in dark.
    ========================================================================== */
 
 /* Track colors — light mode */
 [data-slot="switch"][data-state="unchecked"] {
-  background: #94a3b8 !important; /* slate-400 */
+  background: var(--switch-background) !important;
 }
 [data-slot="switch"][data-state="checked"] {
-  background: #4f46e5 !important; /* indigo-600 */
+  background: var(--primary) !important;
 }
 
 /* Track colors — dark mode */
 .dark [data-slot="switch"][data-state="unchecked"] {
-  background: #64748b !important; /* slate-500 */
+  background: var(--switch-background) !important;
 }
 .dark [data-slot="switch"][data-state="checked"] {
-  background: #818cf8 !important; /* indigo-400 */
+  background: var(--primary) !important;
 }
 
 /* Thumb — always white in dark mode */
@@ -205,40 +217,30 @@ body {
 
 /* ==========================================================================
    Primary Button Gradient
-   Applies the brand gradient to all primary buttons — both shadcn <Button>
-   (data-slot="button") and raw <button> with bg-indigo-600.
+   Applies the brand gradient to all primary buttons via shadcn <Button>
+   (data-slot="button").
    ========================================================================== */
 
-[data-slot="button"].bg-primary,
-button[class*="bg-indigo-600"],
-a[class*="bg-indigo-600"] {
-  background: linear-gradient(to right, #312e81, #4338ca) !important;
+[data-slot="button"].bg-primary {
+  background: linear-gradient(to right, var(--primary-deep), var(--primary-hover)) !important;
   border: none;
 }
 
-[data-slot="button"].bg-primary:hover,
-button[class*="bg-indigo-600"]:hover,
-a[class*="bg-indigo-600"]:hover {
-  background: linear-gradient(to right, #3730a3, #4f46e5) !important;
+[data-slot="button"].bg-primary:hover {
+  background: linear-gradient(to right, var(--primary-hover), var(--primary)) !important;
 }
 
-[data-slot="button"].bg-primary:disabled,
-button[class*="bg-indigo-600"]:disabled,
-a[class*="bg-indigo-600"]:disabled {
-  background: linear-gradient(to right, #312e81, #4338ca) !important;
+[data-slot="button"].bg-primary:disabled {
+  background: linear-gradient(to right, var(--primary-deep), var(--primary-hover)) !important;
 }
 
 /* Dark mode gradient buttons — default deep/vibrant, hover lighter */
-.dark [data-slot="button"].bg-primary,
-.dark button[class*="bg-indigo-600"],
-.dark a[class*="bg-indigo-600"] {
-  background: linear-gradient(to right, #3730a3, #4f46e5) !important;
+.dark [data-slot="button"].bg-primary {
+  background: linear-gradient(to right, var(--primary-hover), var(--primary)) !important;
 }
 
-.dark [data-slot="button"].bg-primary:hover,
-.dark button[class*="bg-indigo-600"]:hover,
-.dark a[class*="bg-indigo-600"]:hover {
-  background: linear-gradient(to right, #4338ca, #6366f1) !important;
+.dark [data-slot="button"].bg-primary:hover {
+  background: linear-gradient(to right, var(--primary), var(--primary-hover)) !important;
 }
 
 /* ==========================================================================
@@ -322,20 +324,20 @@ a[class*="bg-indigo-600"]:disabled {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.3); /* indigo-500 with opacity */
+  background: color-mix(in srgb, var(--primary) 30%, transparent);
   border-radius: 9999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.5); /* indigo-500 with more opacity */
+  background: color-mix(in srgb, var(--primary) 50%, transparent);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:active {
-  background: rgba(79, 70, 229, 0.7); /* indigo-600 with opacity */
+  background: color-mix(in srgb, var(--primary) 70%, transparent);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
@@ -354,30 +356,30 @@ a[class*="bg-indigo-600"]:disabled {
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+  scrollbar-color: color-mix(in srgb, var(--primary) 30%, transparent) transparent;
 }
 
 /* Dark mode scrollbar adjustments */
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(129, 140, 248, 0.3); /* indigo-400 with opacity */
+  background: color-mix(in srgb, var(--primary) 30%, transparent);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(129, 140, 248, 0.5);
+  background: color-mix(in srgb, var(--primary) 50%, transparent);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 .dark ::-webkit-scrollbar-thumb:active {
-  background: rgba(129, 140, 248, 0.7);
+  background: color-mix(in srgb, var(--primary) 70%, transparent);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 .dark * {
-  scrollbar-color: rgba(129, 140, 248, 0.3) transparent;
+  scrollbar-color: color-mix(in srgb, var(--primary) 30%, transparent) transparent;
 }
 
 /* Sidebar specific - thinner scrollbar */
@@ -428,7 +430,7 @@ a[class*="bg-indigo-600"]:disabled {
 
 /* Clerk primary buttons - match Tilia primary button style */
 .cl-formButtonPrimary {
-  background: linear-gradient(to right, #4f46e5, #7c3aed) !important;
+  background: linear-gradient(to right, var(--primary), var(--primary-hover)) !important;
   border: none !important;
   border-radius: calc(var(--radius) - 2px) !important;
   font-weight: 500 !important;
@@ -436,8 +438,8 @@ a[class*="bg-indigo-600"]:disabled {
 }
 
 .cl-formButtonPrimary:hover {
-  background: linear-gradient(to right, #4338ca, #6d28d9) !important;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+  background: linear-gradient(to right, var(--primary-hover), var(--primary-deep)) !important;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
 
 .cl-formButtonPrimary:focus-visible {
@@ -468,7 +470,7 @@ a[class*="bg-indigo-600"]:disabled {
 
 .cl-formFieldInput:focus {
   border-color: var(--ring) !important;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent) !important;
   outline: none !important;
 }
 
@@ -490,7 +492,7 @@ a[class*="bg-indigo-600"]:disabled {
 }
 
 .cl-footerActionLink:hover {
-  color: #4f46e5 !important;
+  color: var(--primary) !important;
 }
 
 /* Clerk user button avatar */
@@ -858,7 +860,7 @@ a[class*="bg-indigo-600"]:disabled {
 }
 
 .card-gradient-border:hover::before {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed, #ec4899);
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover), var(--accent));
   opacity: 1;
 }
 

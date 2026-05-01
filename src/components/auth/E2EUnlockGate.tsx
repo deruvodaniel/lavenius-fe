@@ -241,14 +241,14 @@ export function E2EUnlockGate({ children }: E2EUnlockGateProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-gradient-to-br from-blue-50 via-indigo-50 to-slate-100 dark:from-slate-950 dark:via-indigo-950 dark:to-slate-900">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-gradient-to-br from-blue-50 via-primary-light to-muted dark:from-background dark:via-primary-deep dark:to-background">
       <Card className="w-full max-w-md shadow-xl border-0">
         <CardHeader>
-          <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/60 flex items-center justify-center mb-2">
+          <div className="w-12 h-12 rounded-full bg-primary-muted dark:bg-primary-deep/60 flex items-center justify-center mb-2">
             {mode === 'passphrase' ? (
-              <KeyRound className="w-6 h-6 text-indigo-600" />
+              <KeyRound className="w-6 h-6 text-primary" />
             ) : (
-              <RefreshCw className="w-6 h-6 text-indigo-600" />
+              <RefreshCw className="w-6 h-6 text-primary" />
             )}
           </div>
           <CardTitle>

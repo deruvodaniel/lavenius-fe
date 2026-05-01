@@ -170,7 +170,7 @@ describe('EmptyState', () => {
       );
 
       const iconContainer = document.querySelector('.rounded-full');
-      expect(iconContainer).toHaveClass('bg-gray-100');
+      expect(iconContainer).toHaveClass('bg-muted');
     });
   });
 
@@ -280,7 +280,7 @@ describe('EmptyState', () => {
       );
 
       const button = screen.getByRole('button', { name: 'Click me' });
-      expect(button).toHaveClass('bg-indigo-600');
+      expect(button).toHaveClass('bg-primary');
       expect(button).toHaveClass('text-white');
       expect(button).toHaveClass('rounded-lg');
     });

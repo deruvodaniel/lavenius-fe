@@ -28,9 +28,9 @@ export function EmptyState({
       <div className={`${
         isSubtle
           ? 'w-16 h-16 bg-muted'
-          : 'w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100'
+          : 'w-20 h-20 bg-gradient-to-br from-primary-muted to-primary-muted'
       } rounded-full flex items-center justify-center mb-4 transition-transform hover:scale-110`}>
-        <Icon className={`${isSubtle ? 'w-8 h-8 text-muted-foreground' : 'w-10 h-10 text-indigo-600'}`} />
+        <Icon className={`${isSubtle ? 'w-8 h-8 text-muted-foreground' : 'w-10 h-10 text-primary'}`} />
       </div>
       
       <h3 className={`${isSubtle ? 'text-base' : 'text-lg'} font-medium text-foreground mb-2`}>

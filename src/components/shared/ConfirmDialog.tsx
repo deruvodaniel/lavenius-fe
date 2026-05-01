@@ -67,8 +67,8 @@ const variantConfig: Record<ConfirmDialogVariant, {
   },
   default: {
     icon: HelpCircle,
-    iconBg: 'bg-indigo-100',
-    iconColor: 'text-indigo-600',
+    iconBg: 'bg-primary-muted',
+    iconColor: 'text-primary',
     buttonVariant: 'default',
   },
 };

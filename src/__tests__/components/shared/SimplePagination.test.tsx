@@ -379,7 +379,7 @@ describe('SimplePagination', () => {
 
       const wrapper = container.firstChild as HTMLElement;
       expect(wrapper).toHaveClass('border-t');
-      expect(wrapper).toHaveClass('border-gray-100');
+      expect(wrapper).toHaveClass('border-border');
     });
 
     it('applies proper padding', () => {
@@ -394,8 +394,7 @@ describe('SimplePagination', () => {
 
       const buttons = screen.getAllByRole('button');
       buttons.forEach((button) => {
-        expect(button).toHaveClass('h-8');
-        expect(button).toHaveClass('w-8');
+        expect(button).toHaveClass('size-9');
       });
     });
 
@@ -404,7 +403,7 @@ describe('SimplePagination', () => {
 
       const pageInfo = screen.getByText('1 / 5');
       expect(pageInfo).toHaveClass('text-sm');
-      expect(pageInfo).toHaveClass('text-gray-600');
+      expect(pageInfo).toHaveClass('text-muted-foreground');
     });
 
     it('item range text has proper styling', () => {
@@ -412,7 +411,7 @@ describe('SimplePagination', () => {
 
       const itemRange = screen.getByText('1-10 de 50');
       expect(itemRange).toHaveClass('text-sm');
-      expect(itemRange).toHaveClass('text-gray-500');
+      expect(itemRange).toHaveClass('text-muted-foreground');
     });
   });
 });

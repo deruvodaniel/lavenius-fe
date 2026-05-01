@@ -40,15 +40,15 @@ const STEP_CONFIG: Record<
 > = {
   configureProfile: {
     icon: User,
-    route: '/dashboard/configuracion?tab=profile',
-    colorClass: 'text-indigo-600 dark:text-indigo-400',
-    bgClass: 'bg-indigo-100 dark:bg-indigo-900/30',
+    route: '/dashboard/perfil',
+    colorClass: 'text-primary dark:text-primary',
+    bgClass: 'bg-primary-muted dark:bg-primary-deep/30',
   },
   connectCalendar: {
     icon: Calendar,
     route: '/dashboard/configuracion',
-    colorClass: 'text-purple-600 dark:text-purple-400',
-    bgClass: 'bg-purple-100 dark:bg-purple-900/30',
+    colorClass: 'text-primary dark:text-primary',
+    bgClass: 'bg-primary-muted dark:bg-primary-deep/30',
   },
   addFirstPatient: {
     icon: UserPlus,
@@ -220,7 +220,7 @@ export function OnboardingProgressCard({ className = '' }: OnboardingProgressCar
   return (
     <Card className={`p-4 sm:p-6 bg-white dark:bg-card relative overflow-hidden ${className}`}>
       {/* Decorative gradient background */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-100/50 to-transparent dark:from-indigo-900/20 rounded-bl-full pointer-events-none" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary-muted/50 to-transparent dark:from-primary-deep/20 rounded-bl-full pointer-events-none" />
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-4">
@@ -256,7 +256,7 @@ export function OnboardingProgressCard({ className = '' }: OnboardingProgressCar
           <span className="text-sm font-medium text-foreground">
             {t('dashboard.setupProgress.progress', { completed, total })}
           </span>
-          <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
+          <span className="text-sm font-semibold text-primary dark:text-primary">
             {percentage}%
           </span>
         </div>

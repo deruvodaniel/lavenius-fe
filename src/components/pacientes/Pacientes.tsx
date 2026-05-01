@@ -445,9 +445,9 @@ export function Pacientes() {
         <div className="p-4 md:p-6 lg:p-8 flex items-center justify-center min-h-[400px]">
           <div className="flex flex-col items-center gap-3">
             <div className="inline-flex items-center gap-2">
-              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-              <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
             </div>
             <p className="text-muted-foreground">{t('patients.loadingPatientFile')}</p>
           </div>
@@ -520,7 +520,7 @@ export function Pacientes() {
               <Filter className="w-4 h-4" />
               {t('patients.filters.label')}
               {activeFilterCount > 0 && (
-                <Badge className="ml-1 h-5 w-5 p-0 text-[10px] bg-indigo-600 text-white border-0 rounded-full flex items-center justify-center">
+                <Badge className="ml-1 h-5 w-5 p-0 text-[10px] bg-primary text-white border-0 rounded-full flex items-center justify-center">
                   {activeFilterCount}
                 </Badge>
               )}
@@ -602,7 +602,7 @@ export function Pacientes() {
                     type="checkbox"
                     checked={soloTurnosEstaSemana}
                     onChange={(e) => setSoloTurnosEstaSemana(e.target.checked)}
-                    className="w-4 h-4 text-indigo-600 border-border rounded focus:ring-indigo-500"
+                    className="w-4 h-4 text-primary border-border rounded focus:ring-primary"
                   />
                   <span className="text-sm text-foreground">{t('patients.filters.onlyWithSessionsThisWeek')}</span>
                 </label>
@@ -656,7 +656,7 @@ export function Pacientes() {
                 variant={viewMode === 'cards' ? 'secondary' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('cards')}
-                className={viewMode === 'cards' ? 'text-indigo-600 shadow-sm' : 'text-muted-foreground'}
+                className={viewMode === 'cards' ? 'text-primary shadow-sm' : 'text-muted-foreground'}
               >
                 <LayoutGrid className="w-4 h-4" />
                 <span>{t('patients.view.cards')}</span>
@@ -665,7 +665,7 @@ export function Pacientes() {
                 variant={viewMode === 'table' ? 'secondary' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('table')}
-                className={viewMode === 'table' ? 'text-indigo-600 shadow-sm' : 'text-muted-foreground'}
+                className={viewMode === 'table' ? 'text-primary shadow-sm' : 'text-muted-foreground'}
               >
                 <List className="w-4 h-4" />
                 <span>{t('patients.view.table')}</span>
@@ -710,7 +710,7 @@ export function Pacientes() {
                   type="checkbox"
                   checked={soloTurnosEstaSemana}
                   onChange={(e) => setSoloTurnosEstaSemana(e.target.checked)}
-                  className="w-4 h-4 text-indigo-600 border-border rounded focus:ring-indigo-500"
+                  className="w-4 h-4 text-primary border-border rounded focus:ring-primary"
                 />
                 <span className="text-foreground text-sm">{t('patients.filters.onlyWithSessionsThisWeek')}</span>
               </label>
@@ -791,8 +791,8 @@ export function Pacientes() {
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 aspect-square bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <span className="text-indigo-600 text-xs font-semibold">
+                          <div className="w-9 h-9 aspect-square bg-primary-muted rounded-full flex items-center justify-center flex-shrink-0">
+                            <span className="text-primary text-xs font-semibold">
                               {getNameInitials(paciente.nombre)}
                             </span>
                           </div>
@@ -801,7 +801,7 @@ export function Pacientes() {
                       </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{t('patients.fields.ageYears', { age: paciente.edad })}</td>
                       <td className="px-4 py-3">
-                        <span className="px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700">
+                        <span className="px-2 py-1 rounded-full text-xs bg-primary-muted text-primary-hover">
                           {paciente.coberturaMedica || '-'}
                         </span>
                       </td>
@@ -810,7 +810,7 @@ export function Pacientes() {
                           paciente.modalidad === 'remoto'
                             ? 'bg-blue-100 text-blue-700'
                             : paciente.modalidad === 'presencial'
-                            ? 'bg-purple-100 text-purple-700'
+                            ? 'bg-primary-muted text-primary-hover'
                             : 'bg-teal-100 text-teal-700'
                         }`}>
                           {paciente.modalidad === 'remoto' ? (
@@ -823,7 +823,7 @@ export function Pacientes() {
                       </td>
                       <td className="px-4 py-3 text-sm">
                         {proximoTurno ? (
-                          <span className="text-indigo-600 font-medium">
+                          <span className="text-primary font-medium">
                             {proximoTurno.dias === 0
                               ? t('patients.nextAppointment.today')
                               : proximoTurno.dias === 1
@@ -844,7 +844,7 @@ export function Pacientes() {
                               setEditingPatient(patient || null);
                               setPacienteDrawerOpen(true);
                             }}
-                            className="h-8 w-8 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50"
+                            className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary-light"
                             title={t('patients.actions.editPatient')}
                             aria-label={t('patients.actions.editPatient')}
                           >
@@ -891,8 +891,8 @@ export function Pacientes() {
                   className="flex items-center gap-3 cursor-pointer flex-1"
                   onClick={() => handleSelectPatient(paciente.id)}
                 >
-                  <div className="w-12 h-12 aspect-square bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-indigo-600">
+                  <div className="w-12 h-12 aspect-square bg-primary-muted rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-primary">
                       {getNameInitials(paciente.nombre)}
                     </span>
                   </div>
@@ -910,7 +910,7 @@ export function Pacientes() {
                       setEditingPatient(patient || null);
                       setPacienteDrawerOpen(true);
                     }}
-                    className="h-8 w-8 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50"
+                    className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary-light"
                     title={t('patients.actions.editPatient')}
                     aria-label={t('patients.actions.editPatient')}
                   >
@@ -941,7 +941,7 @@ export function Pacientes() {
                     paciente.modalidad === 'remoto'
                       ? 'bg-blue-100 text-blue-700'
                       : paciente.modalidad === 'presencial'
-                      ? 'bg-purple-100 text-purple-700'
+                      ? 'bg-primary-muted text-primary-hover'
                       : 'bg-teal-100 text-teal-700'
                   }`}
                 >
@@ -958,7 +958,7 @@ export function Pacientes() {
                 </span>
 
                 {paciente.coberturaMedica && (
-                  <span className="px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700">
+                  <span className="px-2 py-1 rounded-full text-xs bg-primary-muted text-primary-hover">
                     {paciente.coberturaMedica}
                   </span>
                 )}
@@ -968,10 +968,10 @@ export function Pacientes() {
               <div className="mt-4 pt-4 border-t border-border">
                 {proximoTurno ? (
                   <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="w-4 h-4 text-indigo-600" />
+                    <Calendar className="w-4 h-4 text-primary" />
                     <span className="text-muted-foreground">
                       {t('patients.nextAppointment.nextIn')}{' '}
-                      <span className="text-indigo-600">
+                      <span className="text-primary">
                         {proximoTurno.dias === 0
                           ? t('patients.nextAppointment.todayLower')
                           : proximoTurno.dias === 1

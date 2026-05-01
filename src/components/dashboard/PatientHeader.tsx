@@ -48,10 +48,10 @@ export function PatientHeader({
   const initials = getNameInitials(`${patient.firstName} ${patient.lastName || ''}`);
 
   return (
-    <div className={`bg-gradient-to-r ${isFlagged ? 'from-red-900 to-red-700' : 'from-indigo-900 to-indigo-700'} text-white rounded-lg p-4 md:p-6 lg:p-8 mb-6 transition-colors`}>
+    <div className={`bg-gradient-to-r ${isFlagged ? 'from-red-900 to-red-700' : 'from-primary-deep to-primary-hover'} text-white rounded-lg p-4 md:p-6 lg:p-8 mb-6 transition-colors`}>
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
         {/* Avatar */}
-        <div className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 ${isFlagged ? 'bg-red-600' : 'bg-indigo-600'} rounded-full flex items-center justify-center flex-shrink-0 relative`}>
+        <div className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 ${isFlagged ? 'bg-red-600' : 'bg-primary'} rounded-full flex items-center justify-center flex-shrink-0 relative`}>
           <span className="text-white text-xl sm:text-2xl md:text-3xl">
             {initials}
           </span>
@@ -72,7 +72,7 @@ export function PatientHeader({
               </span>
             )}
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-indigo-200">
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-primary-foreground/80">
             <div className="flex items-center gap-2">
               <User className="w-4 h-4" />
               <span>{edad} años</span>
@@ -94,23 +94,23 @@ export function PatientHeader({
             variant="ghost"
             size="icon"
             onClick={onEditPatient}
-            className={cn(isFlagged ? 'hover:bg-red-600' : 'hover:bg-indigo-600')}
+            className={cn(isFlagged ? 'hover:bg-red-600' : 'hover:bg-primary')}
             title={t('clinicalFile.actions.editPatient')}
             aria-label={t('clinicalFile.actions.editPatient')}
           >
-            <Pencil className={cn('w-6 h-6', isFlagged ? 'text-red-200' : 'text-indigo-200')} />
+            <Pencil className={cn('w-6 h-6', isFlagged ? 'text-red-200' : 'text-primary-foreground/80')} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={onToggleFlag}
             disabled={isSavingFlag}
-            className={cn(isFlagged ? 'hover:bg-red-600' : 'hover:bg-indigo-600')}
+            className={cn(isFlagged ? 'hover:bg-red-600' : 'hover:bg-primary')}
             title={isFlagged ? t('clinicalFile.actions.removeRisk') : t('clinicalFile.actions.markHighRisk')}
             aria-label={isFlagged ? t('clinicalFile.actions.removeRisk') : t('clinicalFile.actions.markHighRisk')}
           >
             <Flag
-              className={cn('w-6 h-6', isFlagged ? 'fill-yellow-400 text-yellow-400' : 'text-indigo-200')}
+              className={cn('w-6 h-6', isFlagged ? 'fill-yellow-400 text-yellow-400' : 'text-primary-foreground/80')}
             />
           </Button>
         </div>

@@ -76,13 +76,13 @@ export function AppLayout({ children, sidebar, appName = 'Tilia' }: AppLayoutPro
   return (
     <div className="h-screen flex flex-col lg:flex-row overflow-hidden bg-muted">
       {/* Mobile Header - hidden on desktop */}
-      <header className="bg-indigo-900 text-white p-4 flex items-center justify-between shadow-lg z-40 lg:hidden">
+      <header className="bg-primary-deep text-white p-4 flex items-center justify-between shadow-lg z-40 lg:hidden">
         <h1 className="text-xl font-bold flex items-center gap-2">{appName} <BetaBadge /></h1>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setDrawerOpen(!drawerOpen)}
-          className="hover:bg-indigo-800 text-white"
+          className="hover:bg-primary-deep text-white"
           aria-label={t('common.toggleMenu', 'Toggle menu')}
         >
           {drawerOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -99,7 +99,7 @@ export function AppLayout({ children, sidebar, appName = 'Tilia' }: AppLayoutPro
           />
 
           {/* Drawer Content - never collapsed on mobile, no header (AppLayout already shows one) */}
-          <aside className="relative z-[81] ml-auto h-full w-64 bg-indigo-900 text-white shadow-2xl overflow-y-auto">
+          <aside className="relative z-[81] ml-auto h-full w-64 bg-primary-deep text-white shadow-2xl overflow-y-auto">
             {sidebar(handleDrawerClose, false, false)}
           </aside>
         </div>
@@ -109,7 +109,7 @@ export function AppLayout({ children, sidebar, appName = 'Tilia' }: AppLayoutPro
       <div className="hidden lg:block relative flex-shrink-0">
         <aside 
           className={cn(
-            'h-full bg-indigo-900 text-white transition-all duration-300 ease-in-out',
+            'h-full bg-primary-deep text-white transition-all duration-300 ease-in-out',
             sidebarCollapsed ? 'w-20' : 'w-64'
           )}
         >

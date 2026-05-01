@@ -20,14 +20,14 @@ interface EnhancedCardProps {
 const variantStyles: Record<CardVariant, string> = {
   default: 'bg-card',
   gradient: cn(
-    'bg-gradient-to-br from-card via-muted/50 to-indigo-50/30',
-    'dark:from-card dark:via-card dark:to-indigo-950/20',
-    'border-indigo-100/50 dark:border-indigo-900/30'
+    'bg-gradient-to-br from-card via-muted/50 to-primary-light/30',
+    'dark:from-card dark:via-card dark:to-primary-deep/20',
+    'border-primary-muted/50 dark:border-primary-deep/30'
   ),
   outlined: cn(
     'bg-transparent border-2',
     'border-border',
-    'hover:border-indigo-300 dark:hover:border-indigo-700'
+    'hover:border-primary-muted dark:hover:border-primary-hover'
   ),
   elevated: cn(
     'bg-card',
@@ -37,7 +37,7 @@ const variantStyles: Record<CardVariant, string> = {
   interactive: cn(
     'bg-card',
     'card-hover-lift cursor-pointer',
-    'hover:border-indigo-200 dark:hover:border-indigo-700'
+    'hover:border-primary-muted dark:hover:border-primary-hover'
   ),
 };
 

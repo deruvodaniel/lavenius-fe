@@ -120,9 +120,9 @@ export function OnboardingStepper() {
   // Show loading while Clerk loads user data
   if (!isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-primary-light to-accent-light">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
+          <Loader2 className="w-10 h-10 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
         </div>
       </div>
@@ -248,7 +248,7 @@ export function OnboardingStepper() {
   const canSkip = currentStep === 1 || currentStep === 2;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-primary-light to-accent-light">
       <div className="w-full max-w-xl">
         {/* Stepper Header */}
         <StepperHeader 
@@ -289,7 +289,7 @@ export function OnboardingStepper() {
                       placeholder={t('onboarding.profile.placeholders.licenseNumber')}
                       aria-invalid={!!errors.licenseNumber}
                       disabled={isSubmitting}
-                      className="transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20"
+                      className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                     />
                   </FormField>
 
@@ -466,7 +466,7 @@ export function OnboardingStepper() {
               >
                 {/* Summary of entered info */}
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 space-y-3">
+                  <div className="bg-gradient-to-br from-primary-light to-accent-light rounded-xl p-4 space-y-3">
                     <h4 className="text-sm font-medium text-foreground">
                       {t('onboarding.complete.summary')}
                     </h4>
@@ -517,7 +517,7 @@ export function OnboardingStepper() {
                     <p className="text-sm text-muted-foreground">
                       <span className="font-medium text-foreground">{t('onboarding.complete.tip')}</span>{' '}
                       {t('onboarding.complete.tipText')}{' '}
-                      <span className="text-indigo-600 font-medium">{t('onboarding.complete.helpSection')}</span>{' '}
+                      <span className="text-primary font-medium">{t('onboarding.complete.helpSection')}</span>{' '}
                       {t('onboarding.complete.tipSuffix')}
                     </p>
                   </div>
@@ -567,7 +567,7 @@ export function OnboardingStepper() {
                     type="button"
                     onClick={handleComplete}
                     disabled={isSubmitting}
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200 transition-all duration-200 hover:shadow-xl hover:shadow-indigo-300"
+                    className="bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-deep text-white shadow-lg shadow-primary-muted transition-all duration-200 hover:shadow-xl hover:shadow-primary-muted"
                   >
                     {isSubmitting ? (
                       <>
@@ -583,7 +583,7 @@ export function OnboardingStepper() {
                     type="button"
                     onClick={handleNext}
                     disabled={isSubmitting}
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200 transition-all duration-200 hover:shadow-xl hover:shadow-indigo-300"
+                    className="bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-deep text-white shadow-lg shadow-primary-muted transition-all duration-200 hover:shadow-xl hover:shadow-primary-muted"
                   >
                     {isLastContentStep ? t('onboarding.navigation.review') : t('onboarding.navigation.next')}
                     <ChevronRight className="w-4 h-4 ml-1" />
@@ -618,8 +618,8 @@ function StepContent({ icon: Icon, title, description, iconClassName = '', child
   return (
     <>
       <CardHeader className="text-center pb-2">
-        <div className={`w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 ${iconClassName}`}>
-          <Icon className="w-8 h-8 text-indigo-600" />
+        <div className={`w-16 h-16 bg-gradient-to-br from-primary-muted to-primary-muted rounded-full flex items-center justify-center mx-auto mb-4 ${iconClassName}`}>
+          <Icon className="w-8 h-8 text-primary" />
         </div>
         <CardTitle className="text-xl sm:text-2xl font-semibold text-foreground">
           {title}
@@ -652,7 +652,7 @@ function FormField({ id, label, icon: Icon, required, error, children }: FormFie
   return (
     <div className="space-y-2">
       <Label htmlFor={id} className="flex items-center gap-2">
-        <Icon className="w-4 h-4 text-indigo-600" />
+        <Icon className="w-4 h-4 text-primary" />
         {label}
         {required && <span className="text-red-500">*</span>}
         {!required && <span className="text-muted-foreground text-xs">(opcional)</span>}
@@ -679,7 +679,7 @@ interface SummaryItemProps {
 function SummaryItem({ icon: Icon, label, value }: SummaryItemProps) {
   return (
     <div className="flex items-center gap-3 text-sm">
-      <Icon className="w-4 h-4 text-indigo-500 flex-shrink-0" />
+      <Icon className="w-4 h-4 text-primary flex-shrink-0" />
       <span className="text-muted-foreground">{label}:</span>
       <span className="text-foreground font-medium truncate">{value}</span>
     </div>

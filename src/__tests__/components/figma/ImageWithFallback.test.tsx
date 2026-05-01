@@ -157,7 +157,7 @@ describe('ImageWithFallback', () => {
       const fallbackContainer = container.querySelector('.my-class');
       expect(fallbackContainer).toBeInTheDocument();
       expect(fallbackContainer).toHaveClass('inline-block');
-      expect(fallbackContainer).toHaveClass('bg-gray-100');
+      expect(fallbackContainer).toHaveClass('bg-muted');
       expect(fallbackContainer).toHaveClass('text-center');
     });
 

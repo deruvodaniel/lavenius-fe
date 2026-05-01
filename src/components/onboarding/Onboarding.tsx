@@ -278,8 +278,8 @@ export function Onboarding() {
   // Show loading while Clerk loads user data
   if (!isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-900 dark:via-indigo-950 dark:to-purple-950">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-primary-light to-accent-light dark:from-foreground dark:via-primary-deep dark:to-primary-deep">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -616,7 +616,7 @@ export function Onboarding() {
       {/* License Number - Required */}
       <div className="space-y-2">
         <Label htmlFor="licenseNumber" className="flex items-center gap-2 text-foreground">
-          <Award className="w-4 h-4 text-indigo-600" />
+          <Award className="w-4 h-4 text-primary" />
           {t('onboarding.stepper.fields.licenseNumber')}
           <span className="text-red-500">*</span>
         </Label>
@@ -631,7 +631,7 @@ export function Onboarding() {
           aria-describedby={errors.licenseNumber ? 'license-error' : undefined}
           disabled={isSubmitting}
           className={cn(
-            "transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20",
+            "transition-all duration-200 focus:ring-2 focus:ring-primary/20",
             errors.licenseNumber && "border-red-500 focus:ring-red-500/20"
           )}
         />
@@ -645,7 +645,7 @@ export function Onboarding() {
       {/* Specialty - Optional */}
       <div className="space-y-2">
         <Label htmlFor="specialty" className="flex items-center gap-2 text-foreground">
-          <Stethoscope className="w-4 h-4 text-indigo-600" />
+          <Stethoscope className="w-4 h-4 text-primary" />
           {t('onboarding.stepper.fields.specialty')}
           <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
@@ -654,7 +654,7 @@ export function Onboarding() {
           onValueChange={(value) => handleInputChange('specialty', value as Specialty)}
           disabled={isSubmitting}
         >
-          <SelectTrigger id="specialty" className="transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20">
+          <SelectTrigger id="specialty" className="transition-all duration-200 focus:ring-2 focus:ring-primary/20">
             <SelectValue placeholder={t('onboarding.stepper.placeholders.specialty')} />
           </SelectTrigger>
           <SelectContent>
@@ -723,7 +723,7 @@ export function Onboarding() {
       {/* Phone */}
       <div className="space-y-2">
         <Label htmlFor="phone" className="flex items-center gap-2 text-foreground">
-          <Phone className="w-4 h-4 text-indigo-600" />
+          <Phone className="w-4 h-4 text-primary" />
           {t('onboarding.stepper.fields.phone')}
           <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
@@ -791,7 +791,7 @@ export function Onboarding() {
       {/* Website */}
       <div className="space-y-2">
         <Label htmlFor="website" className="flex items-center gap-2 text-foreground">
-          <Globe className="w-4 h-4 text-indigo-600" />
+          <Globe className="w-4 h-4 text-primary" />
           {t('onboarding.stepper.fields.website')}
           <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
         </Label>
@@ -805,7 +805,7 @@ export function Onboarding() {
           aria-describedby={errors.website ? 'website-error' : undefined}
           disabled={isSubmitting}
           className={cn(
-            "transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20",
+            "transition-all duration-200 focus:ring-2 focus:ring-primary/20",
             errors.website && "border-red-500 focus:ring-red-500/20"
           )}
         />
@@ -873,7 +873,7 @@ export function Onboarding() {
           aria-describedby={errors.bio ? 'bio-error' : undefined}
           disabled={isSubmitting}
           className={cn(
-            "transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20 resize-none",
+            "transition-all duration-200 focus:ring-2 focus:ring-primary/20 resize-none",
             errors.bio && "border-red-500 focus:ring-red-500/20"
           )}
         />
@@ -926,14 +926,14 @@ export function Onboarding() {
 
         {/* Summary */}
         {filledData.length > 0 && (
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 rounded-xl p-4 space-y-2">
+          <div className="bg-gradient-to-br from-primary-light to-accent-light dark:from-primary-deep/50 dark:to-primary-deep/50 rounded-xl p-4 space-y-2">
             <h4 className="text-sm font-medium text-foreground mb-3">
               {t('onboarding.stepper.complete.summary')}
             </h4>
             {filledData.map((item, index) => (
               <div
                 key={index}
-                className="flex justify-between text-sm py-1 border-b border-indigo-100 dark:border-indigo-800 last:border-0"
+                className="flex justify-between text-sm py-1 border-b border-primary-muted dark:border-primary-deep last:border-0"
               >
                 <span className="text-muted-foreground">{item.label}:</span>
                 <span className="text-foreground font-medium truncate ml-2 max-w-[60%]">
@@ -945,8 +945,8 @@ export function Onboarding() {
         )}
 
         {/* Tip */}
-        <div className="bg-indigo-50 dark:bg-indigo-950/40 rounded-lg p-4 border border-indigo-100 dark:border-indigo-800">
-          <p className="text-sm text-indigo-700 dark:text-indigo-300">
+        <div className="bg-primary-light dark:bg-primary-deep/40 rounded-lg p-4 border border-primary-muted dark:border-primary-deep">
+          <p className="text-sm text-primary-hover dark:text-primary-foreground/60">
             <span className="font-medium">{t('onboarding.complete.tip')}</span>{' '}
             {t('onboarding.stepper.complete.tipText')}
           </p>
@@ -969,7 +969,7 @@ export function Onboarding() {
             }}
             disabled={isSubmitting}
             className={cn(
-              "transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20",
+              "transition-all duration-200 focus:ring-2 focus:ring-primary/20",
               errors.passphrase && "border-red-500 focus:ring-red-500/20"
             )}
           />
@@ -1042,7 +1042,7 @@ export function Onboarding() {
             }}
             disabled={isSubmitting}
             className={cn(
-              "transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20",
+              "transition-all duration-200 focus:ring-2 focus:ring-primary/20",
               errors.confirmPassphrase && "border-red-500 focus:ring-red-500/20"
             )}
           />
@@ -1087,7 +1087,7 @@ export function Onboarding() {
             <Input
               readOnly
               value={recoverySecret}
-              className="font-mono text-xs bg-white dark:bg-slate-900"
+              className="font-mono text-xs bg-white dark:bg-foreground"
             />
           )}
 
@@ -1127,7 +1127,7 @@ export function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-900 dark:via-indigo-950 dark:to-purple-950">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-primary-light to-accent-light dark:from-foreground dark:via-primary-deep dark:to-primary-deep">
       <div className="w-full max-w-md">
         {/* Beta badge */}
         <div className="flex justify-center mb-4">
@@ -1148,7 +1148,7 @@ export function Onboarding() {
           {/* Progress bar */}
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-500 ease-out"
+              className="h-full bg-gradient-to-r from-primary to-primary-hover transition-all duration-500 ease-out"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
@@ -1168,8 +1168,8 @@ export function Onboarding() {
                   <div 
                     className={cn(
                       "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300",
-                      isCompleted && "bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50",
-                      isCurrent && "bg-gradient-to-br from-indigo-600 to-purple-600 ring-4 ring-indigo-100 dark:ring-indigo-900 shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50",
+                      isCompleted && "bg-gradient-to-br from-primary to-primary-hover shadow-lg shadow-primary-muted dark:shadow-primary-deep/50",
+                      isCurrent && "bg-gradient-to-br from-primary to-primary-hover ring-4 ring-primary-muted dark:ring-primary-deep shadow-lg shadow-primary-muted dark:shadow-primary-deep/50",
                       !isCompleted && !isCurrent && "bg-muted border-2 border-border"
                     )}
                   >
@@ -1184,7 +1184,7 @@ export function Onboarding() {
                   </div>
                   <span className={cn(
                     "text-xs mt-1 hidden sm:block transition-colors duration-300",
-                    isCompleted ? "text-indigo-600 font-medium" : isCurrent ? "text-foreground font-medium" : "text-muted-foreground"
+                    isCompleted ? "text-primary font-medium" : isCurrent ? "text-foreground font-medium" : "text-muted-foreground"
                   )}>
                     {t(`onboarding.stepper.stepNames.${step.key}`)}
                   </span>
@@ -1202,12 +1202,12 @@ export function Onboarding() {
           >
             <CardHeader className="text-center pb-2">
               <div className={cn(
-                "w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/60 dark:to-purple-900/60 rounded-full flex items-center justify-center mx-auto mb-4 transition-transform duration-300",
+                "w-16 h-16 bg-gradient-to-br from-primary-muted to-primary-muted dark:from-primary-deep/60 dark:to-primary-deep/60 rounded-full flex items-center justify-center mx-auto mb-4 transition-transform duration-300",
                 isLastStep && "animate-stepper-celebration"
               )}>
                 {(() => {
                   const Icon = stepConfig.icon;
-                  return <Icon className="w-8 h-8 text-indigo-600" />;
+                  return <Icon className="w-8 h-8 text-primary" />;
                 })()}
               </div>
               <CardTitle className="text-xl sm:text-2xl font-semibold text-foreground">
@@ -1231,7 +1231,7 @@ export function Onboarding() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !canCompleteSetup}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50 transition-all duration-200 hover:shadow-xl hover:shadow-indigo-300 dark:hover:shadow-indigo-800/60"
+                className="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-deep text-white shadow-lg shadow-primary-muted dark:shadow-primary-deep/50 transition-all duration-200 hover:shadow-xl hover:shadow-primary-muted dark:hover:shadow-primary-deep/60"
               >
                 {isSubmitting ? (
                   <>
@@ -1247,7 +1247,7 @@ export function Onboarding() {
                 type="button"
                 onClick={handleNext}
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50 transition-all duration-200 hover:shadow-xl hover:shadow-indigo-300 dark:hover:shadow-indigo-800/60"
+                className="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-deep text-white shadow-lg shadow-primary-muted dark:shadow-primary-deep/50 transition-all duration-200 hover:shadow-xl hover:shadow-primary-muted dark:hover:shadow-primary-deep/60"
               >
                 {t('common.next')}
                 <ArrowRight className="w-4 h-4 ml-1" />

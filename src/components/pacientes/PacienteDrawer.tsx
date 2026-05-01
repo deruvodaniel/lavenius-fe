@@ -315,8 +315,8 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
       initialFocus="#paciente-nombre"
     >
       <DrawerBody>
-        <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-          <p className="text-indigo-800 text-sm">
+        <div className="bg-primary-light border border-primary-muted rounded-lg p-4">
+          <p className="text-primary-deep text-sm">
             <Trans i18nKey="patients.drawer.requiredFieldsNote">
               Los campos marcados con <span className="text-red-500">*</span> son obligatorios.
             </Trans>
@@ -326,7 +326,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
         {/* Personal Information */}
         <div className="bg-card border border-border rounded-lg p-6">
           <h3 className="text-foreground mb-4 flex items-center gap-2">
-            <User className="w-5 h-5 text-indigo-600" />
+            <User className="w-5 h-5 text-primary" />
             {t('patients.drawer.sections.personalInfo')}
           </h3>
 
@@ -488,7 +488,7 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
         {/* Treatment Modality */}
         <div className="bg-card border border-border rounded-lg p-6">
           <h3 className="text-foreground mb-4 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-indigo-600" />
+            <Calendar className="w-5 h-5 text-primary" />
             {t('patients.drawer.sections.treatmentModality')}
           </h3>
 
@@ -501,8 +501,8 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
                   onClick={() => setFormData({ ...formData, tipoSesion: 'presential' })}
                   className={`flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
                     formData.tipoSesion === 'presential'
-                      ? 'border-purple-600 bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300'
-                      : 'border-border text-foreground hover:border-purple-300'
+                      ? 'border-primary bg-primary-light dark:bg-primary-deep/50 text-primary-hover dark:text-primary'
+                      : 'border-border text-foreground hover:border-primary-muted'
                   }`}
                 >
                   <MapPin className="w-5 h-5" />
@@ -531,8 +531,8 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
                     key={freq}
                     className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
                       formData.frecuencia === freq
-                        ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/50'
-                        : 'border-border hover:border-indigo-300'
+                        ? 'border-primary bg-primary-light dark:bg-primary-deep/50'
+                        : 'border-border hover:border-primary-muted'
                     }`}
                   >
                     <input
@@ -541,9 +541,9 @@ function PacienteDrawerForm({ isOpen, onClose, onSave, patient, isLoading = fals
                       value={freq}
                       checked={formData.frecuencia === freq}
                       onChange={(e) => setFormData({ ...formData, frecuencia: e.target.value as Frecuencia })}
-                      className="w-4 h-4 text-indigo-600 border-border focus:ring-indigo-500"
+                      className="w-4 h-4 text-primary border-border focus:ring-primary"
                     />
-                    <span className={`text-sm font-medium ${formData.frecuencia === freq ? 'text-indigo-700 dark:text-indigo-300' : 'text-foreground'}`}>
+                    <span className={`text-sm font-medium ${formData.frecuencia === freq ? 'text-primary-hover dark:text-primary-foreground/60' : 'text-foreground'}`}>
                       {freq === 'semanal' && t('patients.frequency.weekly')}
                       {freq === 'quincenal' && t('patients.frequency.biweekly')}
                       {freq === 'mensual' && t('patients.frequency.monthly')}

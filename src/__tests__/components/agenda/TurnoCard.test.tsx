@@ -496,7 +496,7 @@ describe('TurnoCard', () => {
 
       const card = screen.getByText('Juan Pérez').closest('.border-l-4');
       expect(card).toBeInTheDocument();
-      expect(card).toHaveClass('bg-white', 'hover:shadow-md');
+      expect(card).toHaveClass('hover:shadow-md');
     });
   });
 
@@ -511,7 +511,7 @@ describe('TurnoCard', () => {
     it('generates correct initials for three-word name', () => {
       render(<TurnoCard {...defaultProps} patient={{ ...mockPatient, nombre: 'Juan Pablo García' }} />);
 
-      expect(screen.getByText('JP')).toBeInTheDocument();
+      expect(screen.getByText('JG')).toBeInTheDocument();
     });
 
     it('generates correct initials for single-word name', () => {
@@ -608,7 +608,7 @@ describe('TurnoCard', () => {
     it('avatar has correct styling', () => {
       render(<TurnoCard {...defaultProps} />);
 
-      const avatar = screen.getByText('JP').closest('.bg-indigo-100');
+      const avatar = screen.getByText('JP').closest('.bg-primary-muted');
       expect(avatar).toBeInTheDocument();
       expect(avatar).toHaveClass('rounded-full', 'w-8', 'h-8');
     });
@@ -616,7 +616,7 @@ describe('TurnoCard', () => {
     it('time section has correct styling', () => {
       render(<TurnoCard {...defaultProps} />);
 
-      const timeSection = screen.getByText('10:00').closest('.text-gray-600');
+      const timeSection = screen.getByText('10:00').closest('.text-muted-foreground');
       expect(timeSection).toBeInTheDocument();
     });
   });

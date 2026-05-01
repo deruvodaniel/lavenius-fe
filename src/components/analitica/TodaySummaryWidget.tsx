@@ -50,9 +50,9 @@ export function TodaySummaryWidget({
   return (
     <div
       className={cn(
-        'rounded-xl border border-indigo-100 dark:border-indigo-900/50',
-        'bg-gradient-to-r from-indigo-50 via-background to-purple-50',
-        'dark:from-indigo-950/30 dark:via-background dark:to-purple-950/30',
+        'rounded-xl border border-primary-muted dark:border-primary-deep/50',
+        'bg-gradient-to-r from-primary-light via-background to-accent-light',
+        'dark:from-primary-deep/30 dark:via-background dark:to-primary-deep/30',
         'p-4 shadow-sm',
         'animate-fade-in'
       )}
@@ -77,8 +77,8 @@ export function TodaySummaryWidget({
           disabled={!onSessionsClick}
         >
           <div className="relative">
-            <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <div className="w-10 h-10 rounded-lg bg-primary-muted dark:bg-primary-deep/50 flex items-center justify-center">
+              <Calendar className="w-5 h-5 text-primary dark:text-primary" />
             </div>
             {/* Mini progress ring */}
             <svg

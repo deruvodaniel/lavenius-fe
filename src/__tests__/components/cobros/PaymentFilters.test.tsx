@@ -205,7 +205,7 @@ describe('DateFilters', () => {
       render(<DateFilters {...defaultProps} quickFilter="week" />);
 
       const weekButton = screen.getByRole('button', { name: 'Esta semana' });
-      expect(weekButton).toHaveClass('bg-indigo-600', 'text-white');
+      expect(weekButton).toHaveClass('bg-primary', 'text-white');
     });
 
     it('does not show date inputs by default', () => {

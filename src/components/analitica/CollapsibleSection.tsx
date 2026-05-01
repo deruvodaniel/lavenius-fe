@@ -31,7 +31,7 @@ interface CollapsibleSectionProps {
 export function CollapsibleSection({
   title,
   icon: Icon,
-  iconColor = 'text-indigo-600',
+  iconColor = 'text-primary',
   defaultOpen = true,
   children,
   badge,

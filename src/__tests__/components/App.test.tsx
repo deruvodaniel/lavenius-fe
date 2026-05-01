@@ -105,6 +105,7 @@ vi.mock('@/components/shared', () => ({
   LoadingOverlay: ({ message }: { message: string }) => (
     <div data-testid="loading-overlay">{message}</div>
   ),
+  BetaBadge: () => <span data-testid="beta-badge">BETA</span>,
 }));
 
 // Mock lazy-loaded components

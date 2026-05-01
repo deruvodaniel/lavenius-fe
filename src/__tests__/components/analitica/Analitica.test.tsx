@@ -968,8 +968,8 @@ describe('Analitica', () => {
       });
       
       await waitFor(() => {
-        // Should have cards with bg-white class
-        const cards = container.querySelectorAll('.bg-white');
+        // Should have cards with bg-card class
+        const cards = container.querySelectorAll('.bg-card');
         expect(cards.length).toBeGreaterThan(0);
       });
     });
@@ -983,7 +983,7 @@ describe('Analitica', () => {
       
       await waitFor(() => {
         // Icons should be rendered in colored containers
-        const iconContainers = container.querySelectorAll('[class*="bg-indigo-100"], [class*="bg-green-100"], [class*="bg-blue-100"], [class*="bg-amber-100"]');
+        const iconContainers = container.querySelectorAll('[class*="bg-primary-muted"], [class*="bg-green-100"], [class*="bg-blue-100"], [class*="bg-amber-100"]');
         expect(iconContainers.length).toBeGreaterThan(0);
       });
     });

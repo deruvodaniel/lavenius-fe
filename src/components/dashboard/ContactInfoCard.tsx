@@ -41,7 +41,7 @@ export function ContactInfoCard({
     <div className="bg-card border rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-foreground flex items-center gap-2">
-          <FileText className="w-5 h-5 text-indigo-600" />
+          <FileText className="w-5 h-5 text-primary" />
           {t('clinicalFile.sections.contactInfo')}
         </h3>
         {!isEditing && (

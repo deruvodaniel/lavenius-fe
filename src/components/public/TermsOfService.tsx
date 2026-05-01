@@ -6,7 +6,7 @@ export function TermsOfService() {
   const { t } = useTranslation();
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30 dark:from-background dark:via-indigo-950/20 dark:to-purple-950/20">
+    <main className="min-h-screen bg-gradient-to-br from-background via-primary-light/30 to-accent-light/30 dark:from-background dark:via-primary-deep/20 dark:to-primary-deep/20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div className="mb-8">
           <Link
@@ -20,7 +20,7 @@ export function TermsOfService() {
 
         <article className="bg-card border border-border rounded-2xl shadow-sm p-6 sm:p-10">
           <header className="mb-8 pb-6 border-b border-border">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 text-xs font-medium mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary-hover dark:text-primary-foreground/60 text-xs font-medium mb-4">
               <FileText className="w-4 h-4" />
               {t('termsOfService.badge')}
             </div>

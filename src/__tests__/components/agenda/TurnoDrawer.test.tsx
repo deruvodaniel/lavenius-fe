@@ -139,6 +139,7 @@ vi.mock('@/components/shared', () => ({
         </button>
       </div>
     ) : null,
+  BetaBadge: () => <span data-testid="beta-badge">BETA</span>,
 }));
 
 // ============================================================================

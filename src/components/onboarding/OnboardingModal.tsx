@@ -5,7 +5,6 @@ import {
   Shield, 
   Calendar, 
   UserPlus, 
-  Settings,
   PartyPopper,
   ChevronRight,
   ChevronLeft,
@@ -37,7 +36,7 @@ export function OnboardingModal({
   const [currentStep, setCurrentStep] = useState(0);
   const { completeOnboarding } = useOnboarding();
 
-  const totalSteps = 5;
+  const totalSteps = 4;
 
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
@@ -105,15 +104,7 @@ export function OnboardingModal({
                 {t('onboarding.calendar.later')}
               </Button>
               <p className="text-xs text-muted-foreground text-center mt-2">
-                {t('onboarding.calendar.workWeekTipPrefix')}{' '}
-                <Link
-                  to="/dashboard/configuracion"
-                  onClick={onClose}
-                  className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
-                >
-                  {t('onboarding.calendar.settingsLink')}
-                </Link>{' '}
-                {t('onboarding.calendar.workWeekTipSuffix')}
+                {t('onboarding.calendar.workWeekTip')}
               </p>
             </div>
           </OnboardingStep>
@@ -148,45 +139,6 @@ export function OnboardingModal({
       case 3:
         return (
           <OnboardingStep
-            icon={Settings}
-            title={t('onboarding.settings.title')}
-            description={t('onboarding.settings.description')}
-          >
-            <div className="space-y-3">
-              <p className="text-xs text-muted-foreground text-center">
-                {t('onboarding.settings.remindersTip')}
-              </p>
-              <p className="text-xs text-muted-foreground text-center">
-                {t('onboarding.settings.bookingLinkTipPrefix')}{' '}
-                <Link
-                  to="/dashboard/configuracion?tab=profile"
-                  onClick={onClose}
-                  className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
-                >
-                  {t('onboarding.settings.profileLinkLabel')}
-                </Link>{' '}
-                {t('onboarding.settings.bookingLinkTipSuffix')}
-              </p>
-              <Button asChild className="w-full">
-                <Link to="/dashboard/configuracion" onClick={onClose}>
-                  {t('onboarding.settings.openSettings')}
-                </Link>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleNext}
-                className="w-full text-sm text-muted-foreground hover:text-foreground"
-              >
-                {t('onboarding.calendar.later')}
-              </Button>
-            </div>
-          </OnboardingStep>
-        );
-
-      case 4:
-        return (
-          <OnboardingStep
             icon={PartyPopper}
             title={t('onboarding.complete.title')}
             description={t('onboarding.complete.description')}
@@ -194,10 +146,7 @@ export function OnboardingModal({
             <div className="bg-muted rounded-lg p-4 text-left space-y-2">
               <p className="text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">{t('onboarding.complete.tip')}</span> {t('onboarding.complete.tipText')}{' '}
-                <Link to="/dashboard/ayuda" onClick={onClose} className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
-                  {t('onboarding.complete.helpSection')}
-                </Link>{' '}
-                {t('onboarding.complete.tipSuffix')}
+                <Link to="/ayuda" onClick={onClose} className="text-primary font-medium hover:underline">{t('onboarding.complete.helpSection')}</Link> {t('onboarding.complete.tipSuffix')}
               </p>
             </div>
           </OnboardingStep>
@@ -261,7 +210,7 @@ export function OnboardingModal({
                   variant="ghost"
                   size="sm"
                   onClick={handleNext}
-                  className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 font-medium px-0"
+                  className="flex items-center gap-1 text-sm text-primary hover:text-primary-hover font-medium px-0"
                 >
                   {t('onboarding.navigation.next')}
                   <ChevronRight className="w-4 h-4" />

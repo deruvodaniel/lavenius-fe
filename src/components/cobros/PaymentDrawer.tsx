@@ -36,7 +36,7 @@ const PaymentTypeSelector = ({ selected, onChange, disabled }: PaymentTypeSelect
         disabled={disabled}
         className={`flex-1 p-3 rounded-lg border-2 transition-all ${
           selected === 'single'
-            ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+            ? 'border-primary bg-primary-light text-primary-hover'
             : 'border-border hover:border-border/70 text-muted-foreground'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
@@ -49,7 +49,7 @@ const PaymentTypeSelector = ({ selected, onChange, disabled }: PaymentTypeSelect
         disabled={disabled}
         className={`flex-1 p-3 rounded-lg border-2 transition-all ${
           selected === 'monthly'
-            ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+            ? 'border-primary bg-primary-light text-primary-hover'
             : 'border-border hover:border-border/70 text-muted-foreground'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
@@ -451,11 +451,11 @@ export const PaymentDrawer = ({
 
                     {/* Selected session preview */}
                     {selectedSession && (
-                      <div className="mt-3 p-3 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 rounded-lg">
-                        <p className="font-medium text-indigo-900 dark:text-indigo-300">
+                      <div className="mt-3 p-3 bg-primary-light dark:bg-primary-deep/30 border border-primary-muted dark:border-primary-deep rounded-lg">
+                        <p className="font-medium text-primary-deep dark:text-primary-foreground/60">
                           {selectedSession.patientName || selectedSession.patient?.firstName}
                         </p>
-                        <p className="text-indigo-700 dark:text-indigo-400 text-sm mt-0.5">
+                        <p className="text-primary-hover dark:text-primary text-sm mt-0.5">
                           {new Date(selectedSession.scheduledFrom).toLocaleDateString('es-AR', {
                             weekday: 'long',
                             day: 'numeric',

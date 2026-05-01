@@ -20,7 +20,7 @@ describe('Skeleton', () => {
 
       const skeleton = container.firstChild;
       expect(skeleton).toBeInTheDocument();
-      expect(skeleton).toHaveClass('bg-gray-200');
+      expect(skeleton).toHaveClass('bg-muted');
       expect(skeleton).toHaveClass('rounded');
     });
 
@@ -109,7 +109,7 @@ describe('SkeletonCard', () => {
     const { container } = render(<SkeletonCard />);
 
     const card = container.firstChild;
-    expect(card).toHaveClass('bg-white');
+    expect(card).toHaveClass('bg-card');
     expect(card).toHaveClass('rounded-lg');
     expect(card).toHaveClass('shadow-sm');
     expect(card).toHaveClass('p-6');
@@ -158,7 +158,7 @@ describe('SkeletonTable', () => {
     const { container } = render(<SkeletonTable />);
 
     const tableContainer = container.firstChild;
-    expect(tableContainer).toHaveClass('bg-white');
+    expect(tableContainer).toHaveClass('bg-card');
     expect(tableContainer).toHaveClass('rounded-lg');
     expect(tableContainer).toHaveClass('shadow-sm');
     expect(tableContainer).toHaveClass('overflow-hidden');
@@ -169,14 +169,14 @@ describe('SkeletonList', () => {
   it('renders default 3 items', () => {
     const { container } = render(<SkeletonList />);
 
-    const items = container.querySelectorAll('.bg-white');
+    const items = container.querySelectorAll('.bg-card');
     expect(items.length).toBe(3);
   });
 
   it('renders custom number of items', () => {
     const { container } = render(<SkeletonList items={5} />);
 
-    const items = container.querySelectorAll('.bg-white');
+    const items = container.querySelectorAll('.bg-card');
     expect(items.length).toBe(5);
   });
 
@@ -224,7 +224,7 @@ describe('SkeletonCalendar', () => {
     const { container } = render(<SkeletonCalendar />);
 
     const calendarContainer = container.firstChild;
-    expect(calendarContainer).toHaveClass('bg-white');
+    expect(calendarContainer).toHaveClass('bg-card');
     expect(calendarContainer).toHaveClass('rounded-lg');
     expect(calendarContainer).toHaveClass('shadow-sm');
     expect(calendarContainer).toHaveClass('p-4');
@@ -236,14 +236,14 @@ describe('SkeletonStats', () => {
   it('renders default 4 cards', () => {
     const { container } = render(<SkeletonStats />);
 
-    const cards = container.querySelectorAll('.bg-white');
+    const cards = container.querySelectorAll('.bg-card');
     expect(cards.length).toBe(4);
   });
 
   it('renders custom number of cards', () => {
     const { container } = render(<SkeletonStats cards={6} />);
 
-    const cards = container.querySelectorAll('.bg-white');
+    const cards = container.querySelectorAll('.bg-card');
     expect(cards.length).toBe(6);
   });
 
@@ -269,14 +269,14 @@ describe('SkeletonNotes', () => {
   it('renders default 3 notes', () => {
     const { container } = render(<SkeletonNotes />);
 
-    const notes = container.querySelectorAll('.bg-white');
+    const notes = container.querySelectorAll('.bg-card');
     expect(notes.length).toBe(3);
   });
 
   it('renders custom number of notes', () => {
     const { container } = render(<SkeletonNotes items={5} />);
 
-    const notes = container.querySelectorAll('.bg-white');
+    const notes = container.querySelectorAll('.bg-card');
     expect(notes.length).toBe(5);
   });
 
@@ -284,7 +284,7 @@ describe('SkeletonNotes', () => {
     const { container } = render(<SkeletonNotes />);
 
     // Each note should have multiple skeleton lines
-    const skeletonLines = container.querySelectorAll('.bg-gray-200');
+    const skeletonLines = container.querySelectorAll('.bg-muted');
     expect(skeletonLines.length).toBeGreaterThan(9); // At least 3 per note
   });
 
@@ -301,7 +301,7 @@ describe('SkeletonSessionCard', () => {
     const { container } = render(<SkeletonSessionCard />);
 
     const card = container.firstChild;
-    expect(card).toHaveClass('bg-white');
+    expect(card).toHaveClass('bg-card');
     expect(card).toHaveClass('rounded-lg');
     expect(card).toHaveClass('p-4');
     expect(card).toHaveClass('border');
@@ -342,7 +342,7 @@ describe('LoadingOverlay', () => {
     const overlay = container.firstChild;
     expect(overlay).toHaveClass('absolute');
     expect(overlay).toHaveClass('inset-0');
-    expect(overlay).toHaveClass('bg-white/80');
+    expect(overlay).toHaveClass('bg-background/80');
     expect(overlay).toHaveClass('backdrop-blur-sm');
     expect(overlay).toHaveClass('z-50');
   });
