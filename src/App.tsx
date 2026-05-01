@@ -30,9 +30,14 @@ function LandingRoute() {
   const { isLoaded, isSignedIn } = useClerkAuth();
   const { user } = useUser();
 
-  // Show loading while Clerk initializes
+  // Public route should not block on Clerk load:
+  // if Clerk is slow/unavailable, still render landing.
   if (!isLoaded) {
-    return <LoadingOverlay message="Cargando..." />;
+    return (
+      <Suspense fallback={<LoadingOverlay message="Cargando..." />}>
+        <Landing />
+      </Suspense>
+    );
   }
 
   if (isSignedIn) {
