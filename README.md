@@ -1,11 +1,55 @@
 
-  # Plataforma de Gestión Médica
+# Lavenius Frontend
 
-  This is a code bundle for Plataforma de Gestión Médica. The original project is available at https://www.figma.com/design/SkkDJt1z4CEPtFrLhOH2uL/Plataforma-de-Gesti%C3%B3n-M%C3%A9dica.
+Aplicación frontend de Lavenius (React + Vite + TypeScript).
 
-  ## Running the code
+## Desarrollo local
 
-  Run `npm i` to install the dependencies.
+```bash
+npm install
+npm run dev
+```
 
-  Run `npm run dev` to start the development server.
+Servidor local por defecto: `http://localhost:5173`.
+
+## Scripts principales
+
+```bash
+npm run dev
+npm run type-check
+npm run lint
+npm run test -- --run
+npm run build
+```
+
+## Deploy a produccion (Vercel)
+
+El frontend deploya directamente en Vercel y existen dos ambientes productivos separados por rama:
+
+| Proyecto Vercel | Dominio | Rama productiva |
+|---|---|---|
+| `lavenius-fe` | `www.terapp-ia.com` | `terappia` |
+| `somostilia` | `www.somostilia.com` | `main` |
+
+Al mergear en la rama productiva correspondiente, Vercel ejecuta el deploy automaticamente.
+
+## Politica de ramas para releases
+
+- Siempre pushear primero a `tilia`.
+- Los PR siempre deben apuntar a `tilia`.
+- Nunca abrir PR directo a `main`.
+- `main` se considera rama de produccion y solo se actualiza por promocion aprobada.
+
+## Configuracion de Vercel
+
+La configuración de salida está en `vercel.json`:
+
+- `outputDirectory`: `build`
+- Reescritura SPA para rutas cliente hacia `index.html`
+
+## Documentacion adicional
+
+Para el proceso completo de release, smoke tests y rollback ver:
+
+- `../docs/FRONTEND_PRODUCTION_DEPLOY.md`
   
