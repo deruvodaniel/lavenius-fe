@@ -64,11 +64,11 @@ export function NotFound() {
             Si el problema persiste, contacta a soporte tecnico:
           </p>
           <a 
-            href="mailto:lavenius.net@gmail.com"
+            href="mailto:support@terapp-ia.com"
             className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-medium transition-colors"
           >
             <Mail className="w-4 h-4" />
-            lavenius.net@gmail.com
+            support@terapp-ia.com
           </a>
         </div>
 
