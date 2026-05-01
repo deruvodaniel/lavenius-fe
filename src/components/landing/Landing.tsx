@@ -64,6 +64,43 @@ const mockStats = {
   tasaCobro: '94%',
 };
 
+function DeferredSection({
+  children,
+  minHeightClass = 'min-h-[520px]',
+}: {
+  children: React.ReactNode;
+  minHeightClass?: string;
+}) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    if (shouldRender) return;
+
+    const node = ref.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldRender(true);
+          observer.disconnect();
+        }
+      },
+      { root: null, rootMargin: '700px 0px', threshold: 0.01 }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shouldRender]);
+
+  return (
+    <div ref={ref} className={shouldRender ? undefined : minHeightClass}>
+      {shouldRender ? children : null}
+    </div>
+  );
+}
+
 // ============================================================================
 // SUB-COMPONENTS
 // ============================================================================
@@ -1655,16 +1692,32 @@ export function Landing() {
       <HeroSection />
       <PurposeSection />
       <FeaturesSection />
-      <PatientBookingSection />
-      <AnalyticsSection />
-      <RemindersSection />
-      <SecuritySection />
+      <DeferredSection minHeightClass="min-h-[560px]">
+        <PatientBookingSection />
+      </DeferredSection>
+      <DeferredSection minHeightClass="min-h-[640px]">
+        <AnalyticsSection />
+      </DeferredSection>
+      <DeferredSection minHeightClass="min-h-[620px]">
+        <RemindersSection />
+      </DeferredSection>
+      <DeferredSection minHeightClass="min-h-[360px]">
+        <SecuritySection />
+      </DeferredSection>
       {/* <SocialProofSection /> */}
-      <WhyTiliaSection />
-      <FAQSection />
+      <DeferredSection minHeightClass="min-h-[560px]">
+        <WhyTiliaSection />
+      </DeferredSection>
+      <DeferredSection minHeightClass="min-h-[520px]">
+        <FAQSection />
+      </DeferredSection>
       {/* <PricingSection /> */}
-      <CTASection />
-      <Footer />
+      <DeferredSection minHeightClass="min-h-[360px]">
+        <CTASection />
+      </DeferredSection>
+      <DeferredSection minHeightClass="min-h-[260px]">
+        <Footer />
+      </DeferredSection>
       <StickyMobileCTA />
     </div>
   );

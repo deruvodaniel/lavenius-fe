@@ -1,14 +1,16 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { SignedIn, SignedOut, RedirectToSignIn, useAuth as useClerkAuth, useUser } from '@clerk/clerk-react';
-import { Landing } from './components/landing';
-import { Dashboard } from './components/dashboard';
-import { Onboarding } from './components/onboarding';
 import { NotFound, LoadingOverlay } from './components/shared';
 import { E2EUnlockGate } from './components/auth/E2EUnlockGate';
 import { AccountTypeSelection } from './components/auth/AccountTypeSelection';
-import { PrivacyPolicy, TermsOfService } from './components/public';
 import { AccountType, getUserAccountType } from './lib/auth/accountType';
+
+const Landing = lazy(() => import('./components/landing/Landing').then(m => ({ default: m.Landing })));
+const Dashboard = lazy(() => import('./components/dashboard/Dashboard').then(m => ({ default: m.Dashboard })));
+const Onboarding = lazy(() => import('./components/onboarding/Onboarding').then(m => ({ default: m.Onboarding })));
+const PrivacyPolicy = lazy(() => import('./components/public/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
+const TermsOfService = lazy(() => import('./components/public/TermsOfService').then(m => ({ default: m.TermsOfService })));
 
 // Lazy load dashboard views.
 const Agenda = lazy(() => import('./components/agenda/Agenda').then(m => ({ default: m.Agenda })));
@@ -40,14 +42,22 @@ function LandingRoute() {
     }
 
     if (accountType === AccountType.Patient) {
-      return <Landing />;
+      return (
+        <Suspense fallback={<LoadingOverlay message="Cargando..." />}>
+          <Landing />
+        </Suspense>
+      );
     }
 
     const hasCompletedOnboarding = user?.unsafeMetadata?.onboardingComplete === true;
     return <Navigate to={hasCompletedOnboarding ? '/dashboard' : '/onboarding'} replace />;
   }
 
-  return <Landing />;
+  return (
+    <Suspense fallback={<LoadingOverlay message="Cargando..." />}>
+      <Landing />
+    </Suspense>
+  );
 }
 
 /**
@@ -75,7 +85,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
         ) : accountType === AccountType.Patient ? (
           <Navigate to="/" replace />
         ) : hasCompletedOnboarding ? (
-          <E2EUnlockGate>{children}</E2EUnlockGate>
+          <E2EUnlockGate>
+            <Suspense fallback={<LoadingOverlay message="Cargando..." />}>
+              {children}
+            </Suspense>
+          </E2EUnlockGate>
         ) : (
           <Navigate to="/onboarding" replace />
         )}
@@ -212,8 +226,22 @@ export default function App() {
       />
 
       {/* Public legal route */}
-      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-      <Route path="/terms-of-service" element={<TermsOfService />} />
+      <Route
+        path="/privacy-policy"
+        element={(
+          <Suspense fallback={<LoadingOverlay message="Cargando..." />}>
+            <PrivacyPolicy />
+          </Suspense>
+        )}
+      />
+      <Route
+        path="/terms-of-service"
+        element={(
+          <Suspense fallback={<LoadingOverlay message="Cargando..." />}>
+            <TermsOfService />
+          </Suspense>
+        )}
+      />
       <Route path="/book/:therapistId" element={<PublicBookingRoute />} />
       
       {/* TODO: Custom Clerk Auth routes for future implementation
