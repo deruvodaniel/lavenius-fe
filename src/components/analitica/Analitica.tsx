@@ -83,12 +83,12 @@ const TIME_RANGE_KEYS: { value: TimeRange; key: string }[] = [
 
 const COLORS = {
   primary: 'var(--primary)',
-  success: '#22c55e', // green-500
-  warning: '#f59e0b', // amber-500
-  danger: '#ef4444', // red-500
-  muted: '#9ca3af', // gray-400
-  blue: '#3b82f6',
-  purple: '#8b5cf6',
+  success: 'var(--success)',
+  warning: 'var(--warning)',
+  danger: 'var(--destructive)',
+  muted: 'var(--muted-foreground)',
+  blue: 'var(--info)',
+  purple: 'var(--primary-light)',
   pink: '#ec4899',
   cyan: '#06b6d4',
 };

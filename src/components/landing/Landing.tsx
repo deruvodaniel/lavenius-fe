@@ -97,7 +97,7 @@ function NavBar() {
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-[#2D0051] to-[#3D1A6E] rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-hover rounded-lg flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
@@ -281,7 +281,7 @@ function HeroSection() {
                 <SignUpButton mode="modal">
                   <Button
                     size="lg"
-                    className="w-full sm:w-auto !bg-gradient-to-r !from-[#2D0051] !to-[#3D1A6E] hover:!from-[#3D1A6E] hover:!to-[#1A0A33] text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
+                    className="w-full sm:w-auto !bg-gradient-to-r !from-primary !to-primary-hover hover:!from-primary-hover hover:!to-primary-deep text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
                   >
                     {t('landing.hero.cta')}
                     <ArrowRight className="w-5 h-5 ml-2" />
@@ -302,15 +302,15 @@ function HeroSection() {
             <AnimatedSection animation="fade" delay={500} duration={600}>
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 mt-10 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  <CheckCircle2 className="w-4 h-4 text-success" />
                   <span className="font-medium">{t('landing.hero.noCreditCard')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  <CheckCircle2 className="w-4 h-4 text-success" />
                   <span className="font-medium">{t('landing.hero.dataEncrypted')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  <CheckCircle2 className="w-4 h-4 text-success" />
                   <span className="font-medium">{t('landing.hero.supportIncluded')}</span>
                 </div>
               </div>
@@ -324,58 +324,58 @@ function HeroSection() {
               <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-hover rounded-2xl blur-2xl opacity-20 scale-105" />
               
               {/* Dashboard mockup */}
-              <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+              <div className="relative bg-card rounded-2xl shadow-2xl border border-border overflow-hidden">
                 {/* Browser-like header */}
-                <div className="bg-gray-100 px-4 py-3 flex items-center gap-2 border-b border-gray-200">
+                <div className="bg-muted px-4 py-3 flex items-center gap-2 border-b border-border">
                   <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-400" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                    <div className="w-3 h-3 rounded-full bg-green-400" />
+                    <div className="w-3 h-3 rounded-full bg-destructive/60" />
+                    <div className="w-3 h-3 rounded-full bg-warning" />
+                    <div className="w-3 h-3 rounded-full bg-success" />
                   </div>
                   <div className="flex-1 flex justify-center">
-                    <div className="bg-white rounded-md px-4 py-1 text-xs text-gray-500 border border-gray-200">
+                    <div className="bg-card rounded-md px-4 py-1 text-xs text-muted-foreground border border-border">
                       app.terapp-ia.com
                     </div>
                   </div>
                 </div>
                 
                 {/* Dashboard content */}
-                <div className="p-4 bg-gray-50">
+                <div className="p-4 bg-muted/50">
                   {/* Stats row */}
                   <div className="grid grid-cols-3 gap-3 mb-4">
-                    <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                      <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
+                    <div className="bg-card rounded-lg p-3 shadow-sm border border-border/50">
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
                         <DollarSign className="w-3 h-3" />
                         <span>{t('landing.hero.preview.income', 'Ingresos')}</span>
                       </div>
-                      <div className="text-lg font-bold text-gray-900">$485.000</div>
-                      <div className="text-xs text-emerald-500 flex items-center gap-1">
+                      <div className="text-lg font-bold text-foreground">$485.000</div>
+                      <div className="text-xs text-success flex items-center gap-1">
                         <TrendingUp className="w-3 h-3" />
                         +12%
                       </div>
                     </div>
-                    <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                      <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
+                    <div className="bg-card rounded-lg p-3 shadow-sm border border-border/50">
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
                         <Calendar className="w-3 h-3" />
                         <span>{t('landing.hero.preview.sessions', 'Sesiones')}</span>
                       </div>
-                      <div className="text-lg font-bold text-gray-900">42</div>
-                      <div className="text-xs text-gray-400">{t('landing.hero.preview.thisMonth', 'este mes')}</div>
+                      <div className="text-lg font-bold text-foreground">42</div>
+                      <div className="text-xs text-muted-foreground">{t('landing.hero.preview.thisMonth', 'este mes')}</div>
                     </div>
-                    <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                      <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
+                    <div className="bg-card rounded-lg p-3 shadow-sm border border-border/50">
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
                         <Users className="w-3 h-3" />
                         <span>{t('landing.hero.preview.patients', 'Pacientes')}</span>
                       </div>
-                      <div className="text-lg font-bold text-gray-900">18</div>
-                      <div className="text-xs text-gray-400">{t('landing.hero.preview.active', 'activos')}</div>
+                      <div className="text-lg font-bold text-foreground">18</div>
+                      <div className="text-xs text-muted-foreground">{t('landing.hero.preview.active', 'activos')}</div>
                     </div>
                   </div>
                   
                   {/* Mini calendar preview */}
-                  <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-100 mb-3">
+                  <div className="bg-card rounded-lg p-3 shadow-sm border border-border/50 mb-3">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-medium text-gray-700">{t('landing.hero.preview.todayAgenda', 'Agenda de hoy')}</span>
+                      <span className="text-sm font-medium text-foreground">{t('landing.hero.preview.todayAgenda', 'Agenda de hoy')}</span>
                       <span className="text-xs text-primary font-medium">5 {t('landing.hero.preview.appointments', 'turnos')}</span>
                     </div>
                     <div className="space-y-2">
@@ -385,19 +385,19 @@ function HeroSection() {
                         { time: '14:00', name: 'Ana Martínez', color: 'emerald' },
                       ].map((apt, i) => (
                         <div key={i} className="flex items-center gap-3 py-1.5">
-                          <span className="text-xs text-gray-500 w-10">{apt.time}</span>
+                          <span className="text-xs text-muted-foreground w-10">{apt.time}</span>
                           <div className={`w-1 h-6 rounded-full bg-${apt.color}-500`} />
-                          <span className="text-sm text-gray-700">{apt.name}</span>
+                          <span className="text-sm text-foreground">{apt.name}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                   
                   {/* Payment reminder */}
-                  <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                  <div className="bg-warning/10 rounded-lg p-3 border border-warning/30">
                     <div className="flex items-center gap-2">
-                      <Bell className="w-4 h-4 text-amber-600" />
-                      <span className="text-xs text-amber-800">
+                      <Bell className="w-4 h-4 text-warning" />
+                      <span className="text-xs text-warning">
                         {t('landing.hero.preview.pendingPayment', '2 cobros pendientes por $24.000')}
                       </span>
                     </div>
@@ -469,9 +469,9 @@ function FeaturesSection() {
   
   const colorClasses = {
     indigo: 'bg-primary/15 text-primary dark:text-primary',
-    emerald: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+    emerald: 'bg-success/15 text-success',
     purple: 'bg-primary-light/15 text-primary dark:text-primary',
-    blue: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
+    blue: 'bg-info/15 text-info',
   };
   
   return (
@@ -524,7 +524,7 @@ function AnalyticsSection() {
   ];
   
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[#1A0A33] to-[#2D0051] text-white">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-deep to-primary text-white">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Text Content */}
@@ -567,7 +567,7 @@ function AnalyticsSection() {
                     {t('landing.analytics.stats.monthlyIncome')}
                   </div>
                   <div className="text-2xl font-bold text-white">{mockStats.ingresosMes}</div>
-                  <div className="text-xs text-emerald-400 flex items-center gap-1 mt-1">
+                  <div className="text-xs text-success flex items-center gap-1 mt-1">
                     <TrendingUp className="w-3 h-3" />
                     {t('landing.analytics.stats.vsLastMonth')}
                   </div>
@@ -592,7 +592,7 @@ function AnalyticsSection() {
                     <CheckCircle2 className="w-4 h-4" />
                     {t('landing.analytics.stats.collectionRate')}
                   </div>
-                  <div className="text-2xl font-bold text-emerald-400">{mockStats.tasaCobro}</div>
+                  <div className="text-2xl font-bold text-success">{mockStats.tasaCobro}</div>
                 </div>
               </div>
               
@@ -654,9 +654,9 @@ function RemindersSection() {
   ];
   
   const colorClasses = {
-    green: 'bg-green-500/15 text-green-600 dark:text-green-400',
-    amber: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
-    emerald: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+    green: 'bg-success/15 text-success',
+    amber: 'bg-warning/15 text-warning',
+    emerald: 'bg-success/15 text-success',
   };
   
   return (
@@ -695,7 +695,7 @@ function RemindersSection() {
           {/* Text Content */}
           <AnimatedSection animation="slide-up" duration={500} className="order-1 lg:order-2">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/15 text-amber-700 dark:text-amber-300 rounded-full text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-warning/15 text-warning rounded-full text-sm font-medium mb-6">
                 <Bell className="w-4 h-4" />
                 {t('landing.reminders.badge')}
               </div>
@@ -932,7 +932,7 @@ function SocialProofSection() {
                 <CardContent className="p-6">
                   <div className="flex gap-1 mb-4">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                      <Star key={i} className="w-4 h-4 fill-warning text-warning" />
                     ))}
                   </div>
                   <blockquote className="text-muted-foreground mb-6 leading-relaxed">
@@ -990,9 +990,9 @@ function WhyTerappIASection() {
       highlight: 'bg-primary',
     },
     emerald: {
-      bg: 'bg-emerald-500/15',
-      text: 'text-emerald-600 dark:text-emerald-400',
-      highlight: 'bg-emerald-500',
+      bg: 'bg-success/15',
+      text: 'text-success',
+      highlight: 'bg-success',
     },
     purple: {
       bg: 'bg-primary-light/15',
@@ -1000,9 +1000,9 @@ function WhyTerappIASection() {
       highlight: 'bg-primary-light',
     },
     amber: {
-      bg: 'bg-amber-500/15',
-      text: 'text-amber-600 dark:text-amber-400',
-      highlight: 'bg-amber-500',
+      bg: 'bg-warning/15',
+      text: 'text-warning',
+      highlight: 'bg-warning',
     },
   };
   
@@ -1071,7 +1071,7 @@ function FAQSection() {
       <div className="max-w-3xl mx-auto">
         <AnimatedSection animation="slide-up" duration={500}>
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-success/15 text-success rounded-full text-sm font-medium mb-6">
               <MessageCircle className="w-4 h-4" />
               {t('landing.faq.badge')}
             </div>
@@ -1151,7 +1151,7 @@ function PricingCard({
           <div className={`mx-auto rounded-xl flex items-center justify-center ${compactMobile ? 'w-10 h-10 mb-3' : 'w-12 h-12 mb-4'} ${
             plan.color === 'indigo' ? 'bg-primary/15 text-primary dark:text-primary' :
             plan.color === 'purple' ? 'bg-primary-light/15 text-primary dark:text-primary' :
-            'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+            'bg-warning/15 text-warning'
           }`}>
             <plan.icon className={compactMobile ? 'w-5 h-5' : 'w-6 h-6'} />
           </div>
@@ -1166,8 +1166,8 @@ function PricingCard({
           <ul className={`${compactMobile ? 'space-y-2.5 mb-4' : 'space-y-3 mb-6'}`}>
             {visibleFeatures.map((featureKey, i) => (
               <li key={i} className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-green-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
+                <div className="w-5 h-5 rounded-full bg-success/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-success" />
                 </div>
                 <span className="text-muted-foreground text-sm">{t(featureKey)}</span>
               </li>
@@ -1186,7 +1186,7 @@ function PricingCard({
           <Button
             className={`w-full py-6 ${
               plan.popular
-                ? '!bg-gradient-to-r !from-[#2D0051] !to-[#3D1A6E] hover:!from-[#3D1A6E] hover:!to-[#1A0A33] text-white'
+                ? '!bg-gradient-to-r !from-primary !to-primary-hover hover:!from-primary-hover hover:!to-primary-deep text-white'
                 : 'bg-muted hover:bg-muted/80 text-foreground'
             }`}
           >
@@ -1319,11 +1319,11 @@ function PricingSection() {
               {t('landing.pricing.trustBadges.encryption')}
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-green-500" />
+              <CheckCircle2 className="w-4 h-4 text-success" />
               {t('landing.pricing.trustBadges.cancelAnytime')}
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-500" />
+              <Clock className="w-4 h-4 text-warning" />
               {t('landing.pricing.trustBadges.freeTrial')}
             </div>
           </div>
@@ -1337,7 +1337,7 @@ function CTASection() {
   const { t } = useTranslation();
   
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[#2D0051] to-[#1A0A33]">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary to-primary-deep">
       <div className="max-w-4xl mx-auto text-center">
         <AnimatedSection animation="slide-up" duration={500}>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
@@ -1388,22 +1388,22 @@ function Footer() {
   ];
   
   return (
-    <footer id="contact" className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-900 text-gray-400">
+    <footer id="contact" className="py-12 px-4 sm:px-6 lg:px-8 bg-primary-deep text-muted-foreground">
       <div className="max-w-7xl mx-auto">
         {/* Main footer content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-gray-800">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-border/20">
           {/* Brand section */}
           <div className="flex flex-col items-center md:items-start gap-4">
             <button 
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-[#2D0051] to-[#3D1A6E] rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-hover rounded-lg flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <span className="text-lg font-bold text-white">{t('landing.brand')}</span>
             </button>
-            <p className="text-sm text-gray-500 text-center md:text-left max-w-xs">
+            <p className="text-sm text-muted-foreground text-center md:text-left max-w-xs">
               {t('landing.footer.tagline')}
             </p>
           </div>
@@ -1456,14 +1456,14 @@ function Footer() {
         {/* Copyright */}
         <div className="pt-8 text-center text-sm">
           © {currentYear} {t('landing.brand')}. {t('landing.footer.rights')}
-          <span className="mx-2 text-gray-600">•</span>
+          <span className="mx-2 text-muted-foreground/50">•</span>
           <a
             href="/privacy-policy"
             className="text-primary hover:text-primary-foreground/60 transition-colors"
           >
             {t('landing.footer.privacyPolicy')}
           </a>
-          <span className="mx-2 text-gray-600">•</span>
+          <span className="mx-2 text-muted-foreground/50">•</span>
           <a
             href="/terms-of-service"
             className="text-primary hover:text-primary-foreground/60 transition-colors"
