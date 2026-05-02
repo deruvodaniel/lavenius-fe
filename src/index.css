@@ -9,132 +9,132 @@ html {
 
 @layer base {
   :root {
-    /* ── Base surfaces — warm sand canvas ─────────────────────────── */
-    --background: #FAF6F0;
-    --foreground: #2A211B;
+    /* ── Base surfaces — warm linen canvas ────────────────────────── */
+    --background: #F4F2EC;            /* warm linen, green undertone */
+    --foreground: #1C2A20;            /* deep forest, near-black */
 
     /* Card */
-    --card: #FFFFFF;
-    --card-foreground: #2A211B;
+    --card: #FDFCF8;
+    --card-foreground: #1C2A20;
 
     /* Popover */
-    --popover: #FFFFFF;
-    --popover-foreground: #2A211B;
+    --popover: #FDFCF8;
+    --popover-foreground: #1C2A20;
 
-    /* Primary — clay/terracotta */
-    --primary: #B8553A;
-    --primary-foreground: #FFFFFF;
+    /* Primary — deep sage forest */
+    --primary: #3D5C4A;
+    --primary-foreground: #F4F2EC;
 
-    /* Secondary — warm linen */
-    --secondary: #EFE7DA;
-    --secondary-foreground: #2A211B;
+    /* Secondary — soft sage surface */
+    --secondary: #EBF0ED;
+    --secondary-foreground: #1C2A20;
 
     /* Muted */
-    --muted: #F1EADD;
-    --muted-foreground: #6B5D52;
+    --muted: #EBF0ED;
+    --muted-foreground: #496459;      /* muted forest, 5.1:1 on bg */
 
-    /* Accent — olive/sage */
-    --accent: #5C6B3A;
-    --accent-foreground: #FFFFFF;
+    /* Accent — warm amber/honey, autumnal */
+    --accent: #B07C3A;
+    --accent-foreground: #FDFCF8;
 
-    /* Destructive — dusty rose-red */
-    --destructive: #B23B3B;
+    /* Destructive */
+    --destructive: #A84949;
     --destructive-foreground: #FFFFFF;
 
     /* Border, Input, Ring */
-    --border: #E5DCCC;
-    --input: #E5DCCC;
-    --input-background: #FFFFFF;
-    --ring: #B8553A;
-    --switch-background: #D9CFBE;
+    --border: #D4E0D8;
+    --input: #D4E0D8;
+    --input-background: #FDFCF8;
+    --ring: #3D5C4A;
+    --switch-background: #B8CCB8;
 
     /* Primary variants — surfaces, hover, gradients */
-    --primary-light: #FBEEE7;
-    --primary-muted: #F4D9CB;
-    --primary-hover: #9E4530;
-    --primary-deep: #6F2E1F;
-    --accent-light: #E8EBD8;
+    --primary-light: #E6EFEA;
+    --primary-muted: #CFDFD5;
+    --primary-hover: #2D4537;
+    --primary-deep: #1D2E24;
+    --accent-light: #F5EBD6;
 
-    /* Radius */
-    --radius: 0.75rem;
+    /* Radius — 20px, very rounded */
+    --radius: 1.25rem;
 
-    /* Semantic status — tuned warm */
-    --success: #4F7A3A;
+    /* Semantic status */
+    --success: #2D6E45;
     --success-foreground: #FFFFFF;
-    --warning: #B86A1A;
+    --warning: #B07C3A;
     --warning-foreground: #FFFFFF;
-    --info: #2F6E7A;
+    --info: #2C5F78;
     --info-foreground: #FFFFFF;
 
-    /* Chart colors — 5 categóricos cohesivos con la marca */
-    --chart-1: #B8553A;  /* clay (primary) */
-    --chart-2: #5C6B3A;  /* olive (accent) */
-    --chart-3: #2F6E7A;  /* dusty teal */
-    --chart-4: #C99A2E;  /* mustard */
-    --chart-5: #7E4F8C;  /* plum */
+    /* Chart — forest / amber / teal / sage / warm-brown */
+    --chart-1: #3D5C4A;
+    --chart-2: #B07C3A;
+    --chart-3: #2C5F78;
+    --chart-4: #7AAA88;
+    --chart-5: #8C6A3A;
   }
 
   .dark {
-    /* ── Base surfaces — warm coffee-black ────────────────────────── */
-    --background: #1B1714;
-    --foreground: #F0E8DC;
+    /* ── Base surfaces — deep forest, no blue-black ────────────────── */
+    --background: #141D18;            /* deep forest */
+    --foreground: #E2EDE6;            /* light sage-cream */
 
     /* Card */
-    --card: #241E1A;
-    --card-foreground: #F0E8DC;
+    --card: #1B2920;
+    --card-foreground: #E2EDE6;
 
     /* Popover */
-    --popover: #2A231E;
-    --popover-foreground: #F0E8DC;
+    --popover: #1F3028;
+    --popover-foreground: #E2EDE6;
 
-    /* Primary — bright clay for dark surfaces */
-    --primary: #E08363;
-    --primary-foreground: #2A1108;
+    /* Primary — bright sage green, readable on dark */
+    --primary: #72AA85;
+    --primary-foreground: #0E1A12;
 
     /* Secondary */
-    --secondary: #2E2620;
-    --secondary-foreground: #F0E8DC;
+    --secondary: #1B2920;
+    --secondary-foreground: #E2EDE6;
 
     /* Muted */
-    --muted: #2E2620;
-    --muted-foreground: #A89887;
+    --muted: #1B2920;
+    --muted-foreground: #7AAA88;
 
-    /* Accent — bright sage */
-    --accent: #A4B57A;
-    --accent-foreground: #1F2410;
+    /* Accent — warm amber, brighter for dark */
+    --accent: #D4A24E;
+    --accent-foreground: #1A1108;
 
     /* Destructive */
-    --destructive: #E07070;
-    --destructive-foreground: #2A0E0E;
+    --destructive: #D07A72;
+    --destructive-foreground: #1C0C0C;
 
     /* Border, Input, Ring */
-    --border: #3A2F26;
-    --input: #3A2F26;
-    --input-background: #2E2620;
-    --ring: #E08363;
-    --switch-background: #4A3D32;
+    --border: #243A2C;
+    --input: #243A2C;
+    --input-background: #1B2920;
+    --ring: #72AA85;
+    --switch-background: #2D4537;
 
     /* Primary variants — dark mode */
-    --primary-light: #2E2018;
-    --primary-muted: #3D2A20;
-    --primary-hover: #ED967A;
-    --primary-deep: #B8553A;
-    --accent-light: #2A3220;
+    --primary-light: #1B2920;
+    --primary-muted: #243A2C;
+    --primary-hover: #88BE99;
+    --primary-deep: #3D5C4A;
+    --accent-light: #261E0E;
 
-    /* Semantic status — dark mode tuned */
-    --success: #8FB877;
-    --success-foreground: #16240E;
-    --warning: #E4A455;
-    --warning-foreground: #2E1A06;
-    --info: #6FAEB8;
-    --info-foreground: #0E2429;
+    /* Semantic status — dark mode */
+    --success: #5CBF7E;
+    --success-foreground: #0A1E10;
+    --warning: #D4A24E;
+    --warning-foreground: #1A1108;
+    --info: #5BA8C8;
+    --info-foreground: #0C1D26;
 
-    /* Chart colors — brighter, retained categorical spread */
-    --chart-1: #E08363;  /* clay */
-    --chart-2: #A4B57A;  /* sage */
-    --chart-3: #6FAEB8;  /* teal */
-    --chart-4: #E4B968;  /* mustard */
-    --chart-5: #B58AC2;  /* plum */
+    /* Chart — brighter, same categorical spread */
+    --chart-1: #72AA85;
+    --chart-2: #D4A24E;
+    --chart-3: #5BA8C8;
+    --chart-4: #A0CCA8;
+    --chart-5: #C8A872;
   }
 
   /* Apply theme colors globally */
@@ -153,12 +153,16 @@ html {
 
 body {
   margin: 0;
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  font-family: 'Jost', ui-sans-serif, system-ui, -apple-system, sans-serif;
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3 {
+  font-family: 'Lora', Georgia, 'Times New Roman', serif;
+  font-feature-settings: 'kern', 'liga', 'onum';
+  letter-spacing: -0.01em;
 }
 
 /* ==========================================================================
