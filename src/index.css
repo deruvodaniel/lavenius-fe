@@ -58,6 +58,14 @@ html {
     /* Radius */
     --radius: 0.5rem;
 
+    /* Semantic status colors */
+    --success: #16A34A;
+    --success-foreground: #ffffff;
+    --warning: #D97706;
+    --warning-foreground: #ffffff;
+    --info: #2563EB;
+    --info-foreground: #ffffff;
+
     /* Chart colors */
     --chart-1: #2D0051;
     --chart-2: #D3E141;
@@ -112,6 +120,14 @@ html {
     --primary-hover: #D4CCFF;
     --primary-deep: #1A1228;
     --accent-light: #2A2B0E;
+
+    /* Semantic status colors — dark mode */
+    --success: #4ADE80;
+    --success-foreground: #052E16;
+    --warning: #FBBF24;
+    --warning-foreground: #422006;
+    --info: #60A5FA;
+    --info-foreground: #1E3A5F;
 
     /* Chart colors — brighter for dark mode */
     --chart-1: #C5BAFF;
