@@ -9,132 +9,132 @@ html {
 
 @layer base {
   :root {
-    /* Background & Foreground */
-    --background: #F9F7EB;
-    --foreground: #2D0051;
+    /* ── Base surfaces — warm sand canvas ─────────────────────────── */
+    --background: #FAF6F0;
+    --foreground: #2A211B;
 
     /* Card */
-    --card: #ffffff;
-    --card-foreground: #2D0051;
+    --card: #FFFFFF;
+    --card-foreground: #2A211B;
 
     /* Popover */
-    --popover: #EAE4F4;
-    --popover-foreground: #2D0051;
+    --popover: #FFFFFF;
+    --popover-foreground: #2A211B;
 
-    /* Primary — brand purple */
-    --primary: #2D0051;
-    --primary-foreground: #ffffff;
+    /* Primary — clay/terracotta */
+    --primary: #B8553A;
+    --primary-foreground: #FFFFFF;
 
-    /* Secondary */
-    --secondary: #EAE4F4;
-    --secondary-foreground: #2D0051;
+    /* Secondary — warm linen */
+    --secondary: #EFE7DA;
+    --secondary-foreground: #2A211B;
 
     /* Muted */
-    --muted: #EAE4F4;
-    --muted-foreground: #9070AA;
+    --muted: #F1EADD;
+    --muted-foreground: #6B5D52;
 
-    /* Accent — lime */
-    --accent: #D3E141;
-    --accent-foreground: #3D4010;
+    /* Accent — olive/sage */
+    --accent: #5C6B3A;
+    --accent-foreground: #FFFFFF;
 
-    /* Destructive */
-    --destructive: #B94A6A;
-    --destructive-foreground: #FFF0F5;
+    /* Destructive — dusty rose-red */
+    --destructive: #B23B3B;
+    --destructive-foreground: #FFFFFF;
 
     /* Border, Input, Ring */
-    --border: #DDD5EE;
-    --input: #DDD5EE;
-    --input-background: #EAE4F4;
-    --ring: #2D0051;
-    --switch-background: #C5BAFF;
+    --border: #E5DCCC;
+    --input: #E5DCCC;
+    --input-background: #FFFFFF;
+    --ring: #B8553A;
+    --switch-background: #D9CFBE;
 
-    /* Primary variants — intermediate shades for surfaces, hover, sidebar */
-    --primary-light: #F1ECF8;
-    --primary-muted: #EAE4F4;
-    --primary-hover: #3D1A6E;
-    --primary-deep: #1A0A33;
-    --accent-light: #F4F7D6;
+    /* Primary variants — surfaces, hover, gradients */
+    --primary-light: #FBEEE7;
+    --primary-muted: #F4D9CB;
+    --primary-hover: #9E4530;
+    --primary-deep: #6F2E1F;
+    --accent-light: #E8EBD8;
 
     /* Radius */
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    /* Semantic status colors */
-    --success: #16A34A;
-    --success-foreground: #ffffff;
-    --warning: #D97706;
-    --warning-foreground: #ffffff;
-    --info: #2563EB;
-    --info-foreground: #ffffff;
+    /* Semantic status — tuned warm */
+    --success: #4F7A3A;
+    --success-foreground: #FFFFFF;
+    --warning: #B86A1A;
+    --warning-foreground: #FFFFFF;
+    --info: #2F6E7A;
+    --info-foreground: #FFFFFF;
 
-    /* Chart colors */
-    --chart-1: #2D0051;
-    --chart-2: #D3E141;
-    --chart-3: #C5BAFF;
-    --chart-4: #8B5CF6;
-    --chart-5: #B94A6A;
+    /* Chart colors — 5 categóricos cohesivos con la marca */
+    --chart-1: #B8553A;  /* clay (primary) */
+    --chart-2: #5C6B3A;  /* olive (accent) */
+    --chart-3: #2F6E7A;  /* dusty teal */
+    --chart-4: #C99A2E;  /* mustard */
+    --chart-5: #7E4F8C;  /* plum */
   }
 
   .dark {
-    /* Background & Foreground */
-    --background: #1A1228;
-    --foreground: #F1ECF8;
+    /* ── Base surfaces — warm coffee-black ────────────────────────── */
+    --background: #1B1714;
+    --foreground: #F0E8DC;
 
     /* Card */
-    --card: #261840;
-    --card-foreground: #F1ECF8;
+    --card: #241E1A;
+    --card-foreground: #F0E8DC;
 
     /* Popover */
-    --popover: #201830;
-    --popover-foreground: #F1ECF8;
+    --popover: #2A231E;
+    --popover-foreground: #F0E8DC;
 
-    /* Primary — lavender for dark mode */
-    --primary: #C5BAFF;
-    --primary-foreground: #2D0051;
+    /* Primary — bright clay for dark surfaces */
+    --primary: #E08363;
+    --primary-foreground: #2A1108;
 
     /* Secondary */
-    --secondary: #201830;
-    --secondary-foreground: #F1ECF8;
+    --secondary: #2E2620;
+    --secondary-foreground: #F0E8DC;
 
     /* Muted */
-    --muted: #201830;
-    --muted-foreground: #7A5C96;
+    --muted: #2E2620;
+    --muted-foreground: #A89887;
 
-    /* Accent — lime */
-    --accent: #D3E141;
-    --accent-foreground: #3D4010;
+    /* Accent — bright sage */
+    --accent: #A4B57A;
+    --accent-foreground: #1F2410;
 
     /* Destructive */
-    --destructive: #E07090;
-    --destructive-foreground: #FFF0F5;
+    --destructive: #E07070;
+    --destructive-foreground: #2A0E0E;
 
     /* Border, Input, Ring */
-    --border: #3A2858;
-    --input: #3A2858;
-    --input-background: #2E2044;
-    --ring: #C5BAFF;
-    --switch-background: #3A2858;
+    --border: #3A2F26;
+    --input: #3A2F26;
+    --input-background: #2E2620;
+    --ring: #E08363;
+    --switch-background: #4A3D32;
 
     /* Primary variants — dark mode */
-    --primary-light: #2E2044;
-    --primary-muted: #3A2858;
-    --primary-hover: #D4CCFF;
-    --primary-deep: #1A1228;
-    --accent-light: #2A2B0E;
+    --primary-light: #2E2018;
+    --primary-muted: #3D2A20;
+    --primary-hover: #ED967A;
+    --primary-deep: #B8553A;
+    --accent-light: #2A3220;
 
-    /* Semantic status colors — dark mode */
-    --success: #4ADE80;
-    --success-foreground: #052E16;
-    --warning: #FBBF24;
-    --warning-foreground: #422006;
-    --info: #60A5FA;
-    --info-foreground: #1E3A5F;
+    /* Semantic status — dark mode tuned */
+    --success: #8FB877;
+    --success-foreground: #16240E;
+    --warning: #E4A455;
+    --warning-foreground: #2E1A06;
+    --info: #6FAEB8;
+    --info-foreground: #0E2429;
 
-    /* Chart colors — brighter for dark mode */
-    --chart-1: #C5BAFF;
-    --chart-2: #D3E141;
-    --chart-3: #8B5CF6;
-    --chart-4: #F1ECF8;
-    --chart-5: #E07090;
+    /* Chart colors — brighter, retained categorical spread */
+    --chart-1: #E08363;  /* clay */
+    --chart-2: #A4B57A;  /* sage */
+    --chart-3: #6FAEB8;  /* teal */
+    --chart-4: #E4B968;  /* mustard */
+    --chart-5: #B58AC2;  /* plum */
   }
 
   /* Apply theme colors globally */
@@ -153,9 +153,10 @@ html {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
