@@ -74,15 +74,17 @@ export default {
       },
       fontFamily: {
         sans: [
-          "Inter",
+          "Jost",
           "ui-sans-serif",
           "system-ui",
           "-apple-system",
-          "Segoe UI",
-          "Roboto",
-          "Helvetica Neue",
-          "Arial",
           "sans-serif",
+        ],
+        serif: [
+          "Lora",
+          "Georgia",
+          "Times New Roman",
+          "serif",
         ],
       },
       keyframes: {
