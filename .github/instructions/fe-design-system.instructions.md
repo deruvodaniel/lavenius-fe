@@ -32,7 +32,7 @@ Definidos en `src/index.css` bajo `:root` (light) y `.dark`.
 | `bg-secondary` | `--secondary` | Acciones secundarias |
 | `bg-muted` | `--muted` | Fondos de inputs, zonas inactivas |
 | `text-muted-foreground` | `--muted-foreground` | Texto secundario, placeholders |
-| `bg-accent` | `--accent` | Accent lima (highlights, badges) |
+| `bg-accent` | `--accent` | Accent oliva/sage (highlights, badges) |
 | `text-accent-foreground` | `--accent-foreground` | Texto sobre accent |
 | `bg-accent-light` | `--accent-light` | Versión suave del accent |
 | `border-border` | `--border` | Bordes, separadores |
@@ -42,16 +42,19 @@ Definidos en `src/index.css` bajo `:root` (light) y `.dark`.
 
 ### Valores actuales (referencia — cambiar SOLO en `index.css`)
 
+Paleta **"Clay & Sage"** — humanista terrosa, profesional y cálida.
+
 **Light mode:**
-- Primary: `#2D0051` (morado profundo)
-- Accent: `#D3E141` (lima)
-- Background: `#F9F7EB`
-- Foreground: `#2D0051`
+- Primary: `#B8553A` (clay/terracotta)
+- Accent: `#5C6B3A` (olive/sage)
+- Background: `#FAF6F0` (warm sand)
+- Foreground: `#2A211B` (warm near-black)
 
 **Dark mode:**
-- Primary: `#C5BAFF` (lavanda)
-- Background: `#1A1228`
-- Foreground: `#F1ECF8`
+- Primary: `#E08363` (clay brillante)
+- Accent: `#A4B57A` (sage brillante)
+- Background: `#1B1714` (warm coffee-black)
+- Foreground: `#F0E8DC` (warm cream)
 
 ---
 
@@ -127,10 +130,13 @@ Para cambiar **tipografía global**, modificar la propiedad `font-family` en el 
 
 ## Tipografía
 
-- Fuente base: system-ui stack (definida en `body` de `index.css`).
-- Para cambiar la fuente global: modificar `font-family` en `body {}` en `index.css`.
+- **Fuente base: Inter** (Google Fonts, cargada via `<link>` en `index.html`).
+- Stack completo: `'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif` (fallback nativo si la fuente no carga).
+- `font-variant-numeric: tabular-nums` aplicado globalmente — ideal para tablas, horarios, importes.
+- `font-feature-settings: 'cv11', 'ss01', 'ss03'` — variantes legibles de `1`, `a` y `g`.
+- Pesos disponibles: 400 (regular), 500 (medium), 600 (semibold), 700 (bold), 800 (extrabold).
 - Tamaños via utilidades Tailwind (`text-sm`, `text-base`, `text-lg`, etc.).
-- Pesos: `font-medium`, `font-semibold`, `font-bold`.
+- Para cambiar la fuente global: modificar `<link>` en `index.html` + `font-family` en `body` de `index.css` + `fontFamily.sans` en `tailwind.config.js`.
 
 ---
 
@@ -138,9 +144,9 @@ Para cambiar **tipografía global**, modificar la propiedad `font-family` en el 
 
 | Tailwind | Variable | Valor base |
 |---|---|---|
-| `rounded-lg` | `--radius` | `0.5rem` |
-| `rounded-md` | `calc(--radius - 2px)` | `0.375rem` |
-| `rounded-sm` | `calc(--radius - 4px)` | `0.25rem` |
+| `rounded-lg` | `--radius` | `0.75rem` (12px) |
+| `rounded-md` | `calc(--radius - 2px)` | `0.625rem` (10px) |
+| `rounded-sm` | `calc(--radius - 4px)` | `0.5rem` (8px) |
 
 Para cambiar el radio global: modificar `--radius` en `src/index.css`.
 
