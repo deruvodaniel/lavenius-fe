@@ -125,7 +125,7 @@ function NavBar() {
   ];
   
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-card/90 backdrop-blur-md border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[rgba(253,252,248,0.8)] dark:bg-[rgba(20,29,24,0.95)] backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -467,6 +467,83 @@ function PurposeSection() {
               {t('landing.purpose.privacyLink')}
             </a>
           </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PatientBookingSection() {
+  const { t } = useTranslation();
+
+  return (
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-background via-indigo-950/10 to-purple-950/10">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <AnimatedSection animation="slide-up" duration={500}>
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/15 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium mb-6">
+                <Users className="w-4 h-4" />
+                {t('landing.patientBooking.badge')}
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
+                {t('landing.patientBooking.title')}
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                {t('landing.patientBooking.description')}
+              </p>
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center mt-0.5">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <p className="text-foreground">{t('landing.patientBooking.steps.patient')}</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center mt-0.5">
+                    <CheckCircle2 className="w-4 h-4" />
+                  </div>
+                  <p className="text-foreground">{t('landing.patientBooking.steps.therapist')}</p>
+                </div>
+              </div>
+            </div>
+          </AnimatedSection>
+
+          <AnimatedSection animation="scale" delay={150} duration={600}>
+            <div className="bg-card/90 rounded-2xl border border-border shadow-2xl overflow-hidden">
+              <div className="p-4 border-b border-border bg-muted/40">
+                <p className="text-sm font-semibold text-foreground">{t('landing.patientBooking.mock.publicBookingTitle')}</p>
+                <p className="text-xs text-muted-foreground">{t('landing.patientBooking.mock.publicBookingSubtitle')}</p>
+              </div>
+
+              <div className="p-4 space-y-4">
+                <div className="rounded-xl border border-border bg-muted/30 p-3">
+                  <p className="text-xs text-muted-foreground mb-2">{t('landing.patientBooking.mock.availableSlots')}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-2.5 py-1 rounded-md text-xs bg-indigo-600 text-white">10:30 - 11:15</span>
+                    <span className="px-2.5 py-1 rounded-md text-xs bg-background border border-border text-foreground">11:15 - 12:00</span>
+                    <span className="px-2.5 py-1 rounded-md text-xs bg-background border border-border text-foreground">12:00 - 12:45</span>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
+                  <p className="text-xs text-amber-300 mb-1">{t('landing.patientBooking.mock.pendingRequest')}</p>
+                  <p className="text-sm text-foreground">{t('landing.patientBooking.mock.pendingDescription')}</p>
+                </div>
+
+                <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
+                  <p className="text-xs text-emerald-300 mb-1">{t('landing.patientBooking.mock.agendaReview')}</p>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm text-foreground">{t('landing.patientBooking.mock.agendaDescription')}</p>
+                    <span className="px-2 py-1 rounded-md text-xs bg-emerald-600 text-white whitespace-nowrap">
+                      {t('landing.patientBooking.mock.approveAction')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </AnimatedSection>
         </div>
       </div>
     </section>
@@ -1424,10 +1501,10 @@ function Footer() {
   ];
   
   return (
-    <footer id="contact" className="py-12 px-4 sm:px-6 lg:px-8 bg-primary-deep text-muted-foreground">
+    <footer id="contact" className="py-12 px-4 sm:px-6 lg:px-8 bg-primary-deep text-white/70">
       <div className="max-w-7xl mx-auto">
         {/* Main footer content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-border/20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-white/10">
           {/* Brand section */}
           <div className="flex flex-col items-center md:items-start gap-4">
             <button 
@@ -1439,7 +1516,7 @@ function Footer() {
               </div>
               <span className="text-lg font-bold text-white">{t('landing.brand')}</span>
             </button>
-            <p className="text-sm text-muted-foreground text-center md:text-left max-w-xs">
+            <p className="text-sm text-white/60 text-center md:text-left max-w-xs">
               {t('landing.footer.tagline')}
             </p>
           </div>
@@ -1492,17 +1569,17 @@ function Footer() {
         {/* Copyright */}
         <div className="pt-8 text-center text-sm">
           © {currentYear} {t('landing.brand')}. {t('landing.footer.rights')}
-          <span className="mx-2 text-muted-foreground/50">•</span>
+          <span className="mx-2 text-white/30">•</span>
           <a
             href="/privacy-policy"
-            className="text-primary hover:text-primary-foreground/60 transition-colors"
+            className="text-white/60 hover:text-white transition-colors"
           >
             {t('landing.footer.privacyPolicy')}
           </a>
-          <span className="mx-2 text-muted-foreground/50">•</span>
+          <span className="mx-2 text-white/30">•</span>
           <a
             href="/terms-of-service"
-            className="text-primary hover:text-primary-foreground/60 transition-colors"
+            className="text-white/60 hover:text-white transition-colors"
           >
             {t('landing.footer.termsOfService')}
           </a>
